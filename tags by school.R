@@ -40,37 +40,20 @@ data.matrix(m3) -> nonconsorts.by.school.m
 ## And, finally, make figures. 
 ## If remake_figs is true, new pdf files will be created; otherwise, they'll display on screen only.
 
-# All schools
-diss.count <- nrow(noexcludes)
-
-filename <- paste0("tags by all schools, N",diss.count," agnes.pdf")
-if(remake_figs) {pdf(file=filename)}
-	# bind the first heatmap to a variable, so we can be consistent about the order
-	ag <- heatmap(noex.by.school.m,hclustfun=function(d){agnes(d,method="ward")},scale="row",col=brewer.pal(9,"PuRd"),main="Method Tag Averages by School, all schools")
-	mtext("Each cell gives the likelihood that a given dissertation from the school in row Y is tagged with the method in column X.",side=1)
-if(remake_figs) {dev.off()}
-
-	# and some divisive clustering just to compare
-filename <- paste0("tags by all schools, N",diss.count," diana.pdf")
-if(remake_figs) {pdf(file=filename)}
-di <- heatmap(noex.by.school.m,hclustfun=function(d){diana(d,metric="ward")},scale="row",col=brewer.pal(9,"PuRd"),main="Method Tag Averages by School, all schools")
-mtext("Each cell gives the likelihood that a given dissertation from the school in row Y is tagged with the method in column X.",side=1)
-if(remake_figs) {dev.off()}
-
 # Consortium schools only
 consort.count <- nrow(consorts)
 
 filename <- paste0("tags by consortium schools, N",consort.count," agnes.pdf")
 if(remake_figs) {pdf(file=filename)}
 
-heatmap.fixedcols(consorts.by.school.m, myColInd=ag$colInd, hclustfun=function(d){agnes(d,method="ward")},scale="row",col=brewer.pal(9,"PuRd"),main="Method Tag Averages by School, consortium schools only")
+ag <- heatmap(consorts.by.school.m, hclustfun=function(d){agnes(d,method="ward")},scale="row",col=brewer.pal(9,"PuRd"),main="Method Tag Averages by School, consortium schools only")
 mtext("Each cell gives the likelihood that a given dissertation from the school in row Y is tagged with the method in column X.",side=1)
 if(remake_figs) {dev.off()}
 
 	# and, again, some divisive clustering just to compare
 filename <- paste0("tags by consortium schools, N",consort.count," diana.pdf")
 if(remake_figs) {pdf(file=filename)}
-heatmap.fixedcols(consorts.by.school.m, myColInd=ag$colInd, hclustfun=function(d){diana(d,metric="ward")}, scale="row", col=brewer.pal(9,"PuRd"), main="Method Tag Averages by School, consortium schools only")
+di <- heatmap(consorts.by.school.m, hclustfun=function(d){diana(d,metric="ward")}, scale="row", col=brewer.pal(9,"PuRd"), main="Method Tag Averages by School, consortium schools only")
 mtext("Each cell gives the likelihood that a given dissertation from the school in row Y is tagged with the method in column X.",side=1)
 if(remake_figs) {dev.off()}
 
@@ -86,9 +69,28 @@ if(remake_figs) {dev.off()}
 	# and, again, some divisive clustering just to compare
 filename <- paste0("tags by non-consortium schools, N",nonconsort.count," diana.pdf")
 if(remake_figs) {pdf(file=filename)}
-heatmap.fixedcols(nonconsorts.by.school.m,myColInd=ag$colInd, hclustfun=function(d){diana(d,metric="ward")}, scale="row", col=brewer.pal(9,"PuRd"), main="Method Tag Averages by School, non-consortium schools only")
+heatmap.fixedcols(nonconsorts.by.school.m,myColInd=di$colInd, hclustfun=function(d){diana(d,metric="ward")}, scale="row", col=brewer.pal(9,"PuRd"), main="Method Tag Averages by School, non-consortium schools only")
 mtext("Each cell gives the likelihood that a given dissertation from the school in row Y is tagged with the method in column X.",side=1)
 if(remake_figs) {dev.off()}
+
+
+# All schools
+diss.count <- nrow(noexcludes)
+
+filename <- paste0("tags by all schools, N",diss.count," agnes.pdf")
+if(remake_figs) {pdf(file=filename)}
+	# bind the first heatmap to a variable, so we can be consistent about the order
+	heatmap.fixedcols(noex.by.school.m, myColInd=ag$colInd, hclustfun=function(d){agnes(d,method="ward")},scale="row",col=brewer.pal(9,"PuRd"),main="Method Tag Averages by School, all schools")
+	mtext("Each cell gives the likelihood that a given dissertation from the school in row Y is tagged with the method in column X.",side=1)
+if(remake_figs) {dev.off()}
+
+	# and some divisive clustering just to compare
+filename <- paste0("tags by all schools, N",diss.count," diana.pdf")
+if(remake_figs) {pdf(file=filename)}
+heatmap.fixedcols(noex.by.school.m, myColInd=di$colInd, hclustfun=function(d){diana(d,metric="ward")},scale="row",col=brewer.pal(9,"PuRd"),main="Method Tag Averages by School, all schools")
+mtext("Each cell gives the likelihood that a given dissertation from the school in row Y is tagged with the method in column X.",side=1)
+if(remake_figs) {dev.off()}
+
 
 
 # remove interim variables
