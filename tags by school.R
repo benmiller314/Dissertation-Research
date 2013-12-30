@@ -67,11 +67,6 @@ heatmap.fixedcols(consorts.by.school.m, myColInd=ag$colInd, hclustfun=function(d
 mtext("Each cell gives the likelihood that a given dissertation from the school in row Y is tagged with the method in column X.",side=1)
 if(remake_figs) {dev.off()}
 
-# can I customize that?
-# consorts.by.school.s <- consorts.by.school.m[h1$rowInd,h1$colInd] 	# sort by similarity function in heatmap
-# head(consorts.by.school.s)
-# heatmap.ben(consorts.by.school.s)	# just meh
-
 	# and, again, some divisive clustering just to compare
 filename <- paste0("tags by consortium schools, N",consort.count," diana.pdf")
 if(remake_figs) {pdf(file=filename)}
