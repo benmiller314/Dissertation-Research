@@ -12,6 +12,7 @@ topnames <- lapply(topnames, FUN=function(x) substr(x,1,8))
 
 # prep some useful functions
 # source(file="function scratchpad.R")
+source(file="extract subjects.R")
 source(file="Factor-Bug fixing.R")
 source(file="heatmap_ben.R")
 source(file="method tag array.R")
