@@ -1,5 +1,6 @@
 
-# slightly modifies the heatmap function to allow for pre-set column order
+## slightly modifies the built-in heatmap function to allow for pre-set column order (lines 46-69)
+
 heatmap.fixedcols <- function (x, myColInd, Rowv = NULL, Colv = if (symm) "Rowv" else NULL, 
     distfun = dist, hclustfun = hclust, reorderfun = function(d, 
         w) reorder(d, w), add.expr, symm = FALSE, revC = identical(Colv, 

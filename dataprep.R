@@ -15,8 +15,9 @@ topnames <- lapply(topnames, FUN=function(x) substr(x,1,8))
 source(file="extract subjects.R")
 source(file="Factor-Bug fixing.R")
 source(file="heatmap_ben.R")
-source(file="method tag array.R")
 source(file="heatmap fixedcols.R")
+source(file="method tag array.R")
+
 
 ## now get the data 
 # The most recent file of dissertation metadata

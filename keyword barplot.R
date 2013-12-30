@@ -11,8 +11,8 @@
 	summary(kw.list, maxsum=6000) -> kw.table	
 	
 	# Put the list in descending order by frequency, and chop out the term they all share
-	sort(kw.table,decreasing=TRUE) -> kw.table
-	kw.table[2:length(kw.table)] -> kw.table
+	kw.table <- sort(kw.table,decreasing=TRUE)
+	kw.table <- kw.table[2:length(kw.table)]
 	
 	kw.count <- length(kw.table)
 	kw.mean <- mean(kw.table)
