@@ -1,17 +1,22 @@
-
-require(RColorBrewer)
-
 ## Plan of Attack
-
+#
 # for each school, determine a latitude and longitude (solved by geocode.R)
 # create a table with columns for school, lat, lng, each tagname sum, total disses
 # use map() to define a map area
 # use add.pie() to plot a point for each school, with colors set by RColorBrewer, z values set by tagname sums, and radius = sqrt of total disses
 
 
+## Set requirements
+require(doBy)
+require(RColorBrewer)
+
+
+
+
+
 ## Build the Table
 
-require(doBy)
+
 # sum each method type for all schools. NB: noexcludes created by dataprep.R
 tagsums.by.school <- summaryBy(Case+Crit+Cult+Disc+Ethn+Expt+Hist+Intv+Meta+Modl+Phil+Poet+Pract+Rhet+Surv+Othr~School,data=noexcludes, FUN=sum)
 filename <- paste0(dataloc, "tagsums by school.csv")

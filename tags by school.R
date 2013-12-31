@@ -6,6 +6,7 @@ if(!exists("noexcludes")) {
 	source(file="dataprep.R")
 }
 
+# If remake_figs is true, new pdf files will be created; otherwise, they'll display on screen only.
 if(!exists("remake_figs")) {
 	remake_figs <- FALSE
 }
@@ -38,7 +39,6 @@ data.matrix(m3) -> nonconsorts.by.school.m
 
 
 ## And, finally, make figures. 
-## If remake_figs is true, new pdf files will be created; otherwise, they'll display on screen only.
 
 # Consortium schools only
 consort.count <- nrow(consorts)
