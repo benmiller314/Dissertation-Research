@@ -3,7 +3,7 @@
 ################################
 ## Second set: tag as percentage of school total as radii, each tag separately
 ##
-filename <- paste("US map, percent case 2001-2010, N",diss.count,".pdf",collapse="")
+filename <- paste0(imageloc, "US map, percent case 2001-2010, N",diss.count,".pdf")
 pdf(filename)
 map("worldHires",c("usa","Canada","Mexico"), xlim=c(-135,-53), ylim=c(23,58), fill=FALSE)
 map("state", boundary = FALSE, col="gray",add=TRUE)
@@ -11,7 +11,7 @@ points(x=Lng[case],y=Lat[case],cex=sqrt(Case.sum/DissCount),col="gray10",pch=21,
 title("Clinical / Case Study dissertations \n as percentage of school total", sub=paste(casesum, "dissertations, 2001-2010"))
 dev.off()
 
-filename <- paste("US map, percent crit 2001-2010, N",diss.count,".pdf",collapse="")
+filename <- paste0(imageloc, "US map, percent crit 2001-2010, N",diss.count,".pdf")
 pdf(filename)
 map("worldHires",c("usa","Canada","Mexico"), xlim=c(-135,-53), ylim=c(23,58), fill=FALSE)
 map("state", boundary = FALSE, col="gray",add=TRUE)
@@ -19,7 +19,7 @@ points(x=Lng[crit],y=Lat[crit],cex=sqrt(Crit.sum/DissCount),col="gray10",pch=21,
 title("Critical / Hermeneutical dissertations \n as percentage of school total", sub=paste(critsum, "dissertations, 2001-2010"))
 dev.off()
 
-filename <- paste("US map, percent cult 2001-2010, N",diss.count,".pdf",collapse="")
+filename <- paste0(imageloc, "US map, percent cult 2001-2010, N",diss.count,".pdf")
 pdf(filename)
 map("worldHires",c("usa","Canada","Mexico"), xlim=c(-135,-53), ylim=c(23,58), fill=FALSE)
 map("state", boundary = FALSE, col="gray",add=TRUE)
@@ -27,7 +27,7 @@ points(x=Lng[cult],y=Lat[cult],cex=sqrt(Cult.sum/DissCount),col="gray10",pch=21,
 title("Cultural-Critical dissertations \n as percentage of school total", sub=paste(cultsum,"dissertations, 2001-2010"))
 dev.off()
 
-filename <- paste("US map, percent disc 2001-2010, N",diss.count,".pdf",collapse="")
+filename <- paste0(imageloc, "US map, percent disc 2001-2010, N",diss.count,".pdf")
 pdf(filename)
 map("worldHires",c("usa","Canada","Mexico"), xlim=c(-135,-53), ylim=c(23,58), fill=FALSE)
 map("state", boundary = FALSE, col="gray",add=TRUE)
@@ -35,7 +35,7 @@ points(x=Lng[disc],y=Lat[disc],cex=sqrt(Disc.sum/DissCount),col="gray10",pch=21,
 title("Discourse or Text Analysis dissertations \n as percentage of school total", sub=paste(discsum,"dissertations, 2001-2010"))
 dev.off()
 
-filename <- paste("US map, percent ethn 2001-2010, N",diss.count,".pdf",collapse="")
+filename <- paste0(imageloc, "US map, percent ethn 2001-2010, N",diss.count,".pdf")
 pdf(filename)
 map("worldHires",c("usa","Canada","Mexico"), xlim=c(-135,-53), ylim=c(23,58), fill=FALSE)
 map("state", boundary = FALSE, col="gray",add=TRUE)
@@ -43,7 +43,7 @@ points(x=Lng[ethn],y=Lat[ethn],cex=sqrt(Ethn.sum/DissCount),col="gray10",pch=21,
 title("Ethnographic dissertations \n as percentage of school total", sub=paste(ethnsum,"dissertations, 2001-2010"))
 dev.off()
 
-filename <- paste("US map, percent expt 2001-2010, N",diss.count,".pdf",collapse="")
+filename <- paste0(imageloc, "US map, percent expt 2001-2010, N",diss.count,".pdf")
 pdf(filename)
 map("worldHires",c("usa","Canada","Mexico"), xlim=c(-135,-53), ylim=c(23,58), fill=FALSE)
 map("state", boundary = FALSE, col="gray",add=TRUE)
@@ -51,7 +51,7 @@ points(x=Lng[expt],y=Lat[expt],cex=sqrt(Expt.sum/DissCount),col="gray10",pch=21,
 title("Experimental dissertations \n as percentage of school total", sub=paste(exptsum,"dissertations, 2001-2010"))
 dev.off()
 
-filename <- paste("US map, percent hist 2001-2010, N",diss.count,".pdf",collapse="")
+filename <- paste0(imageloc, "US map, percent hist 2001-2010, N",diss.count,".pdf")
 pdf(filename)
 map("worldHires",c("usa","Canada","Mexico"), xlim=c(-135,-53), ylim=c(23,58), fill=FALSE)
 map("state", boundary = FALSE, col="gray",add=TRUE)
@@ -59,7 +59,7 @@ points(x=Lng[hist],y=Lat[hist],cex=sqrt(Hist.sum/DissCount),col="gray10",pch=21,
 title("Historical / Archival dissertations \n as percentage of school total", sub=paste(histsum,"dissertations, 2001-2010"))
 dev.off()
 
-filename <- paste("US map, percent intv 2001-2010, N",diss.count,".pdf",collapse="")
+filename <- paste0(imageloc, "US map, percent intv 2001-2010, N",diss.count,".pdf")
 pdf(filename)
 map("worldHires",c("usa","Canada","Mexico"), xlim=c(-135,-53), ylim=c(23,58), fill=FALSE)
 map("state", boundary = FALSE, col="gray",add=TRUE)
@@ -67,7 +67,7 @@ points(x=Lng[intv],y=Lat[intv],cex=sqrt(Intv.sum/DissCount),col="gray10",pch=21,
 title("Interview / Questionnaire dissertations \n as percentage of school total", sub=paste(intvsum,"dissertations, 2001-2010"))
 dev.off()
 
-filename <- paste("US map, percent meta 2001-2010, N",diss.count,".pdf",collapse="")
+filename <- paste0(imageloc, "US map, percent meta 2001-2010, N",diss.count,".pdf")
 pdf(filename)
 map("worldHires",c("usa","Canada","Mexico"), xlim=c(-135,-53), ylim=c(23,58), fill=FALSE)
 map("state", boundary = FALSE, col="gray",add=TRUE)
@@ -75,7 +75,7 @@ points(x=Lng[meta],y=Lat[meta],cex=sqrt(Meta.sum/DissCount),col="gray10",pch=21,
 title("Meta-Analytical / Discipliniographic dissertations \n as percentage of school total", sub=paste(metasum,"dissertations, 2001-2010"))
 dev.off()
 
-filename <- paste("US map, percent modl 2001-2010, N",diss.count,".pdf",collapse="")
+filename <- paste0(imageloc, "US map, percent modl 2001-2010, N",diss.count,".pdf")
 pdf(filename)
 map("worldHires",c("usa","Canada","Mexico"), xlim=c(-135,-53), ylim=c(23,58), fill=FALSE)
 map("state", boundary = FALSE, col="gray",add=TRUE)
@@ -83,7 +83,7 @@ points(x=Lng[modl],y=Lat[modl],cex=sqrt(Modl.sum/DissCount),col="gray10",pch=21,
 title("Model-Building dissertations \n as percentage of school total", sub=paste(modlsum,"dissertations, 2001-2010"))
 dev.off()
 
-filename <- paste("US map, percent phil 2001-2010, N",diss.count,".pdf",collapse="")
+filename <- paste0(imageloc, "US map, percent phil 2001-2010, N",diss.count,".pdf")
 pdf(filename)
 map("worldHires",c("usa","Canada","Mexico"), xlim=c(-135,-53), ylim=c(23,58), fill=FALSE)
 map("state", boundary = FALSE, col="gray",add=TRUE)
@@ -91,7 +91,7 @@ points(x=Lng[phil],y=Lat[phil],cex=sqrt(Phil.sum/DissCount),col="gray10",pch=21,
 title("Philosophical dissertations \n as percentage of school total", sub=paste(philsum,"dissertations, 2001-2010"))
 dev.off()
 
-filename <- paste("US map, percent poet 2001-2010, N",diss.count,".pdf",collapse="")
+filename <- paste0(imageloc, "US map, percent poet 2001-2010, N",diss.count,".pdf")
 pdf(filename)
 map("worldHires",c("usa","Canada","Mexico"), xlim=c(-135,-53), ylim=c(23,58), fill=FALSE)
 map("state", boundary = FALSE, col="gray",add=TRUE)
@@ -99,7 +99,7 @@ points(x=Lng[poet],y=Lat[poet],cex=sqrt(Poet.sum/DissCount),col="gray10",pch=21,
 title("Poetic / Fictive dissertations \n as percentage of school total", sub=paste(poetsum,"dissertations, 2001-2010"))
 dev.off()
 
-filename <- paste("US map, percent pract 2001-2010, N",diss.count,".pdf",collapse="")
+filename <- paste0(imageloc, "US map, percent pract 2001-2010, N",diss.count,".pdf")
 pdf(filename)
 map("worldHires",c("usa","Canada","Mexico"), xlim=c(-135,-53), ylim=c(23,58), fill=FALSE)
 map("state", boundary = FALSE, col="gray",add=TRUE)
@@ -107,7 +107,7 @@ points(x=Lng[pract],y=Lat[pract],cex=sqrt(Pract.sum/DissCount),col="gray10",pch=
 title("Practitioner / Teacher Research dissertations \n as percentage of school total", sub=paste(practsum,"dissertations, 2001-2010"))
 dev.off()
 
-filename <- paste("US map, percent rhet 2001-2010, N",diss.count,".pdf",collapse="")
+filename <- paste0(imageloc, "US map, percent rhet 2001-2010, N",diss.count,".pdf")
 pdf(filename)
 map("worldHires",c("usa","Canada","Mexico"), xlim=c(-135,-53), ylim=c(23,58), fill=FALSE)
 map("state", boundary = FALSE, col="gray",add=TRUE)
@@ -115,7 +115,7 @@ points(x=Lng[rhet],y=Lat[rhet],cex=sqrt(Rhet.sum/DissCount),col="gray10",pch=21,
 title("Rhetorical Analysis dissertations \n as percentage of school total", sub=paste(rhetsum,"dissertations, 2001-2010"))
 dev.off()
 
-filename <- paste("US map, percent surv 2001-2010, N",diss.count,".pdf",collapse="")
+filename <- paste0(imageloc, "US map, percent surv 2001-2010, N",diss.count,".pdf")
 pdf(filename)
 map("worldHires",c("usa","Canada","Mexico"), xlim=c(-135,-53), ylim=c(23,58), fill=FALSE)
 map("state", boundary = FALSE, col="gray",add=TRUE)
@@ -123,7 +123,7 @@ points(x=Lng[surv],y=Lat[surv],cex=sqrt(Surv.sum/DissCount),col="gray10",pch=21,
 title("Survey dissertations \n as percentage of school total", sub=paste(survsum,"dissertations, 2001-2010"))
 dev.off()
 
-filename <- paste("US map, percent othr 2001-2010, N",diss.count,".pdf",collapse="")
+filename <- paste0(imageloc, "US map, percent othr 2001-2010, N",diss.count,".pdf")
 pdf(filename)
 map("worldHires",c("usa","Canada","Mexico"), xlim=c(-135,-53), ylim=c(23,58), fill=FALSE)
 map("state", boundary = FALSE, col="gray",add=TRUE)

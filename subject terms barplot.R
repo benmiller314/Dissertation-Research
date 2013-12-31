@@ -17,7 +17,7 @@ subj.median <- median(subj.table)
 
 how.many <- 30
 
-filename <- paste("subject terms barplot, top ",how.many,", N",diss.count,".pdf",collapse="")
+filename <- paste0(imageloc, "subject terms barplot, top ", how.many, ", N", diss.count, ".pdf")
 
 pdf(file=filename)
 
@@ -36,9 +36,9 @@ mtext(paste(diss.count,"theses,",subj.count,"subjects, median =",subj.median,", 
 
 dev.off()
 
-filename2 <- paste("subject terms barplot, below",how.many,", above median, N",diss.count,".pdf",collapse="")
+filename <- paste0(imageloc, "subject terms barplot, below", how.many, ", above median, N",diss.count,".pdf")
 
-pdf(file=filename2)
+pdf(file=filename)
 
 # for some unknown reason, how.many+1 still includes the 30th item. :\
 barplot(subj.table[how.many+2:length(subj.table)/2],horiz=FALSE,main=paste("Frequency of Subject Terms below",how.many,"above median"), axisnames=TRUE,width=c(10,10),space=0.4,las=2, pty="m",mai=c(5,10,8,5))

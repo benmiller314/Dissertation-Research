@@ -142,7 +142,7 @@ print(tag.totals.s)
 
 # While we're here, make a horizontal bar plot of tag totals
 main <- "Frequency of Assigned Method Tags, All Schools"
-filename <- paste0(main, ", N=",diss.count,".pdf")
+filename <- paste0(imageloc, main, ", N=",diss.count,".pdf")
 pdf(filename)
 	barplot(tag.totals.s, horiz=TRUE, xpd=FALSE, las=1, axes=FALSE)
 	title(main)
@@ -168,7 +168,7 @@ names(tag.totals) <- substr(names(tag.totals),1,4)
 print(sum.by.tags2)
 
 # now let's see how that looks as a heatmap...
-filename <- paste("Method Tag Co-Occurrence (R heatmap function), N",diss.count,".pdf",collapse="")
+filename <- paste0(imageloc, "Method Tag Co-Occurrence (R heatmap function), N",diss.count,".pdf")
 pdf(filename)
 data.matrix(sum.by.tags2) -> sum.by.tags.m			# heatmap needs a matrix, not a list
 h1 <- heatmap(sum.by.tags.m,symm=TRUE,main="Method Tag Co-Occurrence", sub="raw counts; diagonals are solo methods", col=brewer.pal(9,"YlOrRd"))
@@ -181,7 +181,7 @@ sum.by.tags.s <- sum.by.tags2[h1$rowInd,h1$colInd] 		# sorted by similarity func
 
 
 # give it a spin!
-filename <- paste("Method Tag Co-Occurrence (ben heatmap), N", diss.count, ".pdf", collapse="")
+filename <- paste0(imageloc, "Method Tag Co-Occurrence (ben heatmap), N", diss.count, ".pdf")
 pdf(filename)
 	heatmap.ben(sum.by.tags.s, diags=TRUE)
 	title(main="Method Tag Co-Occurrence", sub="diagonals are solo methods")
@@ -205,7 +205,7 @@ for (i in 1:nrow(sum.by.tags.n)) {
 sum.by.tags.n <- round(sum.by.tags.n * 100, 0)
 print(sum.by.tags.n)
 
-filename <- paste("Method Tag Co-Occurrence (ben heatmap, normed, whole numbers), N",diss.count,".pdf",collapse="")
+filename <- paste0(imageloc, "Method Tag Co-Occurrence (ben heatmap, normed, whole numbers), N",diss.count,".pdf")
 pdf(filename)
 	# heatmap(data.matrix(sum.by.tags.n),symm=TRUE,main="Method Tag Co-Occurrence", sub="normed by dividing intersection count by row total;\n diagonals are solo methods", col=brewer.pal(9,"YlOrRd"))
 	heatmap.ben(sum.by.tags.n)

@@ -7,7 +7,7 @@ sfreq <- sort(sfreq, decreasing=TRUE)
 
 # just for fun, let's visualize all of the schools' frequencies
 main <- "Dissertation Output of Schools follows a Power Law"
-filename <- paste0(main, ", N", diss.count,".pdf")
+filename <- paste0(imageloc, main, ", N", diss.count,".pdf")
 pdf(filename)
 	plot(sfreq, type="o", pch=18, bty="n", xlab="Schools", ylab="Number of Dissertations")
 	title(main)
@@ -20,7 +20,7 @@ dev.off()
 cfreq <- table(factor(consorts$School))
 cfreq <- sort(cfreq, decreasing=TRUE)
 main <- "Top 6 Consortium Schools Way Over the Trend"
-filename <- paste0(main, ", consortium schools, N", nrow(consorts),".pdf")
+filename <- paste0(imageloc, main, ", consortium schools, N", nrow(consorts),".pdf")
 pdf(filename)
 	plot(cfreq, type="o", pch=18, bty="n", xlab="Schools", ylab="Number of Dissertations 2001-2010")
 	title(main)
@@ -57,7 +57,7 @@ toplist <- function (tag, cutoff) {
 	}
 }
 toplists <- lapply(sumnames, FUN=function(x) toplist(x, cutoff))
-filename <- paste("top",cutoff,"schools by method tag.csv")
+filename <- paste0(dataloc, "top ",cutoff," schools by method tag.csv")
 write.csv(toplists, filename)
 
 ## now let's add percentages to those numbers 
@@ -197,12 +197,12 @@ find_pcts <- function (tag, data=by.school) {
 	# 
 
 	# and save this tag's list before we move on
-	filename <- paste("top", cutoff, "schools by method tag,", tag, "minimum", minimum, "disses per school.csv")
+	filename <- paste0(dataloc, "top ", cutoff, " schools by method tag ", tag, ", minimum", minimum, "disses per school.csv")
 	write.csv(ans.trim, filename)
 }
 
 top.schools.by.tag <- lapply(sumnames, FUN=function(x) find_pcts(x))
-filename <- paste("top", cutoff, "schools by method tag, minimum",minimum,"disses per school.csv")
+filename <- paste0(dataloc, "top ", cutoff, " schools by method tag, minimum ",minimum," disses per school.csv")
 lapply(top.schools.by.tag, FUN=function(x) write.csv(x, append=TRUE))
 
 # lapply(sumnames, FUN=function(x) find_pcts(x, justcons))	# not working yet
@@ -229,7 +229,7 @@ o <- order(disses.by.school$DissCount, disses.by.school$School, decreasing=T)
 print(disses.by.school[o,c("School","DissCount")])
 
 # success! save it and go:
-filename <- "Appendix A - Schools and Dissertation Counts.csv"
+filename <- paste0(dataloc, "Appendix A - Schools and Dissertation Counts.csv")
 write.csv(disses.by.school[o,c("School","DissCount")], file=filename)
 
 
@@ -237,7 +237,7 @@ write.csv(disses.by.school[o,c("School","DissCount")], file=filename)
 noncon.index <- !(1:nrow(disses.by.school) %in% con.index)
 noncons <- disses.by.school[noncon.index,]
 p <- order(noncons$DissCount, noncons$School, decreasing=T)
-filename <- paste("Appendix - Top", cutoff, "Non-Consortium Schools.csv")
+filename <- paste0(dataloc, "Appendix - Top ", cutoff, " Non-Consortium Schools by Dissertation Count.csv")
 write.csv(head(noncons[p, c("School","DissCount")], cutoff), file=filename)
 
 # clean up the workspace

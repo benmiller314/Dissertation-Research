@@ -14,16 +14,18 @@ require(RColorBrewer)
 require(doBy)
 # sum each method type for all schools. NB: noexcludes created by dataprep.R
 tagsums.by.school <- summaryBy(Case+Crit+Cult+Disc+Ethn+Expt+Hist+Intv+Meta+Modl+Phil+Poet+Pract+Rhet+Surv+Othr~School,data=noexcludes, FUN=sum)
-write.csv(tagsums.by.school, file="../tagsums by school.csv")
+filename <- paste0(dataloc, "tagsums by school.csv")
+write.csv(tagsums.by.school, file=filename)
 
 # count total dissertations for each school
 disses.by.school <- summaryBy(Year~School, data=noexcludes,FUN=length)
 names(disses.by.school) <- c("School","DissCount")
-write.csv(disses.by.school, file="../disses by school.csv")
+filename <- paste0(dataloc, "disses by school.csv")
+write.csv(disses.by.school, file=filename)
 
 # load file with school names and lat/lng data, created by geocode.R; 
 # NB: diss.count created by dataprep.R
-filename <- paste("geocoding by school, N",diss.count,".csv",collapse="")
+filename <- paste0("geocoding by school, N",diss.count,".csv")
 all_schools <- read.csv(filename)
 all_schools <- data.frame(all_schools[,2:ncol(all_schools)])
 names(all_schools) <- c("School","Lat","Lng","City","State")
@@ -79,7 +81,7 @@ for (i in 1:length(cc.bins)) {
 par(mfrow=c(1,1))
 
 # okay, basic map of the data, focusing on the US and Canada
-filename <- paste("all dissertations, US map, N",diss.count,"2.pdf",collapse="")
+filename <- paste0(imageloc, "all dissertations, US map, N",diss.count,"2.pdf")
 pdf(file=filename)
 
 map("worldHires",c("usa","Canada","Mexico"), xlim=c(-135,-53), ylim=c(23,58), col="gray90", fill=FALSE)
@@ -106,7 +108,7 @@ title(main="Locations of Schools in the Consortium /n of Doctoral Programs in Rh
 
 
 # superimposing!
-filename <- paste("comp-rhet schools (consorts and non) superimposed on carnegie2010 doctoral schools.pdf")
+filename <- paste0(imageloc, "comp-rhet schools (consorts and non) superimposed on carnegie2010 doctoral schools, N", nrow(disses.by.school), ".pdf")
 pdf(file=filename)
 
 	par(mfrow = c(1,1))
@@ -128,7 +130,7 @@ dev.off()
 
 
 # now let's do one more zoomed out
-filename <- paste("all dissertations, world map, N",diss.count,".pdf",collapse="")
+filename <- paste0(imageloc, "all dissertations, world map, N", diss.count, ".pdf")
 pdf(file=filename)
 map("worldHires", col="gray70", fill=FALSE)
 	# points(x=cdoc2010.geo$Lng, y=cdoc2010.geo$Lat, pch=24, cex=0.6, col="gray20", bg=cc.realcolors) # CC2010 as upward-facing triangles

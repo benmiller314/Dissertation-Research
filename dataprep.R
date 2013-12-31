@@ -9,6 +9,9 @@ sumnames <- sapply(tagnames, FUN=function(x) paste0(x,".sum"))
 topnames <- sapply(tagnames, FUN=function(x) as.list(tolower(paste0("top.",x))))
 topnames <- lapply(topnames, FUN=function(x) substr(x,1,8))
 
+setwd("/Users/benmiller314/Dropbox/coursework, etc/dissertation/R experiments/Dissertation Research")
+imageloc <- "../Dissertation Research - Figures/"
+dataloc <- "../"
 
 # prep some useful functions
 # source(file="function scratchpad.R")

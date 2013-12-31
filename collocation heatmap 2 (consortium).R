@@ -30,7 +30,7 @@ for(i in 1:ncol(sum.by.tags.c)) {
 
 # make a horizontal bar plot of tag totals
 main <- "Frequency of Assigned Method Tags, Consortium Schools Only"
-filename <- paste0(main, ", N=",consort.count,".pdf")
+filename <- paste0(imageloc, main, ", N=",consort.count,".pdf")
 pdf(filename)
 	barplot(tag.totals.cs, horiz=TRUE, xpd=FALSE, las=1, axes=FALSE)
 	title(main)
@@ -40,7 +40,7 @@ dev.off()
 
 # make a stacked horizontal bar plot of tag totals for consortium within all schools
 main <- "Frequency of Assigned Method Tags"
-filename <- paste0(main, ", N=",diss.count,".pdf")
+filename <- paste0(imageloc, main, ", N=",diss.count,".pdf")
 pdf(filename)
 	barplot(as.matrix(rbind(tag.totals.cs, tag.totals.s-tag.totals.cs)), horiz=TRUE, beside=FALSE, xpd=FALSE, las=1, axes=FALSE, col=c("gray80", "white"))
 	title(main)

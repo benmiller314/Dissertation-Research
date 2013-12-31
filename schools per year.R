@@ -24,7 +24,7 @@ row.names(per.year) <- c(2001:2010)		# label counts by year
 per.year
 
 main <- "Dissertations and Granting Institutions by Year"
-filename <- paste0(main,", N",diss.count,".pdf") 
+filename <- paste0(imageloc, main,", N",diss.count,".pdf") 
 pdf(filename)
 	max.y <- round(max(per.year)/10) * 10
 	plot(x=c(2001:2010), y=seq(from=0,to=max.y,length.out=10), type="n", main=main, ylab="Count", xlab="", bty="l")

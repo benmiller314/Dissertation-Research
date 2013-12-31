@@ -151,7 +151,7 @@ for (i in 1:nrow(sum.by.tags2)) {
 }
 print(sum.by.tags.n)
 
-filename <- paste("Method Tag Co-Occurrence, N",diss.count,".pdf",collapse="")
+filename <- paste0(imageloc, "Method Tag Co-Occurrence, N",diss.count,".pdf")
 pdf(filename)
 heatmap(data.matrix(sum.by.tags.n),symm=TRUE,main="Method Tag Co-Occurrence", col=brewer.pal(9,"YlOrRd"))
 dev.off()

@@ -5,7 +5,7 @@ methods.barplot <- function(data, dataname="noexcludes") {
 	data.t <- table(data)
 	rows <- length(data)
 	
-	filename <- paste0("method count barplot, ", dataname, " (N ",rows,").pdf")	
+	filename <- paste0(imageloc, "method count barplot, ", dataname, " (N ",rows,").pdf")	
 	
 	pdf(file=filename)
 	

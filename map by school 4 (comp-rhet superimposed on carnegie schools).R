@@ -38,7 +38,7 @@ for (i in 1:length(cc.bins)) {
 
 
 # First graph: superimposing all 10 years of C/R data onto 2010 Carnegie schools
-filename <- paste("comp-rhet schools superimposed on carnegie2010 doctoral schools.pdf")
+filename <- paste0(imageloc, "comp-rhet schools superimposed on carnegie2010 doctoral schools.pdf")
 pdf(file=filename)
 
 par(mfrow = c(1,1))
@@ -51,3 +51,4 @@ legend(x="bottomright", title="Dissertations \n per school", legend=c("[1,2)", "
 legend(x="bottomleft", legend=c("Carnegie","Comp/Rhet"), pch=c(24,21), bty="n")
 title(main="Most doctoral progams in the US \n now have some comp/rhet dissertations", sub="Carnegie classifications based on IPGRAD2010 > 11")
 
+dev.off()

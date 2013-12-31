@@ -3,7 +3,7 @@
 ##########################
 ## First set of tag plots: raw numbers as radii, each tag separately
 ##
-filename <- paste("US map, case 2001-2010, N",diss.count,".pdf",collapse="")
+filename <- paste0(imageloc, "US map, case 2001-2010, N",diss.count,".pdf")
 pdf(filename)
 map("worldHires",c("usa","Canada","Mexico"), xlim=c(-135,-53), ylim=c(23,58), fill=FALSE)
 map("state", boundary = FALSE, col="gray",add=TRUE)
@@ -11,7 +11,7 @@ points(x=Lng[case],y=Lat[case],cex=sqrt(DissCount),col="gray10",pch=21,bg=alpha(
 title("Clinical / Case Study sites", sub=paste(casesum,"dissertations, 2001-2010"))
 dev.off()
 
-filename <- paste("US map, crit 2001-2010, N",diss.count,".pdf",collapse="")
+filename <- paste0(imageloc, "US map, crit 2001-2010, N",diss.count,".pdf")
 pdf(filename)
 map("worldHires",c("usa","Canada","Mexico"), xlim=c(-135,-53), ylim=c(23,58), fill=FALSE)
 map("state", boundary = FALSE, col="gray",add=TRUE)
@@ -19,7 +19,7 @@ points(x=Lng[crit],y=Lat[crit],cex=sqrt(DissCount),col="gray10",pch=21,bg=alpha(
 title("Critical/Hermeneutical sites", sub=paste(critsum,"dissertations, 2001-2010"))
 dev.off()
 
-filename <- paste("US map, cult 2001-2010, N",diss.count,".pdf",collapse="")
+filename <- paste0(imageloc, "US map, cult 2001-2010, N",diss.count,".pdf")
 pdf(filename)
 map("worldHires",c("usa","Canada","Mexico"), xlim=c(-135,-53), ylim=c(23,58), fill=FALSE)
 map("state", boundary = FALSE, col="gray",add=TRUE)
@@ -27,7 +27,7 @@ points(x=Lng[cult],y=Lat[cult],cex=sqrt(DissCount),col="gray10",pch=21,bg=alpha(
 title("Cultural / Critical sites", sub=paste(cultsum,"dissertations, 2001-2010"))
 dev.off()
 
-filename <- paste("US map, disc 2001-2010, N",diss.count,".pdf",collapse="")
+filename <- paste0(imageloc, "US map, disc 2001-2010, N",diss.count,".pdf")
 pdf(filename)
 map("worldHires",c("usa","Canada","Mexico"), xlim=c(-135,-53), ylim=c(23,58), fill=FALSE)
 map("state", boundary = FALSE, col="gray",add=TRUE)
@@ -35,7 +35,7 @@ points(x=Lng[disc],y=Lat[disc],cex=sqrt(DissCount),col="gray10",pch=21,bg=alpha(
 title("Discourse or Text Analysis sites", sub=paste(discsum,"dissertations, 2001-2010"))
 dev.off()
 
-filename <- paste("US map, ethn 2001-2010, N",diss.count,".pdf",collapse="")
+filename <- paste0(imageloc, "US map, ethn 2001-2010, N",diss.count,".pdf")
 pdf(filename)
 map("worldHires",c("usa","Canada","Mexico"), xlim=c(-135,-53), ylim=c(23,58), fill=FALSE)
 map("state", boundary = FALSE, col="gray",add=TRUE)
@@ -43,7 +43,7 @@ points(x=Lng[ethn],y=Lat[ethn],cex=sqrt(DissCount),col="gray10",pch=21,bg=alpha(
 title("Ethnographic sites", sub=paste(ethnsum,"dissertations, 2001-2010"))
 dev.off()
 
-filename <- paste("US map, expt 2001-2010, N",diss.count,".pdf",collapse="")
+filename <- paste0(imageloc, "US map, expt 2001-2010, N",diss.count,".pdf")
 pdf(filename)
 map("worldHires",c("usa","Canada","Mexico"), xlim=c(-135,-53), ylim=c(23,58), fill=FALSE)
 map("state", boundary = FALSE, col="gray",add=TRUE)
@@ -51,7 +51,7 @@ points(x=Lng[expt],y=Lat[expt],cex=sqrt(DissCount),col="gray10",pch=21,bg=alpha(
 title("Experimental sites", sub=paste(exptsum,"dissertations, 2001-2010"))
 dev.off()
 
-filename <- paste("US map, hist 2001-2010, N",diss.count,".pdf",collapse="")
+filename <- paste0(imageloc, "US map, hist 2001-2010, N",diss.count,".pdf")
 pdf(filename)
 map("worldHires",c("usa","Canada","Mexico"), xlim=c(-135,-53), ylim=c(23,58), fill=FALSE)
 map("state", boundary = FALSE, col="gray",add=TRUE)
@@ -59,7 +59,7 @@ points(x=Lng[hist],y=Lat[hist],cex=sqrt(DissCount),col="gray10",pch=21,bg=alpha(
 title("Historical / Archival sites", sub=paste(histsum,"dissertations, 2001-2010"))
 dev.off()
 
-filename <- paste("US map, intv 2001-2010, N",diss.count,".pdf",collapse="")
+filename <- paste0(imageloc, "US map, intv 2001-2010, N",diss.count,".pdf")
 pdf(filename)
 map("worldHires",c("usa","Canada","Mexico"), xlim=c(-135,-53), ylim=c(23,58), fill=FALSE)
 map("state", boundary = FALSE, col="gray",add=TRUE)
@@ -67,7 +67,7 @@ points(x=Lng[intv],y=Lat[intv],cex=sqrt(DissCount),col="gray10",pch=21,bg=alpha(
 title("Interview / Questionnaire sites", sub=paste(intvsum,"dissertations, 2001-2010"))
 dev.off()
 
-filename <- paste("US map, meta 2001-2010, N",diss.count,".pdf",collapse="")
+filename <- paste0(imageloc, "US map, meta 2001-2010, N",diss.count,".pdf")
 pdf(filename)
 map("worldHires",c("usa","Canada","Mexico"), xlim=c(-135,-53), ylim=c(23,58), fill=FALSE)
 map("state", boundary = FALSE, col="gray",add=TRUE)
@@ -75,7 +75,7 @@ points(x=Lng[meta],y=Lat[meta],cex=sqrt(DissCount),col="gray10",pch=21,bg=alpha(
 title("Meta-Analysis / Discipliniography sites", sub=paste(metasum,"dissertations, 2001-2010"))
 dev.off()
 
-filename <- paste("US map, modl 2001-2010, N",diss.count,".pdf",collapse="")
+filename <- paste0(imageloc, "US map, modl 2001-2010, N",diss.count,".pdf")
 pdf(filename)
 map("worldHires",c("usa","Canada","Mexico"), xlim=c(-135,-53), ylim=c(23,58), fill=FALSE)
 map("state", boundary = FALSE, col="gray",add=TRUE)
@@ -83,7 +83,7 @@ points(x=Lng[modl],y=Lat[modl],cex=sqrt(DissCount),col="gray10",pch=21,bg=alpha(
 title("Model-Building sites", sub=paste(modlsum,"dissertations, 2001-2010"))
 dev.off()
 
-filename <- paste("US map, phil 2001-2010, N",diss.count,".pdf",collapse="")
+filename <- paste0(imageloc, "US map, phil 2001-2010, N",diss.count,".pdf")
 pdf(filename)
 map("worldHires",c("usa","Canada","Mexico"), xlim=c(-135,-53), ylim=c(23,58), fill=FALSE)
 map("state", boundary = FALSE, col="gray",add=TRUE)
@@ -91,7 +91,7 @@ points(x=Lng[phil],y=Lat[phil],cex=sqrt(DissCount),col="gray10",pch=21,bg=alpha(
 title("Philosophical sites", sub=paste(philsum,"dissertations, 2001-2010"))
 dev.off()
 
-filename <- paste("US map, poet 2001-2010, N",diss.count,".pdf",collapse="")
+filename <- paste0(imageloc, "US map, poet 2001-2010, N",diss.count,".pdf")
 pdf(filename)
 map("worldHires",c("usa","Canada","Mexico"), xlim=c(-135,-53), ylim=c(23,58), fill=FALSE)
 map("state", boundary = FALSE, col="gray",add=TRUE)
@@ -99,7 +99,7 @@ points(x=Lng[poet],y=Lat[poet],cex=sqrt(DissCount),col="gray10",pch=21,bg=alpha(
 title("Poetic / Fictive sites", sub=paste(poetsum,"dissertations, 2001-2010"))
 dev.off()
 
-filename <- paste("US map, pract 2001-2010, N",diss.count,".pdf",collapse="")
+filename <- paste0(imageloc, "US map, pract 2001-2010, N",diss.count,".pdf")
 pdf(filename)
 map("worldHires",c("usa","Canada","Mexico"), xlim=c(-135,-53), ylim=c(23,58), fill=FALSE)
 map("state", boundary = FALSE, col="gray",add=TRUE)
@@ -107,7 +107,7 @@ points(x=Lng[pract],y=Lat[pract],cex=sqrt(DissCount),col="gray10",pch=21,bg=alph
 title("Practitioner / Teacher Research sites", sub=paste(practsum,"dissertations, 2001-2010"))
 dev.off()
 
-filename <- paste("US map, rhet 2001-2010, N",diss.count,".pdf",collapse="")
+filename <- paste0(imageloc, "US map, rhet 2001-2010, N",diss.count,".pdf")
 pdf(filename)
 map("worldHires",c("usa","Canada","Mexico"), xlim=c(-135,-53), ylim=c(23,58), fill=FALSE)
 map("state", boundary = FALSE, col="gray",add=TRUE)
@@ -115,7 +115,7 @@ points(x=Lng[rhet],y=Lat[rhet],cex=sqrt(DissCount),col="gray10",pch=21,bg=alpha(
 title("Rhetorical Analysis sites", sub=paste(rhetsum,"dissertations, 2001-2010"))
 dev.off()
 
-filename <- paste("US map, surv 2001-2010, N",diss.count,".pdf",collapse="")
+filename <- paste0(imageloc, "US map, surv 2001-2010, N",diss.count,".pdf")
 pdf(filename)
 map("worldHires",c("usa","Canada","Mexico"), xlim=c(-135,-53), ylim=c(23,58), fill=FALSE)
 map("state", boundary = FALSE, col="gray",add=TRUE)
@@ -123,7 +123,7 @@ points(x=Lng[surv],y=Lat[surv],cex=sqrt(DissCount),col="gray10",pch=21,bg=alpha(
 title("Survey sites", sub=paste(survsum,"dissertations, 2001-2010"))
 dev.off()
 
-filename <- paste("US map, othr 2001-2010, N",diss.count,".pdf",collapse="")
+filename <- paste0(imageloc, "US map, othr 2001-2010, N",diss.count,".pdf")
 pdf(filename)
 map("worldHires",c("usa","Canada","Mexico"), xlim=c(-135,-53), ylim=c(23,58), fill=FALSE)
 map("state", boundary = FALSE, col="gray",add=TRUE)
