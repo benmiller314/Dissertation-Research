@@ -1,3 +1,6 @@
+## I'm pretty sure this file has now been superceded...
+stop("Instead of using 'map by school.R', please call the individual map by school files.")
+
 
 require(RColorBrewer)
 
