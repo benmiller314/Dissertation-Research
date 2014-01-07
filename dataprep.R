@@ -7,6 +7,7 @@ ans <- function() {
 # name the method tags most of these analyses are interested in
 tagnames <- c("Clin","Crit","Cult","Disc","Ethn","Expt","Hist","Intv","Meta","Modl","Phil","Poet","Prac","Rhet","Surv","Othr")
 sumnames <- sapply(tagnames, FUN=function(x) paste0(x,".sum"))
+meannames <- sapply(tagnames, FUN=function(x) paste0(x,".mean"))
 topnames <- sapply(tagnames, FUN=function(x) as.list(tolower(paste0("top.",x))))
 topnames <- lapply(topnames, FUN=function(x) substr(x,1,8))
 
