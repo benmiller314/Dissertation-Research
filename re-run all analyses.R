@@ -1,9 +1,15 @@
+setwd("/Users/benmiller314/Dropbox/coursework, etc/dissertation/R experiments/Dissertation Research")
+
 source(file="dataprep.R")
-remake_figs <- TRUE; source(file="tags by school.R")
+remake_figs <- TRUE; 
+
+source(file="tags by school.R")
 source(file="methodcount barplot.R")
 source(file="keyword barplot.R")
 source(file="collocation heatmap.R")
-source(file="map by school 4 (comp-rhet superimposed on carnegie schools).R")
+
 source(file="top 10 lists.R")
-# source(file="map by school.R")		# per-method maps
 source(file="schools per year.R") 
+
+# source(file="map by school.R")		# per-method maps	# look for the individual files instead
+source(file="map by school 4 (comp-rhet superimposed on carnegie schools).R")
