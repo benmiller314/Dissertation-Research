@@ -92,4 +92,4 @@ if(remake_figs) {dev.off()}
 
 
 # remove interim variables
-rm(m1, m2, m3)
+rm(m1, m2, m3, noex.by.school.m, nonconsorts.by.school.m, consorts.by.school.m)
