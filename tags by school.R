@@ -8,21 +8,23 @@ if(!exists("noexcludes")) {
 
 
 # first we do the summary (tag mean) of each method type for all schools. 
-summaryBy(. ~ School, data=noexcludes) -> noexcludes.by.school
+noexcludes.by.school <- summaryBy(. ~ School, data=noexcludes)
 
 	# get more meaningful row names (and a purely numerical matrix, for heatmapping)
 row.names(noexcludes.by.school) <- noexcludes.by.school[,1]
 noexcludes.by.school <- noexcludes.by.school[,2:ncol(noexcludes.by.school)]
 
 	# remove columns other than method tags, again for the heatmap, and matricize	
-m1 <- noexcludes.by.school[,which(!names(noexcludes.by.school) %in% c("Year.mean","Method.Count.mean","Exclude.Level.mean"))]
+m1 <- noexcludes.by.school[,which(names(noexcludes.by.school) %in% meannames)]
 data.matrix(m1) -> noex.by.school.m
+
+
 
 # next step: just consortium schools
 summaryBy(. ~ School,data=consorts) -> consorts.by.school
 row.names(consorts.by.school) <- consorts.by.school[,1]
 consorts.by.school <- consorts.by.school[,2:ncol(consorts.by.school)]
-m2 <- consorts.by.school[,which(!names(consorts.by.school) %in% c("Year.mean","Method.Count.mean","Exclude.Level.mean"))]
+m2 <- consorts.by.school[,which(names(consorts.by.school) %in% meannames)]
 data.matrix(m2) -> consorts.by.school.m
 
 
@@ -30,7 +32,7 @@ data.matrix(m2) -> consorts.by.school.m
 summaryBy(. ~ School,data=nonconsorts) -> nonconsorts.by.school
 row.names(nonconsorts.by.school) <- nonconsorts.by.school[,1]
 nonconsorts.by.school <- nonconsorts.by.school[,2:ncol(consorts.by.school)]
-m3 <- nonconsorts.by.school[,which(!names(consorts.by.school) %in% c("Year.mean","Method.Count.mean","Exclude.Level.mean"))]
+m3 <- nonconsorts.by.school[,which(names(nonconsorts.by.school) %in% meannames)]
 data.matrix(m3) -> nonconsorts.by.school.m
 
 
