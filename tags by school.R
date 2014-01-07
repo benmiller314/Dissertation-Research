@@ -6,10 +6,6 @@ if(!exists("noexcludes")) {
 	source(file="dataprep.R")
 }
 
-# If remake_figs is true, new pdf files will be created; otherwise, they'll display on screen only.
-if(!exists("remake_figs")) {
-	remake_figs <- FALSE
-}
 
 # first we do the summary (tag mean) of each method type for all schools. 
 summaryBy(. ~ School, data=noexcludes) -> noexcludes.by.school
