@@ -6,13 +6,19 @@ if(!exists("noexcludes")) {
 	source(file="dataprep.R")
 }
 
+## TO DO: create wrapper function that lets us specify data and tags in one location only, to avoid careless errors in the future as we add new data sets (e.g. with the simplified tagging system)
 
 # first we do the summary (tag mean) of each method type for all schools. 
 noexcludes.by.school <- summaryBy(. ~ School, data=noexcludes)
+# temporarily fix parameters for testing
+dataset <- noexcludes
+tagset <- meannames
 
 	# get more meaningful row names (and a purely numerical matrix, for heatmapping)
 row.names(noexcludes.by.school) <- noexcludes.by.school[,1]
 noexcludes.by.school <- noexcludes.by.school[,2:ncol(noexcludes.by.school)]
+# open wrapper function
+schoolwise <- function(dataset, tagset) {
 
 	# remove columns other than method tags, again for the heatmap, and matricize	
 m1 <- noexcludes.by.school[,which(names(noexcludes.by.school) %in% meannames)]
@@ -93,3 +99,6 @@ if(remake_figs) {dev.off()}
 
 # remove interim variables
 rm(m1, m2, m3, noex.by.school.m, nonconsorts.by.school.m, consorts.by.school.m)
+
+# close wrapper function
+}
