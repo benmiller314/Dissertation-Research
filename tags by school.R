@@ -14,7 +14,7 @@ tagset_name <- "meannames"
 myCol <- brewer.pal(9, "PuRd")
 
 # open wrapper function
-schoolwise <- function(dataset_name, tagset_name) {
+schoolwise <- function(dataset_name, tagset_name, fixedcols=NULL) {
 	
 	# 0. convert variable names to variables. we'll use the names later in the figure titles.
 	dataset <- get(dataset_name)
@@ -32,13 +32,18 @@ schoolwise <- function(dataset_name, tagset_name) {
 	m2 <- data.matrix(m1)
 	
 	# 4. make the heatmap: use pre-determined columns if need be.
+
 	# 4a. agglomerative clustering (agnes) first:
 	filename <- paste0(imageloc, "tags by schools, ", dataset_name, ", N", nrow(dataset), ", agnes.pdf")
 	maintitle <- paste0("Method Tag Averages by school, ", dataset_name, ", ", tagset_name)
 	
 	if(remake_figs) {pdf(file=filename)}
-	ag <- heatmap(m2, hclustfun=function(d){agnes(d,method="ward")}, scale="row", col=myCol, main=maintitle)
-	mtext("Each cell gives the likelihood that a given dissertation from the school in row Y is tagged with the method in column X.",side=1)
+		if(!is.null(fixedcols)) {
+			ag <- heatmap.fixedcols(m2, myColInd=fixedcols, hclustfun=function(d){agnes(d,method="ward")}, scale="row", col=myCol, main=maintitle)
+		} else {
+			ag <- heatmap(m2, hclustfun=function(d){agnes(d,method="ward")}, scale="row", col=myCol, main=maintitle)
+		}
+		mtext("Each cell gives the likelihood that a given dissertation from the school in row Y is tagged with the method in column X.",side=1)
 	if(remake_figs) {dev.off()}
 	
 	# 4b. now divisive clustering (diana):
@@ -46,10 +51,15 @@ schoolwise <- function(dataset_name, tagset_name) {
 	maintitle <- paste0("Method Tag Averages by school, ", dataset_name, ", ", tagset_name)
 	
 	if(remake_figs) {pdf(file=filename)}
-	di <- heatmap(m2, hclustfun=function(d){diana(d,metric="ward")}, scale="row", col=myCol, main=maintitle)
-	mtext("Each cell gives the likelihood that a given dissertation from the school in row Y is tagged with the method in column X.",side=1)
+		if(!is.null(fixedcols)) {
+			di <- heatmap.fixedcols(m2, myColInd=fixedcols, hclustfun=function(d){diana(d,metric="ward")}, scale="row", col=myCol, main=maintitle)
+		} else {
+			di <- heatmap(m2, hclustfun=function(d){diana(d,metric="ward")}, scale="row", col=myCol, main=maintitle)
+		}
+		mtext("Each cell gives the likelihood that a given dissertation from the school in row Y is tagged with the method in column X.",side=1)
 	if(remake_figs) {dev.off()}
 	
+
 	# save the row and column orders to allow for consistent sorting later
 	return(list("ag" = ag, "di" = di))
 	
@@ -98,11 +108,11 @@ schoolwise <- function(dataset_name, tagset_name) {
 # # Non-Consortium schools only
 # nonconsort.count <- nrow(nonconsorts)
 
-# filename <- paste0(imageloc, "tags by non-consortium schools, N",nonconsort.count," agnes.pdf")
-# if(remake_figs) {pdf(file=filename)}
-# heatmap.fixedcols(nonconsorts.by.school.m, myColInd=ag$colInd, hclustfun=function(d){agnes(d,method="ward")}, scale="row", col=brewer.pal(9,"PuRd"), main="Method Tag Averages by School, non-consortium schools only")
-# mtext("Each cell gives the likelihood that a given dissertation from the school in row Y is tagged with the method in column X.",side=1)
-# if(remake_figs) {dev.off()}
+filename <- paste0(imageloc, "tags by non-consortium schools, N",nonconsort.count," agnes.pdf")
+if(remake_figs) {pdf(file=filename)}
+heatmap.fixedcols(nonconsorts.by.school.m, myColInd=ag$colInd, hclustfun=function(d){agnes(d,method="ward")}, scale="row", col=brewer.pal(9,"PuRd"), main="Method Tag Averages by School, non-consortium schools only")
+mtext("Each cell gives the likelihood that a given dissertation from the school in row Y is tagged with the method in column X.",side=1)
+if(remake_figs) {dev.off()}
 
 	# # and, again, some divisive clustering just to compare
 # filename <- paste0(imageloc, "tags by non-consortium schools, N",nonconsort.count," diana.pdf")
