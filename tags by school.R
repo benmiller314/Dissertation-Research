@@ -11,7 +11,7 @@ if(!exists("noexcludes")) {
 myCol <- brewer.pal(9, "PuRd")
 
 # open wrapper function
-schoolwise <- function(dataset_name, tagset_name, fixedcols=NULL) {
+schoolwise <- function(dataset_name, tagset_name, agfixedcols=NULL, difixedcols=NULL) {
 	
 	# 0. convert variable names to variables. we'll use the names later in the figure titles.
 	dataset <- get(dataset_name)
@@ -35,8 +35,8 @@ schoolwise <- function(dataset_name, tagset_name, fixedcols=NULL) {
 	maintitle <- paste0("Method Tag Averages by school, ", dataset_name, ", ", tagset_name)
 	
 	if(remake_figs) {pdf(file=filename)}
-		if(!is.null(fixedcols)) {
-			ag <- heatmap.fixedcols(m2, myColInd=fixedcols, hclustfun=function(d){agnes(d,method="ward")}, scale="row", col=myCol, main=maintitle)
+		if(!is.null(agfixedcols)) {
+			ag <- heatmap.fixedcols(m2, myColInd=agfixedcols, hclustfun=function(d){agnes(d,method="ward")}, scale="row", col=myCol, main=maintitle)
 		} else {
 			ag <- heatmap(m2, hclustfun=function(d){agnes(d,method="ward")}, scale="row", col=myCol, main=maintitle)
 		}
@@ -49,7 +49,7 @@ schoolwise <- function(dataset_name, tagset_name, fixedcols=NULL) {
 	
 	if(remake_figs) {pdf(file=filename)}
 		if(!is.null(fixedcols)) {
-			di <- heatmap.fixedcols(m2, myColInd=fixedcols, hclustfun=function(d){diana(d,metric="ward")}, scale="row", col=myCol, main=maintitle)
+			di <- heatmap.fixedcols(m2, myColInd=difixedcols, hclustfun=function(d){diana(d,metric="ward")}, scale="row", col=myCol, main=maintitle)
 		} else {
 			di <- heatmap(m2, hclustfun=function(d){diana(d,metric="ward")}, scale="row", col=myCol, main=maintitle)
 		}
@@ -65,9 +65,9 @@ schoolwise <- function(dataset_name, tagset_name, fixedcols=NULL) {
 
 
 # call the functions for all relevant datasets
-schoolwise("consorts","meannames")
-schoolwise("nonconsorts","meannames")
-schoolwise("noexcludes", "meannames")
+a <- schoolwise("consorts","meannames")
+schoolwise("nonconsorts","meannames", agfixedcols=a$ag$colInd, difixedcols=a$di$colInd)
+schoolwise("noexcludes", "meannames", agfixedcols=a$ag$colInd, difixedcols=a$di$colInd)
 
 
 
