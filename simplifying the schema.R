@@ -1,5 +1,6 @@
 ## Goal: Group tags to pool influence of (e.g.) quantitative approaches.
 #  Possible groups: Aggregable (disc, expt, surv, meta), Phenomenological (case, ethn), Dialectical (crit, hist, modl, phil, rhet), Craft-Based (poet, prac [and tool-building]; cf. Johnson 2010). Bad fits: intv, meta. Drop cult and intv, move meta to Agg.
+# As an alternative pool, cf. Michael Carter's "Ways of Knowing and Doing in the Disciplines"?
 
 if(!exists(sfreq)) {
 	source(file="top 10 lists.R")
@@ -7,6 +8,9 @@ if(!exists(sfreq)) {
 if(!exists(noexcludes)) {
 	source(file="dataprep.R")
 }
+
+# define shortcut for new tag names
+tagnames.collapse <- c("Aggreg", "Phenom", "Dialec", "Crafty")
 	
 short_schema <- function (data) {	
 	# Create a data frame to hold the updated info; we'll merge later.
@@ -16,7 +20,7 @@ short_schema <- function (data) {
 			Phenom = -1,
 			Dialec = -1,
 			Crafty = -1,
-			Counts = -1
+			Counts.collapse = -1
 	)
 	head(collapse)
 	
@@ -52,7 +56,7 @@ short_schema <- function (data) {
 		cr <- collapse[i,"Crafty"] <- a
 		
 		# Now look for multi-modality across these broad categories
-		collapse[i, "Counts"] <- sum(ag, ph, di, cr)
+		collapse[i, "Counts.collapse"] <- sum(ag, ph, di, cr)
 	}
 	# Clean up the workspace
 	rm(a, a1, a2, a3, a4, a5, ag, ph, di, cr)
@@ -60,22 +64,18 @@ short_schema <- function (data) {
 	return(collapse)
 }
 
-collapse <- short_schema(noexcludes)
-head(collapse, 10)
+# # Confirm the function works properly
+# collapse <- short_schema(noexcludes)
+# head(collapse, 10)
 	
-# Exploring the newly configured data
-table(collapse$Counts)
-noexcludes[which(collapse$Counts == 0),c("Method.Terms",tagnames)]
+# # Explore the newly configured data
+# table(collapse$Counts.collapse)
+# mean(collapse$Counts.collapse)
+# noexcludes[which(collapse$Counts == 0),c("Method.Terms",tagnames)]
 
-names(noexcludes)
+# names(noexcludes)
 
-colSums(collapse[2:ncol(collapse)])
-colMeans(collapse[2:ncol(collapse)])
+# colSums(collapse[2:(ncol(collapse)-1)])
 
-nrow(collapse)
-
-
-
-# collapse$cat <- paste0()
 
 
