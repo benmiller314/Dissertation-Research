@@ -29,6 +29,7 @@ source(file="Factor-Bug fixing.R")
 source(file="heatmap_ben.R")
 source(file="heatmap fixedcols.R")
 source(file="method tag array.R")
+source(file="simplifying the schema.R")
 
 
 ## now get the data 
@@ -36,8 +37,11 @@ source(file="method tag array.R")
 print(noquote("Select the most recent file of dissertation metadata."))
 bigarray <- read.csv(file=file.choose())
 
-# parse the method tags
+# parse the method tags... including for the collapsed schema
 bigarray <- parse_tags(bigarray)
+tmp <- short_schema(bigarray)
+bigarray <- merge(bigarray, tmp, by="Pub.number")
+rm(tmp)
 
 # filter out false positives
 noexcludes <- bigarray[bigarray$Exclude.Level==0,] 
@@ -60,6 +64,7 @@ for (i in refactor.index) {
 source(file="check count.R")
 
 # get tag index columns on their own, for simplicity down the road
+# TO DO: See whether we still need this
 tagarray <- noexcludes[,tagnames]
 row.names(tagarray) <- noexcludes[,"Author"]
 data.matrix(tagarray) -> tagarray.m
@@ -67,7 +72,7 @@ data.matrix(tagarray) -> tagarray.m
 # tag.totals <- tagtotals(tagarray, skip=0)
 # barplot(tag.totals)
 
-consortium <- read.csv(file="../doctoral-consortium-schools-programs, reconciled to carnegie.csv")
+consortium <- read.csv(file=paste0(dataloc,"doctoral-consortium-schools-programs, reconciled to carnegie.csv")))
 conschools <- factor(consortium$University)
 consorts.index <- which(noexcludes$School %in% conschools)
 consorts <- noexcludes[consorts.index,]
@@ -82,6 +87,7 @@ consort.count <- nrow(consorts)
 missing_conschools <- setdiff(levels(conschools),levels(conschoolsfound))
 non_conschools <- setdiff(levels(noexcludes$School),levels(conschools))
 nonconsorts <- noexcludes[(which(noexcludes$School %in% non_conschools)),]
+
 
 # split out multiple advisors?
 
