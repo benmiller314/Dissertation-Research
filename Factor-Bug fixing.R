@@ -1,6 +1,16 @@
-# Factor-Bug fixing:
-# when you find out your reconciliation picked the wrong version, and now you get invalid factor levels
-# NB: Now included in function scratchpad
+## Rationale:
+#  When dealing with text, R likes to pre-determine what counts as a valid possibility 
+#  (because it thinks everything is an experimental observation with controlled variables). 
+#  Trying to add new rows in a text column, therefore, sometimes causes problems. 
+#  fix_factor allows you to add new items to (or edit old ones in) your factor-ish vectors.
+#
+## Parameters: 
+#  f         - a factor, i.e. a text column, in which you want to add or edit some entry
+#  to.add    - the entry you wish to add, or the revised value if editing. required.
+#  to.remove - the entry you wish to replace, if editing. optional.
+#
+## Usage:
+#  some.factor <- fixfactor(some.factor, to.add=some.new.text)
 
 fix_factor <- function(f, to.add, to.remove = NULL) {
 	ff <- as.character(f)
@@ -12,4 +22,3 @@ fix_factor <- function(f, to.add, to.remove = NULL) {
 	}
 	return(factor(ff))
 }
-

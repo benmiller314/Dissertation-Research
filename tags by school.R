@@ -1,13 +1,15 @@
+## GOAL: Given a tagged set of dissertation data and a tagging schema, aggregate tag frequency and distribution at each school in the dataset. After building the function for the analysis, run it on various subsets of data and tags.
+
 require(doBy)
 require(cluster)
 require(RColorBrewer)
 
+# make sure we've run dataprep.R
 if(!exists("noexcludes")) {
 	source(file="dataprep.R")
 }
 
-
-# fix broad parameters
+# set broad parameters
 myCol <- brewer.pal(9, "PuRd")
 
 # open wrapper function
@@ -68,6 +70,9 @@ schoolwise <- function(dataset_name, tagset_name, agfixedcols=NULL, difixedcols=
 a <- schoolwise("consorts","meannames")
 schoolwise("nonconsorts","meannames", agfixedcols=a$ag$colInd, difixedcols=a$di$colInd)
 schoolwise("noexcludes", "meannames", agfixedcols=a$ag$colInd, difixedcols=a$di$colInd)
+
+# next up: re-run with the simplified schema
+b <- 
 
 
 

@@ -1,5 +1,5 @@
 ## GOAL: given method terms in one column, create and append an array of tag labels, 0 or 1,
-## and append columns for Method Count and Exclude Level (0=keep, 1=maybe throw out, 2=throw out)
+## and append columns for Method Count and Exclude Level (0=keep, 1=maybe throw out, 2=throw out).
 ## Note that this used to be done in GoogleRefine, but I want it more automate-able.
 
 # load placeholder data; replace with function notation later
@@ -12,7 +12,7 @@
 
 parse_tags <- function(data) {
 	if (!is.null(data$Crit)) {
-		stop("Data seems to be parsed already. Choose a different file to use this function.")
+		stop("Data seems to be parsed already. Choose a different dataset to use this function.")
 	}
 
 	# Create a data frame to hold the updated info; we'll merge later.
