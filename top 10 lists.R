@@ -1,4 +1,11 @@
-# Goal: list the 10(e.g.) most frequently occurring schools overall and by method tag
+## Goal: list the 10(e.g.) most frequently occurring schools overall and by method tag
+
+# First, make sure the data exists
+if(!exists("noexcludes")) {
+	source(file="dataprep.R")
+}
+
+# Set broad parameters
 cutoff <- 10
 
 # sfreq = schools by frequency
@@ -41,8 +48,14 @@ print(cfreq[1:cutoff])
 
 ## now for the tags
 # if we've run 'map by school 1 (setup).R', then we can use the doBy summaries created there
-tagsums.by.school <- read.csv(file="../tagsums by school.csv")
-disses.by.school <- read.csv(file="../disses by school.csv")
+if(!exists("tagsums.by.school")) {
+	source(file="map by school 1 (setup).R")
+}
+
+# variables created by the source above should be the most up to date; csv's are for quick reference
+# tagsums.by.school <- read.csv(file=paste0(dataloc, "../tagsums by school.csv"))
+# disses.by.school <- read.csv(file=paste0(dataloc, "../disses by school.csv"))
+
 by.school <- merge(disses.by.school, tagsums.by.school, by="School")
 by.school$X.x <- by.school$X.y <- NULL
 
