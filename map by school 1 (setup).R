@@ -29,8 +29,9 @@ filename <- paste0(dataloc, "disses by school.csv")
 write.csv(disses.by.school, file=filename)
 
 # load file with school names and lat/lng data, created by geocode.R; 
+# 3. load file with school names and lat/lng data, created by geocode.R; 
 # NB: diss.count created by dataprep.R
-filename <- paste0("geocoding by school, N",diss.count,".csv")
+filename <- paste0(dataloc, "geocoding by school, N", diss.count, ".csv")
 all_schools <- read.csv(filename)
 all_schools <- data.frame(all_schools[,2:ncol(all_schools)])
 names(all_schools) <- c("School","Lat","Lng","City","State")

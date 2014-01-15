@@ -84,6 +84,6 @@ levels(all_schools[,3])
 rm(l2,l3,geoCols)
 
 #save that file!
-filename <- paste0(dataloc, "geocoding by school, N",diss.count,".csv")
+filename <- paste0(dataloc, "geocoding by school, N", diss.count,".csv")
 write.csv(all_schools,file=filename)
 
