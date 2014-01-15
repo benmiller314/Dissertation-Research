@@ -8,7 +8,6 @@
 
 ## Set requirements
 require(doBy)
-require(RColorBrewer)
 
 # check that we have all the source files we'll need
 if(!exists("noexcludes")) {source(file="dataprep.R")}
@@ -18,70 +17,69 @@ dataset_name <- "noexcludes"
 tagset_name <- "tagnames"
 
 
-## Begin wrapper function
+## B. Build the Table
+
+# Begin wrapper function
 maptags1 <- function (dataset_name="noexcludes", tagset_name="tagnames") {
 
- 
-## Build the Table
+	# 0. convert parameters into useable values (we'll use the names later, for saving files)
+	dataset <- get(dataset_name)
+	tagset <- get(tagset_name)
+	
+	# 1. sum each method type for all schools.
+	a1 <- summaryBy(.~School,data=dataset, FUN=sum)
+	
+	# move school names from first column into row names
+	row.names(a1) <- a1$School
+	a1 <- a1[,2:ncol(a1)]
+	
+	# limit output columns to those in the relevant tagset
+	sumnames <- paste0(tagset, ".sum")
+	a1 <- a1[,which(names(a1) %in% sumnames)]
+	
+	# save the output
+	filename <- paste0(dataloc, tagset_name, " tagsums by school, ", dataset_name, ", N", nrow(dataset), ".csv")
+	write.csv(a1, file=filename)
+	
+	
+	# 2. count total dissertations for each school
+	a2 <- summaryBy(Year~School, data=dataset,FUN=length)
+	names(a2) <- c("School","DissCount")
+	head(a2)
+	filename <- paste0(dataloc, "disses by school, ", dataset_name, ", N", nrow(dataset), ".csv")
+	write.csv(a2, file=filename)
+	
+	# 3. load file with school names and lat/lng data, created by geocode.R; 
+	# NB: diss.count created by dataprep.R
+	filename <- paste0(dataloc, "geocoding by school, N", diss.count, ".csv")
+	all_schools <- read.csv(filename)
+	
+	# trim the first column, which is just the row number
+	all_schools <- data.frame(all_schools[,2:ncol(all_schools)])
+	
+	# get clean column names
+	names(all_schools) <- c("School","Lat","Lng","City","State")
+	
+	# 4. stitch together steps 1-3, inner join to eliminate schools left over from false positives.
+	# this should give us a geocoded index of schools with columns for total disscount and for counts of each tag in the tagset.
+	a4 <- merge(all_schools, a1, by="School")
+	a4 <- merge(a4, a2, by="School")
+	
+	# 5. return the merged table, since that should be enough to make maps
+	return(a4)
+	
+	
+	## Old material: saves specific versions of the output table. Removed because too large.
+	# noexcludes.geo <- merge(dataset, schools.geo,by="School")
+	# consorts.geo.index <- which(schools.geo$School %in% conschools)
+	# consorts.geo <- schools.geo[consorts.geo.index,]
+	
+	## Save this stitched-up file for stuff that's easier in Excel
+	# filename <- paste0(dataloc, tagset_name, " tagsums and disscounts by school, N", nrow(dataset), ".csv")
+	# write.csv(noexcludes.geo, file=filename)
+	# head(noexcludes.geo[which(names(noexcludes.geo) %in% c("School", "DissCount", sumnames))])
 
-# 0. convert parameters into useable values (we'll use the names later, for saving files)
-dataset <- get(dataset_name)
-tagset <- get(tagset_name)
-
-# 1. sum each method type for all schools.
-a1 <- summaryBy(.~School,data=dataset, FUN=sum)
-
-# move school names from first column into row names
-row.names(a1) <- a1$School
-a1 <- a1[,2:ncol(a1)]
-
-# limit output columns to those in the relevant tagset
-sumnames <- paste0(tagset, ".sum")
-a1 <- a1[,which(names(a1) %in% sumnames)]
-
-# save the output
-filename <- paste0(dataloc, tagset_name, " tagsums by school, ", dataset_name, ", N", nrow(dataset), ".csv")
-write.csv(a1, file=filename)
-
-
-# 2. count total dissertations for each school
-a2 <- summaryBy(Year~School, data=dataset,FUN=length)
-names(a2) <- c("School","DissCount")
-head(a2)
-filename <- paste0(dataloc, "disses by school, ", dataset_name, ", N", nrow(dataset), ".csv")
-write.csv(a2, file=filename)
-
-# 3. load file with school names and lat/lng data, created by geocode.R; 
-# NB: diss.count created by dataprep.R
-filename <- paste0(dataloc, "geocoding by school, N", diss.count, ".csv")
-all_schools <- read.csv(filename)
-
-# trim the first column, which is just the row number
-all_schools <- data.frame(all_schools[,2:ncol(all_schools)])
-
-# get clean column names
-names(all_schools) <- c("School","Lat","Lng","City","State")
-
-# 4. stitch together steps 1-3, inner join to eliminate schools left over from false positives.
-# this should give us a geocoded index of schools with columns for total disscount and for counts of each tag in the tagset.
-a4 <- merge(all_schools, a1, by="School")
-a4 <- merge(a4, a2, by="School")
-
-# 5. return the merged table, since that should be enough to make maps
-return(a4)
-
-
-## Old material: saves specific versions of the output table. Removed because too large.
-# noexcludes.geo <- merge(dataset, schools.geo,by="School")
-# consorts.geo.index <- which(schools.geo$School %in% conschools)
-# consorts.geo <- schools.geo[consorts.geo.index,]
-
-## Save this stitched-up file for stuff that's easier in Excel
-# filename <- paste0(dataloc, tagset_name, " tagsums and disscounts by school, N", nrow(dataset), ".csv")
-# write.csv(noexcludes.geo, file=filename)
-# head(noexcludes.geo[which(names(noexcludes.geo) %in% c("School", "DissCount", sumnames))])
-
-## Close wrapper function
+# Close wrapper function maptags1
 }
 
 
@@ -95,6 +93,7 @@ require(mapplots)
 require(maptools)
 require(scales)
 
+require(RColorBrewer)
 
 ## Define color scale for fill (comment out unused versions)
 mycol <- alpha(brewer.pal(5,"YlOrRd"),0.5)					# color!
