@@ -1,7 +1,6 @@
 m <- noexcludes$Method.Terms
 m1 <- as.character(m)
-m2 <- sapply(m1, FUN=function(x) unlinkst(strsplit(x,"|",fixed=TRUE)))
-
+m2 <- sapply(m1, FUN=function(x) strsplit(x,"|",fixed=TRUE))
 
 checkcount <- sapply(m2, FUN=function(x) length(grep("~check", x, ignore.case=TRUE)))
 

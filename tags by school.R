@@ -50,7 +50,7 @@ schoolwise <- function(dataset_name, tagset_name, agfixedcols=NULL, difixedcols=
 	maintitle <- paste0("Method Tag Averages by school, ", dataset_name, ", ", tagset_name)
 	
 	if(remake_figs) {pdf(file=filename)}
-		if(!is.null(fixedcols)) {
+		if(!is.null(difixedcols)) {
 			di <- heatmap.fixedcols(m2, myColInd=difixedcols, hclustfun=function(d){diana(d,metric="ward")}, scale="row", col=myCol, main=maintitle)
 		} else {
 			di <- heatmap(m2, hclustfun=function(d){diana(d,metric="ward")}, scale="row", col=myCol, main=maintitle)

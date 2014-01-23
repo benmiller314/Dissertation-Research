@@ -42,7 +42,7 @@ data.matrix(tagarray) -> tagarray.m
 # tag.totals <- tagtotals(tagarray, skip=0)
 # barplot(tag.totals)
 
-consortium <- read.csv(file=paste0(dataloc,"doctoral-consortium-schools-programs, reconciled to carnegie.csv")))
+consortium <- read.csv(file=paste0(dataloc,"doctoral-consortium-schools-programs, reconciled to carnegie.csv"))
 conschools <- factor(consortium$University)
 consorts.index <- which(noexcludes$School %in% conschools)
 consorts <- noexcludes[consorts.index,]
