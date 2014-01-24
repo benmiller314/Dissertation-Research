@@ -5,7 +5,7 @@ require(cluster)
 require(RColorBrewer)
 
 # make sure we've run dataprep.R
-if(!exists("noexcludes")) {
+if(!exists("imageloc")) {
 	source(file="dataprep.R")
 }
 
@@ -18,6 +18,7 @@ schoolwise <- function(dataset_name, tagset_name, agfixedcols=NULL, difixedcols=
 	# 0. convert variable names to variables. we'll use the names later in the figure titles.
 	dataset <- get(dataset_name)
 	tagset <- get(tagset_name)
+	tagset <- sapply(tagset, FUN=function(x) paste0(x,".mean"))
 	
 	# 1. do the summary (tag mean) of each method type for all schools. 
 	d1 <- summaryBy(. ~ School, data=dataset)
@@ -67,12 +68,12 @@ schoolwise <- function(dataset_name, tagset_name, agfixedcols=NULL, difixedcols=
 
 
 # call the functions for all relevant datasets
-a <- schoolwise("consorts","meannames")
-schoolwise("nonconsorts","meannames", agfixedcols=a$ag$colInd, difixedcols=a$di$colInd)
-schoolwise("noexcludes", "meannames", agfixedcols=a$ag$colInd, difixedcols=a$di$colInd)
+a <- schoolwise("consorts", "tagnames")
+schoolwise("nonconsorts", "tagnames", agfixedcols=a$ag$colInd, difixedcols=a$di$colInd)
+schoolwise("noexcludes", "tagnames", agfixedcols=a$ag$colInd, difixedcols=a$di$colInd)
 
 # next up: re-run with the simplified schema
-b <- 
+b <- schoolwise("consorts", "tagnames.simple")
 
 
 

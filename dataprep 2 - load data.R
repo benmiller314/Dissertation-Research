@@ -1,5 +1,5 @@
 if (!exists("tagnames")) {
-	source(file="dataprep 1 - parameters.R")
+	source(file="dataprep.R")
 }
 
 ## now get the data 
