@@ -2,22 +2,34 @@
 ## and append columns for Method Count and Exclude Level (0=keep, 1=maybe throw out, 2=throw out).
 ## Note that this used to be done in GoogleRefine, but I want it more automate-able.
 
-# load placeholder data; replace with function notation later
-# if(!exists(bigarray)) {
+
+# # Make sure we have data to work with during testing
+# if(!exists("tagnames")) {
 	# source(file="dataprep.R")
-# } else {
-	# data <- bigarray[c(1:13,16)]
+# }
+
+# if(!exists("noexcludes")) {
+	# source(file="dataprep 2 - load data.R")
 # }
 
 
 parse_tags <- function(data) {
-	if (!is.null(data$Crit)) {
-		stop("Data seems to be parsed already. Choose a different dataset to use this function.")
+	# Check that the columns we're adding don't already exist
+	while(any(names(data) %in% tagnames)) {
+		c <- readline("Looks like data has already been parsed. Overwrite (O) or Abort (A)? \n short_schema > ")
+		if(c == "A") {
+			warning("Short_schema not applied; data already parsed.")
+			return()
+		} else if (c == "O") {
+			break
+		} else {
+			print(noquote("I do not understand your response. Try again?"))
+		}
 	}
 
 	# Create a data frame to hold the updated info; we'll merge later.
 	tags <- data.frame(
-		Pub.number = data["Pub.number"],
+		"Pub.number" = data["Pub.number"],
 		"Clin" = 0,
 		"Crit" = 0,
 		"Cult" = 0,
@@ -43,6 +55,9 @@ parse_tags <- function(data) {
 	searchterms <- c("Clinical","Hermeneutical","Cultural","Discourse","Ethnographic","Experimental","Historical","Interview","Meta-Analy","Model","Philosophical","Poetic","Practitioner","Rhetorical", "Survey", "Other")
 	
 	searchresults <- lapply(searchterms, FUN=function(x) grep(x, mt, ignore.case=F))
+	
+	## bug-hunting
+	# grep("Clinical", a[,"Method.Terms"], ignore.case=F)
 	
 	for (i in 1:length(searchresults)) {
 		tags[searchresults[[i]], i+1] <- 1

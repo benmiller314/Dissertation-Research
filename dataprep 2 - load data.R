@@ -9,9 +9,8 @@ bigarray <- read.csv(file=file.choose())
 
 # parse the method tags... including for the collapsed schema
 bigarray <- parse_tags(bigarray)
-tmp <- short_schema(bigarray)
-bigarray <- merge(bigarray, tmp, by="Pub.number")
-rm(tmp)
+bigarray <- short_schema(bigarray)
+
 
 # filter out false positives
 noexcludes <- bigarray[bigarray$Exclude.Level==0,] 

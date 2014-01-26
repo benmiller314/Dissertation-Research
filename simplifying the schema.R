@@ -2,14 +2,32 @@
 #  Possible groups: Aggregable (disc, expt, surv, meta), Phenomenological (case, ethn), Dialectical (crit, hist, modl, phil, rhet), Craft-Based (poet, prac [and tool-building]; cf. Johnson 2010). Bad fits: intv, meta. Drop cult and intv, move meta to Agg.
 # As an alternative pool, cf. Michael Carter's "Ways of Knowing and Doing in the Disciplines"?
 
-if(!exists("noexcludes")) {
-	source(file="dataprep.R")
-}
+# # Make sure we have data to work with during testing
+# if(!exists("tagnames")) {
+	# source(file="dataprep.R")
+# }
+
+# if(!exists("noexcludes")) {
+	# source(file="dataprep 2 - load data.R")
+# }
 
 # define shortcut for new tag names
 tagnames.simple <- c("Aggreg", "Phenom", "Dialec", "Crafty")
 	
 short_schema <- function (data) {	
+	# Check that the columns we're adding don't already exist
+	while(any(names(data) %in% tagnames.simple)) {
+		c <- readline("Looks like data has already been parsed. Overwrite (O) or Abort (A)? \n short_schema > ")
+		if(c == "A") {
+			warning("Short_schema not applied; data already parsed.")
+			return()
+		} else if (c == "O") {
+			break
+		} else {
+			print(noquote("I do not understand your response. Try again?"))
+		}
+	}
+
 	# Create a data frame to hold the updated info; we'll merge later.
 	simple <- data.frame(
 			Pub.number = data["Pub.number"],
@@ -32,7 +50,7 @@ short_schema <- function (data) {
 		ag <- simple[i,"Aggreg"] <- a
 		
 		# Phenomenological
-		a1 <- as.integer(data[i,"Case"])
+		a1 <- as.integer(data[i,"Clin"])
 		a2 <- as.integer(data[i,"Ethn"])
 		a <- max(a1, a2)
 		ph <- simple[i,"Phenom"] <- a
@@ -56,16 +74,24 @@ short_schema <- function (data) {
 		# Now look for multi-modality across these broad categories
 		simple[i, "Counts.simple"] <- sum(ag, ph, di, cr)
 	}
-	# Clean up the workspace
-	rm(a, a1, a2, a3, a4, a5, ag, ph, di, cr)
+	# # Clean up the workspace (not needed after testing)
+	# rm(a, a1, a2, a3, a4, a5, ag, c, ph, di, cr)
 
-	return(simple)
+	data[, tagnames.simple] <- simple[, tagnames.simple]
+	data[, "Counts.simple"] <- simple[, "Counts.simple"]
+	return(data)
 }
 
 # # Confirm the function works properly
-# simple <- short_schema(bigarray)
-# head(simple, 10)
-
+# data <- head(bigarray)
+# data
+# data <- short_schema(data)
+# data
+# data[, tagnames.simple] <- -1
+# data
+# data <- short_schema(data)
+# data
+# rm(data, simple)
 	
 # # Explore the newly configured data
 # table(simple$Counts.simple)
