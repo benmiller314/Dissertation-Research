@@ -8,17 +8,17 @@
 	# source(file="dataprep.R")
 # }
 
-# if(!exists("noexcludes")) {
+# if(!exists("bigarray")) {
 	# source(file="dataprep 2 - load data.R")
 # }
-
+# data <- head(bigarray)
 
 parse_tags <- function(data) {
 	# Check that the columns we're adding don't already exist
 	while(any(names(data) %in% tagnames)) {
-		c <- readline("Looks like data has already been parsed. Overwrite (O) or Abort (A)? \n short_schema > ")
+		c <- readline("Looks like data has already been parsed. Overwrite (O) or Abort (A)? \n parse_tags > ")
 		if(c == "A") {
-			warning("Short_schema not applied; data already parsed.")
+			warning("Parse_tags not applied; data already parsed.")
 			return()
 		} else if (c == "O") {
 			break
@@ -76,7 +76,8 @@ parse_tags <- function(data) {
 	el2 <- grep("xclude ?", mt, fixed=T)
 	tags[el2, "Exclude.Level"] <- tags[el2, "Exclude.Level"] - 1
 	
-	head(data.frame(				# make sure it worked
+	# make sure it worked
+	head(data.frame(				
 			"Method.Terms" = data[which(tags$Exclude.Level > 0),"Method.Terms"], 
 			"Exclude.Level" = tags[which(tags$Exclude.Level > 0),"Exclude.Level"]
 	    ), 30)
@@ -94,8 +95,8 @@ parse_tags <- function(data) {
 	# head(mt)
 	
 	## Satisfied that the foregoing worked, let's merge 
-	data2 <- merge(data,tags,by="Pub.number")
-	return(data2)
+	data[, names(tags)] <- tags
+	return(data)
 }
 
 # clean up the workspace -- not needed after function notation is put in

@@ -77,8 +77,7 @@ short_schema <- function (data) {
 	# # Clean up the workspace (not needed after testing)
 	# rm(a, a1, a2, a3, a4, a5, ag, c, ph, di, cr)
 
-	data[, tagnames.simple] <- simple[, tagnames.simple]
-	data[, "Counts.simple"] <- simple[, "Counts.simple"]
+	data[, names(simple)] <- simple
 	return(data)
 }
 
