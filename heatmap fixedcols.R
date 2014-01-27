@@ -1,7 +1,7 @@
 
 ## slightly modifies the built-in heatmap function to allow for pre-set column order (lines 46-69)
 
-heatmap.fixedcols <- function (x, myColInd, Rowv = NULL, Colv = if (symm) "Rowv" else NULL, 
+heatmap.fixedcols <- function (x, myColInd = NULL, myRowInd = NULL, Rowv = NULL, Colv = if (symm) "Rowv" else NULL, 
     distfun = dist, hclustfun = hclust, reorderfun = function(d, 
         w) reorder(d, w), add.expr, symm = FALSE, revC = identical(Colv, 
         "Rowv"), scale = c("row", "column", "none"), na.rm = TRUE, 
@@ -65,8 +65,9 @@ heatmap.fixedcols <- function (x, myColInd, Rowv = NULL, Colv = if (symm) "Rowv"
     }
     else colInd <- 1L:nc
     
-    # okay, whatever, I'm over-riding all that with my pre-chosen column order
-    colInd <- myColInd
+    # okay, whatever, I'm over-riding all that with my pre-chosen column and row order
+    if (!is.null(myColInd)) { colInd <- myColInd }
+    if (!is.null(myRowInd)) { rowInd <- myRowInd }
     
     x <- x[rowInd, colInd]
     labRow <- if (is.null(labRow)) 
