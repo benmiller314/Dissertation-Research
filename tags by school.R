@@ -61,7 +61,7 @@ schoolwise <- function(dataset_name, tagset_name, agfixedcols=NULL, difixedcols=
 	
 
 	# save the row and column orders to allow for consistent sorting later
-	return(list("ag" = ag, "di" = di))
+	return(list("ag" = ag, "di" = di, byschool = m1))
 	
 # close wrapper function
 }
@@ -74,8 +74,17 @@ schoolwise("noexcludes", "tagnames", agfixedcols=a$ag$colInd, difixedcols=a$di$c
 
 # next up: re-run with the simplified schema
 b <- schoolwise("consorts", "tagnames.simple")
+schoolwise("nonconsorts", "tagnames.simple")
+c <- schoolwise("noexcludes", "tagnames.simple")
+schoolwise("consorts", "tagnames.simple", agfixedcols=c$ag$colInd, difixedcols=c$di$colInd)
+schoolwise("nonconsorts", "tagnames.simple", agfixedcols=c$ag$colInd, difixedcols=c$di$colInd)
 
+# explore the data
+d <- order(c$byschool$Aggreg.mean, decreasing=TRUE)
+schoolwise("consorts", "tagnames.simple", agfixedcols=d, difixedcols=d)
 
-
+c$byschool[c$di$rowInd, which(names(c$byschool) %in% sapply(tagnames.simple, FUN=function(x) paste0(x,".mean")))]
+which(rowsum(c$byschool, row.names(c$byschool)) == 0)
+?rowsum
 # remove interim variables
 rm(m1, m2, m3, noex.by.school.m, nonconsorts.by.school.m, consorts.by.school.m)
