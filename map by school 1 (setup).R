@@ -10,7 +10,8 @@
 require(doBy)
 
 # check that we have all the source files we'll need
-if(!exists("noexcludes")) {source(file="dataprep.R")}
+if(!exists("imageloc")) {source(file="dataprep.R")}
+if(!exists("noexcludes")) {source(file="dataprep 2 - load data.R")}
 
 # set temporary values for the wrapper function -- comment out when done
 dataset_name <- "noexcludes"
@@ -18,6 +19,7 @@ tagset_name <- "tagnames"
 
 
 ## B. Build the Table
+
 
 # Begin wrapper function
 maptags1 <- function (dataset_name="noexcludes", tagset_name="tagnames") {
@@ -29,13 +31,9 @@ maptags1 <- function (dataset_name="noexcludes", tagset_name="tagnames") {
 	# 1. sum each method type for all schools.
 	a1 <- summaryBy(.~School,data=dataset, FUN=sum)
 	
-	# move school names from first column into row names
-	row.names(a1) <- a1$School
-	a1 <- a1[,2:ncol(a1)]
-	
 	# limit output columns to those in the relevant tagset
 	sumnames <- paste0(tagset, ".sum")
-	a1 <- a1[,which(names(a1) %in% sumnames)]
+	a1 <- a1[, which(names(a1) %in% c("School", sumnames))]
 	
 	# save the output
 	filename <- paste0(dataloc, tagset_name, " tagsums by school, ", dataset_name, ", N", nrow(dataset), ".csv")
@@ -48,18 +46,21 @@ maptags1 <- function (dataset_name="noexcludes", tagset_name="tagnames") {
 	head(a2)
 	filename <- paste0(dataloc, "disses by school, ", dataset_name, ", N", nrow(dataset), ".csv")
 	write.csv(a2, file=filename)
-	
+
 	# 3. load file with school names and lat/lng data, created by geocode.R; 
-	# NB: diss.count created by dataprep.R
-	filename <- paste0(dataloc, "geocoding by school, N", diss.count, ".csv")
-	all_schools <- read.csv(filename)
+	# NB: diss.count created by 'dataprep 2 - load the data.R'
+	if !exists("all_schools") {
+		filename <- paste0(dataloc, "geocoding by school, N", diss.count, ".csv")
+		all_schools <- read.csv(filename)
+	}
 	
 	# trim the first column, which is just the row number
 	all_schools <- data.frame(all_schools[,2:ncol(all_schools)])
 	
 	# get clean column names
 	names(all_schools) <- c("School","Lat","Lng","City","State")
-	
+
+		
 	# 4. stitch together steps 1-3, inner join to eliminate schools left over from false positives.
 	# this should give us a geocoded index of schools with columns for total disscount and for counts of each tag in the tagset.
 	a4 <- merge(all_schools, a1, by="School")
@@ -81,6 +82,9 @@ maptags1 <- function (dataset_name="noexcludes", tagset_name="tagnames") {
 
 # Close wrapper function maptags1
 }
+
+# test function
+maptags1()
 
 
 attach(schools.geo)
@@ -148,7 +152,7 @@ title(main="Locations of Schools in the Consortium /n of Doctoral Programs in Rh
 
 
 # superimposing!
-filename <- paste0(imageloc, "comp-rhet schools (consorts and non) superimposed on carnegie2010 doctoral schools, N", nrow(disses.by.school), ".pdf")
+filename <- paste0(imageloc, "comp-rhet schools (consorts and non) superimposed on carnegie2010 doctoral schools, N", nrow(a2), ".pdf")
 pdf(file=filename)
 
 	par(mfrow = c(1,1))
