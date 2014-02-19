@@ -12,8 +12,8 @@ if(!exists("imageloc")) {
 # set broad parameters
 myCol <- brewer.pal(9, "PuRd")
 
-# open wrapper function
-schoolwise <- function(dataset_name, tagset_name, agfixedcols=NULL, difixedcols=NULL) {
+# function for getting data
+schoolwise.data <- function(dataset_name, tagset_name) {
 	
 	# 0. convert variable names to variables. we'll use the names later in the figure titles.
 	dataset <- get(dataset_name)
@@ -30,6 +30,20 @@ schoolwise <- function(dataset_name, tagset_name, agfixedcols=NULL, difixedcols=
 	# 3. remove columns other than method tags, again for the heatmap, and matricize	
 	m1 <- d1[,which(names(d1) %in% tagset)]
 	m2 <- data.matrix(m1)
+	
+	return(m2)
+}
+
+# function for graphing data
+schoolwise <- function(dataset_name, tagset_name, agfixedcols=NULL, difixedcols=NULL) {
+	
+	# 0. convert variable names to variables. we'll use the names later in the figure titles.
+	dataset <- get(dataset_name)
+	tagset <- get(tagset_name)
+	tagset <- sapply(tagset, FUN=function(x) paste0(x,".mean"))
+	
+	# 1-3 call the data-grabbing function
+	m2 <- schoolwise.data(dataset_name, tagset_name)
 	
 	# 4. make the heatmap: use pre-determined columns if need be.
 
