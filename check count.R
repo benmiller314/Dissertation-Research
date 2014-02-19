@@ -2,7 +2,21 @@ m <- noexcludes$Method.Terms
 m1 <- as.character(m)
 m2 <- sapply(m1, FUN=function(x) strsplit(x,"|",fixed=TRUE))
 
+# find everything that might need checking
 checkcount <- sapply(m2, FUN=function(x) length(grep("~check", x, ignore.case=TRUE)))
+sum(checkcount)
+
+# filter out the ones that are maybe worth checking from those that def need checking
+checkmaybes <- sapply(m2, FUN=function(x) length(grep("~check \\?", x, ignore.case=TRUE)))
+sum(checkmaybes)
+m5 <- noexcludes[which(checkmaybes < checkcount),]
+nrow(m5)
+
+# save the file that still needs checking
+filename <- paste0(dataloc, "noexcludes in need of checking.csv")
+write.csv(m5, file=filename)
+
+
 
 ## test
 # data.frame(noexcludes[1:20, which(names(noexcludes) %in% c("Method.Terms"))], as.factor(checkcount[1:20]), row.names=NULL)
@@ -18,7 +32,7 @@ noexcludes[allchecks, which(names(noexcludes) %in% c("Method.Terms"))] <- "Other
 # noexcludes$Method.Terms
 
 print(paste("Converted questionable method terms in",length(allchecks),"rows. Row indices affected:"))
-as.numeric(allchecks)
+print(as.numeric(allchecks))
 
 ## To restore replaced rows:
 # levels(noexcludes$Method.Terms) <- levels(factor(m))
