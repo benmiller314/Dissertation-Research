@@ -23,17 +23,19 @@ schoolwise.data <- function(dataset_name="consorts", tagset_name="tagnames") {
 	
 	# 1. remove columns other than method tags and school
 	dataset <- dataset[, which(names(dataset) %in% c("School", tagset))]
-
-	# 2. do the summary (tag mean) of each method type for all schools. 
+	
+	# 2. do the summary of each method type for all schools. 
 	d1 <- summaryBy(. ~ School, data=dataset, FUN=mean)
 	d2 <- summaryBy(. ~ School, data=dataset, FUN=sum)
+	d3 <- summaryBy( ~ School, data=dataset, FUN=length)
 	
 	# 3. get more meaningful row names (and a purely numerical matrix, for heatmapping)
 	# Note that the first column will always be the list of schools because of the query in step 2.
 	row.names(d1) <- d1[,1]; d1 <- d1[,2:ncol(d1)]
 	row.names(d2) <- d2[,1]; d2 <- d2[,2:ncol(d2)]
+	row.names(d3) <- d3[,1]; d3 <- d3[,2:ncol(d3)]
 	
-	return(list("means" = d1, "sums" = d2))
+	return(list("means" = d1, "sums" = d2, "counts" = d3))
 }
 
 # function for graphing data
@@ -46,6 +48,7 @@ schoolwise <- function(dataset_name, tagset_name, agfixedcols=NULL, difixedcols=
 	
 	# 1-3 call the data-grabbing function
 	m2 <- schoolwise.data(dataset_name, tagset_name)$means
+	m2 <- data.matrix(m2)
 	
 	# 4. make the heatmap: use pre-determined columns if need be.
 
