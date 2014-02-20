@@ -7,7 +7,7 @@ methods.barplot <- function(data, dataname="noexcludes") {
 	
 	filename <- paste0(imageloc, "method count barplot, ", dataname, " (N ",rows,").pdf")	
 	
-	pdf(file=filename)
+	if (remake_figs) {pdf(file=filename)}
 	
 	barplot(data.t, 
 			main="Most Dissertations use Multiple Methods",
@@ -32,8 +32,9 @@ methods.barplot <- function(data, dataname="noexcludes") {
 			text=paste("mean =",round(data.mean,2),"\n","sd =",round(data.sd,2),"\n","N =",rows)
 		)
 
-	dev.off()
+	if (remake_figs) {dev.off()}
 }
 
-methods.barplot(noexcludes$MethodCount, "All Schools")
-methods.barplot(consorts$MethodCount, "Consortium Schools Only")
+methods.barplot(noexcludes$Method.Count, "All Schools")
+methods.barplot(consorts$Method.Count, "Consortium Schools Only")
+methods.barplot(nonconsorts$Method.Count, "Non-Consortium Schools Only")
