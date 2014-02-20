@@ -28,13 +28,7 @@ schoolwise.data <- function(dataset_name="consorts", tagset_name="tagnames") {
 	d1 <- summaryBy(. ~ School, data=dataset, FUN=mean)
 	d2 <- summaryBy(. ~ School, data=dataset, FUN=sum)
 	d3 <- summaryBy( ~ School, data=dataset, FUN=length)
-	
-	# 3. get more meaningful row names (and a purely numerical matrix, for heatmapping)
-	# Note that the first column will always be the list of schools because of the query in step 2.
-	row.names(d1) <- d1[,1]; d1 <- d1[,2:ncol(d1)]
-	row.names(d2) <- d2[,1]; d2 <- d2[,2:ncol(d2)]
-	row.names(d3) <- d3[,1]; d3 <- d3[,2:ncol(d3)]
-	
+		
 	return(list("means" = d1, "sums" = d2, "counts" = d3))
 }
 
@@ -46,9 +40,14 @@ schoolwise <- function(dataset_name, tagset_name, agfixedcols=NULL, difixedcols=
 	tagset <- get(tagset_name)
 	tagset <- sapply(tagset, FUN=function(x) paste0(x,".mean"))
 	
-	# 1-3 call the data-grabbing function
+	# 1-2 call the data-grabbing function
 	m2 <- schoolwise.data(dataset_name, tagset_name)$means
+
+	# 3. get more meaningful row names (and a purely numerical matrix, for heatmapping)
+	# Note that the first column will always be the list of schools because of the query in step 2.
+	row.names(m2) <- m2[,1]; m2 <- m2[,2:ncol(m2)]
 	m2 <- data.matrix(m2)
+	
 	
 	# 4. make the heatmap: use pre-determined columns if need be.
 
