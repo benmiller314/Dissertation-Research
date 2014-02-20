@@ -16,7 +16,7 @@ fix_factor <- function(f, to.add, to.remove = NULL) {
 	ff <- as.character(f)
 
 	if (!is.null(to.remove)) {
-		ff[which(ff == to.remove)] <- to.add
+		ff[which(ff %in% to.remove)] <- to.add
 	} else {
 		ff <- c(ff, to.add)
 	}
