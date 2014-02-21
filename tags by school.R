@@ -79,7 +79,7 @@ schoolwise <- function(dataset_name, tagset_name, agfixedcols=NULL, difixedcols=
 	
 
 	# save the row and column orders to allow for consistent sorting later
-	return(list("ag" = ag, "di" = di, byschool = m2))
+	return(list("ag" = ag, "di" = di))
 	
 # close wrapper function
 }
