@@ -87,7 +87,8 @@ schoolwise <- function(dataset_name, tagset_name, agfixedcols=NULL, difixedcols=
 
 # call the functions for all relevant datasets
 a <- schoolwise("consorts", "tagnames")
-schoolwise("nonconsorts", "tagnames", agfixedcols=a$ag$colInd, difixedcols=a$di$colInd)
+# schoolwise("nonconsorts", "tagnames", agfixedcols=a$ag$colInd, difixedcols=a$di$colInd)
+schoolwise("nonconsorts", "tagnames")
 schoolwise("noexcludes", "tagnames", agfixedcols=a$ag$colInd, difixedcols=a$di$colInd)
 
 # next up: re-run with the simplified schema
