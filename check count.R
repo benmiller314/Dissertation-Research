@@ -58,4 +58,4 @@ noexcludes$Method.Count <- sapply(m4, FUN=length)
 # others <- sapply(m3, FUN=function(x) if (grep("Other", x, ignore.case=TRUE) return(1) else return(0)))
 
 # remove interim variables to save memory
-rm(m, m1, m2, m3, m4, allchecks, backup, other.index)
+rm(m, m1, m2, m3, m4, m5, allchecks, backup, other.index)
