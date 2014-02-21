@@ -32,7 +32,7 @@ parse_tags <- function(data) {
 		"Pub.number" = data["Pub.number"],
 		"Clin" = 0,
 		"Crit" = 0,
-		"Cult" = 0,
+		# "Cult" = 0,
 		"Disc" = 0,
 		"Ethn" = 0,
 		"Expt" = 0,
@@ -52,7 +52,9 @@ parse_tags <- function(data) {
 	
 	# For each method tag, deduce from Method.Terms what tags are present.
 	mt <- data[, "Method.Terms"]
-	searchterms <- c("Clinical","Hermeneutical","Cultural","Discourse","Ethnographic","Experimental","Historical","Interview","Meta-Analy","Model","Philosophical","Poetic","Practitioner","Rhetorical", "Survey", "Other")
+	searchterms <- c("Clinical","Hermeneutical",
+	# "Cultural",
+	"Discourse","Ethnographic","Experimental","Historical","Interview","Meta-Analy","Model","Philosophical","Poetic","Practitioner","Rhetorical", "Survey", "Other")
 	
 	searchresults <- lapply(searchterms, FUN=function(x) grep(x, mt, ignore.case=F))
 	
@@ -66,7 +68,12 @@ parse_tags <- function(data) {
 	# Populate Method.Count by summing across each row
 	for (i in 1:nrow(tags)) {
 		tags[i,"Method.Count"] <- sum(tags[i,tagnames])
-	}
+	}	
+	
+	# Account for Method.Count==0, which means that the only tag was excluded above
+	print(noquote(paste("Converting", length(which(tags$Method.Count==0)), "dissertations with solo tags now excluded from the schema to solo 'Other'")))
+	tags[which(tags$Method.Count==0), "Othr"] <- 1
+
 	
 	# Populate Exclude.Level 
 	el <- grep("xclude", mt, fixed=T)
