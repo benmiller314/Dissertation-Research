@@ -12,7 +12,7 @@
 # }
 
 # define shortcut for new tag names
-tagnames.simple <- c("Aggreg", "Phenom", "Dialec", "Crafty")
+tagnames.simple <- c("Aggreg", "Phenom", "Dialec", "Crafty", "Pract")
 	
 short_schema <- function (data) {	
 	# Check that the columns we're adding don't already exist
@@ -31,10 +31,11 @@ short_schema <- function (data) {
 	# Create a data frame to hold the updated info; we'll merge later.
 	simple <- data.frame(
 			Pub.number = data["Pub.number"],
-			Aggreg = -1,
-			Phenom = -1,
-			Dialec = -1,
-			Crafty = -1,
+			Aggreg = -1,		# Aggregable
+			Phenom = -1,		# Phenomenological
+			Dialec = -1,		# Dialectical
+			Crafty = -1,		# Craft-Based
+			Pract  = -1,		# Practitioner (a little redundant, but makes `simple` simpler.)
 			Counts.simple = -1
 	)
 	head(simple)
@@ -66,31 +67,36 @@ short_schema <- function (data) {
 		
 		# Craft-Based
 		a1 <- as.integer(data[i,"Poet"])
-		a2 <- as.integer(data[i,"Prac"])
+#		a2 <- as.integer(data[i,"Prac"])
 		a3 <- as.integer(grep("tool-building",data[i,"Method.Terms"],ignore.case=TRUE))
-		a <- max(a1, a2, a3)
+		a <- max(a1, 
+		       # a2, 
+				 a3)
 		cr <- simple[i,"Crafty"] <- a
 		
+		# Practitioner
+		pr <- simple[i, "Pract"] <- as.integer(data[i,"Prac"])
+		
 		# Now look for multi-modality across these broad categories
-		simple[i, "Counts.simple"] <- sum(ag, ph, di, cr)
+		simple[i, "Counts.simple"] <- sum(ag, ph, di, cr, pr)
 	}
 	# # Clean up the workspace (not needed after testing)
-	# rm(a, a1, a2, a3, a4, a5, ag, c, ph, di, cr)
+	# rm(a, a1, a2, a3, a4, a5, ag, c, ph, di, cr, pr)
 
 	data[, names(simple)] <- simple
 	return(data)
 }
 
-# # Confirm the function works properly
-# data <- head(bigarray)
-# data
-# data <- short_schema(data)
-# data
-# data[, tagnames.simple] <- -1
-# data
-# data <- short_schema(data)
-# data
-# rm(data, simple)
+# Confirm the function works properly
+data <- head(bigarray)
+data
+data <- short_schema(data)
+data
+data[, tagnames.simple] <- -1
+data
+data <- short_schema(data)
+data
+rm(data, simple)
 	
 # # Explore the newly configured data
 # table(simple$Counts.simple)
