@@ -16,8 +16,8 @@ myCol <- brewer.pal(9, "PuRd")
 schoolwise.data <- function(dataset_name="consorts", tagset_name="tagnames") {
 	
 	# 0. convert variable names to variables. we'll use the names later in the figure titles.
-	dataset <- get(dataset_name)
-	tagset <- get(tagset_name)
+	dataset <- get(dataset_name, envir=parent.frame())
+	tagset <- get(tagset_name, envir=parent.frame())
 	tagset.mean <- sapply(tagset, FUN=function(x) paste0(x,".mean"))
 	tagset.sum <- sapply(tagset, FUN=function(x) paste0(x,".sum"))
 	
