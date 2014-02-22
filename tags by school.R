@@ -52,7 +52,7 @@ schoolwise <- function(dataset_name, tagset_name, agfixedcols=NULL, difixedcols=
 	# 4. make the heatmap: use pre-determined columns if need be.
 
 	# 4a. agglomerative clustering (agnes) first:
-	filename <- paste0(imageloc, "tags by schools, ", dataset_name, ", N", nrow(dataset), ", agnes.pdf")
+	filename <- paste0(imageloc, "tags by schools, ", dataset_name, ", N", nrow(dataset), ", ", tagset_name, "agnes.pdf")
 	maintitle <- paste0("Method Tag Averages by school, ", dataset_name, ", ", tagset_name)
 	
 	if(remake_figs) {pdf(file=filename)}
@@ -65,7 +65,7 @@ schoolwise <- function(dataset_name, tagset_name, agfixedcols=NULL, difixedcols=
 	if(remake_figs) {dev.off()}
 	
 	# 4b. now divisive clustering (diana):
-	filename <- paste0(imageloc, "tags by schools, ", dataset_name, ", N", nrow(dataset), ", diana.pdf")
+	filename <- paste0(imageloc, "tags by schools, ", dataset_name, ", N", nrow(dataset), ", ", tagset_name, " diana.pdf")
 	maintitle <- paste0("Method Tag Averages by school, ", dataset_name, ", ", tagset_name)
 	
 	if(remake_figs) {pdf(file=filename)}
