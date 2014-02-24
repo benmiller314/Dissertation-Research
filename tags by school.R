@@ -76,10 +76,21 @@ schoolwise <- function(dataset_name, tagset_name, agfixedcols=NULL, difixedcols=
 		}
 		mtext("Each cell gives the likelihood that a given dissertation from the school in row Y is tagged with the method in column X.",side=1)
 	if(remake_figs) {dev.off()}
+		# 4c. agglomerative clustering via hclust:
+	filename <- paste0(imageloc, "tags by schools, ", dataset_name, ", N", nrow(dataset), ", ", tagset_name, ", hclust.pdf")
+	maintitle <- paste0("Method Tag Averages by school, ", dataset_name, ", ", tagset_name)
 	
 
+	if(remake_figs) {pdf(file=filename)}
+		if(!is.null(agfixedcols)) {
+			hc <- heatmap.fixedcols(m2, myColInd=agfixedcols, scale="row", col=myCol, main=maintitle)
+		} else {
+			hc <- heatmap(m2, scale="row", col=myCol, main=maintitle)
+		}
+		mtext("Each cell gives the likelihood that a given dissertation from the school in row Y is tagged with the method in column X.",side=1)
+	if(remake_figs) {dev.off()}
 	# save the row and column orders to allow for consistent sorting later
-	return(list("ag" = ag, "di" = di))
+	return(list("ag" = ag, "di" = di, "hc" = hc))
 	
 # close wrapper function
 }
