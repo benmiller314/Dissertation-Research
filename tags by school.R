@@ -98,6 +98,10 @@ schoolwise <- function(dataset_name="noexcludes", tagset_name="tagnames", agfixe
 	if(remake_figs) {dev.off()}
 	}
 
+	if(!exists("di", inherits=F)) di <- noquote("Not run")
+	if(!exists("ag", inherits=F)) ag <- noquote("Not run")
+	if(!exists("hc", inherits=F)) hc <- noquote("Not run")
+
 	# save the row and column orders to allow for consistent sorting later
 	return(list("ag" = ag, "di" = di, "hc" = hc))
 	
