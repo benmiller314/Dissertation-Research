@@ -51,23 +51,7 @@ schoolwise <- function(dataset_name="noexcludes", tagset_name="tagnames", agfixe
 	
 	# 4. make the heatmap: use pre-determined columns if need be.
 
-	# 4a. agglomerative clustering (agnes) first:
-	if(agn) {
-		filename <- paste0(imageloc, "tags by schools, ", dataset_name, ", N", nrow(dataset), ", ", tagset_name, ", agnes.pdf")
-	maintitle <- paste0("Method Tag Averages by school, ", dataset_name, ", ", tagset_name)
-	
-
-	if(remake_figs) {pdf(file=filename)}
-		if(!is.null(agfixedcols)) {
-			ag <- heatmap.fixedcols(m2, myColInd=agfixedcols, hclustfun=function(d){agnes(d,method="ward")}, scale="row", col=myCol, main=maintitle)
-		} else {
-			ag <- heatmap(m2, hclustfun=function(d){agnes(d,method="ward")}, scale="row", col=myCol, main=maintitle)
-		}
-		mtext("Each cell gives the likelihood that a given dissertation from the school in row Y is tagged with the method in column X.",side=1)
-	if(remake_figs) {dev.off()}
-	}
-	
-	# 4b. now divisive clustering (diana):
+	# 4b. divisive clustering (diana):
 	if(dia) {
 	filename <- paste0(imageloc, "tags by schools, ", dataset_name, ", N", nrow(dataset), ", ", tagset_name, ", diana.pdf")
 	maintitle <- paste0("Method Tag Averages by school, ", dataset_name, ", ", tagset_name)
@@ -82,6 +66,22 @@ schoolwise <- function(dataset_name="noexcludes", tagset_name="tagnames", agfixe
 	if(remake_figs) {dev.off()}
 	}
 		
+	# 4a. agglomerative clustering (agnes):
+	if(agn) {
+		filename <- paste0(imageloc, "tags by schools, ", dataset_name, ", N", nrow(dataset), ", ", tagset_name, ", agnes.pdf")
+	maintitle <- paste0("Method Tag Averages by school, ", dataset_name, ", ", tagset_name)
+	
+
+	if(remake_figs) {pdf(file=filename)}
+		if(!is.null(agfixedcols)) {
+			ag <- heatmap.fixedcols(m2, myColInd=agfixedcols, hclustfun=function(d){agnes(d,method="ward")}, scale="row", col=myCol, main=maintitle)
+		} else {
+			ag <- heatmap(m2, hclustfun=function(d){agnes(d,method="ward")}, scale="row", col=myCol, main=maintitle)
+		}
+		mtext("Each cell gives the likelihood that a given dissertation from the school in row Y is tagged with the method in column X.",side=1)
+	if(remake_figs) {dev.off()}
+	}
+
 		# 4c. agglomerative clustering via hclust:
 	if(hcl) {
 	filename <- paste0(imageloc, "tags by schools, ", dataset_name, ", N", nrow(dataset), ", ", tagset_name, ", hclust.pdf")
@@ -103,7 +103,7 @@ schoolwise <- function(dataset_name="noexcludes", tagset_name="tagnames", agfixe
 	if(!exists("hc", inherits=F)) hc <- noquote("Not run")
 
 	# save the row and column orders to allow for consistent sorting later
-	return(list("ag" = ag, "di" = di, "hc" = hc))
+	return(list("di" = di, "ag" = ag, "hc" = hc))
 	
 # close wrapper function
 }
@@ -121,6 +121,8 @@ schoolwise("nonconsorts", "tagnames.simple")
 schoolwise("noexcludes", "tagnames.simple")
 # schoolwise("consorts", "tagnames.simple", agfixedcols=c$ag$colInd, difixedcols=c$di$colInd)
 # schoolwise("nonconsorts", "tagnames.simple", agfixedcols=c$ag$colInd, difixedcols=c$di$colInd)
+
+
 
 # # explore the data
 # d <- order(c$byschool$Aggreg.mean, decreasing=TRUE)
