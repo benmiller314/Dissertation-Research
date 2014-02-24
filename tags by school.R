@@ -33,7 +33,7 @@ schoolwise.data <- function(dataset_name="consorts", tagset_name="tagnames") {
 }
 
 # function for graphing data
-schoolwise <- function(dataset_name, tagset_name, agfixedcols=NULL, difixedcols=NULL) {
+schoolwise <- function(dataset_name="noexcludes", tagset_name="tagnames", agfixedcols=NULL, difixedcols=NULL, agn=TRUE, hcl=TRUE, dia=TRUE) {
 	
 	# 0. convert variable names to variables. we'll use the names later in the figure titles.
 	dataset <- get(dataset_name)
@@ -52,9 +52,11 @@ schoolwise <- function(dataset_name, tagset_name, agfixedcols=NULL, difixedcols=
 	# 4. make the heatmap: use pre-determined columns if need be.
 
 	# 4a. agglomerative clustering (agnes) first:
-	filename <- paste0(imageloc, "tags by schools, ", dataset_name, ", N", nrow(dataset), ", ", tagset_name, ", agnes.pdf")
+	if(agn) {
+		filename <- paste0(imageloc, "tags by schools, ", dataset_name, ", N", nrow(dataset), ", ", tagset_name, ", agnes.pdf")
 	maintitle <- paste0("Method Tag Averages by school, ", dataset_name, ", ", tagset_name)
 	
+
 	if(remake_figs) {pdf(file=filename)}
 		if(!is.null(agfixedcols)) {
 			ag <- heatmap.fixedcols(m2, myColInd=agfixedcols, hclustfun=function(d){agnes(d,method="ward")}, scale="row", col=myCol, main=maintitle)
@@ -63,8 +65,10 @@ schoolwise <- function(dataset_name, tagset_name, agfixedcols=NULL, difixedcols=
 		}
 		mtext("Each cell gives the likelihood that a given dissertation from the school in row Y is tagged with the method in column X.",side=1)
 	if(remake_figs) {dev.off()}
+	}
 	
 	# 4b. now divisive clustering (diana):
+	if(dia) {
 	filename <- paste0(imageloc, "tags by schools, ", dataset_name, ", N", nrow(dataset), ", ", tagset_name, ", diana.pdf")
 	maintitle <- paste0("Method Tag Averages by school, ", dataset_name, ", ", tagset_name)
 	
@@ -76,7 +80,10 @@ schoolwise <- function(dataset_name, tagset_name, agfixedcols=NULL, difixedcols=
 		}
 		mtext("Each cell gives the likelihood that a given dissertation from the school in row Y is tagged with the method in column X.",side=1)
 	if(remake_figs) {dev.off()}
+	}
+		
 		# 4c. agglomerative clustering via hclust:
+	if(hcl) {
 	filename <- paste0(imageloc, "tags by schools, ", dataset_name, ", N", nrow(dataset), ", ", tagset_name, ", hclust.pdf")
 	maintitle <- paste0("Method Tag Averages by school, ", dataset_name, ", ", tagset_name)
 	
@@ -89,6 +96,8 @@ schoolwise <- function(dataset_name, tagset_name, agfixedcols=NULL, difixedcols=
 		}
 		mtext("Each cell gives the likelihood that a given dissertation from the school in row Y is tagged with the method in column X.",side=1)
 	if(remake_figs) {dev.off()}
+	}
+
 	# save the row and column orders to allow for consistent sorting later
 	return(list("ag" = ag, "di" = di, "hc" = hc))
 	
