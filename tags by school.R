@@ -33,7 +33,7 @@ schoolwise.data <- function(dataset_name="consorts", tagset_name="tagnames") {
 }
 
 # function for graphing data
-schoolwise <- function(dataset_name="noexcludes", tagset_name="tagnames", agfixedcols=NULL, difixedcols=NULL, agn=TRUE, hcl=TRUE, dia=TRUE) {
+schoolwise <- function(dataset_name="noexcludes", tagset_name="tagnames", agfixedcols=NULL, difixedcols=NULL, agn=TRUE, hcl=TRUE, dia=TRUE, counts=FALSE) {
 	
 	# 0. convert variable names to variables. we'll use the names later in the figure titles.
 	dataset <- get(dataset_name)
@@ -46,7 +46,12 @@ schoolwise <- function(dataset_name="noexcludes", tagset_name="tagnames", agfixe
 
 	# 3. get more meaningful row names (and a purely numerical matrix, for heatmapping)
 	# Note that the first column will always be the list of schools because of the query in step 2.
-	row.names(m2) <- m2[,1]; m2 <- m2[,2:ncol(m2)]
+	if (counts) {
+		row.names(m2) <- paste0(m2$School, " (", m1$counts$School.length, ")") 
+	} else {
+		row.names(m2) <- m2$School
+	}
+	m2 <- m2[,2:ncol(m2)]
 	m2 <- data.matrix(m2)
 	
 	
