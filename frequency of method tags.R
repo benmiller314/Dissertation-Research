@@ -39,27 +39,42 @@ if (remake_figs) { dev.off() }
 
 ## Step 3. Compare ranks of consorts vs. nonconsorts
 
+b1 <- names(b)[order(b, decreasing=T)]
+b2 <- paste0(b1, " (", b[order(b, decreasing=T)], ")")
+c1 <- names(c)[order(c, decreasing=T)]
+c2 <- paste0(c1, " (", c[order(c, decreasing=T)], ")")
+
 # set up a blank plot
 plot.new()
 plot(0:length(tagnames)+1, 0:length(tagnames)+1, axes=FALSE, type="n")
 
 # arrange consorts in descending rank order on the left, nonconsorts on the right
-text(labels=names(b)[order(b, decreasing=T)], rep(1,length(b)), order(b))
-text(labels=names(c)[order(c, decreasing=T)], rep(9,length(c)), order(c))
+text(labels=b2, rep(4,length(b)), order(b))
+text(labels=c2, rep(length(tagnames)-4,length(c)), order(c))
 
 # draw a line from each tag's position on the left to the one on the right
 lapply(tagnames, FUN=function(tag) {
-	segments(x0=1.7, y0=grep(tag, names(b[order(b)])),		 
-	         x1=8.3, y1=grep(tag, names(c[order(c)])))
+	segments(x0=5.7, y0=grep(tag, names(b[order(b)])),		 
+	         x1=length(tagnames)-5.7, y1=grep(tag, names(c[order(c)]))
+	)
 })
 
-# extend those lines to point horizontally to the tags
+# extend those lines to point horizontally to the tags, to remove ambiguity
 lapply(1:length(tagnames), FUN=function(y) {
-	segments(x0=1.6, y0=y,
-			 x1=1.7, y1=y)
-	segments(x0=8.3, y0=y,
-			 x1=8.4, y1=y)		
+	segments(x0=5.4, y0=y,
+			 x1=5.7, y1=y)
+	segments(x0=length(tagnames)-5.4, y0=y,
+			 x1=length(tagnames)-5.7, y1=y)		
 })
 
 # label the two sides
-text(labels=c("Consortium Schools", "Non-consortium Schools"), x=c(1,9), y=rep(length(tagnames)+1,2))
+text(labels=c("Consortium Schools", "Non-consortium Schools"), x=c(4,length(tagnames)-4), y=rep(length(tagnames)+1,2))
+
+# # debugging
+# (b)[order(b)]
+# grep("Rhet",names(b)[order(b)])
+# grep("Ethn",names(b)[order(b)])
+# (c)[order(c)]
+# grep("Ethn",names(c)[order(c)])
+# grep("Rhet",names(c)[order(c)])
+
