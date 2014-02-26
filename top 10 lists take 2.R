@@ -1,9 +1,9 @@
 ## Top 10 Lists, take 2
-
 require(doBy)
 
+
 # open wrapper function
-toplists <- function(dataset_name="noexcludes", tagset_name="tagnames", howmany=5, threshold=5, rank_by_pcts=TRUE) {
+toplists <- function(dataset_name="noexcludes", tagset_name="tagnames", howmany=5, threshold=5, since=2006, until=2010, rank_by_pcts=TRUE) {
 	
 	## 0. convert variable names to variables. we'll use the names later in the figure titles.
 	dataset <- get(dataset_name)
@@ -11,24 +11,16 @@ toplists <- function(dataset_name="noexcludes", tagset_name="tagnames", howmany=
 
 
 	## 1. find schools with more than 5 dissertations in 2006-2010
-
-	# 1a. subset the data for these years
-	d1 <- dataset[which(dataset$Year > 2005),]
+	if (!exists("thresh")) { source(file="thresh.R") }
 	
-	# 1b. summarize that data by school, counting rows
-	d2 <- summaryBy( ~ School, data=d1, FUN=length)
-
-	# 1c. find the schools in that time period with more than threshold (default=5)
-	d3 <- d2[which(d2$School.length >= threshold), "School"]
-	subtitle1 <- paste0("Found ", length(d3), " schools (out of ", nrow(d2), " ", dataset_name, ") with ", threshold, " or more dissertations in 2006-2010")
-
-	## 2. get full 10-year tag data for those schools
-	d4 <- dataset[which(dataset$School %in% d3),]
+	d <- thresh(dataset_name, tagset_name, threshold, since, until)
+	d1 <- d$thresh.data
+	subtitle1 <- d$thresh.report
 
 	if (!exists("schoolwise.data")) { source(file="tags by school.R") }
-	a <- schoolwise.data("d4",tagset_name)
+	a <- schoolwise.data("d1", tagset_name)
 
-	# 2a. Star the schools in the consortium
+	# 2 Star the schools in the consortium
 	c <- which(a$counts$School %in% consorts$School)
 	a$counts$School <- fix_factor(a$counts$School, paste0(a$counts$School[c], "*"), a$counts$School[c])
 
@@ -87,8 +79,12 @@ toplists <- function(dataset_name="noexcludes", tagset_name="tagnames", howmany=
 }
 
 # call function
-toplists(howmany=10, threshold=1)
-toplists(tagset_name="tagnames", rank_by_pcts=FALSE, howmany=20, threshold=1)
+# TO DO: Write the output to a file for easier porting to Word, Scrivener, etc.
+filename <- "Top 5 Schools by Methodological Focus (Ranked by Percentage)"
+toplists()
 
-# clean up working variables (only needed during testing)
-rm(d1, d2, d3, d4, a, a1, a2, a3, a4, a5, a6, b, c)
+filename <- "Top 5 Schools by Methodological Focus (Ranked by Number of Dissertations)"
+toplists(rank_by_pcts=F)
+
+# # clean up working variables (only needed during testing)
+# rm(d1, d2, d3, d4, a, a1, a2, a3, a4, a5, a6, b, c)
