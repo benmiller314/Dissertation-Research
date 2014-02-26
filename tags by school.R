@@ -41,7 +41,8 @@ schoolwise <- function(dataset_name="noexcludes", tagset_name="tagnames", agfixe
 	tagset <- sapply(tagset, FUN=function(x) paste0(x,".mean"))
 	
 	# 1-2 call the data-grabbing function
-	m2 <- schoolwise.data(dataset_name, tagset_name)$means
+	m1 <- schoolwise.data(dataset_name, tagset_name)
+	m2 <- m1$means
 
 	# 3. get more meaningful row names (and a purely numerical matrix, for heatmapping)
 	# Note that the first column will always be the list of schools because of the query in step 2.

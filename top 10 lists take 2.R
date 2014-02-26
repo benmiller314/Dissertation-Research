@@ -80,10 +80,11 @@ toplists <- function(dataset_name="noexcludes", tagset_name="tagnames", howmany=
 
 # call function
 # TO DO: Write the output to a file for easier porting to Word, Scrivener, etc.
-filename <- "Top 5 Schools by Methodological Focus (Ranked by Percentage)"
+filename <- paste0(imageloc, "Top 5 Schools by Methodological Focus (Ranked by Percentage)")
+
 toplists()
 
-filename <- "Top 5 Schools by Methodological Focus (Ranked by Number of Dissertations)"
+filename <- paste0(imageloc,"Top 5 Schools by Methodological Focus (Ranked by Number of Dissertations)")
 toplists(rank_by_pcts=F)
 
 # # clean up working variables (only needed during testing)
