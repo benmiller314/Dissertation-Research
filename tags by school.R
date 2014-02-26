@@ -58,9 +58,9 @@ schoolwise <- function(dataset_name="noexcludes", tagset_name="tagnames", agfixe
 	
 	if(remake_figs) {pdf(file=filename)}
 		if(!is.null(difixedcols)) {
-			di <- heatmap.fixedcols(m2, myColInd=difixedcols, hclustfun=function(d){diana(d,metric="ward")}, scale="row", col=myCol, main=maintitle)
+			di <- heatmap.fixedcols(m2, myColInd=difixedcols, hclustfun=function(d){diana(d,metric="ward")}, scale="row", col=myCol, main=maintitle, margins=c(10,5))
 		} else {
-			di <- heatmap(m2, hclustfun=function(d){diana(d,metric="ward")}, scale="row", col=myCol, main=maintitle)
+			di <- heatmap(m2, hclustfun=function(d){diana(d,metric="ward")}, scale="row", col=myCol, main=maintitle, margins=c(10,5))
 		}
 		mtext("Each cell gives the likelihood that a given dissertation from the school in row Y is tagged with the method in column X.",side=1)
 	if(remake_figs) {dev.off()}
@@ -74,9 +74,9 @@ schoolwise <- function(dataset_name="noexcludes", tagset_name="tagnames", agfixe
 
 	if(remake_figs) {pdf(file=filename)}
 		if(!is.null(agfixedcols)) {
-			ag <- heatmap.fixedcols(m2, myColInd=agfixedcols, hclustfun=function(d){agnes(d,method="ward")}, scale="row", col=myCol, main=maintitle)
+			ag <- heatmap.fixedcols(m2, myColInd=agfixedcols, hclustfun=function(d){agnes(d,method="ward")}, scale="row", col=myCol, main=maintitle, margins=c(10,5))
 		} else {
-			ag <- heatmap(m2, hclustfun=function(d){agnes(d,method="ward")}, scale="row", col=myCol, main=maintitle)
+			ag <- heatmap(m2, hclustfun=function(d){agnes(d,method="ward")}, scale="row", col=myCol, main=maintitle, margins=c(10,5))
 		}
 		mtext("Each cell gives the likelihood that a given dissertation from the school in row Y is tagged with the method in column X.",side=1)
 	if(remake_figs) {dev.off()}
@@ -90,9 +90,9 @@ schoolwise <- function(dataset_name="noexcludes", tagset_name="tagnames", agfixe
 
 	if(remake_figs) {pdf(file=filename)}
 		if(!is.null(agfixedcols)) {
-			hc <- heatmap.fixedcols(m2, myColInd=agfixedcols, scale="row", col=myCol, main=maintitle)
+			hc <- heatmap.fixedcols(m2, myColInd=agfixedcols, scale="row", col=myCol, main=maintitle, margins=c(10,5))
 		} else {
-			hc <- heatmap(m2, scale="row", col=myCol, main=maintitle)
+			hc <- heatmap(m2, scale="row", col=myCol, main=maintitle, margins=c(10,5))
 		}
 		mtext("Each cell gives the likelihood that a given dissertation from the school in row Y is tagged with the method in column X.",side=1)
 	if(remake_figs) {dev.off()}
