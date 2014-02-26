@@ -46,37 +46,32 @@ c0 <- c[!names(c) %in% "Othr"]
 c1 <- names(c0)[order(c0, decreasing=T)]
 c2 <- paste0(c1, " (", c0[order(c0, decreasing=T)], ")")
 
-# set up a blank plot
-plot.new()
-plot(0:length(tagnames)+1, 0:length(tagnames)+1, axes=FALSE, type="n")
+filename <- paste0(imageloc, "Ranks of methods in consorts v nonconsorts, no Othr.pdf")
+if(remake_figs) { pdf(file=filename) }
+	# set up a blank plot
+	plot.new()
+	plot(0:length(tagnames)+1, 0:length(tagnames)+1, axes=FALSE, type="n", xlab="", ylab="")
+	
+	# arrange consorts in descending rank order on the left, nonconsorts on the right
+	text(labels=b2, rep(4,length(b0)), order(b0))
+	text(labels=c2, rep(length(tagnames)-4, length(c0)), order(c0))
+	
+	# draw a line from each tag's position on the left to the one on the right
+	lapply(tagnames[!tagnames %in% "Othr"], FUN=function(tag) {
+		segments(x0=5.7, y0=grep(tag, names(b0[order(b0)])),		 
+		         x1=length(tagnames)-5.7, y1=grep(tag, names(c0[order(c0)]))
+		)
+	})
+	
+	# extend those lines to point horizontally to the tags, to remove ambiguity
+	lapply(1:length(tagnames)-1, FUN=function(y) {
+		segments(x0=5.4, y0=y,
+				 x1=5.7, y1=y)
+		segments(x0=length(tagnames)-5.4, y0=y,
+				 x1=length(tagnames)-5.7, y1=y)		
+	})
+	
+	# label the two sides
+	text(labels=c("Consortium Schools", "Non-consortium Schools"), x=c(4,length(tagnames)-4), y=rep(length(tagnames)+1,2))
 
-# arrange consorts in descending rank order on the left, nonconsorts on the right
-text(labels=b2, rep(4,length(b0)), order(b0))
-text(labels=c2, rep(length(tagnames)-4, length(c0)), order(c0))
-
-# draw a line from each tag's position on the left to the one on the right
-lapply(tagnames[!tagnames %in% "Othr"], FUN=function(tag) {
-	segments(x0=5.7, y0=grep(tag, names(b0[order(b0)])),		 
-	         x1=length(tagnames)-5.7, y1=grep(tag, names(c0[order(c0)]))
-	)
-})
-
-# extend those lines to point horizontally to the tags, to remove ambiguity
-lapply(1:length(tagnames)-1, FUN=function(y) {
-	segments(x0=5.4, y0=y,
-			 x1=5.7, y1=y)
-	segments(x0=length(tagnames)-5.4, y0=y,
-			 x1=length(tagnames)-5.7, y1=y)		
-})
-
-# label the two sides
-text(labels=c("Consortium Schools", "Non-consortium Schools"), x=c(4,length(tagnames)-4), y=rep(length(tagnames)+1,2))
-
-# # debugging
-# (b)[order(b)]
-# grep("Rhet",names(b)[order(b)])
-# grep("Ethn",names(b)[order(b)])
-# (c)[order(c)]
-# grep("Ethn",names(c)[order(c)])
-# grep("Rhet",names(c)[order(c)])
-
+if (remake_figs) { dev.off() }
