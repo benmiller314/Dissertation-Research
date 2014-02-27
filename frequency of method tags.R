@@ -49,7 +49,6 @@ c2 <- paste0(c1, " (", c0[order(c0, decreasing=T)], ")")
 filename <- paste0(imageloc, "Ranks of methods in consorts v nonconsorts, no Othr.pdf")
 if(remake_figs) { pdf(file=filename) }
 	# set up a blank plot
-	plot.new()
 	plot(0:length(tagnames)+1, 0:length(tagnames)+1, axes=FALSE, type="n", xlab="", ylab="")
 	
 	# arrange consorts in descending rank order on the left, nonconsorts on the right
