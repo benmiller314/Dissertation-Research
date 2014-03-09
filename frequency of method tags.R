@@ -40,13 +40,24 @@ if (remake_figs) { pdf(file=filename) }
 if (remake_figs) { dev.off() }
 
 ## Step 3. Compare ranks of consorts vs. nonconsorts; leave out Othr
-b0 <- b[!names(b) %in% "Othr"]
-b1 <- names(b0)[order(b0, decreasing=T)]
-b2 <- paste0(b1, " (", b0[order(b0, decreasing=T)], ")")
+# 3a. Version with raw counts
+	b0 <- b[!names(b) %in% "Othr"]
+	b1 <- names(b0)[order(b0, decreasing=T)]
+	b2 <- paste0(b1, " (", b0[order(b0, decreasing=T)], ")")
+	
+	c0 <- c[!names(c) %in% "Othr"]
+	c1 <- names(c0)[order(c0, decreasing=T)]
+	c2 <- paste0(c1, " (", c0[order(c0, decreasing=T)], ")")
 
-c0 <- c[!names(c) %in% "Othr"]
-c1 <- names(c0)[order(c0, decreasing=T)]
-c2 <- paste0(c1, " (", c0[order(c0, decreasing=T)], ")")
+	filename <- paste0(imageloc, "Ranks of methods in consorts v nonconsorts, no Othr.pdf")
+	
+# 3b. Version with percentages
+	b2 <- paste0(b1, " (", 
+							round(100*b0[order(b0, decreasing=T)]/nrow(consorts), 0), 
+					  ")")
+	c2 <- paste0(c1, " (", 
+							round(100*c0[order(c0, decreasing=T)]/nrow(nonconsorts), 0), 
+					  ")")
 
 filename <- paste0(imageloc, "Ranks of methods in consorts v nonconsorts, no Othr.pdf")
 if(remake_figs) { pdf(file=filename) }
