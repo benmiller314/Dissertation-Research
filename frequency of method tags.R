@@ -7,8 +7,10 @@
 
 # Step 1. Sum the tag columns
 
-get_tags <- function(x) {
-	a1 <- x[, tagnames]
+get_tags <- function(x, tagset_name="tagnames") {
+	tagset <- get(tagset_name)
+	
+	a1 <- x[, tagset]
 	a2 <- apply(a1, 2, sum)
 	print(a2)
 }
