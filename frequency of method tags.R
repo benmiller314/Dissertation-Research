@@ -24,7 +24,6 @@ main <- "Frequency of Assigned Method Tags"
 filename <- paste0(imageloc, main, ".pdf")
 
 if (remake_figs) { pdf(file=filename) }
-	plot.new()
 	par(mfrow=c(1,1))
 	
 	barplot(a[order(a)], horiz=TRUE, xpd=FALSE, las=1, axes=FALSE, main=main, col="gray80")
@@ -34,9 +33,12 @@ if (remake_figs) { pdf(file=filename) }
 	text(x=30, y=seq(from=0.7,to=18.7,length.out=16), labels=b[order(a)])
 	
 	# barplot(-c[order(a)], las=1, horiz=TRUE, xpd=FALSE, axes=FALSE, col="gray90")
-	text(x=a[order(a)]-30, y=seq(from=0.7,to=18.7,length.out=16), labels=c[order(a)])
+	text(x=a[order(a)]-c[order(a)]+30, y=seq(from=0.7,to=18.7,length.out=16), labels=c[order(a)])
 	
 	mtext("Tags are non-exclusive, so sum will be greater than the 2,711 dissertations.", side=1)
+	
+	legend(x="bottomright", c("Consortium Schools", "Non-Consortium Schools"), fill=c("white","gray80"), bty="n")
+	
 if (remake_figs) { dev.off() }
 
 ## Step 3. Compare ranks of consorts vs. nonconsorts; leave out Othr
@@ -59,14 +61,17 @@ if (remake_figs) { dev.off() }
 							round(100*c0[order(c0, decreasing=T)]/nrow(nonconsorts), 0), 
 					  ")")
 
-filename <- paste0(imageloc, "Ranks of methods in consorts v nonconsorts, no Othr.pdf")
+	filename <- paste0(imageloc, "Ranks of methods in consorts v nonconsorts, no Othr, pcts.pdf")
+	
+
 if(remake_figs) { pdf(file=filename) }
 	# set up a blank plot
-	plot(0:length(tagnames)+1, 0:length(tagnames)+1, axes=FALSE, type="n", xlab="", ylab="")
+	
+	plot(x=0:length(tagnames)+1, y=0:length(tagnames)+1, axes=FALSE, type="n", xlab="", ylab="")
 	
 	# arrange consorts in descending rank order on the left, nonconsorts on the right
-	text(labels=b2, rep(4,length(b0)), order(b0))
-	text(labels=c2, rep(length(tagnames)-4, length(c0)), order(c0))
+	text(labels=b2, x=rep(4,length(b0)), y=length(b2):1)
+	text(labels=c2, x=rep(length(tagnames)-4, length(c0)), y=length(c2):1)
 	
 	# draw a line from each tag's position on the left to the one on the right
 	lapply(tagnames[!tagnames %in% "Othr"], FUN=function(tag) {
@@ -85,6 +90,11 @@ if(remake_figs) { pdf(file=filename) }
 	
 	# label the two sides
 	text(labels=c("Consortium Schools", "Non-consortium Schools"), x=c(4,length(tagnames)-4), y=rep(length(tagnames)+1,2))
+	text(labels=c(paste0("(N=",nrow(consorts),")"), paste0("(N=",nrow(nonconsorts),")")), x=c(4,length(tagnames)-4), y=rep(length(tagnames),2))
+
+	
+if (remake_figs) { dev.off() }
+
 ## Test some significance via Chi-Squared (or is it Fisher Exact?) Test
 
 # # # first vector: Tag in consorts vs. nonTag in consorts
@@ -96,3 +106,5 @@ if(remake_figs) { pdf(file=filename) }
 	   # nrow(nonconsorts)-c["Expt"])
 	   
 # chisq.test(as.matrix(x,y), correct=F)
+# z <- data.matrix(c(50,50), c(400,400))
+# chisq.test
