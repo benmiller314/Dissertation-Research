@@ -9,6 +9,34 @@ tagnames <- c("Clin","Crit",
 # "Cult",
 "Disc","Ethn","Expt","Hist","Intv","Meta","Modl","Phil","Poet","Prac","Rhet","Surv","Othr")
 
+tagnames.long <- c( "Clinical / Case Study", 
+					"Critical / Hermeneutical",
+					# "Cultural-Critical",
+					"Discourse or Text Analytical",
+					"Ethnographic",
+					"Experimental / Quasi-Experimental",
+					"Historical / Archival",
+					"Interview / Focus Group",
+					"Meta-Analytical / Discipliniographic",
+					"Model-Building",
+					"Philosophical / Theoretical",
+					"Poetic / Fictive / Craft-Based",
+					"Practitioner / Teacher-Research",
+					"Rhetorical Analytical",
+					"Survey",
+					"Other"
+					)
+					
+# provide a function to convert tag column labels to real tag names					
+realtags <- function(tag, tagset_name="tagnames") {
+	tagset <- get(tagset_name)
+	index <- grep(tag, tagset, ignore.case=TRUE)
+	tagset.long <- get(paste0(tagset_name, ".long"))
+
+	return(tagset.long[index])
+}
+
+
 sumnames <- sapply(tagnames, FUN=function(x) paste0(x,".sum"))
 meannames <- sapply(tagnames, FUN=function(x) paste0(x,".mean"))
 topnames <- sapply(tagnames, FUN=function(x) as.list(tolower(paste0("top.",x))))
@@ -32,6 +60,6 @@ source(file="Factor-Bug fixing.R")
 source(file="heatmap_ben.R")
 source(file="heatmap fixedcols.R")
 source(file="method tag array.R")
-source(file="simplifying the schema.R")
 source(file="thresh.R")
+source(file="simplifying the schema.R")
 

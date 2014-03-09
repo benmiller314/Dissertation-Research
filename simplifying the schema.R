@@ -13,6 +13,13 @@
 
 # define shortcut for new tag names
 tagnames.simple <- c("Aggreg", "Phenom", "Dialec", "Crafty", "Pract")
+tagnames.simple.long <- c(
+						   "Aggregable", 
+						   "Phenomenological", 
+						   "Dialectical", 
+						   "Craft-based", 
+						   "Practitioner / Teacher Research")
+
 	
 short_schema <- function (data) {	
 	# Check that the columns we're adding don't already exist
@@ -88,15 +95,15 @@ short_schema <- function (data) {
 }
 
 # Confirm the function works properly
-data <- head(bigarray)
-data
-data <- short_schema(data)
-data
-data[, tagnames.simple] <- -1
-data
-data <- short_schema(data)
-data
-rm(data, simple)
+# data <- head(bigarray)
+# data
+# data <- short_schema(data)
+# data
+# data[, tagnames.simple] <- -1
+# data
+# data <- short_schema(data)
+# data
+# rm(data, simple)
 	
 # # Explore the newly configured data
 # table(simple$Counts.simple)
