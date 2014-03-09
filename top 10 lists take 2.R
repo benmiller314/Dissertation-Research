@@ -2,8 +2,9 @@
 require(doBy)
 
 
+
 # open wrapper function
-toplists <- function(dataset_name="noexcludes", tagset_name="tagnames", howmany=5, threshold=5, since=2006, until=2010, rank_by_pcts=TRUE) {
+toplists <- function(dataset_name="noexcludes", tagset_name="tagnames", howmany=5, threshold=5, since=2006, until=2010, rank_by_pcts=TRUE, combine=TRUE) {
 	
 	## 0. convert variable names to variables. we'll use the names later in the figure titles.
 	dataset <- get(dataset_name)
@@ -11,7 +12,7 @@ toplists <- function(dataset_name="noexcludes", tagset_name="tagnames", howmany=
 
 
 	## 1. find schools with more than 5 dissertations in 2006-2010
-	if (!exists("thresh")) { source(file="thresh.R") }
+	if(!exists("thresh", mode="function")) { source(file="thresh.R") }
 	
 	d <- thresh(dataset_name, tagset_name, threshold, since, until)
 	d1 <- d$thresh.data
@@ -44,19 +45,46 @@ toplists <- function(dataset_name="noexcludes", tagset_name="tagnames", howmany=
 		a4 <- head(a$means[a1, tag.mean], howmany)			# pct of disses with chosen tag
 		a4 <- round(100*a4, 0)								# cleaner percentage
 
-		# combine per-tag count and pct					
-		if(rank_by) {
-			a5 <- paste0(a4, "% (", a3,")")
+		if(combine) {
+			# combine per-tag count and pct					
+			if(rank_by) {
+				a5 <- paste0(a4, "% (", a3,")")
+			} else {
+				a5 <- paste0(a3, " (", a4, "%)")
+			}
+		
+			# combine raw number with per-tag data
+			a6 <- cbind(a2, tag = a5)							
+			names(a6) <- c("School", "Total", tag)				# get cleaner column names
+	
+			# combine School and Total, then remove Total
+			a6$School <- fix_factor(a6$School, paste0(a6$School, " (", a6$Total, ")"), a6$School)						
+			a6$Total <- NULL
 		} else {
-			a5 <- paste0(a3, " (", a4, "%)")
+			# leave per-tag count, per-tag pct, total count, and school as separate columns
+			a5 <- cbind(a2, "P"=a4, "D"=a3, "T"=a2$School.length)
+			if(rank_by) {
+				a6 <- a5[, c("School", "P", "D", "T")] 	
+				filename <- paste0(imageloc, 
+						"Top 5 Schools by Methodological Focus (Ranked by Percentage), ",
+						dataset_name, ", ", tagset_name, ".csv")
+			} else {
+				a6 <- a5[, c("School", "T", "D", "P")] 	
+				filename <- paste0(imageloc,
+						"Top 5 Schools by Methodological Focus (Ranked by Number of Dissertations), ",
+						dataset_name, ", ", tagset_name, ".csv")
+			}
+				
+			# export as tab-delimited
+			# to do: check if the file exists, prompt to overwrite or abort
+			if(remake_figs) {
+				names(a6)[1] <- realtags(tag, tagset_name)		# label for file
+				write(t(names(a6)), ncolumns=4, filename, sep=",", append=TRUE)
+				write(t(a6), ncolumns=4, filename, sep=",", append=TRUE)
+				write("", ncolumns=4, filename, sep=",", append=TRUE)	
+				names(a6)[1] <- "School"	# label for screen
+			}   
 		}
-
-		a6 <- cbind(a2, tag = a5)							# combine raw number with per-tag data
-		names(a6) <- c("School", "Total", tag)				# get cleaner column names
-
-		# combine School and Total, then remove Total
-		a6$School <- fix_factor(a6$School, paste0(a6$School, " (", a6$Total, ")"), a6$School)						
-		a6$Total <- NULL
 		
 		return(a6)	
 	}
@@ -80,12 +108,12 @@ toplists <- function(dataset_name="noexcludes", tagset_name="tagnames", howmany=
 
 # call function
 # TO DO: Write the output to a file for easier porting to Word, Scrivener, etc.
-filename <- paste0(imageloc, "Top 5 Schools by Methodological Focus (Ranked by Percentage)")
 
-toplists()
+toplists(rank_by_pcts=T, combine=F)
 
-filename <- paste0(imageloc,"Top 5 Schools by Methodological Focus (Ranked by Number of Dissertations)")
 toplists(rank_by_pcts=F)
+
+
 
 # # clean up working variables (only needed during testing)
 # rm(d1, d2, d3, d4, a, a1, a2, a3, a4, a5, a6, b, c)
