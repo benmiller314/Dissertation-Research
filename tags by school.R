@@ -53,7 +53,12 @@ schoolwise <- function(dataset_name="noexcludes", tagset_name="tagnames", agfixe
 	}
 	m2 <- m2[,2:ncol(m2)]
 	m2 <- data.matrix(m2)
+	head(m2)
 	
+	# try this old approach to finding the best sort method
+		# agn_methods <- c("average","single","complete","ward","weighted");
+		# agn <- lapply(agn_methods, FUN=function(x) {agnes(m2, diss=F, metric=x)})
+		# agn_best.index <- max(c(agn[[1]]$ac, agn[[2]]$ac, agn[[3]]$ac, agn[[4]]$ac, agn[[5]]$ac))
 	
 	# 4. make the heatmap: use pre-determined columns if need be.
 

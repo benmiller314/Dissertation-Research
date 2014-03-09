@@ -72,5 +72,14 @@ if(remake_figs) { pdf(file=filename) }
 	
 	# label the two sides
 	text(labels=c("Consortium Schools", "Non-consortium Schools"), x=c(4,length(tagnames)-4), y=rep(length(tagnames)+1,2))
+## Test some significance via Chi-Squared (or is it Fisher Exact?) Test
 
-if (remake_figs) { dev.off() }
+# # # first vector: Tag in consorts vs. nonTag in consorts
+# x <- c(b["Expt"], 					# number of Tag in consorts
+	   # c["Expt"])
+
+# # second vector: Tag in consorts vs. nonTag in consorts
+# y <- c(nrow(consorts)-b["Expt"]), 	# total consorts diss-count minus number of Tag in consorts
+	   # nrow(nonconsorts)-c["Expt"])
+	   
+# chisq.test(as.matrix(x,y), correct=F)

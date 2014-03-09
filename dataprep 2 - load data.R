@@ -57,6 +57,10 @@ missing_conschools <- setdiff(levels(conschools),levels(conschoolsfound))
 non_conschools <- setdiff(levels(noexcludes$School),levels(conschools))
 nonconsorts <- noexcludes[(which(noexcludes$School %in% non_conschools)),]
 
+# confirm that nonconsorts gets all the schools not in consorts
+setequal(nonconsorts, (noexcludes[-consorts.index,]))
+
+
 
 # split out multiple advisors?
 

@@ -1,53 +1,58 @@
 stop("This file has been deprecated. Instead of using 'top 10 lists.R', please call the toplists() function from source(file='top 10 lists take 2.R').")
 
 
-# ## Goal: list the 10(e.g.) most frequently occurring schools overall and by method tag
+## Goal: list the 10(e.g.) most frequently occurring schools overall and by method tag
 
-# # First, make sure the data exists
-# if(!exists("noexcludes")) {
-	# source(file="dataprep.R")
-# }
+# First, make sure the data exists
+if(!exists("noexcludes")) {
+	source(file="dataprep.R")
+}
 
-# # Set broad parameters
-# cutoff <- 10
+# Set broad parameters
+cutoff <- 10
 
-# # sfreq = schools by frequency
-# sfreq <- table(noexcludes$School)
-# sfreq <- sort(sfreq, decreasing=TRUE)
+# sfreq = schools by frequency
+sfreq <- table(noexcludes$School)
+sfreq <- sort(sfreq, decreasing=TRUE)
 
-# # just for fun, let's visualize all of the schools' frequencies
-# main <- "Dissertation Output of Schools follows a Power Law"
-# filename <- paste0(imageloc, main, ", N", diss.count,".pdf")
-# if(remake_figs) {pdf(filename)}
-	# plot(sfreq, type="o", pch=18, bty="n", xlab="Schools", ylab="Number of Dissertations")
-	# title(main)
-	# abline(h = median(sfreq), col="red")
-	# abline(h = mean(sfreq), col="blue")
-	# legend(x=150,y=30,legend=c(paste("Mean = ",round(mean(sfreq),4)),paste("Median = ",round(median(sfreq),4))), lwd=2, col=c("blue","red"), bty="n")
-# if(remake_figs) {dev.off()}
+par(mfrow=c(1,1))
+
+# just for fun, let's visualize all of the schools' frequencies
+main <- "Dissertation Output of Schools follows a Power Law"
+filename <- paste0(imageloc, main, ", N", diss.count,".pdf")
+if(remake_figs) {pdf(filename)}
+	plot(sfreq, type="o", pch=18, bty="n", xlab="Schools", ylab="Number of Dissertations")
+	title(main)
+	abline(h = median(sfreq), col="red")
+	abline(h = mean(sfreq), col="blue")
+	legend(x=150,y=30,legend=c(paste("Mean = ",round(mean(sfreq),4)),paste("Median = ",round(median(sfreq),4))), lwd=2, col=c("blue","red"), bty="n")
+if(remake_figs) {dev.off()}
+
+	plot(, type="o", pch=18, bty="n", xlab="Schools", ylab="Number of Dissertations", xlog=T, ylog=T)
 
 
-# # and again for consortium schools only
-# cfreq <- table(factor(consorts$School))
-# cfreq <- sort(cfreq, decreasing=TRUE)
-# main <- "Top 6 Consortium Schools Way Over the Trend"
-# filename <- paste0(imageloc, main, ", consortium schools, N", nrow(consorts),".pdf")
-# pdf(filename)
-	# plot(cfreq, type="o", pch=18, bty="n", xlab="Schools", ylab="Number of Dissertations 2001-2010")
-	# title(main)
-	# # abline(h = median(cfreq), col="red")
-	# # abline(h = mean(cfreq), col="blue")
-	# legend(x=50,y=40,legend=c(paste("Mean = ",round(mean(cfreq),4)),paste("Median = ",round(median(cfreq),4))), bty="n")
-	# text(cfreq[1:5], labels=paste0(names(cfreq[1:5])," (",cfreq[1:5],")"), pos=4, offset=1)
-	# text(cfreq[6], labels=paste0(names(cfreq[6])," (",cfreq[6],")"), pos=4, offset=1)
+
+# and again for consortium schools only
+cfreq <- table(factor(consorts$School))
+cfreq <- sort(cfreq, decreasing=TRUE)
+main <- "Top 6 Consortium Schools Way Over the Trend"
+filename <- paste0(imageloc, main, ", consortium schools, N", nrow(consorts),".pdf")
+pdf(filename)
+	plot(cfreq, type="o", pch=18, bty="n", xlab="Schools", ylab="Number of Dissertations 2001-2010")
+	title(main)
+	# abline(h = median(cfreq), col="red")
+	# abline(h = mean(cfreq), col="blue")
+	legend(x=50,y=40,legend=c(paste("Mean = ",round(mean(cfreq),4)),paste("Median = ",round(median(cfreq),4))), bty="n")
+	text(cfreq[1:5], labels=paste0(names(cfreq[1:5])," (",cfreq[1:5],")"), pos=4, offset=1)
+	text(cfreq[6], labels=paste0(names(cfreq[6])," (",cfreq[6],")"), pos=4, offset=1)
 	
 	
 
-# dev.off()
+dev.off()
 
-# # overall top 10 lists
-# print(sfreq[1:cutoff])
-# print(cfreq[1:cutoff])
+# overall top 10 lists
+print(sfreq[1:cutoff])
+print(cfreq[1:cutoff])
 
 
 
