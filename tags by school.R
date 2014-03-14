@@ -121,8 +121,8 @@ schoolwise <- function(dataset_name="noexcludes", tagset_name="tagnames", agfixe
 
 
 # call the functions for all relevant datasets
-schoolwise("consorts", "tagnames")
-schoolwise("nonconsorts", "tagnames")
+schoolwise("consorts", "tagnames", agn=T, hcl=F, dia=F)
+schoolwise("nonconsorts", "tagnames", agn=T, hcl=F, dia=F)
 schoolwise("noexcludes", "tagnames")
 # schoolwise("nonconsorts", "tagnames", agfixedcols=a$ag$colInd, difixedcols=a$di$colInd)
 
