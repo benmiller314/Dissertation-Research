@@ -143,12 +143,12 @@ print(tag.totals.s)
 # While we're here, make a horizontal bar plot of tag totals
 main <- "Frequency of Assigned Method Tags, All Schools"
 filename <- paste0(imageloc, main, ", N=",diss.count,".pdf")
-pdf(filename)
+if(remake_figs) { pdf(filename) }
 	barplot(tag.totals.s, horiz=TRUE, xpd=FALSE, las=1, axes=FALSE)
 	title(main)
 	text(x=tag.totals.s-30, y=seq(from=0.7,to=18.7,length.out=16), labels=tag.totals.s)
 	mtext("Tags are non-exclusive, so sum will be greater than the 2,711 dissertations.", side=1)
-dev.off()
+if(remake_figs) { dev.off() }
 
 # And now let's replace the diagonals with solo-tag counts: the number of times
 # that tag occurs as the only tag.
@@ -169,10 +169,10 @@ print(sum.by.tags2)
 
 # now let's see how that looks as a heatmap...
 filename <- paste0(imageloc, "Method Tag Co-Occurrence (R heatmap function), N",diss.count,".pdf")
-pdf(filename)
+if(remake_figs) { pdf(filename) }
 data.matrix(sum.by.tags2) -> sum.by.tags.m			# heatmap needs a matrix, not a list
 h1 <- heatmap(sum.by.tags.m,symm=TRUE,main="Method Tag Co-Occurrence", sub="raw counts; diagonals are solo methods", col=brewer.pal(9,"YlOrRd"))
-dev.off()
+if(remake_figs) { dev.off() }
 
 # can I customize that?
 sum.by.tags.s <- sum.by.tags2[h1$rowInd,h1$colInd] 		# sorted by similarity function in heatmap
@@ -182,11 +182,11 @@ sum.by.tags.s <- sum.by.tags2[h1$rowInd,h1$colInd] 		# sorted by similarity func
 
 # give it a spin!
 filename <- paste0(imageloc, "Method Tag Co-Occurrence (ben heatmap), N", diss.count, ".pdf")
-pdf(filename)
+if(remake_figs) { pdf(filename) } 
 	heatmap.ben(sum.by.tags.s, diags=TRUE)
 	title(main="Method Tag Co-Occurrence", sub="diagonals are solo methods")
 	mtext("A box in row X, column Y gives the number of \n dissertations tagged Y that are also tagged X", side=2)
-dev.off()
+if(remake_figs) { dev.off() }
 
 
 
@@ -206,12 +206,12 @@ sum.by.tags.n <- round(sum.by.tags.n * 100, 0)
 print(sum.by.tags.n)
 
 filename <- paste0(imageloc, "Method Tag Co-Occurrence (ben heatmap, normed, whole numbers), N",diss.count,".pdf")
-pdf(filename)
+if(remake_figs) { pdf(filename) }
 	# heatmap(data.matrix(sum.by.tags.n),symm=TRUE,main="Method Tag Co-Occurrence", sub="normed by dividing intersection count by row total;\n diagonals are solo methods", col=brewer.pal(9,"YlOrRd"))
 	heatmap.ben(sum.by.tags.n)
 	title(main="Method Tag Co-Occurrence", sub="normed by dividing intersection count by row total;\n diagonals are solo methods")
 	mtext("A box in row X, column Y gives the probability \n that a dissertation tagged X is also tagged Y", side=2)
-dev.off()
+if(remake_figs) { dev.off() }
 
 
 
