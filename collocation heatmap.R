@@ -1,5 +1,4 @@
 ### Given method tags, collocate and construct a heat plot.
-require(doBy)
 require(RColorBrewer)
 
 ## If a dissertation is tagged X, how many times is it also tagged Y?
@@ -94,17 +93,14 @@ sum.by.tags <- sumbytags()
 # }
 # solo.counts.barplot()
 
-
-
-# finally, let's replace the ".sum" names with more symmetrical names:
-names(sum.by.tags2) <- substr(names(sum.by.tags2),1,4)
-row.names(sum.by.tags2) <- paste(substr(row.names(sum.by.tags2),1,4))
-names(tag.totals) <- substr(names(tag.totals),1,4)
-print(sum.by.tags2)
+# TO DO: Remake the heatplot function given the new summary function above
 
 # now let's see how that looks as a heatmap...
-filename <- paste0(imageloc, "Method Tag Co-Occurrence (R heatmap function), N",diss.count,".pdf")
-if(remake_figs) { pdf(filename) }
+if(remake_figs) { 
+	filename <- paste0(imageloc, "Method Tag Co-Occurrence (R heatmap function), N",diss.count,".pdf")
+	pdf(filename) 
+}
+
 data.matrix(sum.by.tags2) -> sum.by.tags.m			# heatmap needs a matrix, not a list
 h1 <- heatmap(sum.by.tags.m,symm=TRUE,main="Method Tag Co-Occurrence", sub="raw counts; diagonals are solo methods", col=brewer.pal(9,"YlOrRd"))
 if(remake_figs) { dev.off() }
