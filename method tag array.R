@@ -72,7 +72,10 @@ parse_tags <- function(data) {
 	
 	# Account for Method.Count==0, which means that the only tag was excluded above
 	print(noquote(paste("Converting", length(which(tags$Method.Count==0)), "dissertations with solo tags now excluded from the schema to solo 'Other'")))
-	tags[which(tags$Method.Count==0), "Othr"] <- 1
+	zeroindex <- which(tags$Method.Count==0)
+	tags[zeroindex, "Othr"] <- 1
+	tags[zeroindex, "Method.Count"] <- 1
+	
 
 	
 	# Populate Exclude.Level 

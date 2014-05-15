@@ -29,7 +29,7 @@ for (i in refactor.index) {
 }
 
 
-# redefine methods that are all "check" or "check?" as "Other"
+# redefine methods that are all "check" or "check?" as "Other," and recalculate "Method.Count"
 source(file="check count.R")
 
 # get tag index columns on their own, for simplicity down the road
