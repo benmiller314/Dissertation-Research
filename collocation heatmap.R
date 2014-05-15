@@ -48,51 +48,51 @@ sumbytags <- function(dataset_name="noexcludes", tagset_name="tagnames") {
 sum.by.tags <- sumbytags()
 
 
-## Make a horizontal bar plot of total dissertation counts for each tag.
-total.counts.barplot <- function (dataset_name="noexcludes", tagset_name="tagnames") {
-	sum.by.tags <- sumbytags(dataset_name, tagset_name)
-	total.counts <- sort(sum.by.tags$total.counts, decreasing=FALSE)
-	length <- length(tagnames)
-	diss.count <- nrow(get(dataset_name))
+# ## Make a horizontal bar plot of total dissertation counts for each tag.
+# total.counts.barplot <- function (dataset_name="noexcludes", tagset_name="tagnames") {
+	# sum.by.tags <- sumbytags(dataset_name, tagset_name)
+	# total.counts <- sort(sum.by.tags$total.counts, decreasing=FALSE)
+	# length <- length(tagnames)
+	# diss.count <- nrow(get(dataset_name))
 
-	main <- "Frequency of Assigned Method Tags"
-	submain <- paste0(dataset_name, ", ", tagset_name)
-	if(remake_figs) { 
-			filename <- paste0(imageloc, main, ", N", diss.count, ".pdf")
-			pdf(filename) 
-	}
-		barplot(total.counts, horiz=TRUE, xpd=FALSE, las=1, axes=FALSE)
-		title(main)
-		text(x=total.counts-30, y=seq(from=0.7,to=(length+2.5),length.out=length), labels=total.counts)
-		mtext(submain, side=3)
-		mtext(paste("Tags are non-exclusive, so sum will be greater than the", diss.count, "dissertations."), side=1)
+	# main <- "Frequency of Assigned Method Tags"
+	# submain <- paste0(dataset_name, ", ", tagset_name)
+	# if(remake_figs) { 
+			# filename <- paste0(imageloc, main, ", N", diss.count, ".pdf")
+			# pdf(filename) 
+	# }
+		# barplot(total.counts, horiz=TRUE, xpd=FALSE, las=1, axes=FALSE)
+		# title(main)
+		# text(x=total.counts-30, y=seq(from=0.7,to=(length+2.5),length.out=length), labels=total.counts)
+		# mtext(submain, side=3)
+		# mtext(paste("Tags are non-exclusive, so sum will be greater than the", diss.count, "dissertations."), side=1)
 
-	if(remake_figs) { dev.off() }
-}
-total.counts.barplot()
+	# if(remake_figs) { dev.off() }
+# }
+# total.counts.barplot()
 
-## Make a horizontal bar plot of solo dissertation counts for each tag.
-solo.counts.barplot <- function (dataset_name="noexcludes", tagset_name="tagnames") {
-	sum.by.tags <- sumbytags(dataset_name, tagset_name)
-	solo.counts <- sort(sum.by.tags$solo.counts, decreasing=FALSE)
-	length <- length(tagnames)
-	diss.count <- nrow(get(dataset_name))
+# ## Make a horizontal bar plot of solo dissertation counts for each tag.
+# solo.counts.barplot <- function (dataset_name="noexcludes", tagset_name="tagnames") {
+	# sum.by.tags <- sumbytags(dataset_name, tagset_name)
+	# solo.counts <- sort(sum.by.tags$solo.counts, decreasing=FALSE)
+	# length <- length(tagnames)
+	# diss.count <- nrow(get(dataset_name))
 
-	main <- "Frequency of Exclusively Assigned Method Tags"
-	submain <- paste0(dataset_name, ", ", tagset_name)
-	if(remake_figs) { 
-			filename <- paste0(imageloc, main, ", N", diss.count, ".pdf")
-			pdf(filename) 
-	}
-		barplot(solo.counts, horiz=TRUE, xpd=FALSE, las=1, axes=FALSE)
-		title(main)
-		text(x=solo.counts-5, y=seq(from=0.7,to=(length+2.5),length.out=length), labels=solo.counts)
-		mtext(submain, side=3)
-		mtext(paste("For the subset of ", sum(solo.counts), "of", diss.count, "dissertations with only one tag."), side=1)
+	# main <- "Frequency of Exclusively Assigned Method Tags"
+	# submain <- paste0(dataset_name, ", ", tagset_name)
+	# if(remake_figs) { 
+			# filename <- paste0(imageloc, main, ", N", diss.count, ".pdf")
+			# pdf(filename) 
+	# }
+		# barplot(solo.counts, horiz=TRUE, xpd=FALSE, las=1, axes=FALSE)
+		# title(main)
+		# text(x=solo.counts-5, y=seq(from=0.7,to=(length+2.5),length.out=length), labels=solo.counts)
+		# mtext(submain, side=3)
+		# mtext(paste("For the subset of ", sum(solo.counts), "of", diss.count, "dissertations with only one tag."), side=1)
 
-	if(remake_figs) { dev.off() }
-}
-solo.counts.barplot()
+	# if(remake_figs) { dev.off() }
+# }
+# solo.counts.barplot()
 
 
 
