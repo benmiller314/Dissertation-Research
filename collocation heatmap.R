@@ -2,164 +2,99 @@
 require(doBy)
 require(RColorBrewer)
 
-## TO DO: Figure out how to code sumbytags more efficiently using lapply
+## If a dissertation is tagged X, how many times is it also tagged Y?
+#  NB: diagonals in the resulting matrix are for solo tags, i.e. 
+#  the number of times a dissertation tagged X is *only* tagged X.
+#  The total number of times a dissertation is tagged X are returned separately.
 
-sumbytags <- function (tagarray) {
-	# Strategy: for each tag in tagnames (ie. "Case", "Crit", etc), do a summaryBy 
-	# and extract only the case in which the tag is active
-	summaryBy(Case+Crit+Cult+Disc+Ethn+Expt+Hist+Intv+Meta+Modl+Phil+Poet+Pract+Rhet+Surv+Othr~Case,data=tagarray,FUN=sum) -> tag1.sum
-	tag1.sum <- tag1.sum[which(tag1.sum$Case == 1),]
-	row.names(tag1.sum) <- names(tag1.sum)[1]
-	tag1.sum <- tag1.sum[2:ncol(tag1.sum)]
+sumbytags <- function(dataset_name="noexcludes", tagset_name="tagnames") {
+	sum.by.tags <- total.counts <- solo.counts <- c()
+	dataset <- get(dataset_name)
+	tagset <- get(tagset_name)
 	
-	# then repeat for the next tag
-	summaryBy(Case+Crit+Cult+Disc+Ethn+Expt+Hist+Intv+Meta+Modl+Phil+Poet+Pract+Rhet+Surv+Othr~Crit,data=tagarray,FUN=sum) -> tag2.sum
-	tag2.sum <- tag2.sum[which(tag2.sum$Crit == 1),]
-	row.names(tag2.sum) <- names(tag2.sum)[1]
-	tag2.sum <- tag2.sum[2:ncol(tag2.sum)]
-	
-	# and bind the rows together
-	sum.by.tags <- rbind(tag1.sum,tag2.sum)
-	
-	# on to tag 3
-	summaryBy(Case+Crit+Cult+Disc+Ethn+Expt+Hist+Intv+Meta+Modl+Phil+Poet+Pract+Rhet+Surv+Othr~Cult,data=tagarray,FUN=sum) -> tag3.sum
-	tag3.sum <- tag3.sum[which(tag3.sum$Cult == 1),]
-	row.names(tag3.sum) <- names(tag3.sum)[1]
-	tag3.sum <- tag3.sum[2:ncol(tag3.sum)]
-	
-	# and bind the rows together again
-	sum.by.tags <- rbind(sum.by.tags,tag3.sum)
-	
-	# at this point we can just copy and paste, changing only the tag. We're up to Disc
-	summaryBy(Case+Crit+Cult+Disc+Ethn+Expt+Hist+Intv+Meta+Modl+Phil+Poet+Pract+Rhet+Surv+Othr~Disc,data=tagarray,FUN=sum) -> tag3.sum
-	tag3.sum <- tag3.sum[which(tag3.sum$Disc == 1),]
-	row.names(tag3.sum) <- names(tag3.sum)[1]
-	tag3.sum <- tag3.sum[2:ncol(tag3.sum)]
-	
-	sum.by.tags <- rbind(sum.by.tags,tag3.sum)
-	
-	# Now we're on Ethn
-	summaryBy(Case+Crit+Cult+Disc+Ethn+Expt+Hist+Intv+Meta+Modl+Phil+Poet+Pract+Rhet+Surv+Othr~Ethn,data=tagarray,FUN=sum) -> tag3.sum
-	tag3.sum <- tag3.sum[which(tag3.sum$Ethn == 1),]
-	row.names(tag3.sum) <- names(tag3.sum)[1]
-	tag3.sum <- tag3.sum[2:ncol(tag3.sum)]
-	sum.by.tags <- rbind(sum.by.tags,tag3.sum)
-	
-	# Now we're on Expt
-	summaryBy(Case+Crit+Cult+Disc+Ethn+Expt+Hist+Intv+Meta+Modl+Phil+Poet+Pract+Rhet+Surv+Othr~Expt,data=tagarray,FUN=sum) -> tag3.sum
-	tag3.sum <- tag3.sum[which(tag3.sum$Expt == 1),]
-	row.names(tag3.sum) <- names(tag3.sum)[1]
-	tag3.sum <- tag3.sum[2:ncol(tag3.sum)]
-	sum.by.tags <- rbind(sum.by.tags,tag3.sum)
-	
-	# Now we're on Hist
-	summaryBy(Case+Crit+Cult+Disc+Ethn+Expt+Hist+Intv+Meta+Modl+Phil+Poet+Pract+Rhet+Surv+Othr~Hist,data=tagarray,FUN=sum) -> tag3.sum
-	tag3.sum <- tag3.sum[which(tag3.sum$Hist == 1),]
-	row.names(tag3.sum) <- names(tag3.sum)[1]
-	tag3.sum <- tag3.sum[2:ncol(tag3.sum)]
-	sum.by.tags <- rbind(sum.by.tags,tag3.sum)
-	
-	# Now we're on Intv
-	summaryBy(Case+Crit+Cult+Disc+Ethn+Expt+Hist+Intv+Meta+Modl+Phil+Poet+Pract+Rhet+Surv+Othr~Intv,data=tagarray,FUN=sum) -> tag3.sum
-	tag3.sum <- tag3.sum[which(tag3.sum$Intv == 1),]
-	row.names(tag3.sum) <- names(tag3.sum)[1]
-	tag3.sum <- tag3.sum[2:ncol(tag3.sum)]
-	sum.by.tags <- rbind(sum.by.tags,tag3.sum)
-	
-	# Now we're on Meta
-	summaryBy(Case+Crit+Cult+Disc+Ethn+Expt+Hist+Intv+Meta+Modl+Phil+Poet+Pract+Rhet+Surv+Othr~Meta,data=tagarray,FUN=sum) -> tag3.sum
-	tag3.sum <- tag3.sum[which(tag3.sum$Meta == 1),]
-	row.names(tag3.sum) <- names(tag3.sum)[1]
-	tag3.sum <- tag3.sum[2:ncol(tag3.sum)]
-	sum.by.tags <- rbind(sum.by.tags,tag3.sum)
-	
-	# Now we're on Modl
-	summaryBy(Case+Crit+Cult+Disc+Ethn+Expt+Hist+Intv+Meta+Modl+Phil+Poet+Pract+Rhet+Surv+Othr~Modl,data=tagarray,FUN=sum) -> tag3.sum
-	tag3.sum <- tag3.sum[which(tag3.sum$Modl == 1),]
-	row.names(tag3.sum) <- names(tag3.sum)[1]
-	tag3.sum <- tag3.sum[2:ncol(tag3.sum)]
-	sum.by.tags <- rbind(sum.by.tags,tag3.sum)
-	
-	# Now we're on Phil
-	summaryBy(Case+Crit+Cult+Disc+Ethn+Expt+Hist+Intv+Meta+Modl+Phil+Poet+Pract+Rhet+Surv+Othr~Phil,data=tagarray,FUN=sum) -> tag3.sum
-	tag3.sum <- tag3.sum[which(tag3.sum$Phil == 1),]
-	row.names(tag3.sum) <- names(tag3.sum)[1]
-	tag3.sum <- tag3.sum[2:ncol(tag3.sum)]
-	sum.by.tags <- rbind(sum.by.tags,tag3.sum)
-	
-	# Now we're on Poet
-	summaryBy(Case+Crit+Cult+Disc+Ethn+Expt+Hist+Intv+Meta+Modl+Phil+Poet+Pract+Rhet+Surv+Othr~Poet,data=tagarray,FUN=sum) -> tag3.sum
-	tag3.sum <- tag3.sum[which(tag3.sum$Poet == 1),]
-	row.names(tag3.sum) <- names(tag3.sum)[1]
-	tag3.sum <- tag3.sum[2:ncol(tag3.sum)]
-	sum.by.tags <- rbind(sum.by.tags,tag3.sum)
-	
-	# Now we're on Pract
-	summaryBy(Case+Crit+Cult+Disc+Ethn+Expt+Hist+Intv+Meta+Modl+Phil+Poet+Pract+Rhet+Surv+Othr~Pract,data=tagarray,FUN=sum) -> tag3.sum
-	tag3.sum <- tag3.sum[which(tag3.sum$Pract == 1),]
-	row.names(tag3.sum) <- names(tag3.sum)[1]
-	tag3.sum <- tag3.sum[2:ncol(tag3.sum)]
-	sum.by.tags <- rbind(sum.by.tags,tag3.sum)
-	
-	# Now we're on Rhet
-	summaryBy(Case+Crit+Cult+Disc+Ethn+Expt+Hist+Intv+Meta+Modl+Phil+Poet+Pract+Rhet+Surv+Othr~Rhet,data=tagarray,FUN=sum) -> tag3.sum
-	tag3.sum <- tag3.sum[which(tag3.sum$Rhet == 1),]
-	row.names(tag3.sum) <- names(tag3.sum)[1]
-	tag3.sum <- tag3.sum[2:ncol(tag3.sum)]
-	sum.by.tags <- rbind(sum.by.tags,tag3.sum)
-	
-	# Now we're on Surv
-	summaryBy(Case+Crit+Cult+Disc+Ethn+Expt+Hist+Intv+Meta+Modl+Phil+Poet+Pract+Rhet+Surv+Othr~Surv,data=tagarray,FUN=sum) -> tag3.sum
-	tag3.sum <- tag3.sum[which(tag3.sum$Surv == 1),]
-	row.names(tag3.sum) <- names(tag3.sum)[1]
-	tag3.sum <- tag3.sum[2:ncol(tag3.sum)]
-	sum.by.tags <- rbind(sum.by.tags,tag3.sum)
-
-	# Now we're on Othr
-	summaryBy(Case+Crit+Cult+Disc+Ethn+Expt+Hist+Intv+Meta+Modl+Phil+Poet+Pract+Rhet+Surv+Othr~Othr,data=tagarray,FUN=sum) -> tag3.sum
-	tag3.sum <- tag3.sum[which(tag3.sum$Othr == 1),]
-	row.names(tag3.sum) <- names(tag3.sum)[1]
-	tag3.sum <- tag3.sum[2:ncol(tag3.sum)]
-	sum.by.tags <- rbind(sum.by.tags,tag3.sum)
-	
-	
-	# That should be everything!
-	return(sum.by.tags)
+	for (i in 1:length(tagset)) {
+		# select the tag
+		tag <- tagset[i]
+		
+		# sum columns where the tag is 0 and where it's 1; 
+		# this produces an array with two rows.
+		tagsum <- aggregate(dataset[, tagset], list(dataset[, tag]), FUN=sum)
+		
+		# save the row in which the tag is "on", i.e. row 2. 
+		# First column is the on/off status, so get rid of it.
+		sum.by.tags <- rbind(sum.by.tags, tagsum[2, 2:ncol(tagsum)])
+		
+		# Name the row we've just added by the tag we're currently summarizing.
+		row.names(sum.by.tags)[i] <- tag
+		
+		# Now the diagonals will dominate, so find the solo count for the tag
+		solosum <- sum(dataset[which(dataset$Method.Count==1), tag])
+		solo.counts <- c(solo.counts, solosum)
+		names(solo.counts)[i] <- tag
+		
+		# ... and replace the diagonal with that solo count (but save the true count)
+		total.counts <- c(total.counts, sum.by.tags[i,i])
+		names(total.counts)[i] <- tag
+		sum.by.tags[i,i] <- solosum
+		
+	}
+	# print(sum.by.tags)
+	# print(total.counts)
+			
+	return (list("correlations" = sum.by.tags,
+				 "solo.counts" = solo.counts,
+				 "total.counts" = total.counts))
 }
-# run the function above when the file is loaded
-sum.by.tags <- sumbytags(tagarray)
-print(sum.by.tags)
+sum.by.tags <- sumbytags()
 
 
-# Now, the diagonals will totally dominate the heatmap, so let's get those separately
-tag.totals <- c()
-for(i in 1:ncol(sum.by.tags)) {
-	tag.totals <- c(tag.totals,sum.by.tags[i,i])
+## Make a horizontal bar plot of total dissertation counts for each tag.
+total.counts.barplot <- function (dataset_name="noexcludes", tagset_name="tagnames") {
+	sum.by.tags <- sumbytags(dataset_name, tagset_name)
+	total.counts <- sort(sum.by.tags$total.counts, decreasing=FALSE)
+	length <- length(tagnames)
+	diss.count <- nrow(get(dataset_name))
+
+	main <- "Frequency of Assigned Method Tags"
+	submain <- paste0(dataset_name, ", ", tagset_name)
+	if(remake_figs) { 
+			filename <- paste0(imageloc, main, ", N", diss.count, ".pdf")
+			pdf(filename) 
+	}
+		barplot(total.counts, horiz=TRUE, xpd=FALSE, las=1, axes=FALSE)
+		title(main)
+		text(x=total.counts-30, y=seq(from=0.7,to=(length+2.5),length.out=length), labels=total.counts)
+		mtext(submain, side=3)
+		mtext(paste("Tags are non-exclusive, so sum will be greater than the", diss.count, "dissertations."), side=1)
+
+	if(remake_figs) { dev.off() }
 }
-names(tag.totals) <- tagnames
-tag.totals.s <- sort(tag.totals)
-print(tag.totals.s)
+total.counts.barplot()
 
-# While we're here, make a horizontal bar plot of tag totals
-main <- "Frequency of Assigned Method Tags, All Schools"
-filename <- paste0(imageloc, main, ", N=",diss.count,".pdf")
-if(remake_figs) { pdf(filename) }
-	barplot(tag.totals.s, horiz=TRUE, xpd=FALSE, las=1, axes=FALSE)
-	title(main)
-	text(x=tag.totals.s-30, y=seq(from=0.7,to=18.7,length.out=16), labels=tag.totals.s)
-	mtext("Tags are non-exclusive, so sum will be greater than the 2,711 dissertations.", side=1)
-if(remake_figs) { dev.off() }
+## Make a horizontal bar plot of solo dissertation counts for each tag.
+solo.counts.barplot <- function (dataset_name="noexcludes", tagset_name="tagnames") {
+	sum.by.tags <- sumbytags(dataset_name, tagset_name)
+	solo.counts <- sort(sum.by.tags$solo.counts, decreasing=FALSE)
+	length <- length(tagnames)
+	diss.count <- nrow(get(dataset_name))
 
-# And now let's replace the diagonals with solo-tag counts: the number of times
-# that tag occurs as the only tag.
-  # Step 1: find the subset of noexcludes that has MethodCount = 1
-monomethodics <- noexcludes[which(noexcludes$MethodCount == 1),]
-solotagsums <- sumbytags(monomethodics)
-  # Step 2: swap the existing tag.totals with the monomethodic sumbytags
-sum.by.tags2 <- sum.by.tags
-for(i in 1:ncol(sum.by.tags)) {
-	sum.by.tags2[i,i] <- solotagsums[i,i]
+	main <- "Frequency of Exclusively Assigned Method Tags"
+	submain <- paste0(dataset_name, ", ", tagset_name)
+	if(remake_figs) { 
+			filename <- paste0(imageloc, main, ", N", diss.count, ".pdf")
+			pdf(filename) 
+	}
+		barplot(solo.counts, horiz=TRUE, xpd=FALSE, las=1, axes=FALSE)
+		title(main)
+		text(x=solo.counts-5, y=seq(from=0.7,to=(length+2.5),length.out=length), labels=solo.counts)
+		mtext(submain, side=3)
+		mtext(paste("For the subset of ", sum(solo.counts), "of", diss.count, "dissertations with only one tag."), side=1)
+
+	if(remake_figs) { dev.off() }
 }
+solo.counts.barplot()
+
+
 
 # finally, let's replace the ".sum" names with more symmetrical names:
 names(sum.by.tags2) <- substr(names(sum.by.tags2),1,4)
