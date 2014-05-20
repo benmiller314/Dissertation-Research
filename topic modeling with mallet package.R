@@ -30,14 +30,14 @@ top.words.tfitf <- function (topic.model, topic.words, num.top.words = 10)
 	top.indices <- lapply(1:K, FUN=function(x) head(order(tf.itf[x,], decreasing=T), num.top.words))
 
 	# NB: the vocabulary indices are the same as the indices used in each row of the topic.words matrix (and, thus, the tf.itf matrix).
-	lapply(1:K, FUN=function(x) paste0(vocabulary[top.indices[[x]]], collapse=", "))
+	lapply(1:K, FUN=function(x) noquote(paste0(vocabulary[top.indices[[x]]], collapse=", ")))
 }
 
 
 
 ## NB: The following is based heavily on http://cran.r-project.org/web/packages/mallet/mallet.pdf by David Mimno (the 'not run' example for the MalletLDA function, starting on page 9), including most comments. This is where the topic modeling actually happens.
 
-## 0. Create a wrapper for the data with [two] elements, one for each column.
+## 0. Create a wrapper for the data with elements for each column.
 # R does some type inference, and will guess wrong, so give it hints with "colClasses".
 # Note that "id" and "text" are special fields -- mallet will look there for input.
 documents <- list("id"=as.character(noexcludes$Pub.number), 
@@ -45,7 +45,7 @@ documents <- list("id"=as.character(noexcludes$Pub.number),
                   )
                   
 # Ben: Turn most of this file into a function, so we can try different values of K
-ben.mallet.tm <- function(documents, K=10, num.top.words=7) {
+ben.mallet.tm <- function(documents, K=10, num.top.words=7, runlong=FALSE) {
 	
 	# 1. Create a mallet instance list object. Right now we have to specify the stoplist
 	# as a file, can’t pass in a list from R. 
@@ -82,7 +82,7 @@ ben.mallet.tm <- function(documents, K=10, num.top.words=7) {
 	####
 	# 5. Ben: Let's curate that vocabulary! (Approach here based on Mimno 2012, pp. 4-5: he says 5-10%)
 	# 5a. Find words occurring in more than 25% of the documents. Take them out, but save for later.
-	cutoff <- length(documents$id) * .25
+	cutoff <- length(documents$id) * .10
 	top.words.index <- which(word.freqs.sorted$doc.freq > cutoff)
 	top.words <- word.freqs.sorted[top.words.index, ]
 	
@@ -123,12 +123,16 @@ ben.mallet.tm <- function(documents, K=10, num.top.words=7) {
 	
 	# 7. Now train a model. Note that hyperparameter optimization is on, by default.
 	# We can specify the number of iterations. Here we’ll use a large-ish round number.
-	topic.model$train(200)
+	if(runlong) {
+		topic.model$train(500)
+	} else {
+	topic.model$train(200)		
+	}
 	
 	# 8. NEW: run through a few iterations where we pick the best topic for each token,
 	# rather than sampling from the posterior distribution.
-	topic.model$maximize(10)
-	
+	topic.model$maximize(10)	
+		
 	# 9. Get the probability of topics in documents and the probability of words in topics.
 	# By default, these functions return raw word counts. Here we want probabilities,
 	# so we normalize, and add "smoothing" so that nothing has exactly 0 probability.
@@ -151,7 +155,23 @@ ben.mallet.tm <- function(documents, K=10, num.top.words=7) {
 				   "top.words" = top.words)
 }
 
-abstracts.tm <- ben.mallet.tm(documents, K=16)
-str(abstracts.tm)
+abstracts.tm.16 <- ben.mallet.tm(documents, K=16)
+str(abstracts.tm.12)
+k16 <- data.matrix(abstracts.tm.16$topic.labels)
+print(k16)
 
-plot(x=1:15, y=abstracts.tm$top.words$doc.freq[1:15]/nrow(abstracts.tm$matrices$doc.topics), ylog=F)
+abstracts.tm.10 <- ben.mallet.tm(documents, K=10)
+k10 <- data.matrix(abstracts.tm.10$topic.labels)
+print(k10)
+
+abstracts.tm.12 <- ben.mallet.tm(documents, K=12)
+k12_1 <- data.matrix(abstracts.tm.12$topic.labels)
+abstracts.tm.12 <- ben.mallet.tm(documents, K=12)
+k12_2 <- data.matrix(abstracts.tm.12$topic.labels)
+print(k12_1); print(k12_2)
+
+abstracts.tm.12$top.words
+
+mallet.topic.labels(abstracts.tm.12$topic.model, abstracts.tm.12$matrices$topic.words, num.top.words=8)
+top.words.tfitf(abstracts.tm.12$topic.model, abstracts.tm.12$matrices$topic.words, num.top.words=8)
+# plot(x=1:15, y=abstracts.tm$top.words$doc.freq[1:15]/nrow(abstracts.tm$matrices$doc.topics), ylog=F)
