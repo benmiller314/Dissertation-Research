@@ -2,8 +2,6 @@ require(mallet)
 
 ## some params
 malletloc <- "/Users/benmiller314/mallet-2.0.7"
-textloc <- "/Users/benmiller314/Documents/fulltext dissertations/100txt/"
-noexcludes$fulltextpointers <- paste0(textloc, noexcludes$Pub.number, ".txt")
 
 # number of topics
 K <- 10	
