@@ -7,16 +7,5 @@ a <- sort(a)
 head(a)
 b <- file(a[1])
 
-readLines(b, 10)						# just spits back "\xfe\xff" "" over and over
-readLines(b, encoding="UTF-16", 10)		# but so does this
-
-pdfloc  <- "/Users/benmiller314/Documents/fulltext dissertations/"
-c <- paste0(pdfloc, noexcludes$Pub.number, ".pdf")
-c <- sort(c)
-d <- file(c[1])
-
-readLines(d, 10, encoding="UCS-2")		# lots 
-
-
-# list possible encodings (there are many)
-iconvlist()
+# scan(b, what=character(), 100, na.strings="\xfe\xff", skipNul=T)
+d <- readLines(b, 10, skipNul=T)		# with skipNul, it can read! yay!
