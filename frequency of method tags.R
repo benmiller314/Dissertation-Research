@@ -18,6 +18,9 @@ get_tags <- function(x, tagset_name="tagnames") {
 a <- get_tags(noexcludes)
 b <- get_tags(consorts)
 c <- get_tags(nonconsorts)
+e <- thresh("nonconsorts")
+e <- get_tags(e$thresh.data)
+e[order(e)]
 
 # Step 2. Graph 'em
 main <- "Frequency of Assigned Method Tags"

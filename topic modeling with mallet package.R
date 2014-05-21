@@ -2,14 +2,11 @@ require(mallet)
 
 ## some params
 malletloc <- "/Users/benmiller314/mallet-2.0.7"
-
-# number of topics
-K <- 10	
+K <- 10		# number of topics
 
 ## **Helper function: top.words.tfitf**
 # I'd like to get the top words in each topic ranked not by term frequency alone but by uniqueness to the topic -- i.e. term frequency * inverse topic frequency (as modeled on TF*IDF).
 # These will then be used to determine topic subject matter.
-
 top.words.tfitf <- function (topic.model, topic.words, num.top.words = 10) 
 {
 	# 1. for each term-topic pair, calculate term frequency = weight of the term in the topic divided by the total number of terms assigned to the topic. For a normalized topic, the sum should always be 1, so this is just the weight value at each location in the topic.words matrix.

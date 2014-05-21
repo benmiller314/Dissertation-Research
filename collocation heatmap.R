@@ -31,7 +31,7 @@ sumbytags <- function(dataset_name="noexcludes", tagset_name="tagnames") {
 		solo.counts <- c(solo.counts, solosum)
 		names(solo.counts)[i] <- tag
 		
-		# ... and replace the diagonal with that solo count (but save the true count)
+		# ... and replace the diagonal with that solo count (but save the true count, i.e. the total)
 		total.counts <- c(total.counts, sum.by.tags[i,i])
 		names(total.counts)[i] <- tag
 		sum.by.tags[i,i] <- solosum
@@ -112,9 +112,11 @@ sum.by.tags.s <- sum.by.tags2[h1$rowInd,h1$colInd] 		# sorted by similarity func
 
 
 # give it a spin!
-filename <- paste0(imageloc, "Method Tag Co-Occurrence (ben heatmap), N", diss.count, ".pdf")
-if(remake_figs) { pdf(filename) } 
-	heatmap.ben(sum.by.tags.s, diags=TRUE)
+if(remake_figs) {
+	pdf(filename) 
+	filename <- paste0(imageloc, "Method Tag Co-Occurrence (ben heatmap), N", diss.count, ".pdf")
+} 
+	heatmap.ben(sum.by.tags$correlations, diags=TRUE)
 	title(main="Method Tag Co-Occurrence", sub="diagonals are solo methods")
 	mtext("A box in row X, column Y gives the number of \n dissertations tagged Y that are also tagged X", side=2)
 if(remake_figs) { dev.off() }
