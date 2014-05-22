@@ -1,16 +1,40 @@
 # Construct a map of squares, shaded according to value
 
-heatmap.ben <- function (sum.by.tags.s, diags=FALSE) {
+heatmap.ben <- function (
+	sum.by.tags, 			# a list output by sumbytags() containing a correlation matrix, solos, & totals
+	diags   = FALSE,		# should we outline diagonals? 
+	highval = "#818181",	# darkest color
+	lowval  = "#FAFAFA",	# lightest color
+	numCols = 20			# how many different shades?
+	) {
 	
-	highval <- "#818181"		# darkest color
-	lowval  <- "#FAFAFA"		# lightest color
+	# extract the matrix
+	if(!is.matrix(sum.by.tags)) {
+		sum.by.tags.s <- sum.by.tags$correlations
+	} else { sum.by.tags.s <- sum.by.tags }
+
+	# sort the matrix (borrowed from heatmap())
+	Rowv <- rowMeans(sum.by.tags.s, na.rm = TRUE)	# find row means
+	hcr <- hclust(dist(sum.by.tags.s))				# cluster based on distances
+    ddr <- as.dendrogram(hcr)						# convert to dendrogram
+   	ddr <- reorder(ddr, Rowv)						# reorder the dendrogram
+    rowInd <- order.dendrogram(ddr)					# extract the row order
+    
+   	Colv <- colMeans(sum.by.tags.s, na.rm = TRUE)	# find column means
+    hcc <- hclust(dist(sum.by.tags.s))				# cluster based on distances (from the col perspective)
+	ddc <- as.dendrogram(hcc)						# convert to dendrogram
+	ddc <- reorder(ddc, Colv)					# reorder the dendrogram
+	colInd <- order.dendrogram(ddc)					# extract the column order
 	
+	sum.by.tags.s <- sum.by.tags.s[rowInd, colInd]	# apply row and column orders from above
+	
+	
+	# make variables more readable for later
 	n.col <- ncol(sum.by.tags.s); # print(n.col)
 	n.row <- nrow(sum.by.tags.s); # print(n.row)
 
 	# color function
 	colorme <- function (val) {
-		numCols <- 20
 		pal <- colorRampPalette(c(lowval, highval))
 		cols <- pal(numCols)
 		max.val <- max(sum.by.tags.s)
