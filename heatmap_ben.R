@@ -8,22 +8,26 @@ heatmap.ben <- function (
 	numCols = 20			# how many different shades?
 	) {
 	
-	# extract the matrix
+	# extract the matrix, if need be
 	if(!is.matrix(sum.by.tags)) {
 		sum.by.tags.s <- sum.by.tags$correlations
 	} else { sum.by.tags.s <- sum.by.tags }
+	
+	# is it symmetrical?
+	symm <- all(sum.by.tags.s == t(sum.by.tags.s))
 
 	# sort the matrix (borrowed from heatmap())
 	Rowv <- rowMeans(sum.by.tags.s, na.rm = TRUE)	# find row means
 	hcr <- hclust(dist(sum.by.tags.s))				# cluster based on distances
-    ddr <- as.dendrogram(hcr)						# convert to dendrogram
+    ddr <- as.dendrogram(hcr)						# convert to dendrogram (which we might use later)
    	ddr <- reorder(ddr, Rowv)						# reorder the dendrogram
     rowInd <- order.dendrogram(ddr)					# extract the row order
     
    	Colv <- colMeans(sum.by.tags.s, na.rm = TRUE)	# find column means
-    hcc <- hclust(dist(sum.by.tags.s))				# cluster based on distances (from the col perspective)
-	ddc <- as.dendrogram(hcc)						# convert to dendrogram
-	ddc <- reorder(ddc, Colv)					# reorder the dendrogram
+    hcc <- hclust(dist( if(symm) {sum.by.tags.s}
+  						else {t(sum.by.tags.s)}))	# cluster based on distances (from the col perspective)
+	ddc <- as.dendrogram(hcc)						# convert to dendrogram (which we might use later)
+	ddc <- reorder(ddc, Colv)						# reorder the dendrogram
 	colInd <- order.dendrogram(ddc)					# extract the column order
 	
 	sum.by.tags.s <- sum.by.tags.s[rowInd, colInd]	# apply row and column orders from above
