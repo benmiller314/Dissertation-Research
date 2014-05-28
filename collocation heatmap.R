@@ -52,8 +52,8 @@ sum.by.tags <- sumbytags()
 
 # 2. Basic heatmap
 if(remake_figs) {
-	pdf(filename) 
 	filename <- paste0(imageloc, "Method Tag Co-Occurrence, N", diss.count, ".pdf")
+	pdf(filename) 
 } 
 	heatmap.ben(sum.by.tags, diags=TRUE)
 	title(main="Method Tag Co-Occurrence")
