@@ -1,16 +1,17 @@
 ### Given method tags, collocate and construct a heat plot.
-require(RColorBrewer)
 
 ## If a dissertation is tagged X, how many times is it also tagged Y?
 #  NB: diagonals in the resulting matrix are for solo tags, i.e. 
 #  the number of times a dissertation tagged X is *only* tagged X.
-#  The total number of times a dissertation is tagged X are returned separately.
+#  The total number of times dissertations are tagged X is returned separately.
 
 sumbytags <- function(dataset_name="noexcludes", tagset_name="tagnames") {
-	sum.by.tags <- total.counts <- solo.counts <- c()
 	dataset <- get(dataset_name)
 	tagset <- get(tagset_name)
 	
+	# make a fresh start	
+	sum.by.tags <- total.counts <- solo.counts <- c()
+
 	for (i in 1:length(tagset)) {
 		# select the tag
 		tag <- tagset[i]
@@ -40,7 +41,7 @@ sumbytags <- function(dataset_name="noexcludes", tagset_name="tagnames") {
 	# print(sum.by.tags)
 	# print(total.counts)
 			
-	return (list("correlations" = sum.by.tags,
+	return (list("correlations" = as.matrix(sum.by.tags),
 				 "solo.counts" = solo.counts,
 				 "total.counts" = total.counts))
 }
@@ -96,20 +97,23 @@ sum.by.tags <- sumbytags()
 # TO DO: Remake the heatplot function given the new summary function above
 
 # now let's see how that looks as a heatmap...
+require(RColorBrewer)
+
 if(remake_figs) { 
 	filename <- paste0(imageloc, "Method Tag Co-Occurrence (R heatmap function), N",diss.count,".pdf")
 	pdf(filename) 
 }
 
-data.matrix(sum.by.tags2) -> sum.by.tags.m			# heatmap needs a matrix, not a list
-h1 <- heatmap(sum.by.tags.m,symm=TRUE,main="Method Tag Co-Occurrence", sub="raw counts; diagonals are solo methods", col=brewer.pal(9,"YlOrRd"))
+h1 <- heatmap(sum.by.tags$correlations, symm=TRUE, main="Method Tag Co-Occurrence", sub="raw counts; diagonals are solo methods", col=brewer.pal(9,"YlOrRd"))
+
 if(remake_figs) { dev.off() }
 
 # can I customize that?
 sum.by.tags.s <- sum.by.tags2[h1$rowInd,h1$colInd] 		# sorted by similarity function in heatmap
 
-# heatmap.ben function now saved in 'function scratchpad.R', so it loads during dataprep
-
+# heatmap.ben function now saved in 'heatmap_ben.R', so it loads during dataprep
+heatmap(sum.by.tags$correlations)
+heatmap.ben(sum.by.tags, diags=T)
 
 # give it a spin!
 if(remake_figs) {
