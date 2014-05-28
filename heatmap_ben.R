@@ -5,7 +5,7 @@ heatmap.ben <- function (
 	diags   = FALSE,		# should we outline diagonals? 
 	highval = "#818181",	# darkest color
 	lowval  = "#FAFAFA",	# lightest color
-	numCols = 20			# how many different shades?
+	numCols = 10,			# how many different shades?
 	) {
 	
 	# extract the matrix, if need be
