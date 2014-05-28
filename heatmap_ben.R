@@ -2,11 +2,12 @@
 
 heatmap.ben <- function (
 	sum.by.tags, 			# a list output by sumbytags() containing a correlation matrix, solos, & totals
-	diags   = FALSE,		# should we outline diagonals? 
-	highval = "#818181",	# darkest color
-	lowval  = "#FAFAFA",	# lightest color
-	numCols = 10,			# how many different shades?
-	rowscale   = FALSE			# should we norm each row by tag totals?
+	diags    = FALSE,		# should we outline diagonals? 
+	highval  = "#818181",	# darkest color
+	lowval   = "#FAFAFA",	# lightest color
+	numCols  = 10,			# how many different shades?
+	rowscale = FALSE,		# should we norm each row by tag totals?
+	verbose  = TRUE			# should we add a subtitle explaining about solo tags?
 	) {
 	
 	# extract the matrix, if need be
@@ -81,13 +82,15 @@ heatmap.ben <- function (
 	axis(side=1, at=1:n.col, labels=colnames(sum.by.tags.s), pos=0.5, las=2, col="white")
 	
 	# add subtitle indicating scaled / not scaled
-	if (rowscale) {
-		h2 <- paste("Each row normed by dividing over total number of dissertations for that row's tag.",
-					"\n",
-					"Diagonals represent tags occurring on one-method dissertations.")
-	} else {
-		h2 <- "Diagonals represent tags occurring on one-method dissertations."
+	if (verbose) {
+		if (rowscale) {
+			h2 <- paste("Each row normed by dividing over total number of dissertations for that row's tag.",
+						"\n",
+						"Diagonals represent tags occurring on one-method dissertations.")
+		} else {
+			h2 <- "Diagonals represent tags occurring on one-method dissertations."
+		}
+		
+		title(sub=h2)
 	}
-	
-	title(sub=h2)
 }
