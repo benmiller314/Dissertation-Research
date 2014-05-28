@@ -62,6 +62,6 @@ heatmap.ben <- function (
 	}
 
 	# add axis labels
-	axis(side=4, at=n.row:1, labels=row.names(sum.by.tags.s), pos=0.5+n.col, las=2, col="white")
-	axis(side=1, at=1:n.col, labels=names(sum.by.tags.s), pos=0.5, las=2, col="white")	
+	axis(side=4, at=n.row:1, labels=rownames(sum.by.tags.s), pos=0.5+n.col, las=2, col="white")
+	axis(side=1, at=1:n.col, labels=colnames(sum.by.tags.s), pos=0.5, las=2, col="white")	
 }
