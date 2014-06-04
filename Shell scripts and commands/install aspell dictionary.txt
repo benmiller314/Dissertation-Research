@@ -1,0 +1,20 @@
+## Script to get aspell's dictionaries up and running. 
+## Assumes you've downloaded them to ~/Downloads.
+
+#!/bin/bash
+
+# Step 1. Extract the downloaded file
+cd ~/Downloads
+bunzip aspell6-en-7.1-0.tar.bz2
+tar -xvf aspell6-en-7.1-0.tar
+
+# Step 2. Follow instructions in the dictionary README
+cd aspell6-en-7.1-0 
+./configure
+make
+
+# here's the tricky bit: only super-users can copy to the sw directory, so use sudo
+sudo make install
+make clean
+
+# Whew!
