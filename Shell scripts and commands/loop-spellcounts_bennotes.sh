@@ -10,7 +10,7 @@
 
 
 
-function largeloop ()
+function spellcount ()
 {       while read line1; do
 
 ## work in a new directory to avoid over-writing source files
@@ -22,11 +22,11 @@ function largeloop ()
 #sed -n 949'p' ~/Desktop/KT-NewPull-AllDescs-ZAP/$line1 > ~/Desktop/cull-outputs/$line1.txt
 # iconv -f ISO_8859-1 -t UTF-8 ~/KT-sources1/$line1 > ~/KT-clean1/$line1
 
-## (step 2) get wordcount, save to file
-WC=`wc -w ~/Documents/"fulltext dissertations"/bashtest/$line1 | awk 'BEGIN { OFS="\t" } { print $0; }' - `
+## (step 2) get wordcount, save to a variable.
+WC=`wc -w ~/Documents/"fulltext dissertations"/bashtest/$line1 | awk '{ print $1; }' - `
 # > ~/Documents/"fulltext dissertations"/bashtest/wordcount_$line1
 
-## (step 3) find misspelled words, save to file. 
+## (step 3) find misspelled words, save to file in case we want to analyze later.
 # NB: apparently this isn't included in OS X 10.7 (Lion). Boo. 
 # To download the aspell command, you'll need something like
 # Fink http://www.finkproject.org/download/srcdist.php and 
@@ -40,35 +40,33 @@ WC=`wc -w ~/Documents/"fulltext dissertations"/bashtest/$line1 | awk 'BEGIN { OF
 ## Ben's version
 aspell list < ~/Documents/"fulltext dissertations"/bashtest/cleaned_$line1 > ~/Documents/"fulltext dissertations"/bashtest/wordswrong_$line1
 
-## (step 4) count the lines in that file; save the numbers, one new file per old file.
-ERRS=`wc -l ~/Documents/"fulltext dissertations"/bashtest/wordswrong_$line1` 
+## (step 4) count the lines in the wordswrong file; save the numbers in a variable.
+ERRS=`wc -l ~/Documents/"fulltext dissertations"/bashtest/wordswrong_$line1 | awk '{ print $1; }' - `
 # > ~/Documents/"fulltext dissertations"/bashtest/errorcount_$line1
 
 ## (step 5) combine files into a big cumulative one. Here's how:
+	# Step 5a. Outside the loop, create a placeholder output file. (See below.)
+	
+	# Step 5b. Strip '.txt' off the filename; this will help us join tables later.		
+	PUB=`printf $line1 | awk 'BEGIN { FS="." } { print $1; }'`
 
-	## Step 5a. Outside the loop, create a file that contains just a linefeed
-	## and a file to hold the cumulative output. See below.
-		
-	## Step 5c. Concatenate the scratch-space file, the linefeed, and the new file 
-	## (from which we've removed line breaks above); save to the output file.
-	echo "$line1, $WC, $ERRS" >> '/Users/benmiller314/Documents/fulltext dissertations/bashtest/spellcheck.csv'
+	# Step 5c. String together the Pub.number, the wordcount, and the errorcount; 
+	# append to the output file.
+	
+	echo "$PUB, $WC, $ERRS" >> '/Users/benmiller314/Documents/fulltext dissertations/bashtest/spellcheck.csv'
 
     done
 }
 
 ## (this is step 5a)
-if ! [ -e '/Users/benmiller314/Documents/fulltext dissertations/bashtest/linefeed.txt' ] ; then
-	echo ' ' > '/Users/benmiller314/Documents/fulltext dissertations/bashtest/linefeed.txt'
-fi
-
 if ! [ -e !'/Users/benmiller314/Documents/fulltext dissertations/bashtest/spellcheck.csv' ] ; then
-	echo 'File, WordCount, ErrorCount' > '/Users/benmiller314/Documents/fulltext dissertations/bashtest/spellcheck.csv'
+	echo 'Pub.Number, WordCount, ErrorCount' > '/Users/benmiller314/Documents/fulltext dissertations/bashtest/spellcheck.csv'
 fi	
 
 ## (step 6) invoke the loop
 CURRENT_DIR=$PWD
 cd ~/Documents/fulltext\ dissertations/15txt
-ls *.txt | largeloop
+ls *.txt | spellcount
 cd "$CURRENT_DIR"
 
-echo ' ' >> '/Users/benmiller314/Documents/fulltext dissertations/bashtest/spellcheck.csv'
+# echo ' ' >> '/Users/benmiller314/Documents/fulltext dissertations/bashtest/spellcheck.csv'
