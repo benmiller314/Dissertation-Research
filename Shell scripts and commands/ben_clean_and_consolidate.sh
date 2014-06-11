@@ -44,6 +44,9 @@ function combine ()
 {	## Step 1. Outside the loop, create an empty file to hold the cumulative output. 
 	if ! [ -e "$DST/cumulative.csv" ] ; then
 		echo '' > "$DST/cumulative.csv"
+	else 
+		echo "ERROR: $DST/cumulative.csv already exists; aborting combine step."
+		exit 1
 	fi
 	
 	echo "Making cumulative file. Adding:"						# progress report
@@ -88,6 +91,9 @@ fi
 
 if ! [ -e "$DST/spellstats/spellstats.csv" ] ; then
 	echo 'Pub.Number, WordCount, ErrorCount' > "$DST/spellstats/spellstats.csv"
+else 
+	echo "spellstats.csv already exists; aborting script."
+	exit 1
 fi
 
 	echo "Counting spelling errors..."
@@ -111,12 +117,11 @@ while read line1; do
 ## (step 3) count the lines in the wordswrong file; save the numbers in a variable.
 	ERRS=`wc -l "$DST/spellstats/wordswrong_$line1" | awk '{ print $1; }' - `
 
-## (step 4) combine files into a big cumulative one. Here's how:
+## (step 4) combine files into a cumulative table. Here's how:
 	# Step 4a. Outside the loop, create a placeholder output file. (See above.)
 	
-	# Step 4b. Strip '.txt' off the filename; this will help us join tables later.		
-	PUB=`printf $line1 | awk 'BEGIN { FS="." } { print $1; }'`
-
+	# Step 4b. Strip '.txt' and 'cleaned_' off the filename; this will help us join tables later.		
+	PUB=`printf $line1 | awk 'BEGIN { FS="." } { print $1; }' | awk 'BEGIN { FS="_" } { print $2; }'`
 	# Step 4c. String together the Pub.number, the wordcount, and the errorcount; 
 	# append to the output file.
 	echo "-- checking $line1"
