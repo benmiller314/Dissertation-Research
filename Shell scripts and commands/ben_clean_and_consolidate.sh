@@ -2,9 +2,9 @@
 ## While items remain in the list, run a series of commands on them, 
 ## saving the results into new files to avoid accidental overwriting.
 
-## Declare some basics
-SRC=/Users/benmiller314/Documents/"fulltext dissertations"/15txt
-DST=/Users/benmiller314/Documents/"fulltext dissertations"/bashtest
+## Declare some basics: source and destination.
+SRC='/Users/benmiller314/Documents/fulltext dissertations/15txt'
+DST='/Users/benmiller314/Documents/fulltext dissertations/bashtest'
 
 
 ## Here be the loop function, containing the other commands. 
@@ -15,19 +15,17 @@ function largeloop ()
 	echo $line1
 	# echo "Copying from SRC $SRC/$line1 to DST $DST/$line1"
 
-	## Step 0. Copy the file to a new directory.
-	cp "$SRC/$line1" "$DST/$line1"
+# 	## Step 0. Copy the file to a new directory. (Not sure this is necessary)
+# 	echo "Copying from SRC $SRC/$line1 to DST $DST/$line1"
+# 	cp "$SRC/$line1" "$DST/$line1"
 	
+	# 1a. Convert text encoding from ISO 8859-1 (Latin-1) to UTF-8 (unicode standard)
+	# 1b. Using tr, delete all characters except for line breaks and Western characters
+	# 1c. Using tr again, collapse multiple spaces to a newline
+	# 1d. Using tr yet again, replace newlines with spaces (get all text on one line)
+	# 1e. Save to a file in the destination directory.
+	iconv -f ISO_8859-1 -t UTF-8 "$SRC/$line1" | tr -cd '\11\12\40-\176' | tr -s ' ' '\n' | tr '\n' " " > "$DST/cleaned_$line1"
 	
-	## Step 1a. Convert text encoding from ISO 8859-1 (Latin-1) to UTF-8 (unicode standard)
-	## 1b. using sed, do... something??... with lines 949 and 1000; write to standard output. 
-	##   maybe write just lines 949 and 1000 to standard output?
-	## 1c. using perl, replace (s/) all instances (/g) of carriage return (\r, octal \015) 
-	##   with line feed (\n, octal \012).  *** NB: I have NO idea what the flags do! ***
-	## 1d. using tr, replace all instances of line feed with space 
-	## 1e. save the output to a new directory.
-	iconv -f ISO_8859-1 -t UTF-8 "$DST/$line1" | tr -cd '\11\12\40-\176' | tr -s ' ' '\n' | tr '\n' " " > "$DST/cleaned_$line1"
-	#| perl -i -pe 's/\015/\012/g' \
 	
 	## Step 2. Combine files into a big cumulative one. Here's how:
 
