@@ -37,7 +37,12 @@ function clean ()
 		# NB: changed my mind. Here's the code in case I want it again:
 		# `| tr '\n' " "` (without the ``)
 	# 1f. Save to a file in the destination directory.
-	iconv -f ISO_8859-1 -t UTF-8 "$SRC/$line1" | tr -cd '\11\12\40-\176' | sed "/INFO/,/UMI directly to order/d" | sed "/Bell \& Howell/,/-1346/d" > "$DST/cleaned_$line1"
+	iconv -f ISO_8859-1 -t UTF-8 "$SRC/$line1" | tr -cd '\11\12\40-\176' | sed "1,/-1346/d" > "$DST/cleaned_$line1"
+	
+		# catch the case where we've stripped too much, and do it again without sed
+		if ! [ -s "$DST/cleaned_$line1" ] ; then
+			iconv -f ISO_8859-1 -t UTF-8 "$SRC/$line1" | tr -cd '\11\12\40-\176' > "$DST/cleaned_$line1"
+		fi
 	
 	# Close the loop.
 	done
