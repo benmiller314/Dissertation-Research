@@ -137,5 +137,5 @@ cd "$CURRENT_DIR"									# Go back where we were
 
 ## Tell us what we've got!
 FILECOUNT=`wc -l "$DST/spellcheck.csv" | awk '{ print $1; }' - `
-FILECOUNT=`$FILECOUNT-1`							# account for titles in 1st line
+let FILECOUNT=$FILECOUNT-1							# account for titles in 1st line
 echo "Finished. $FILECOUNT files processed."
