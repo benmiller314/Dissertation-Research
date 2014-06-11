@@ -16,7 +16,12 @@ DST='/Users/benmiller314/Documents/fulltext dissertations/bashtest'
 
 ## First function: Get text that R can read. 
 function clean ()
-{   while read line1; do
+{   
+# 	if ! [ -d "$DST/cleanfiles" ] ; then
+# 		mkdir "$DST/cleanfiles"
+# 	fi
+
+	while read line1; do
 
 	## Step 1. Copy the file to a new directory, making changes as it goes
 	echo "Cleaning from SRC $line1 to DST $DST/$line1"			# progress report
@@ -77,9 +82,13 @@ function combine ()
 function spellcount ()
 {       
 ## (step 0 or 4a) Outside the loop, create a placeholder output file
-if ! [ -e "$DST/spellcheck.csv" ] ; then
-	echo 'Pub.Number, WordCount, ErrorCount' > "$DST/spellcheck.csv"
-fi	
+if ! [ -d "$DST/spellstats" ] ; then
+	mkdir "$DST/spellstats"
+fi
+
+if ! [ -e "$DST/spellstats/spellstats.csv" ] ; then
+	echo 'Pub.Number, WordCount, ErrorCount' > "$DST/spellstats/spellstats.csv"
+fi
 
 	echo "Counting spelling errors..."
 
@@ -97,10 +106,10 @@ while read line1; do
 # Once those are installed (no small feat), uncomment and run the commands in file
 # "install aspell dictionary.txt" 
 
-	aspell list < "$DST/$line1" > "$DST/wordswrong_$line1"
+	aspell list < "$DST/$line1" > "$DST/spellstats/wordswrong_$line1"
 
 ## (step 3) count the lines in the wordswrong file; save the numbers in a variable.
-	ERRS=`wc -l "$DST/wordswrong_$line1" | awk '{ print $1; }' - `
+	ERRS=`wc -l "$DST/spellstats/wordswrong_$line1" | awk '{ print $1; }' - `
 
 ## (step 4) combine files into a big cumulative one. Here's how:
 	# Step 4a. Outside the loop, create a placeholder output file. (See above.)
@@ -111,12 +120,12 @@ while read line1; do
 	# Step 4c. String together the Pub.number, the wordcount, and the errorcount; 
 	# append to the output file.
 	echo "-- checking $line1"
-	echo "$PUB, $WC, $ERRS" >> "$DST/spellcheck.csv"
+	echo "$PUB, $WC, $ERRS" >> "$DST/spellstats/spellstats.csv"
 
 ## Close the loop
 done
 	
-	echo "Spelling counts saved to $DST/spellcheck.csv."
+	echo "Spelling counts saved to $DST/spellstats/spellstats.csv."
 	echo ''
 	
 ## Close the function
@@ -136,6 +145,6 @@ ls cleaned* | spellcount							# Call 3rd function
 cd "$CURRENT_DIR"									# Go back where we were
 
 ## Tell us what we've got!
-FILECOUNT=`wc -l "$DST/spellcheck.csv" | awk '{ print $1; }' - `
+FILECOUNT=`wc -l "$DST/spellstats/spellstats.csv" | awk '{ print $1; }' - `
 let FILECOUNT=$FILECOUNT-1							# account for titles in 1st line
 echo "Finished. $FILECOUNT files processed."
