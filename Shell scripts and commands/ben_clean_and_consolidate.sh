@@ -28,14 +28,18 @@ function clean ()
 	
 	# 1a. Convert text encoding from ISO 8859-1 (Latin-1) to UTF-8 (unicode standard)
 	# 1b. Using tr, delete all characters except for line breaks and Western characters
-	# 1c. Using tr again, collapse multiple spaces to a newline
+	# 1c. Using sed, skip the first page added by UMI (which should end the first time 
+	#	  'UM' follows two whitespace characters)
+	# 1d. Using tr again, collapse multiple spaces to a newline
 		# NB: changed my mind. Here's the code in case I want it again:
 		# `| tr -s ' ' '\n'` (without the ``)
-	# 1d. Using tr yet again, replace newlines with spaces (get all text on one line)
+	# 1e. Using tr yet again, replace newlines with spaces (get all text on one line)
 		# NB: changed my mind. Here's the code in case I want it again:
 		# `| tr '\n' " "` (without the ``)
-	# 1e. Save to a file in the destination directory.
-	iconv -f ISO_8859-1 -t UTF-8 "$SRC/$line1" | tr -cd '\11\12\40-\176' > "$DST/cleaned_$line1"
+	# 1f. Save to a file in the destination directory.
+	PATTERN="[[:blank:]][[:blank:]]UM"
+	cat "$DST/cleaned_3000388.txt" | sed "1,/[[:blank:]][[:blank:]]UM/d" > "$DST/cleaned_3000388_mod.txt"
+	iconv -f ISO_8859-1 -t UTF-8 "$SRC/$line1" | tr -cd '\11\12\40-\176' | sed "1,/[[:blank:]][[:blank:]]UM/d" > "$DST/cleaned_$line1"
 	
 	# Close the loop.
 	done
