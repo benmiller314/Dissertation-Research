@@ -29,9 +29,13 @@ function clean ()
 	# 1a. Convert text encoding from ISO 8859-1 (Latin-1) to UTF-8 (unicode standard)
 	# 1b. Using tr, delete all characters except for line breaks and Western characters
 	# 1c. Using tr again, collapse multiple spaces to a newline
+		# NB: changed my mind. Here's the code in case I want it again:
+		# `| tr -s ' ' '\n'` (without the ``)
 	# 1d. Using tr yet again, replace newlines with spaces (get all text on one line)
+		# NB: changed my mind. Here's the code in case I want it again:
+		# `| tr '\n' " "` (without the ``)
 	# 1e. Save to a file in the destination directory.
-	iconv -f ISO_8859-1 -t UTF-8 "$SRC/$line1" | tr -cd '\11\12\40-\176' | tr -s ' ' '\n' | tr '\n' " " > "$DST/cleaned_$line1"
+	iconv -f ISO_8859-1 -t UTF-8 "$SRC/$line1" | tr -cd '\11\12\40-\176' > "$DST/cleaned_$line1"
 	
 	# Close the loop.
 	done
