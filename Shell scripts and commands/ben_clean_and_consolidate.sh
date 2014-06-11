@@ -37,9 +37,7 @@ function clean ()
 		# NB: changed my mind. Here's the code in case I want it again:
 		# `| tr '\n' " "` (without the ``)
 	# 1f. Save to a file in the destination directory.
-	PATTERN="[[:blank:]][[:blank:]]UM"
-	cat "$DST/cleaned_3000388.txt" | sed "1,/[[:blank:]][[:blank:]]UM/d" > "$DST/cleaned_3000388_mod.txt"
-	iconv -f ISO_8859-1 -t UTF-8 "$SRC/$line1" | tr -cd '\11\12\40-\176' | sed "1,/[[:blank:]][[:blank:]]UM/d" > "$DST/cleaned_$line1"
+	iconv -f ISO_8859-1 -t UTF-8 "$SRC/$line1" | tr -cd '\11\12\40-\176' | sed "/INFO/,/UMI directly to order/d" | sed "/Bell \& Howell/,/-1346/d" > "$DST/cleaned_$line1"
 	
 	# Close the loop.
 	done
