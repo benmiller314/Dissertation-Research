@@ -1,35 +1,58 @@
+#!/bin/bash											# declare our shell environment
+
 ## Strategy: read in a list of files in a directory. 
 ## While items remain in the list, run a series of commands on them, 
 ## saving the results into new files to avoid accidental overwriting.
+## Based on scripts by Micki Kaufman (https://twitter.com/MickiKaufman)
 
 ## Declare some basics: source and destination.
-PDF='/Users/benmiller314/Documents/fulltext dissertations'
-SRC='/Users/benmiller314/Documents/fulltext dissertations/as text files'
-DST='/Users/benmiller314/Documents/fulltext dissertations/bashtest'
+PDF='/Users/benmiller314/Documents/fulltext dissertations/morepdfs'
+SRC='/Users/benmiller314/Documents/fulltext dissertations/morepdfs/as text files'
+DST='/Users/benmiller314/Documents/fulltext dissertations/morepdfs/clean'
 
+## for testing purposes
+# line1="3298352.PDF"
 
 
 ## Each function runs a loop, containing commands to apply; 
 ## the variable `line1` will be read in from ls (the directory listing),
 ## which causes the loop to execute on each file in the directory.
-## The functions: clean, combine, spellcount.
+## The functions (extract, clean, combine, spellcount) are called at the bottom;
+## comment out the ones you don't want to run.
 
 ## Zeroth function: extract text from pdf. Run in the $PDF folder.
 #  NB: pdftotext is available for free from http://www.bluem.net/en/mac/packages/
 function extract()
 {
+	# Make sure we have a place to output to.
+	if ! [ -d "$SRC" ] ; then
+		mkdir "$SRC"
+	fi
+
+	# Start the loop.
 	while read line1; do
 		PUB=`printf $line1 | awk 'BEGIN { FS="." } { print $1; }'`
 		printf "Converting $line1 to $PUB.txt ... "				# progress report
-		pdftotext "$PDF/$line1"
-		mv "$PDF/$PUB.txt" "$SRC/$PUB.txt"
-		echo "File made and moved.
+		pdftotext "$PDF/$line1"									# convert the file.
+		if [ $? = 0 ] ; then printf "File made " ; fi			# progress report
+		mv "$PDF/$PUB.txt" "$SRC/$PUB.txt"						# move to txt folder.
+		if [ $? = 0 ] ; then echo "and moved." ; fi				# progress report
+	
+	# Close the loop.
 	done
+
+	# Close the function.
 }
 
 ## First function: Get text that R can read. Run in the $SRC folder.
 function clean ()
 {   
+	# Make sure we have a place to output to.
+	if ! [ -d "$DST" ] ; then
+		mkdir "$DST"
+	fi
+
+	# Start the loop.
 	while read line1; do
 
 	## Step 1. Copy the file to a new directory, making changes as it goes
@@ -39,10 +62,10 @@ function clean ()
 	# 1b. Using tr, delete all characters except for line breaks and Western characters
 	# 1c. Using sed, delete the first page added by UMI (which starts in line 1, and 
 	#	  usually ends with the zip code)
-	# 1d. Using tr again, collapse multiple spaces to a newline
+	# 	1d. Using tr again, collapse multiple spaces to a newline
 	#	  NB: changed my mind. Here's the code in case I want it again:
 	#	  | tr -s ' ' '\n'
-	# 1e. Using tr yet again, replace newlines with spaces (get all text on one line)
+	# 	1e. Using tr yet again, replace newlines with spaces (get all text on one line)
 	#	  NB: changed my mind. Here's the code in case I want it again:
 	#	  | tr '\n' " "
 	# 1f. Save to a file in the destination directory.
@@ -99,7 +122,6 @@ function combine ()
 
 
 ## Third function: Get data toward a conservative estimate of OCR accuracy.
-## Based on a script by Micki Kaufman (https://twitter.com/MickiKaufman)
 ##
 ## Strategy: for each file "$line1" in a directory index (produced by ls), 
 ## (1) find the wordcount
@@ -117,7 +139,8 @@ fi
 if ! [ -e "$DST/spellstats/spellstats.csv" ] ; then
 	echo 'Pub.Number, WordCount, ErrorCount' > "$DST/spellstats/spellstats.csv"
 else 
-	echo "spellstats.csv already exists; aborting script."
+	echo "spellstats.csv already exists; aborting script to avoid duplication."
+	echo "To append, use new DST folder and concatenate later."
 	exit 1
 fi
 
@@ -167,10 +190,12 @@ done
 
 ## Go to the files, and run all the functions.
 CURRENT_DIR=$PWD
+# cd "$PDF"											# Go to pdf directory
+# ls *.PDF | extract									# Call 0th function
 cd "$SRC"											# Go to source directory
 ls *.txt | clean									# Call 1st function
 cd "$DST" 											# Go to output directory
-ls cleaned* | combine								# Call 2nd function
+# ls cleaned* | combine								# Call 2nd function
 ls cleaned* | spellcount							# Call 3rd function
 cd "$CURRENT_DIR"									# Go back where we were
 
