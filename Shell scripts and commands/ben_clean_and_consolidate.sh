@@ -37,20 +37,25 @@ function clean ()
 	
 	# 1a. Convert text encoding from ISO 8859-1 (Latin-1) to UTF-8 (unicode standard)
 	# 1b. Using tr, delete all characters except for line breaks and Western characters
-	# 1c. Using sed, skip the first page added by UMI (which should end the first time 
-	#	  'UM' follows two whitespace characters)
+	# 1c. Using sed, delete the first page added by UMI (which starts in line 1, and 
+	#	  usually ends with the zip code)
 	# 1d. Using tr again, collapse multiple spaces to a newline
-		# NB: changed my mind. Here's the code in case I want it again:
-		# `| tr -s ' ' '\n'` (without the ``)
+	#	  NB: changed my mind. Here's the code in case I want it again:
+	#	  | tr -s ' ' '\n'
 	# 1e. Using tr yet again, replace newlines with spaces (get all text on one line)
-		# NB: changed my mind. Here's the code in case I want it again:
-		# `| tr '\n' " "` (without the ``)
+	#	  NB: changed my mind. Here's the code in case I want it again:
+	#	  | tr '\n' " "
 	# 1f. Save to a file in the destination directory.
-	iconv -f ISO_8859-1 -t UTF-8 "$SRC/$line1" | tr -cd '\11\12\40-\176' | sed "1,/-1346/d" > "$DST/cleaned_$line1"
+
+	iconv -f ISO_8859-1 -t UTF-8 "$SRC/$line1" | \
+	tr -cd '\11\12\40-\176' | \
+	sed "1,/-1346/d" > "$DST/cleaned_$line1"
 	
-		# catch the case where we've stripped too much, and do it again without sed
+		# catch the case where we've stripped too much (i.e. the file has 0 bytes)
+		# and do it again without sed
 		if ! [ -s "$DST/cleaned_$line1" ] ; then
-			iconv -f ISO_8859-1 -t UTF-8 "$SRC/$line1" | tr -cd '\11\12\40-\176' > "$DST/cleaned_$line1"
+			iconv -f ISO_8859-1 -t UTF-8 "$SRC/$line1" | \
+			tr -cd '\11\12\40-\176' > "$DST/cleaned_$line1"
 		fi
 	
 	# Close the loop.
