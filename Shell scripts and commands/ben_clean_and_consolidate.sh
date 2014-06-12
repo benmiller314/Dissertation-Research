@@ -3,7 +3,8 @@
 ## saving the results into new files to avoid accidental overwriting.
 
 ## Declare some basics: source and destination.
-SRC='/Users/benmiller314/Documents/fulltext dissertations/15txt'
+PDF='/Users/benmiller314/Documents/fulltext dissertations'
+SRC='/Users/benmiller314/Documents/fulltext dissertations/as text files'
 DST='/Users/benmiller314/Documents/fulltext dissertations/bashtest'
 
 
@@ -13,14 +14,22 @@ DST='/Users/benmiller314/Documents/fulltext dissertations/bashtest'
 ## which causes the loop to execute on each file in the directory.
 ## The functions: clean, combine, spellcount.
 
+## Zeroth function: extract text from pdf. Run in the $PDF folder.
+#  NB: pdftotext is available for free from http://www.bluem.net/en/mac/packages/
+function extract()
+{
+	while read line1; do
+		PUB=`printf $line1 | awk 'BEGIN { FS="." } { print $1; }'`
+		printf "Converting $line1 to $PUB.txt ... "				# progress report
+		pdftotext "$PDF/$line1"
+		mv "$PDF/$PUB.txt" "$SRC/$PUB.txt"
+		echo "File made and moved.
+	done
+}
 
-## First function: Get text that R can read. 
+## First function: Get text that R can read. Run in the $SRC folder.
 function clean ()
 {   
-# 	if ! [ -d "$DST/cleanfiles" ] ; then
-# 		mkdir "$DST/cleanfiles"
-# 	fi
-
 	while read line1; do
 
 	## Step 1. Copy the file to a new directory, making changes as it goes
