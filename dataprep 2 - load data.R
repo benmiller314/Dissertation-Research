@@ -61,6 +61,10 @@ nonconsorts <- noexcludes[(which(noexcludes$School %in% non_conschools)),]
 setequal(nonconsorts, (noexcludes[-consorts.index,]))
 
 
+## Export file lists for subsets of data
+write(levels(factor(noexcludes$Pub.number)), file="./Shell scripts and commands/file list noexcludes.txt", sep="\n")
+write(levels(factor(consorts$Pub.number)), file="./Shell scripts and commands/file list consorts.txt", sep="\n")
+write(levels(factor(nonconsorts$Pub.number)), file="./Shell scripts and commands/file list nonconsorts list.txt", sep="\n")
 
 # split out multiple advisors?
 

@@ -58,6 +58,7 @@ if(remake_figs) {
 	heatmap.ben(sum.by.tags, diags=TRUE)
 	title(main="Method Tag Co-Occurrence")
 	mtext("A box in row Y, column X gives the number of \n dissertations tagged Y that are also tagged X", side=4)
+	mtext(paste0("N=", diss.count), side=3)
 if(remake_figs) { dev.off() }
 
 # 3. Normed heatmap
@@ -68,4 +69,5 @@ if(remake_figs) {
 	heatmap.ben(sum.by.tags, rowscale=TRUE, diags=TRUE)
 	title(main="Method Tag Co-Occurrence")
 	mtext("A box in row Y, column X gives the probability \n that a dissertation tagged Y is also tagged X", side=4)
+	mtext(paste0("N=", diss.count), side=3)
 if(remake_figs) { dev.off() }
