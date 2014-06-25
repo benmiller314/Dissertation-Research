@@ -1,9 +1,14 @@
 require(mallet)
+require(doBy)
 
 ## some params
 malletloc <- "/Users/benmiller314/mallet-2.0.7"
-textloc <- "/Users/benmiller314/Documents/fulltext dissertations/bashtest"
+textloc <- "/Users/benmiller314/Documents/fulltext dissertations/clean/test_subset"
 K <- 10		# number of topics
+
+# find out the current Java max heap size, since it's choking; then up it
+getOption("java.parameters")			
+j <- .jinit(parameters="-Xmx1024m", force.init=TRUE)
 
 ## **Helper function: top.words.tfitf**
 # I'd like to get the top words in each topic ranked not by term frequency alone but by uniqueness to the topic -- i.e. term frequency * inverse topic frequency (as modeled on TF*IDF).
@@ -67,7 +72,7 @@ ben.mallet.tm <- function(K=10, 						# how many topics?
 	    
 	    # cleanup step 3. Keep only files that are in the dataset we want.
 		dataset <- get(dataset_name)
-		dataset.index <- which(documents$id %in% dataset$Pub.Number)
+		dataset.index <- which(documents$id %in% dataset$Pub.number)
 		documents <- documents[dataset.index, ]
 		
 
@@ -184,10 +189,15 @@ ben.mallet.tm <- function(K=10, 						# how many topics?
 				   "top.words" = top.words)
 }
 
+debug(thresh)
+big.nonconsorts <- thresh("nonconsorts")
+big.nonconsorts <- big.nonconsorts$thresh.data
 
-fulltext.tm.10 <- ben.mallet.tm(K=10, dataset_name="consorts")
+fulltext.tm.10 <- ben.mallet.tm(dataset_name="big.nonconsorts")
 k10 <- data.matrix(fulltext.tm.10$topic.labels)
 print(k10)
+k10.top <- fulltext.tm.10$top.words
+head(k10.top, 100)
 
 abstracts.tm.16 <- ben.mallet.tm(K=16)
 str(abstracts.tm.12)
