@@ -2,6 +2,7 @@ require(mallet)
 
 ## some params
 malletloc <- "/Users/benmiller314/mallet-2.0.7"
+textloc <- "/Users/benmiller314/Documents/fulltext dissertations/bashtest"
 K <- 10		# number of topics
 
 ## **Helper function: top.words.tfitf**
@@ -34,22 +35,49 @@ top.words.tfitf <- function (topic.model, topic.words, num.top.words = 10)
 
 ## NB: The following is based heavily on http://cran.r-project.org/web/packages/mallet/mallet.pdf by David Mimno (the 'not run' example for the MalletLDA function, starting on page 9), including most comments. This is where the topic modeling actually happens.
 
-## 0. Create a wrapper for the data with elements for each column.
-# R does some type inference, and will guess wrong, so give it hints with "colClasses".
-# Note that "id" and "text" are special fields -- mallet will look there for input.
-documents <- list("id"=as.character(noexcludes$Pub.number), 
-                  "text"=as.character(noexcludes$ABSTRACT)
-                  )
                   
 # Ben: Turn most of this file into a function, so we can try different values of K
-ben.mallet.tm <- function(documents, K=10, num.top.words=7, runlong=FALSE) {
+ben.mallet.tm <- function(K=10, 						# how many topics?
+						  num.top.words=7, 				# how to label topics
+						  runlong=FALSE, 				# do extra iterations?
+						  top.cutoff.pct=10, 			# remove words in this % of documents or more
+						  dataset_name="noexcludes"		# which subset of data to include?
+						  ) 
+{
 	
+	## 0. Create a wrapper for the data with elements for each column.
+	# Note that "id" and "text" are special fields -- mallet will look there for input.
+
+	# for abstracts:
+	# documents <- list("id"=as.character(noexcludes$Pub.number), 
+	                  # "text"=as.character(noexcludes$ABSTRACT)
+	                  # )
+	
+	# for full text:
+	documents <- mallet.read.dir(textloc)
+		# cleanup step 1. Final row is spellcounts directory, not a real file; remove it
+		documents <- documents[which(documents$id != paste0(textloc, "/spellstats")), ]
+		
+		# cleanup step 2. Every filename in documents$id has the same length,
+		# and the Pub.number we want is always 7 characters long, starting 10 chars from the end.
+		# Let's extract them, so we can merge with tag data further down the road.
+		len <- nchar(documents$id[1])
+		documents$id <- substr(documents$id, (len-10), (len-4))
+	    rm(len)
+	    
+	    # cleanup step 3. Keep only files that are in the dataset we want.
+		dataset <- get(dataset_name)
+		dataset.index <- which(documents$id %in% dataset$Pub.Number)
+		documents <- documents[dataset.index, ]
+		
+
 	# 1. Create a mallet instance list object. Right now we have to specify the stoplist
 	# as a file, can’t pass in a list from R. 
-	## Ben adds: This creates a Java object required by the Java-like methods used with  topic.model (hijacking R's '$' operator as if it's Java's '.' operator).
+	## Ben adds: This creates a Java object required by the Java-like methods used with topic.model (hijacking R's '$' operator as if it's Java's '.' operator).
 	mallet.instances <- mallet.import(id.array = documents$id,
 		text.array = documents$text, 
 		stoplist.file = paste0(malletloc,"/stoplists/en.txt"),
+		# token.regexp = "\\p{L}+"
 		token.regexp = "\\p{L}[-\\p{L}\\p{Po}]+\\p{L}"
 		)
 	## NB: Instead of Mimno's original p{P} (any punctuation) in the middle of the word, I modded the regex above to search for p{Po} -- that's "any kind of punctuation character that is not a dash, bracket, quote or connector," per http://www.regular-expressions.info/unicode.html -- plus hyphens. This was necessary to break words at  em-dashes.
@@ -78,10 +106,11 @@ ben.mallet.tm <- function(documents, K=10, num.top.words=7, runlong=FALSE) {
 	
 	####
 	# 5. Ben: Let's curate that vocabulary! (Approach here based on Mimno 2012, pp. 4-5: he says 5-10%)
-	# 5a. Find words occurring in more than 25% of the documents. Take them out, but save for later.
-	cutoff <- length(documents$id) * .10
+	# 5a. Find words occurring in more than 10% of the documents. Take them out, but save for later.
+	cutoff <- length(documents$id) * (top.cutoff.pct/100)
 	top.words.index <- which(word.freqs.sorted$doc.freq > cutoff)
-	top.words <- word.freqs.sorted[top.words.index, ]
+	top.words <- word.freqs.sorted[top.words.index, ] 
+		nrow(top.words) / length(vocabulary)
 	
 	# 5b. Find words occurring in fewer than 5 (count, not %) of the documents
 	bottom.words.index <- which(word.freqs.sorted$doc.freq < 5)
@@ -98,12 +127,15 @@ ben.mallet.tm <- function(documents, K=10, num.top.words=7, runlong=FALSE) {
 	new.stoplist <- sort(new.stoplist)
 	write(new.stoplist, file=paste0(malletloc,"/stoplists/en-plus-top-and-bottom.txt"))
 	
-	# 1-4, take 2. Re-run the mallet.import, etc
+	# 1-4, take two: Re-run the mallet.import, etc
 	mallet.instances <- mallet.import(id.array = documents$id,
 		text.array = documents$text, 
 		stoplist.file = paste0(malletloc,"/stoplists/en-plus-top-and-bottom.txt"),
+		# token.regexp = "\\p{L}[\\p{L}]+\\p{L}"
 		token.regexp = "\\p{L}[-\\p{L}\\p{Po}]+\\p{L}"
 		)
+		
+	rm(topic.model)												# maybe will help with heap usage?
 	topic.model <- MalletLDA(num.topics=K)
 	topic.model$loadDocuments(mallet.instances)
 	vocabulary <- topic.model$getVocabulary()
@@ -152,18 +184,23 @@ ben.mallet.tm <- function(documents, K=10, num.top.words=7, runlong=FALSE) {
 				   "top.words" = top.words)
 }
 
-abstracts.tm.16 <- ben.mallet.tm(documents, K=16)
+
+fulltext.tm.10 <- ben.mallet.tm(K=10, dataset_name="consorts")
+k10 <- data.matrix(fulltext.tm.10$topic.labels)
+print(k10)
+
+abstracts.tm.16 <- ben.mallet.tm(K=16)
 str(abstracts.tm.12)
 k16 <- data.matrix(abstracts.tm.16$topic.labels)
 print(k16)
 
-abstracts.tm.10 <- ben.mallet.tm(documents, K=10)
+abstracts.tm.10 <- ben.mallet.tm(K=10)
 k10 <- data.matrix(abstracts.tm.10$topic.labels)
 print(k10)
 
-abstracts.tm.12 <- ben.mallet.tm(documents, K=12)
+abstracts.tm.12 <- ben.mallet.tm(K=12)
 k12_1 <- data.matrix(abstracts.tm.12$topic.labels)
-abstracts.tm.12 <- ben.mallet.tm(documents, K=12)
+abstracts.tm.12 <- ben.mallet.tm(K=12)
 k12_2 <- data.matrix(abstracts.tm.12$topic.labels)
 print(k12_1); print(k12_2)
 
