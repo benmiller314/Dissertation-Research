@@ -1,13 +1,26 @@
-## define some broad parameters, since this file will always be run first
+# dataprep.R
+#
+# A file to configure my usual working directories, variables, and functions.
+# Follow up by running 'dataprep2 - load data.R'; see 'run all analyses.R' for further steps.
+###
+
+# define some broad parameters, since this file will always be run first
 # make a shortcut for retrieving the last entered value
 ans <- function() {
 	.Last.value
 	}
 	
+# set the working directories, taking into account the GitHub setup
+sourceloc <- "/Users/benmiller314/Dropbox/coursework, etc/dissertation/R experiments/Dissertation Research"
+setwd(sourceloc)
+imageloc <- "../Dissertation Research - Figures/"
+dataloc <- "../"
+
+
 # name the method tags most of these analyses are interested in
 tagnames <- c("Clin","Crit",
-# "Cult",
-"Disc","Ethn","Expt","Hist","Intv","Meta","Modl","Phil","Poet","Prac","Rhet","Surv","Othr")
+			  # "Cult",
+			  "Disc","Ethn","Expt","Hist","Intv","Meta","Modl","Phil","Poet","Prac","Rhet","Surv","Othr")
 
 tagnames.long <- c( "Clinical / Case Study", 
 					"Critical / Hermeneutical",
@@ -41,11 +54,6 @@ sumnames <- sapply(tagnames, FUN=function(x) paste0(x,".sum"))
 meannames <- sapply(tagnames, FUN=function(x) paste0(x,".mean"))
 topnames <- sapply(tagnames, FUN=function(x) as.list(tolower(paste0("top.",x))))
 topnames <- lapply(topnames, FUN=function(x) substr(x,1,8))
-
-# set the working directories, taking into account the GitHub setup
-setwd("/Users/benmiller314/Dropbox/coursework, etc/dissertation/R experiments/Dissertation Research")
-imageloc <- "../Dissertation Research - Figures/"
-dataloc <- "../"
 
 # If remake_figs is true (e.g. if set by 'rerun all analyses.R'), new pdf files will be created; 
 # otherwise, they'll display on screen only.
