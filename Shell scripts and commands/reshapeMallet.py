@@ -14,6 +14,8 @@ with open("/Users/benmiller314/mallet-2.0.7/consorts_composition.txt") as f:
             
             #use text number as ID
             Id=a[1]
+            Id=Id.rsplit("_",1)[1]
+            Id=Id.split(".",1)[0]
             
             #create cluster topic and proportion pairings using zip function
             d=zip(a[2::2], a[3::2])
