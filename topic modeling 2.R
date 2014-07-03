@@ -163,11 +163,11 @@ ben.mallet.tm <- function(K=10, 						# how many topics?
 	
 	# 2b.8.a. matrix with documents in rows, topics in columns; raw used only for testing.
 	# These are huge files, so use big.matrix again.
-	doc.topics <- as.big.matrix(mallet.doc.topics(topic.model, smoothed=T, normalized=T), backingfile=paste0(MALLET_HOME, "/", dataset_name, "K", K,  "_doc_topics"))
+	doc.topics <- as.big.matrix(mallet.doc.topics(topic.model, smoothed=T, normalized=T), backingfile=paste0(MALLET_HOME, "/", dataset_name, "K", K, "_doc_topics"))
 	# doc.topics.raw <- as.big.matrix(mallet.doc.topics(topic.model, smoothed=F, normalized=F))
 	
 	# 2b.8.b. matrix with topics in rows, words in columns; raw used only for testing.
-	topic.words <- as.big.matrix(mallet.topic.words(topic.model, smoothed=T, normalized=T), backingfile=paste0(MALLET_HOME, "/", dataset_name, "K", K,  "_topic_words"))
+	topic.words <- as.big.matrix(mallet.topic.words(topic.model, smoothed=T, normalized=T), backingfile=paste0(MALLET_HOME, "/", dataset_name, "K", K, "_topic_words"))
 	# topic.words.raw <- as.big.matrix(mallet.topic.words(topic.model, smoothed=F, normalized=F))
 
 	# 2b.9  Label topics with most frequent words
@@ -178,12 +178,13 @@ ben.mallet.tm <- function(K=10, 						# how many topics?
 	topic.labels.tfitf <- top.words.tfitf(topic.model, topic.words, num.top.words)
 
 	# Now pass back the topic model itself, the labels for them, and the top words we removed:
-	return <- list("topic.model" = topic.model,					# java object
-				   "doc.topics" = doc.topics, 					# doc/topic big.matrix, filebacked
+	save(topic.model, file=paste0(MALLET_HOME, "/", dataset_name, "K", K, ".gz"), compress=TRUE)			
+	
+	return <- list("doc.topics" = doc.topics, 					# doc/topic big.matrix, filebacked
 				   "topic.words" = topic.words,					# topic/word big.matrix, filebacked
 				   "topic.labels" = topic.labels,				# most frequent words in each topic
 				   "topic.labels.tfitf" = topic.labels.tfitf,	# most distinctive words in each topic
-				   "top.words" = top.words						# the words we 
+				   "top.words" = top.words						# the words we cut out as too frequent
 				   )
 }
 
