@@ -1,12 +1,15 @@
 ## Topic modeling, take 2
 # 
 # The plan:
-# 1. Compile all noexcludes into a single massive data file, with one text per line
-# 2. Read in that file as a file-backed big.matrix
-# 3. a. Set up MALLET to analyze that big.matrix
-#    b. For number of topics, try a sequence from 10-200, interval 10. 
-#    c. Store all these crazy outputs as big.matrices.
-# 5. Find the ideal number of topics by maximizing log.likelihood or minimizing perplexity.
+# 1. Choose a directory of cleaned text files, and an optional number of topics
+# 2. Set up MALLET to analyze that directory, but don't run yet
+#	 a. use Ben Marwick's approach ('r2mallet.R') to create the instance file
+#    b. use David Mimno's approach ('topic modeling with mallet package.R') to train the model
+#	    (but use my token regex from that file, not his original one)
+# 3. If we don't know number of topics, 
+#	 a. use foreach() to try a sequence from 10-200, interval 10, then
+#    b. maximize log.likelihood/token, which MALLET outputs somewhere by default. (Find it!)
+# 4. Run MALLET with the parameters set up in Step 2, with the topics as chosen in 1 or 3.
 ##
 
 # 0. Establish the working environment.
@@ -24,4 +27,3 @@ system("'./Shell scripts and commands/ben_clean_and_consolidate.sh'")
 library(bigmemory)
 fulltext_noexcludes <- read.big.matrix("/Users/benmiller314/Documents/fulltext_dissertations/cumulative/noexcludes_cumulative.csv", type="character")
 , backingfile="noexcludes_backing", backingpath="/Users/benmiller314/Documents/fulltext_dissertations/cumulative/", type="character")
-
