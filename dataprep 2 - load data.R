@@ -1,5 +1,5 @@
 if (!exists("tagnames")) {
-	source(file="dataprep.R")
+	source(file="/Users/benmiller314/Dropbox/coursework, etc/dissertation/R experiments/Dissertation Research/dataprep.R")
 }
 
 ## now get the data 
@@ -30,7 +30,7 @@ for (i in refactor.index) {
 
 
 # redefine methods that are all "check" or "check?" as "Other," and recalculate "Method.Count"
-source(file="check count.R")
+source(file=paste0(sourceloc, "/check count.R"))
 
 # get tag index columns on their own, for simplicity down the road
 # TO DO: See whether we still need this
@@ -62,9 +62,9 @@ setequal(nonconsorts, (noexcludes[-consorts.index,]))
 
 
 ## Export file lists for subsets of data
-write(levels(factor(noexcludes$Pub.number)), file="./Shell scripts and commands/file list noexcludes.txt", sep="\n")
-write(levels(factor(consorts$Pub.number)), file="./Shell scripts and commands/file list consorts.txt", sep="\n")
-write(levels(factor(nonconsorts$Pub.number)), file="./Shell scripts and commands/file list nonconsorts list.txt", sep="\n")
+write(levels(factor(noexcludes$Pub.number)), file=paste0(sourceloc, "/Shell scripts and commands/file list noexcludes.txt", sep="\n"))
+write(levels(factor(consorts$Pub.number)), file=paste0(sourceloc, "/Shell scripts and commands/file list consorts.txt", sep="\n"))
+write(levels(factor(nonconsorts$Pub.number)), file=paste0(sourceloc, "/Shell scripts and commands/file list nonconsorts list.txt", sep="\n"))
 
 # split out multiple advisors?
 

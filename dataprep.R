@@ -11,10 +11,11 @@ ans <- function() {
 	}
 	
 # set the working directories, taking into account the GitHub setup
-sourceloc <- "/Users/benmiller314/Dropbox/coursework, etc/dissertation/R experiments/Dissertation Research"
+sourceloc <- "/Users/benmiller314/Dropbox/coursework, etc/dissertation/R experiments/Dissertation Research/"
 setwd(sourceloc)
-imageloc <- "../Dissertation Research - Figures/"
-dataloc <- "../"
+imageloc <- paste0(sourceloc, "../Dissertation Research - Figures/")
+dataloc <- paste0(sourceloc, "../")
+malletloc <- "/Users/benmiller314/mallet-2.0.7"
 
 
 # name the method tags most of these analyses are interested in
