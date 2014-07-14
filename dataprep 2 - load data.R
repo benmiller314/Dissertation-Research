@@ -4,7 +4,7 @@ if (!exists("tagnames")) {
 
 ## now get the data 
 # The most recent file of dissertation metadata
-print(noquote("Select the most recent file of dissertation metadata."))
+message("Select the most recent file of dissertation metadata.")
 bigarray <- read.csv(file=file.choose())
 
 # parse the method tags... including for the collapsed schema
@@ -20,7 +20,7 @@ diss.count <- nrow(noexcludes)
 false.positives <- nrow(justexcludes)
 
 
-print(noquote(paste("In this data set, there are",diss.count,"dissertations, not counting",false.positives,"false positives.")))
+message(paste("In this data set, there are",diss.count,"dissertations, not counting",false.positives,"false positives."))
 
 # refactor levels for noexcludes alone
 refactor.index <- which(names(noexcludes) %in% c("Subject","KEYWORDS","School","Advisor.type","Advisor.Name","Degree","Method.Terms","pages","Flag.notes"))
