@@ -53,14 +53,14 @@ ben.mallet.tm <- function(K=10, 						# how many topics?
 	## 0. Create a wrapper for the data with elements for each column.
 	# Note that "id" and "text" are special fields -- mallet will look there for input.
 
-	# for abstracts:
+	## for abstracts:
 	# documents <- list("id"=as.character(noexcludes$Pub.number), 
 	                  # "text"=as.character(noexcludes$ABSTRACT)
 	                  # )
 	
-	# for full text:
+	## for full text:
 	documents <- mallet.read.dir(textloc)
-		# cleanup step 1. Final row is spellcounts directory, not a real file; remove it
+		# cleanup step 1. Remove spellcounts sub-directory, which isn't a file
 		documents <- documents[which(documents$id != paste0(textloc, "/spellstats")), ]
 		
 		# cleanup step 2. Every filename in documents$id has the same length,
@@ -85,7 +85,7 @@ ben.mallet.tm <- function(K=10, 						# how many topics?
 		# token.regexp = "\\p{L}+"
 		token.regexp = "\\p{L}[-\\p{L}\\p{Po}]+\\p{L}"
 		)
-	## NB: Instead of Mimno's original p{P} (any punctuation) in the middle of the word, I modded the regex above to search for p{Po} -- that's "any kind of punctuation character that is not a dash, bracket, quote or connector," per http://www.regular-expressions.info/unicode.html -- plus hyphens. This was necessary to break words at  em-dashes.
+	## NB: Instead of Mimno's original p{P} (any punctuation) in the middle of the word, I modded the regex above to search for p{Po} -- that's "any kind of punctuation character that is not a dash, bracket, quote or connector," per http://www.regular-expressions.info/unicode.html -- plus hyphens. This was necessary to break words at em-dashes.
 	## NB as well that this regex as structured defines words to be at least three characters long: a letter, plus a letter or punctuation, plus a letter. At some later point I may be curious about the use of the words "I," "me," "we," etc, and that would require a different regex.
 	
 	
