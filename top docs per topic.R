@@ -59,32 +59,93 @@ setkey(topic_keys, topic)
 
 # Step 3. Find top 5 docs for each overall top topic 
 # to get a sense of what's "real" and what's "interesting"
-for (i in 1:min(length(colsums.sort)-1, cutoff)) {	# We're not looking at 100s of topics, so max out.	
-	# i=1			# Test value
-	# i gives the topic rank, not the column where it appears, b/c the 1st column is always Pub.number.
-	# Add one to get the right column name, which is the topic number...
-	topic.num <- as.integer(names(colsums.sort[i+1]))	
-	
-	# and add one again to skip the Pub.number column in outputfile
-	col.ind <- topic.num + 1
-	
-	# Search outputfile for the dissertations with max proportion of that topic, and get the Pub.numbers
-	row.ind <- order(outputfile[, col.ind], decreasing=TRUE)[1:5]
-	diss.ind <- outputfile[row.ind, "Pub.number"]
 
-	topdocs <- noexcludes[match(diss.ind, noexcludes$Pub.number), 	# TO DO: make noexcludes a data.table
-						  c("Pub.number"
-						  , "Title" 
-						  , "Year"
-						  # , "KEYWORDS"
-						  # , "Subject" 
-						  # , "ABSTRACT"
-						  )]
-	message("\nTopic of rank ", i, ":\n")
-	print(topic_keys[topic.num])
-	print(topdocs)
-	# print(outputfile[row.ind, c("Pub.number", (col.ind-3):min((col.ind+3), length(colsums)))])
-	readline("Press <enter> to continue\n")
+	# Step 4. Find all the top-ranked topics for those docs: maybe that really popular topic isn't actually the main component of the docs that come up. We start with the doc-topic matrix from MALLET:
+	filename <- paste0(malletloc, "/", dataset_name, "k", ntopics, "_composition.txt")
+	doc_topics <- read.delim(filename, header=F, skip=1)
+	head(doc_topics)
+	
+	# column 1 is an unneeded index; column 2 contains names of identical length, 
+	# ending with a 7-digit Pub.number followed by ".txt"; final column is empty. Let's simplify.
+	doc_topics[, "V1"] <- NULL 
+	len <- nchar(as.character(doc_topics[1, "V2"]))
+	doc_topics[, "V2"] <- substr(as.character(doc_topics[, "V2"]), (len-10), (len-4))
+	if (is.na(all(doc_topics[, ncol(doc_topics)]))) { doc_topics[, ncol(doc_topics)] <- NULL}
+
+	# Get findable column names
+	colnames(doc_topics)[1] <- "Pub.number"
+	colnames(doc_topics)[seq(2, ncol(doc_topics), 2)] <- paste0("top", seq(1, (ncol(doc_topics)-1)/2, 1))
+	colnames(doc_topics)[seq(3, ncol(doc_topics), 2)] <- paste0("wgt", seq(1, (ncol(doc_topics)-1)/2, 1))
+	head(colnames(doc_topics))
+	
+	# convert to 1-indexed from MALLET's 0-indexed, so everything matches
+	doc_topics[, seq(2, ncol(doc_topics), 2)] <- (doc_topics[, seq(2, ncol(doc_topics), 2)]+1)
+	
+	# for some reason, it thinks the topic weights are characters. They're numbers.
+	doc_topics[, seq(3, ncol(doc_topics), 2)] <- apply(doc_topics[, seq(3, ncol(doc_topics), 2)], 2, FUN=function(x) {
+			x <- as.numeric(x)
+	})
+
+	doc_topics.dt <- as.data.table(doc_topics)
+	setkey(doc_topics.dt, Pub.number)
+	head(doc_topics.dt)
+	
+	noexcludes.dt <- as.data.table(noexcludes)
+	setkey(noexcludes.dt, Pub.number)
+	
+get.topics4doc <- function(pubnum, doc_tops=doc_topics.dt, topic_keys=topic_keys.dt) {
+		# pubnum <- "3051708"; doc_tops <- doc_topics.dt	# test values
+		if (!is.character(pubnum)) { pubnum <- as.character(pubnum) }
+		list("title" = noexcludes.dt[pubnum, c("Title", tagnames, pubnum), with=F],
+			"doc_tops" = doc_tops[pubnum, paste0(c("top","wgt"), rep(1:5, each=2)), with=F],
+			"keys" = topic_keys[as.numeric(doc_tops[pubnum, paste0("top", 1:5), with=F])],
+			"abstract" = noexcludes.dt[pubnum, c("KEYWORDS", "ABSTRACT"), with=F]		
+			)
+}
+
+# Browse through the top topics and their top-proportioned dissertations
+top_topic_browser <- function(start.at=1) {
+	# just in case
+	require(data.table)
+	
+	# List the keys for the top N topics, where N = cutoff
+	len <- min(length(colsums)-1, cutoff)
+	ind <- as.integer(names(colsums.sort)[2:len])		# list of topics by rank; skip Pub.num
+	message("Top ", cutoff, " topics:")
+	print(topic_keys.dt[ind])							# top words for each topic
+
+	
+	
+	# Loop through the top topics and their top-proportioned dissertations,  
+	# optionally showing abstracts and top 5 topics for each of those dissertations
+	for (i in start.at:len) {
+		# i=5						# Test value
+		# i gives the topic rank
+		topic.num <- ind[i]	
+		
+		# Search outputfile for the dissertations with max proportion of that topic, and get the Pub.numbers
+		row.ind <- order(outputfile[, which(names(outputfile)==topic.num)], decreasing=TRUE)[1:5]
+		diss.ind <- outputfile[row.ind, "Pub.number"]
+
+		if (remake_figs) { 	print(paste0("Topic of rank ", i, ":")) } 
+		else { message("\nTopic of rank ", i, ":\n") }
+		
+		print(topic_keys.dt[topic.num])
+		
+		topdocs <- noexcludes.dt[as.character(diss.ind), c("Pub.number", "Title", tagnames), with=F]
+		print(topdocs)
+		if (!remake_figs) { a <- readline("Press <enter> for more detail on these docs, or S to skip to the next topic\n") } else { a <- ""}
+
+		while (tolower(a) != "s") {
+			for(i in topdocs$Pub.number) {
+				print(get.topics4doc(pubnum=i))
+				if (!remake_figs) { a <- readline("Press <enter> for next doc, U for previous doc, or S to skip to the next topic\n") } else { a <- ""}
+				if (tolower(a) == "s") { break }
+				else if (tolower(a) == "u") {i <- i-1}
+			}
+			a <- "s"
+		}
+	}
 }
 
 
