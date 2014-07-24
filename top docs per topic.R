@@ -28,7 +28,7 @@ filename <- paste0(malletloc, "/", dataset_name, "k", ntopics, "_doc-all-topics.
 system("cd 'Shell scripts and commands'; python reshapeMallet.py; cd ..")
 outputfile <- read.delim(filename, header=F)
 
-# switch from 0-indexed to 1-indexed so the topic numbers in topic_keys are the same as row numbers
+# switch from 0-indexed to 1-indexed so the topic numbers in topic_keys.dt are the same as row numbers
 # NB: this seems to be necessary to avoid searching for column "0"
 head(outputfile)
 names(outputfile) <- c("Pub.number", (1:(ncol(outputfile)-1)))
@@ -39,23 +39,25 @@ head(outputfile.dt)
 
 # Step 2. Find overall top topics
 colsums <- colSums(outputfile.dt)
+names(colsums) <- names(outputfile.dt)
 head(colsums)
 colsums.sort <- colsums[order(colsums, decreasing=TRUE)]
 head(colsums.sort)
-plot(2:length(colsums.sort), colsums.sort[2:length(colsums.sort)], xlab="topic numbers (arbitrary)", ylab="sum of contributions")
+plot(2:length(colsums), colsums.sort[2:length(colsums)], xlab="topic numbers (arbitrary)", ylab="sum of contributions", xaxt="n")
+text(x=1+2:length(colsums), y=1+colsums.sort[2:length(colsums)], labels=names(colsums.sort[2:length(colsums)]))
 
 # Oh, and what were those topics, again?
 filename <- paste0(malletloc, "/", dataset_name, "k", ntopics, "_keys.txt")
-topic_keys <- as.data.table(read.delim(filename, header=F))
-setnames(topic_keys, c("V1", "V2", "V3"), c("topic", "alpha", "top_words"))
-names(topic_keys)
-head(topic_keys)
+topic_keys.dt <- as.data.table(read.delim(filename, header=F))
+setnames(topic_keys.dt, c("V1", "V2", "V3"), c("topic", "alpha", "top_words"))
+names(topic_keys.dt)
+head(topic_keys.dt)
 
-# switch from 0-indexed to 1-indexed so the topic numbers in topic_keys are the same as row numbers
+# switch from 0-indexed to 1-indexed so the topic numbers in topic_keys.dt are the same as row numbers
 # NB: this seems to be necessary to avoid searching for column "0"
-topic_keys$topic <- 1:nrow(topic_keys)
-head(topic_keys)
-setkey(topic_keys, topic)
+topic_keys.dt$topic <- 1:nrow(topic_keys.dt)
+head(topic_keys.dt)
+setkey(topic_keys.dt, topic)
 
 # Step 3. Find top 5 docs for each overall top topic 
 # to get a sense of what's "real" and what's "interesting"
