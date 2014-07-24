@@ -37,6 +37,9 @@ system("'./Shell scripts and commands/ben_clean_and_consolidate.sh' consorts")
 # (This use of system() inspired by https://gist.github.com/benmarwick/4537873, 
 # via https://gist.github.com/drlabratory/6198388). Instructions for MALLET import
 # are online at http://mallet.cs.umass.edu/import.php.
+#
+# UGH: I couldn't get the function call to resolve properly using system(), 
+# so now it just outputs a string to run manually in Terminal.
 ben.mallet.import <- function(dataset_name="noexcludes", remove_stopwords=T, extra_stopwords=F) {
 	# 2a.1. where is MALLET, and what is the command that runs it?
 	MALLET_HOME <- "/Users/benmiller314/mallet-2.0.7"			
@@ -75,8 +78,12 @@ ben.mallet.import <- function(dataset_name="noexcludes", remove_stopwords=T, ext
 						"--token-regex", token_regex
 					)
 	
-	# 2a.7. Trigger the import.
-	do.call(system, import_cmd, quote=TRUE)
+	# # 2a.7. Trigger the import.
+	# do.call(system, list(command=shQuote(import_cmd)), quote=FALSE)
+	## Not sure why this isn't working, since it's fine in Terminal, but for now 
+	## just print out import_cmd and run it manually.
+	message("Run the following command in terminal:")
+	print(noquote(import_cmd))
 
 # close the mallet import function
 }
