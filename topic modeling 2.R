@@ -26,28 +26,30 @@
 	
 ## Step 1. Compress the files, if they haven't been compressed already
 ## NB: double-check which commands are commented out before running; this could take a while.
-system("'./Shell scripts and commands/ben_clean_and_consolidate.sh'")
+## If the output file already exists, this call will just exit with an error.
+system("'./Shell scripts and commands/ben_clean_and_consolidate.sh' consorts")
 
 
 
 ## Step 2. Set up MALLET to analyze that file, but don't run yet
-## Step 2a. Run MALLET externally to read in that file as a list of instances.
+## Step 2a. Run MALLET externally to read in the cumulative file as a list of instances.
+#
 # (This use of system() inspired by https://gist.github.com/benmarwick/4537873, 
 # via https://gist.github.com/drlabratory/6198388). Instructions for MALLET import
 # are online at http://mallet.cs.umass.edu/import.php.
-ben.mallet.import <- function(remove_stopwords=T, extra_stopwords=F) {
+ben.mallet.import <- function(dataset_name="noexcludes", remove_stopwords=T, extra_stopwords=F) {
 	# 2a.1. where is MALLET, and what is the command that runs it?
 	MALLET_HOME <- "/Users/benmiller314/mallet-2.0.7"			
 	mallet_cmd <- paste0(MALLET_HOME, "/bin/mallet")
 	
 	# 2a.2. Where is the import file? (determined by the shell script in Step 1)
-	import_file <- "/Users/benmiller314/Documents/fulltext_dissertations/cumulative/noexcludes_cumulative.txt"
+	import_file <- paste0("/Users/benmiller314/Documents/fulltext_dissertations/cumulative/",dataset_name,"_cumulative.txt")
 	
 	# 2a.3. Where should we save the instances created by the import? (we'll need this in Step 2b)
-	imported_file <- "/Users/benmiller314/Documents/fulltext_dissertations/topicmodels/noexcludes_instances.mallet"
+	imported_file <- paste0("/Users/benmiller314/Documents/fulltext_dissertations/topicmodels/",dataset_name,"_instances.mallet")
 	
 	# 2a.4. What counts as a token?
-	token_regex <- "\\p{L}[-\\p{L}\\p{Po}]+\\p{L}"
+	token_regex <- shQuote("\\p{L}[-\\p{L}\\p{Po}]+\\p{L}")
 		# NB: Instead of the default [A-Za-z]*, or Mimno's original p{P} (any punctuation) in the middle of the word, I modded the regex above to search for p{Po} -- that's "any kind of punctuation character that is not a dash, bracket, quote or connector," per http://www.regular-expressions.info/unicode.html -- plus hyphens. This was necessary to break words at em-dashes.
 		# NB as well that this regex as structured defines words to be at least three characters long: a letter, plus a letter or punctuation, plus a letter. At some later point I may be curious about the use of the words "I," "me," "we," etc, and that would require a different regex.
 	
@@ -61,7 +63,7 @@ ben.mallet.import <- function(remove_stopwords=T, extra_stopwords=F) {
 		}
 		if (extra_stopwords) { 	
 			stoplist_file <- paste0(MALLET_HOME, "/stoplists/top-and-bottom-plus.txt")
-			stop_options <- paste(stopoptions, "--extra-stopwords", stoplist_file) 
+			stop_options <- paste(stop_options, "--extra-stopwords", stoplist_file) 
 		} else { 
 			stop_options <- paste(stop_options, "") 
 		}
@@ -69,8 +71,8 @@ ben.mallet.import <- function(remove_stopwords=T, extra_stopwords=F) {
 	# 2a.6. Set the import command to include the parameters set above.
 	import_cmd <- paste(mallet_cmd, "import-file --input", import_file, 
 						"--output", imported_file, 
-						"--token_regex", token_regex, 
-						stop_options
+						stop_options,
+						"--token-regex", token_regex
 					)
 	
 	# 2a.7. Trigger the import.
