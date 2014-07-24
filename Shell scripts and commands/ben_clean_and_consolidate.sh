@@ -4,11 +4,18 @@
 ## While items remain in the list, run a series of commands on them, 
 ## saving the results into new files to avoid accidental overwriting.
 ## Based on scripts by Micki Kaufman (https://twitter.com/MickiKaufman)
+##
+## TO DO: set up PDF, SRC, and DST as parameters to pass in from the command line.
 
-## Declare some basics: source and destination.
-PDF='/Users/benmiller314/Documents/fulltext dissertations/morepdfs'
-SRC='/Users/benmiller314/Documents/fulltext dissertations/morepdfs/as text files'
-DST='/Users/benmiller314/Documents/fulltext dissertations/morepdfs/clean'
+## Declare some basics: source and destination. NB: these will likely change often!
+DATASET=$1
+PDF="/Users/benmiller314/Documents/fulltext_dissertations/morepdfs"
+SRC="/Users/benmiller314/Documents/fulltext_dissertations/morepdfs/as text files"
+DST="/Users/benmiller314/Documents/fulltext_dissertations/clean_""$DATASET""_only"
+
+# Store cumulative data in its own directory
+CUMUL="/Users/benmiller314/Documents/fulltext_dissertations/cumulative"
+
 
 ## for testing purposes
 # line1="3298352.PDF"
@@ -62,13 +69,7 @@ function clean ()
 	# 1b. Using tr, delete all characters except for line breaks and Western characters
 	# 1c. Using sed, delete the first page added by UMI (which starts in line 1, and 
 	#	  usually ends with the zip code)
-	# 	1d. Using tr again, collapse multiple spaces to a newline
-	#	  NB: changed my mind. Here's the code in case I want it again:
-	#	  | tr -s ' ' '\n'
-	# 	1e. Using tr yet again, replace newlines with spaces (get all text on one line)
-	#	  NB: changed my mind. Here's the code in case I want it again:
-	#	  | tr '\n' " "
-	# 1f. Save to a file in the destination directory.
+	# 1d. Save to a file in the destination directory.
 
 	iconv -f ISO_8859-1 -t UTF-8 "$SRC/$line1" | \
 	tr -cd '\11\12\40-\176' | \
@@ -90,34 +91,50 @@ function clean ()
 ## Second function: Combine files into a big cumulative one. Here's how:
 function combine ()
 {	## Step 1. Outside the loop, create an empty file to hold the cumulative output. 
-	if ! [ -e "$DST/cumulative.csv" ] ; then
-		echo '' > "$DST/cumulative.csv"
+	if ! [ -e "$CUMUL/""$DATASET""_cumulative.txt" ] ; then
+		printf '' > "$CUMUL/""$DATASET""_cumulative.txt"
 	else 
-		echo "ERROR: $DST/cumulative.csv already exists; aborting combine step."
+		echo "ERROR: $CUMUL/""$DATASET""_cumulative.txt already exists; aborting combine step."
 		exit 1
 	fi
 	
-	echo "Making cumulative file. Adding:"						# progress report
+	echo "Making cumulative file:"						# progress report
 	
 	
 	
-	## Step 2. Concatenate the cleaned file (from which we've removed line breaks 
-	## above) and append it to the cumulative output file.
+	## Step 2. Concatenate the cleaned file (after removing line breaks) 
+	## and append it to the cumulative output file in MALLET-ready format,
+	## as per http://mallet.cs.umass.edu/import.php: "The first token of each line
+	## (whitespace delimited, with optional comma) becomes the instance name, the 
+	## second token becomes the label, and all additional text on the line is 
+	## interpreted as a sequence of word tokens."
+	
 	while read line1; do
-		echo "-- $line1"										# progress report
+		printf "adding $line1..."										# progress report
 	
-		# Step 2a. Strip '.txt' off the filename; this will help us join tables later.		
-		PUB=`printf $line1 | awk 'BEGIN { FS="." } { print $1; }'`
-	
-		# Step 2b. String together the Pub.number, a comma, and the file contents;
-		# if I'm lucky, this gives me a table that R can read in natively.
-		CONTENTS=`cat "$DST/$line1"`						# unnecessary slowness?
-		echo "$PUB, $CONTENTS" >> "$DST/cumulative.csv"
+		# 2a. Using awk, strip '.txt' and 'cleaned_' off the filename to get the
+		# Pub.number of the diss. We'll use these as instance names in MALLET.		
+		PUB=`printf $line1 | awk 'BEGIN { FS="." } { print $1; }' | awk 'BEGIN { FS="_" } { print $2; }'`
+		# 2b. We don't have labels right now, but eventually we could use methods
+		# exported from R.
+		LAB="placeholder"
 		
+		# 2c. Using tr, remove all commas so we can get a clean csv,
+		# then replace newlines with spaces (get all text on one line).
+		CONTENTS=`cat "$DST/$line1" | tr -d "," | tr -s '\n' " "`		
+		
+		# 2d. String together the instance names, labels, and the file contents;
+		echo "$PUB $LAB $CONTENTS" >> "$CUMUL/""$DATASET""_cumulative.txt"
+		
+		if [ $? = 0 ] ; then 										# progress report
+			echo "done."
+		fi
     done
     
-    echo "All text saved to $DST/cumulative.csv."				# progress report
-    echo ''
+    if [ $? = 0 ] ; then 
+	    echo "All text saved to $CUMUL/""$DATASET""_cumulative.txt"	# progress report
+    	echo ''
+    fi
 }
 
 
