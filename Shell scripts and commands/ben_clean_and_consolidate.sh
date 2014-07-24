@@ -195,9 +195,13 @@ while read line1; do
 ## Close the loop
 done
 	
+	# Final report: Tell us what we've got!
 	echo "Spelling counts saved to $DST/spellstats/spellstats.csv."
-	echo ''
 	
+	FILECOUNT=`wc -l "$DST/spellstats/spellstats.csv" | awk '{ print $1; }' - `
+	let FILECOUNT=$FILECOUNT-1							# account for headers in 1st line
+	echo "$FILECOUNT files processed."
+	echo ''
 ## Close the function
 }
 
@@ -205,7 +209,9 @@ done
 # echo "Currently DST folder is $DST"
 # echo "and the SRC folder is $SRC"
 
+
 ## Go to the files, and run all the functions.
+## Comment out those you don't need right now.
 CURRENT_DIR=$PWD
 # cd "$PDF"											# Go to pdf directory
 # ls *.PDF | extract									# Call 0th function
@@ -215,8 +221,3 @@ cd "$DST" 											# Go to output directory
 # ls cleaned* | combine								# Call 2nd function
 ls cleaned* | spellcount							# Call 3rd function
 cd "$CURRENT_DIR"									# Go back where we were
-
-## Tell us what we've got!
-FILECOUNT=`wc -l "$DST/spellstats/spellstats.csv" | awk '{ print $1; }' - `
-let FILECOUNT=$FILECOUNT-1							# account for titles in 1st line
-echo "Finished. $FILECOUNT files processed."
