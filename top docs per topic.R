@@ -150,6 +150,14 @@ top_topic_browser <- function(start.at=1) {
 	}
 }
 
+if (remake_figs) { 
+	filename <- paste0(imageloc, "top topics, K", ntopics, ".txt")
+	capture.output(top_topic_browser(), file=filename 
+} else {
+	top_topic_browser()
+}
+
+
 
 # Explore the clustering of topics, using code from Rolf Fredheim
 # source("frameToD3.R")
