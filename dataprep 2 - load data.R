@@ -60,13 +60,18 @@ nonconsorts <- noexcludes[(which(noexcludes$School %in% non_conschools)),]
 # confirm that nonconsorts gets all the schools not in consorts
 setequal(nonconsorts, (noexcludes[-consorts.index,]))
 
+# make noexcludes easy to index and search
+library(data.table)
+noexcludes.dt <- as.data.table(noexcludes)
+setkey(noexcludes.dt, Pub.number)
+
 
 ## Export file lists for subsets of data
 write(levels(factor(noexcludes$Pub.number)), file=paste0(sourceloc, "/Shell scripts and commands/file list noexcludes.txt", sep="\n"))
 write(levels(factor(consorts$Pub.number)), file=paste0(sourceloc, "/Shell scripts and commands/file list consorts.txt", sep="\n"))
 write(levels(factor(nonconsorts$Pub.number)), file=paste0(sourceloc, "/Shell scripts and commands/file list nonconsorts list.txt", sep="\n"))
 
-# split out multiple advisors?
+# TO DO (maybe): split out multiple advisors
 
 # if "function scratchpad.R" is being used, clean up unneeded variables
 # rm(datawrangle, best_sort, filter_data, get_tags, matcharray, reorder_ser, rowdiff, rowmatch, shuffle, tagdiff, tagmatch, refactor.index)
