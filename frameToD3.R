@@ -56,7 +56,10 @@ frameToJSON <- function(dt, groupVars, dataVars, outfile) {
   makeList<-function(x){
     if(ncol(x)>2){
       listSplit<-split(x[-1],x[1],drop=T)
-      lapply(names(listSplit),function(y){list(name=y,imports=makeList(listSplit[[y]]))})
+      grp <- names(x)[1]
+      grpnum <- substr(grp, 5, nchar(grp))
+      names(listSplit) <- paste0(names(listSplit), "of", grpnum)
+      lapply(names(listSplit),function(y){list(name=y,children=makeList(listSplit[[y]]))})
     }else{
       lapply(seq(nrow(x[1])),function(y){list(name=x[,1][y],size=x[,2][y])})
     }
@@ -71,8 +74,8 @@ frameToJSON <- function(dt, groupVars, dataVars, outfile) {
   
   #Basically we have made a list of lists containing the information from the tree diagram.
   #Finally we put everything into a list, convert this to json format and save it as data.json
-  jsonOut<-toJSON(list(name="Centre",children=makeList(b2)))
-  head(jsonOut)
+  jsonOut<-toJSON(list(name="Centre",children=out))
+
   #We use the cat function here, because in some cases you may want to add separators, or a prefix and suffix to make the formatting just right
   cat(jsonOut,file="outfile.json")
 }
