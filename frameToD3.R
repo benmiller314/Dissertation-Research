@@ -14,15 +14,15 @@ outfile		# Ben: don't know what this is; presumably we set this to be the name o
 frameToJSON <- function(dt, groupVars, dataVars, outfile) {
   #packages we will need:
   require(data.table)	# Ben: okay, this package is awesome, glad to know about it now!
-  require(jsonlite)		# Ben: but should we now use jsonlite, as per http://bit.ly/1jXAC5M ?
+  require(jsonlite)		# Ben: was RJSONIO, but now jsonlite, as per http://bit.ly/1jXAC5M
   
   #Here you may want to sort by colSums() to keep only the most relevant variables.
-  
+
   #calculate the correlation matrix
   t <- cor(dt[,c(!colnames(dt) %in% groupVars),with=F])
   
   #calculate the hierarchical cluster structure from the correlation scores
-  hc <- hclust(dist(t), "ward")
+  hc <- hclust(dist(t), "ward.D2")
   
   #take a look at your strucutre:
   plot(hc)
