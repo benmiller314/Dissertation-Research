@@ -28,11 +28,19 @@ cutoff <- 55		# I want to set this high, b/c a lot of "top" topics are just acad
 
 ## 1. Edit the reshapeMallet.py script (in TextWrangler) to update filenames, 
 #    then run it here and read in the output.
-get.doctopic.grid <- function(dataset_name="consorts", ntopics=55) {
+get.doctopic.grid <- function(dataset_name="consorts", ntopics=55, doplot=F) {
 	filename <- paste0(malletloc, "/", dataset_name, "k", ntopics, "_doc-all-topics.txt")
-	system("cd 'Shell scripts and commands'; python reshapeMallet.py; cd ..")
+	scope <- paste("cd", shQuote(sourceloc), "; cd 'Shell scripts and commands' ; ls ", filename)
+	if (system(scope)) {
+		command <- paste("cd", shQuote(sourceloc), "; cd 'Shell scripts and commands' python reshapeMallet.py")
+		go <- readline("Have you updated reshapeMallet.py to reflect your current dataset/ntopics? (Y/N)\n")
+		if(tolower(go) != "y") { stop("Better fix that, then") } 
+		print("Converting topic/weight pairs into doc/topic grid...")
+		if(! system(command)) { print("Done.") }
+	} else { 
+		print("Oh, good, the file exists. Moving on...")
+	}
 	outputfile <- read.delim(filename, header=F)
-	
 	# switch from 0-indexed to 1-indexed so the topic numbers in topic_keys.dt are the same as row numbers
 	# NB: this seems to be necessary to avoid searching for column "0"
 	head(outputfile)
@@ -41,29 +49,26 @@ get.doctopic.grid <- function(dataset_name="consorts", ntopics=55) {
 	library(data.table)
 	outputfile.dt <- as.data.table(outputfile)
 	head(outputfile.dt)
-	
 	## Step 2. Find overall top topics
 	# Each cell gives the percentage the topic in that column contributes to the dissertation in that row.
 	# Summing these percentages and sorting gives us a rank based on percentage points.
 	colsums <- colSums(outputfile.dt)
 	names(colsums) <- names(outputfile.dt)
 	head(colsums)
-	
 	colsums.sort <- colsums[order(colsums, decreasing=TRUE)]
 	head(colsums.sort)
-	
 	# Divide the percentage point totals by the number of dissertations to get an overall percent contribution
 	colsums.sort.pct <- round((colsums.sort / nrow(outputfile)), 4) * 100
-	
 	if(remake_figs) { 
 		filename <- paste0(imageloc, dataset_name, "k", ntopics, "_topic-ranks.csv")
 		write.csv(colsums.sort.pct[2:length(colsums.sort.pct)], filename)
 	}
-	
-	# Get an overview of the topic sizes, as a scatterplot
-	plot(2:length(colsums), colsums.sort[2:length(colsums)], xlab="topic numbers (arbitrary)", ylab="sum of contributions", xaxt="n")
-	text(x=1+2:length(colsums), y=1+colsums.sort[2:length(colsums)], labels=names(colsums.sort[2:length(colsums)]))
-
+	# Optionally get an overview of the topic sizes, as a scatterplot
+	if(doplot) {
+		plot(2:length(colsums), colsums.sort[2:length(colsums)], xlab="topic numbers (arbitrary)", ylab="sum of contributions", xaxt="n")
+		text(x=1+2:length(colsums), y=1+colsums.sort[2:length(colsums)], labels=names(colsums.sort[2:length(colsums)]))
+	}
+	# Return with the goods
 	list("colsums" = colsums,
 		 "colsums.sort" = colsums.sort,
 		 "colsums.sort.pct" = colsums.sort.pct,
