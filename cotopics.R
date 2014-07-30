@@ -1,19 +1,20 @@
 # GOAL: find topics that co-occur within individual dissertations
 # at a level greater than (say) 10 or 5%. Map these into a (non-directed) source-target edge table,
 # for use in http://bl.ocks.org/mbostock/7607999 (hierarchical edge bundling).
-
-# NB: once it's all functions, we can source the file 'top docs per topic.R'. 
-# For now, though, just grab the functions below piecemeal from there, as needed.
-
+#
+# Strategy: 
+# 1. in each row i of X, find all columns with X[i,j] > level; call that A.
+# 2. For all combinations of two elements in A, create a new row in a source-target table called "cotopics."
+	
+	
 get.cotopics <- function(dataset_name="consorts", ntopics=55, level=.10) {
 	require(data.table)
-	
+		
+	# NB: once it's all functions, we can source the file 'top docs per topic.R'. 
+	# For now, though, just make sure we have get.doctopic.grid from that file.
+
 	grid <- get.doctopic.grid(dataset_name, ntopics)$outputfile
-	
-	# Strategy: 
-	# 1. in each row i of X, find all columns with X[i,j] > level; call that A.
-	# 2. For all combinations of two elements in A, create a new row in a source-target table called "cotopics."
-	
+		
 	cotopics <- data.frame(row.names=c("source","target"))	# start empty, build up
 	for (i in 1:nrow(grid)) { 
 		A <- which(grid[i, 2:length(grid)] > level)
@@ -35,6 +36,9 @@ get.cotopics <- function(dataset_name="consorts", ntopics=55, level=.10) {
 	print(cotopics)	
 	
 	if(remake_figs) { 
+		# filename <- paste0(imageloc, dataset_name, "k", ntopics, "_edges_", level*100, ".json")
+		# cat(toJSON(cotopics), file=filename)
+		
 		filename <- paste0(imageloc, "co-topic edge table, ", dataset_name, ", k", ntopics, ", ", level*100, "pct.csv")
 		write.csv(cotopics, filename)
 	}

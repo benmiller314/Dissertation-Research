@@ -214,10 +214,10 @@ done
 ## Comment out those you don't need right now.
 CURRENT_DIR=$PWD
 # cd "$PDF"											# Go to pdf directory
-# ls *.PDF | extract									# Call 0th function
-cd "$SRC"											# Go to source directory
-ls *.txt | clean									# Call 1st function
+# ls *.PDF | extract								# Call 0th function
+# cd "$SRC"											# Go to source directory
+# ls *.txt | clean									# Call 1st function
 cd "$DST" 											# Go to output directory
-# ls cleaned* | combine								# Call 2nd function
-ls cleaned* | spellcount							# Call 3rd function
+ls cleaned* | combine								# Call 2nd function
+# ls cleaned* | spellcount							# Call 3rd function
 cd "$CURRENT_DIR"									# Go back where we were
