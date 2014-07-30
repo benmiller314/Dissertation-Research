@@ -20,15 +20,18 @@
 	}
 	
 # Step 1. Get the matrix of texts and topics
-# Choose dataset, number of topics
-dataset_name <- "consorts"
-ntopics <- 55
-cutoff <- 55		# I want to set this high, b/c a lot of "top" topics are just academic discourse.
-					# one way around this would be to throw out non-nouns, but...
+# # Choose dataset, number of topics -- now needed only for testing, so commented out
+# dataset_name <- "consorts"
+# ntopics <- 55
+# cutoff <- 55		# I want to set this high, b/c a lot of "top" topics are just academic discourse.
+					# # one way around this would be to throw out non-nouns, but...
 
 ## 1. Edit the reshapeMallet.py script (in TextWrangler) to update filenames, 
 #    then run it here and read in the output.
 get.doctopic.grid <- function(dataset_name="consorts", ntopics=55, doplot=F) {
+	# get packages in case we've just restarted R
+	require(data.table)
+	
 	filename <- paste0(malletloc, "/", dataset_name, "k", ntopics, "_doc-all-topics.txt")
 	scope <- paste("cd", shQuote(sourceloc), "; cd 'Shell scripts and commands' ; ls ", filename)
 	if (system(scope)) {
@@ -79,6 +82,7 @@ get.doctopic.grid <- function(dataset_name="consorts", ntopics=55, doplot=F) {
 
 # Oh, and what were those topics, again?
 get.topickeys <- function(dataset_name="consorts", ntopics=55) {
+	# get packages in case we've just restarted R
 	require(data.table)
 	
 	filename <- paste0(malletloc, "/", dataset_name, "k", ntopics, "_keys.txt")
@@ -100,6 +104,7 @@ get.topickeys <- function(dataset_name="consorts", ntopics=55) {
 
 	# Step 4. Find all the top-ranked topics for those docs: maybe that really popular topic isn't actually the main component of the docs that come up. We start with the doc-topic matrix from MALLET:
 get.doc.composition <- function(dataset_name="consorts", ntopics=55) {
+	# get packages in case we've just restarted R
 	require(data.table)
 	
 	filename <- paste0(malletloc, "/", dataset_name, "k", ntopics, "_composition.txt")
@@ -138,6 +143,9 @@ setkey(noexcludes.dt, Pub.number)
 
 # Helper function: retrieve top five topics for a given Pub.number
 get.topics4doc <- function(pubnum, dataset_name="consorts", ntopics=55) {
+		# get packages in case we've just restarted R
+		require(data.table)
+		
 		# pubnum <- "3051708"; doc_tops <- doc_topics.dt	# test values
 		if (!is.character(pubnum)) { pubnum <- as.character(pubnum) }
 		
@@ -247,9 +255,11 @@ top_topic_browser <- function(start.rank	 = 1, 				# assuming we're looping, sta
 	}}
 }
 
+# Run the big function above
 if (remake_figs) { 
 	filename <- paste0(imageloc, "top topics - ", dataset_name, ", K", ntopics, ".txt")
-	capture.output(top_topic_browser(), file=filename 
+	readline(paste("About to capture", filename,"- <enter> to continue or <esc> to abort."))
+	capture.output(top_topic_browser(), file=filename)
 } else {
 	top_topic_browser()
 }
@@ -262,5 +272,3 @@ if (remake_figs) {
 # dataVars <- colnames(dt)[!colnames(dt) %in% groupVars]	# Ben: any column that's not an ID is a datapoint 
 # filename <- paste0(malletloc, "/", dataset_name, "k", ntopics, "_clusters.json")
 # frameToJSON(outputfile,groupVars,dataVars,outfile=filename)
-
-
