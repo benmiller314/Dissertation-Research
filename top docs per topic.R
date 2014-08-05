@@ -255,14 +255,14 @@ top_topic_browser <- function(start.rank	 = 1, 				# assuming we're looping, sta
 	}}
 }
 
-# Run the big function above
-if (remake_figs) { 
-	filename <- paste0(imageloc, "top topics - ", dataset_name, ", K", ntopics, ".txt")
-	readline(paste("About to capture", filename,"- <enter> to continue or <esc> to abort."))
-	capture.output(top_topic_browser(), file=filename)
-} else {
-	top_topic_browser()
-}
+## Run the big function above
+# if (remake_figs) { 
+	# filename <- paste0(imageloc, "top topics - ", dataset_name, ", K", ntopics, ".txt")
+	# readline(paste("About to capture browser output as", filename,"- <enter> to continue or <esc> to abort."))
+	# capture.output(top_topic_browser(), file=filename)
+# } else {
+	# top_topic_browser()
+# }
 
 
 
