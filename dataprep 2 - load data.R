@@ -60,6 +60,14 @@ nonconsorts <- noexcludes[(which(noexcludes$School %in% non_conschools)),]
 # confirm that nonconsorts gets all the schools not in consorts
 setequal(nonconsorts, (noexcludes[-consorts.index,]))
 
+# find top nonconsorts
+top.nonconsorts <- thresh("nonconsorts")$thresh.data
+
+# re-factor all factor columns in all data subsets
+consorts <- refactor.all("consorts")
+nonconsorts <- refactor.all("nonconsorts")
+top.nonconsorts <- refactor.all("top.nonconsorts")
+
 # make noexcludes easy to index and search
 library(data.table)
 noexcludes.dt <- as.data.table(noexcludes)
