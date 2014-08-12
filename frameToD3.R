@@ -4,14 +4,34 @@
 
 #My sample data is 1000 rows, with the first column a unique id, followed by 100 columns of data variables
 # Ben: and it's called 'dt'; in this case the ID = a filename, and the data = topic weights
-load("sampleData")
-head(dt)
 
-groupVars <- c("path")	# Ben: this is the name of that first (ID) column. replace accordingly.
-dataVars <-  colnames(dt)[!colnames(dt) %in% groupVars]	# Ben: any column that's not an ID is a datapoint 
-outfile		# Ben: don't know what this is; presumably we set this to be the name of the JSON output below, 
-			# but it's not set in the code RF posted.
-frameToJSON <- function(dt, groupVars, dataVars, outfile) {
+# 
+# load("sampleData")
+# head(dt)
+
+# Ben: set params
+dataset_name <- "consorts"
+ntopics <- 150
+cutoff <- 150	
+
+
+# Ben: get the outputfile
+if(!exists("get.doctopic.grid")) { source(file=paste0(sourceloc, "/top docs per topic.R")) }
+grid <- get.doctopic.grid(dataset_name, ntopics)$outputfile
+outputfile.dt <- as.data.table(grid)
+rm(grid)
+
+
+# Ben: group by ID column; any column that's not an ID is a datapoint 
+groupVars <- c("Pub.number")	
+dataVars <-  colnames(outputfile.dt)[!colnames(outputfile.dt) %in% groupVars]	
+
+# Ben: desired output filename to pass to d3
+webloc <- "/Users/benmiller314/Documents/Webdev/radial_clusters"
+outfile <- paste0(webloc, "/", dataset_name, "k", ntopics, "_clusters.json")	
+
+## Ben: Here be the function
+frameToJSON <- function(dt="outputfile.dt", groupVars, dataVars, outfile) {
   #packages we will need:
   require(data.table)	# Ben: okay, this package is awesome, glad to know about it now!
   require(jsonlite)		# Ben: was RJSONIO, but now jsonlite, as per http://bit.ly/1jXAC5M
@@ -19,7 +39,7 @@ frameToJSON <- function(dt, groupVars, dataVars, outfile) {
   #Here you may want to sort by colSums() to keep only the most relevant variables.
 
   #calculate the correlation matrix
-  t <- cor(dt[,c(!colnames(dt) %in% groupVars),with=F])
+  t <- cor(outputfile.dt[,c(!colnames(outputfile.dt) %in% groupVars),with=F])
   
   #calculate the hierarchical cluster structure from the correlation scores
   hc <- hclust(dist(t), "ward.D2")
@@ -43,7 +63,7 @@ frameToJSON <- function(dt, groupVars, dataVars, outfile) {
   #We might want to know the size of each node. Let's add that
   # Ben: for a topic model, this will find the total %-point contribution of the topic to all docs;
   # that means we could divide by number of docs to scale to [0,1], but no need: it's proportional.
-  b$size <- colSums(dt[,c(dataVars),with=F])
+  b$size <- colSums(outputfile.dt[,c(dataVars),with=F])
   
   #sort the data so it aligns with the structure calculated using hclust()
   setkey(b,order)
