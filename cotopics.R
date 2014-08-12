@@ -7,12 +7,10 @@
 # 2. For all combinations of two elements in A, create a new row in a source-target table called "cotopics."
 	
 	
-get.cotopics <- function(dataset_name="consorts", ntopics=55, level=.10) {
+get.cotopics <- function(dataset_name="consorts", ntopics=55, level=.10, json=F) {
 	require(data.table)
-		
-	# NB: once it's all functions, we can source the file 'top docs per topic.R'. 
-	# For now, though, just make sure we have get.doctopic.grid from that file.
 
+	source(file=paste0(sourceloc, "/top docs per topic.R"))		
 	grid <- get.doctopic.grid(dataset_name, ntopics)$outputfile
 		
 	cotopics <- data.frame(row.names=c("source","target"))	# start empty, build up
@@ -36,16 +34,40 @@ get.cotopics <- function(dataset_name="consorts", ntopics=55, level=.10) {
 	print(cotopics)	
 	
 	if(remake_figs) { 
-		# filename <- paste0(imageloc, dataset_name, "k", ntopics, "_edges_", level*100, ".json")
-		# cat(toJSON(cotopics), file=filename)
-		
+		if(json) {
+			require(jsonlite)
+			filename <- paste0(imageloc, dataset_name, "k", ntopics, "_edges_", level*100, ".json")
+			cat(toJSON(cotopics), file=filename)
+		} else {
 		filename <- paste0(imageloc, "co-topic edge table, ", dataset_name, ", k", ntopics, ", ", level*100, "pct.csv")
 		write.csv(cotopics, filename)
+		}
 	}
 	
 	# and pass it back to the calling environment
 	return(cotopics)
 }
 
-cotopics <- get.cotopics()
-cotopics05 <- get.cotopics(level=0.05)
+
+
+# # cotopics <- get.cotopics()
+# cotopics20 <- get.cotopics(level=0.2)
+# cotopics05 <- get.cotopics(level=0.05)
+
+
+# ## convert one of these edge tables to a json object for hierarchical edge bundling
+# #  (adapted from frameToD3.R)
+# # cotopics20
+# cotopics20[, paste("[{", list(.SD[,paste("[target:", target, "], [weight:", weight, "]}", collapse=", {")]), "]"), by=source]
+# cotopics20[, .SD[, paste(target, weight, collapse=",")], by=source]
+# # read.table(outfile)
+
+
+
+  # # get cotopics, for hierarchical edge bundling
+  # source(paste0(sourceloc, "cotopics.R"))
+  # cotopics20 <- get.cotopics(level=0.2)
+  # targets <- cotopics20[, .SD[, paste(target, collapse=",")], by=source]
+  # targets <- strsplit(targets$V1, ",")
+  # weights <- cotopics20[, .SD[, paste(weight, collapse=",")], by=source]
+  # weights <- strsplit(weights$V1, ",")
