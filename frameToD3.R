@@ -57,6 +57,20 @@ frameToJSON <- function(dt="outputfile.dt", groupVars, dataVars, outfile) {
   memb15 <- as.character(cutree(hc, k = 15))
   memb40 <- as.character(cutree(hc, k = 40))
   
+  # get topic labels, which you've composed elsewhere using 'top docs per topic.R'
+  filename <- paste0(imageloc, "topic labeling - ", dataset_name, ", K", ntopics, ".csv")
+  topic.labels.dt <- tryCatch(
+  		data.table(read.csv(filename), key="Topic"), 
+  		error=function(e) {
+  			message("File not found; using top words instead.")
+  			keys <- get.topickeys(dataset_name, ntopics)
+  			outfile <- paste0(webloc, "/", dataset_name, "k", ntopics, "_clusters_topwords.json")	
+  			return(data.table(Topic=1:ntopics, Label=keys$top_words))
+  		},
+  		finally={message("done.")}
+  )
+
+
   #Now put this information into a table, together with the labels and the order in which they should appear:
   b=data.table(memb2,memb6,memb15,memb40,label=hc$labels,order=hc$order)
   
@@ -94,7 +108,7 @@ frameToJSON <- function(dt="outputfile.dt", groupVars, dataVars, outfile) {
   
   #Basically we have made a list of lists containing the information from the tree diagram.
   #Finally we put everything into a list, convert this to json format and save it as data.json
-  jsonOut<-toJSON(list(name="Centre",children=out))
+  jsonOut<-toJSON(list(name="1of1",children=out))
 
   #We use the cat function here, because in some cases you may want to add separators, or a prefix and suffix to make the formatting just right
   cat(jsonOut,file="outfile.json")
