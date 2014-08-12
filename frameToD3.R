@@ -83,6 +83,9 @@ frameToJSON <- function(dt="outputfile.dt", groupVars, dataVars, outfile) {
   setkey(b,order)
   #drop the order variable:
   b[,order:=NULL]
+  
+  # drop the source variable
+  b[,source:=NULL]
  
   #we define a function which will create a nested list in JSON format:
   #From here: http://stackoverflow.com/questions/12818864/how-to-write-to-json-with-children-from-r
@@ -98,11 +101,12 @@ frameToJSON <- function(dt="outputfile.dt", groupVars, dataVars, outfile) {
       lapply(seq(nrow(x[1])),function(y){list(name=x[,1][y],size=x[,2][y])})
     }
   }
-  
-  #This will not work on a data.table
 
-  b2 <- data.frame(b)
-  out <- makeList(b2)
+  #This will not work on a data.table
+  b <- data.frame(b)
+  out <- makeList(b)
+  str(out)
+  toJSON(out)
   #Have a look at the structure this creates:
   print (head(out))
   
@@ -115,3 +119,5 @@ frameToJSON <- function(dt="outputfile.dt", groupVars, dataVars, outfile) {
 }
 
 frameToJSON(dt,groupVars,dataVars,outfile="data.json")
+
+
