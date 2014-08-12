@@ -137,7 +137,8 @@ frameToJSON <- function(dt="outputfile.dt", groupVars, dataVars, outfile) {
   jsonOut<-toJSON(list(name="1of1",children=out))
 
   #We use the cat function here, because in some cases you may want to add separators, or a prefix and suffix to make the formatting just right
-  cat(jsonOut,file="outfile.json")
+	# Ben adds: to avoid overwriting, only save this file if remake_figs is TRUE
+	if(remake_figs) {  cat(jsonOut,file=outfile)	}
 }
 
 frameToJSON(dt,groupVars,dataVars,outfile="data.json")
