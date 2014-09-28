@@ -24,10 +24,14 @@
 	heap_param <- paste("-Xmx","2g",sep="") 
 	options(java.parameters=heap_param)
 	
+	# What's our dataset?
+	dataset_name <- "noexcludes"
+	
+	
 ## Step 1. Compress the files, if they haven't been compressed already
 ## NB: double-check which commands are commented out before running; this could take a while.
 ## If the output file already exists, this call will just exit with an error.
-system("'./Shell scripts and commands/ben_clean_and_consolidate.sh' consorts")
+system(paste0("'", sourceloc, 'Shell scripts and commands/ben_clean_and_consolidate.sh',"' ", dataset_name))
 
 
 
@@ -41,6 +45,7 @@ system("'./Shell scripts and commands/ben_clean_and_consolidate.sh' consorts")
 # UGH: I couldn't get the function call to resolve properly using system(), 
 # so now it just outputs a string to run manually in Terminal.
 ben.mallet.import <- function(dataset_name="noexcludes", remove_stopwords=T, extra_stopwords=F) {
+	require(mallet)
 	# 2a.1. where is MALLET, and what is the command that runs it?
 	MALLET_HOME <- "/Users/benmiller314/mallet-2.0.7"			
 	mallet_cmd <- paste0(MALLET_HOME, "/bin/mallet")
@@ -52,7 +57,7 @@ ben.mallet.import <- function(dataset_name="noexcludes", remove_stopwords=T, ext
 	imported_file <- paste0("/Users/benmiller314/Documents/fulltext_dissertations/topicmodels/",dataset_name,"_instances.mallet")
 	
 	# 2a.4. What counts as a token?
-	token_regex <- shQuote("\\p{L}[-\\p{L}\\p{Po}]+\\p{L}")
+	token_regex <- '"\\p{L}[-\\p{L}\\p{Po}]+\\p{L}"'
 		# NB: Instead of the default [A-Za-z]*, or Mimno's original p{P} (any punctuation) in the middle of the word, I modded the regex above to search for p{Po} -- that's "any kind of punctuation character that is not a dash, bracket, quote or connector," per http://www.regular-expressions.info/unicode.html -- plus hyphens. This was necessary to break words at em-dashes.
 		# NB as well that this regex as structured defines words to be at least three characters long: a letter, plus a letter or punctuation, plus a letter. At some later point I may be curious about the use of the words "I," "me," "we," etc, and that would require a different regex.
 	
@@ -90,15 +95,16 @@ ben.mallet.import <- function(dataset_name="noexcludes", remove_stopwords=T, ext
 
 # Step 2b. Use Mimno's library(mallet) to actually train the model on those instances.
 ben.mallet.tm <- function(K=10, 						# how many topics?
-						  imported_file,				# the file created by import_from_mallet above
-						  curate_vocab=FALSE			# create new stoplist from top/bottom words?
+						  dataset_name="noexcludes",	# which subset of data to include?
+						  imported_file=paste0("/Users/benmiller314/Documents/fulltext_dissertations/topicmodels/",dataset_name,"_instances.mallet"),		# the file created by ben.mallet.import
+						  curate_vocab=FALSE,			# create new stoplist from top/bottom words?
 						  top.cutoff.pct=10, 			# remove words in this % of documents or more		
 						  num.top.words=7, 				# how to label topics
-						  runlong=FALSE, 				# do extra iterations?
-						  dataset_name="noexcludes"		# which subset of data to include?
+						  runlong=FALSE 				# do extra iterations?
 						  # abstracts=FALSE				# use full text (default) or abstracts only?
 						  ) 
 {
+	require(mallet)
 	
 	# 2b.1. Create a topic trainer object.
 	# NB: It starts out uninteresting; the cool stuff happens when we run the operators on this Java object.
@@ -223,3 +229,6 @@ top.words.tfitf <- function (topic.model, topic.words, num.top.words = 10)
 	lapply(1:K, FUN=function(x) noquote(paste0(vocabulary[top.indices[[x]]], collapse=", ")))
 }
 
+
+## Step 4. Run MALLET with the parameters set up in Step 2, with the topics as chosen in 1 or 3.
+ben.mallet.import(dataset_name)
