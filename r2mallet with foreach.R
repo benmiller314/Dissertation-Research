@@ -14,7 +14,7 @@ library(foreach)
 
 ## Step 1. Set up parameters we might want to change often ##
 	# 1a. Which dataset to examine
-	datasets <- c("noexcludes", "top.nonconsorts", "nonconsorts")	
+	datasets <- c("top.nonconsorts", "noexcludes", "nonconsorts")	
 	
 	# 1b. How many topics? Set kseq to a sequence to try several options.
 	kseq=c(100, 150, 200, 500)
@@ -65,9 +65,11 @@ foreach(dataset_name = datasets) %do% {
 		outputstate <- paste0(dataset_name, "k", k, "_topic-state.gz")
 		outputtopickeys <- paste0(dataset_name, "k", k, "_keys.txt")
 		outputdoctopics <- paste0(dataset_name, "k", k, "_composition.txt")
+		wordtopics <- paste0(dataset_name, "k", k, "_wordtopics.txt")
+	
 		
 		# 4c. String together command to send to MALLET via the shell  
-		train <- paste(mallet_cmd, "train-topics  --input", output, "--num-topics", ntopics, "--optimize-interval",  optint, "--optimize-burn-in", optburnin, "--output-state", outputstate,  "--output-topic-keys", outputtopickeys, "--num-iterations", numiterations, "--output-doc-topics", outputdoctopics)
+		train <- paste(mallet_cmd, "train-topics  --input", output, "--num-topics", ntopics, "--optimize-interval",  optint, "--optimize-burn-in", optburnin, "--output-state", outputstate,  "--output-topic-keys", outputtopickeys, "--num-iterations", numiterations, "--output-doc-topics", outputdoctopics, "--word-topic-counts-file", wordtopics)
 		
 		# 4d. Run the command in the shell.	
 		system(train)
