@@ -8,11 +8,10 @@
 	extract_subjects(noexcludes$KEYWORDS) -> kw.list
 	
 	# Get the frequency chart. maxsum is needed to avoid "othering" half the list.
-	summary(kw.list, maxsum=6000) -> kw.table	
+	summary(kw.list, maxsum=10000) -> kw.table	
 	
 	# Put the list in descending order by frequency, and chop out the term they all share
 	kw.table <- sort(kw.table,decreasing=TRUE)
-	kw.table <- kw.table[2:length(kw.table)]
 	
 	kw.count <- length(kw.table)
 	kw.mean <- mean(kw.table)
