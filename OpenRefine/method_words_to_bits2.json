@@ -1,0 +1,202 @@
+// GoogleRefine Redo code
+// to populate binary method-attribute-array columns if they already exist
+//
+// NB: Now replaced by 'method tag array.R'
+
+[
+  {
+    "op": "core/text-transform",
+    "description": "Text transform on cells in column Hist using expression grel:if(row.index != row.record.fromRowIndex,null, if(contains(join(forEach(row.record.cells['Method Terms'].value,v,v),\" : \"),\"istorical\"),1,0))",
+    "engineConfig": {
+      "facets": [],
+      "mode": "record-based"
+    },
+    "columnName": "Hist",
+    "expression": "grel:if(row.index != row.record.fromRowIndex,null, if(contains(join(forEach(row.record.cells['Method Terms'].value,v,v),\" : \"),\"istorical\"),1,0))",
+    "onError": "keep-original",
+    "repeat": false,
+    "repeatCount": 10
+  },
+  {
+    "op": "core/text-transform",
+    "description": "Text transform on cells in column Clinical / Case study using expression grel:if(row.index != row.record.fromRowIndex,null, if(contains(join(forEach(row.record.cells['Method Terms'].value,v,v),\" : \"),\"linical\"),1,0))",
+    "engineConfig": {
+      "facets": [],
+      "mode": "record-based"
+    },
+    "columnName": "Case",
+    "expression": "grel:if(row.index != row.record.fromRowIndex,null, if(contains(join(forEach(row.record.cells['Method Terms'].value,v,v),\" : \"),\"linical\"),1,0))",
+    "onError": "keep-original",
+    "repeat": false,
+    "repeatCount": 10
+  },
+  {
+    "op": "core/text-transform",
+    "description": "Text transform on cells in column Critical / Hermeneutical using expression grel:if(row.index != row.record.fromRowIndex,null, if(contains(join(forEach(row.record.cells['Method Terms'].value,v,v),\" : \"),\"ermeneutic\"),1,0))",
+    "engineConfig": {
+      "facets": [],
+      "mode": "record-based"
+    },
+    "columnName": "Crit",
+    "expression": "grel:if(row.index != row.record.fromRowIndex,null, if(contains(join(forEach(row.record.cells['Method Terms'].value,v,v),\" : \"),\"ermeneutic\"),1,0))",
+    "onError": "keep-original",
+    "repeat": false,
+    "repeatCount": 10
+  },
+  {
+    "op": "core/text-transform",
+    "description": "Text transform on cells in column Cultural-Critical Studies using expression grel:if(row.index != row.record.fromRowIndex,null, if(contains(join(forEach(row.record.cells['Method Terms'].value,v,v),\" : \"),\"ultural\"),1,0))",
+    "engineConfig": {
+      "facets": [],
+      "mode": "record-based"
+    },
+    "columnName": "Cult",
+    "expression": "grel:if(row.index != row.record.fromRowIndex,null, if(contains(join(forEach(row.record.cells['Method Terms'].value,v,v),\" : \"),\"ultural\"),1,0))",
+    "onError": "keep-original",
+    "repeat": false,
+    "repeatCount": 10
+  },
+  {
+    "op": "core/text-transform",
+    "description": "Text transform on cells in column Discourse or Text Analysis using expression grel:if(row.index != row.record.fromRowIndex,null, if(contains(join(forEach(row.record.cells['Method Terms'].value,v,v),\" : \"),\"iscourse\"),1,0))",
+    "engineConfig": {
+      "facets": [],
+      "mode": "record-based"
+    },
+    "columnName": "Disc",
+    "expression": "grel:if(row.index != row.record.fromRowIndex,null, if(contains(join(forEach(row.record.cells['Method Terms'].value,v,v),\" : \"),\"iscourse\"),1,0))",
+    "onError": "keep-original",
+    "repeat": false,
+    "repeatCount": 10
+  },
+  {
+    "op": "core/text-transform",
+    "description": "Text transform on cells in column Ethnographic using expression grel:if(row.index != row.record.fromRowIndex,null, if(contains(join(forEach(row.record.cells['Method Terms'].value,v,v),\" : \"),\"thnographic\"),1,0))",
+    "engineConfig": {
+      "facets": [],
+      "mode": "record-based"
+    },
+    "columnName": "Ethn",
+    "expression": "grel:if(row.index != row.record.fromRowIndex,null, if(contains(join(forEach(row.record.cells['Method Terms'].value,v,v),\" : \"),\"thnographic\"),1,0))",
+    "onError": "keep-original",
+    "repeat": false,
+    "repeatCount": 10
+  },
+  {
+    "op": "core/text-transform",
+    "description": "Text transform on cells in column Experimental using expression grel:if(row.index != row.record.fromRowIndex,null, if(contains(join(forEach(row.record.cells['Method Terms'].value,v,v),\" : \"),\"xperiment\"),1,0))",
+    "engineConfig": {
+      "facets": [],
+      "mode": "record-based"
+    },
+    "columnName": "Expt",
+    "expression": "grel:if(row.index != row.record.fromRowIndex,null, if(contains(join(forEach(row.record.cells['Method Terms'].value,v,v),\" : \"),\"xperiment\"),1,0))",
+    "onError": "keep-original",
+    "repeat": false,
+    "repeatCount": 10
+  },
+  {
+    "op": "core/text-transform",
+    "description": "Text transform on cells in column Interview / Focus Group using expression grel:if(row.index != row.record.fromRowIndex,null, if(contains(join(forEach(row.record.cells['Method Terms'].value,v,v),\" : \"),\"nterview\"),1,0))",
+    "engineConfig": {
+      "facets": [],
+      "mode": "record-based"
+    },
+    "columnName": "Intv",
+    "expression": "grel:if(row.index != row.record.fromRowIndex,null, if(contains(join(forEach(row.record.cells['Method Terms'].value,v,v),\" : \"),\"nterview\"),1,0))",
+    "onError": "keep-original",
+    "repeat": false,
+    "repeatCount": 10
+  },
+  {
+    "op": "core/text-transform",
+    "description": "Text transform on cells in column Meta-analysis / Discipliniography using expression grel:if(row.index != row.record.fromRowIndex,null, if(contains(join(forEach(row.record.cells['Method Terms'].value,v,v),\" : \"),\"iscipliniograph\"),1,0))",
+    "engineConfig": {
+      "facets": [],
+      "mode": "record-based"
+    },
+    "columnName": "Meta",
+    "expression": "grel:if(row.index != row.record.fromRowIndex,null, if(contains(join(forEach(row.record.cells['Method Terms'].value,v,v),\" : \"),\"iscipliniograph\"),1,0))",
+    "onError": "keep-original",
+    "repeat": false,
+    "repeatCount": 10
+  },
+  {
+    "op": "core/text-transform",
+    "description": "Text transform on cells in column Model-Building using expression grel:if(row.index != row.record.fromRowIndex,null, if(contains(join(forEach(row.record.cells['Method Terms'].value,v,v),\" : \"),\"uilding\"),1,0))",
+    "engineConfig": {
+      "facets": [],
+      "mode": "record-based"
+    },
+    "columnName": "Modl",
+    "expression": "grel:if(row.index != row.record.fromRowIndex,null, if(contains(join(forEach(row.record.cells['Method Terms'].value,v,v),\" : \"),\"uilding\"),1,0))",
+    "onError": "keep-original",
+    "repeat": false,
+    "repeatCount": 10
+  },
+  {
+    "op": "core/text-transform",
+    "description": "Text transform on cells in column Philosophical / Theoretical using expression grel:if(row.index != row.record.fromRowIndex,null, if(contains(join(forEach(row.record.cells['Method Terms'].value,v,v),\" : \"),\"hilosoph\"),1,0))",
+    "engineConfig": {
+      "facets": [],
+      "mode": "record-based"
+    },
+    "columnName": "Phil",
+    "expression": "grel:if(row.index != row.record.fromRowIndex,null, if(contains(join(forEach(row.record.cells['Method Terms'].value,v,v),\" : \"),\"hilosoph\"),1,0))",
+    "onError": "keep-original",
+    "repeat": false,
+    "repeatCount": 10
+  },
+  {
+    "op": "core/text-transform",
+    "description": "Text transform on cells in column Poetic / Fictive using expression grel:if(row.index != row.record.fromRowIndex,null, if(contains(join(forEach(row.record.cells['Method Terms'].value,v,v),\" : \"),\"oetic\"),1,0))",
+    "engineConfig": {
+      "facets": [],
+      "mode": "record-based"
+    },
+    "columnName": "Poet",
+    "expression": "grel:if(row.index != row.record.fromRowIndex,null, if(contains(join(forEach(row.record.cells['Method Terms'].value,v,v),\" : \"),\"oetic\"),1,0))",
+    "onError": "keep-original",
+    "repeat": false,
+    "repeatCount": 10
+  },
+  {
+    "op": "core/text-transform",
+    "description": "Text transform on cells in column Practitioner / Teacher Research using expression grel:if(row.index != row.record.fromRowIndex,null, if(contains(join(forEach(row.record.cells['Method Terms'].value,v,v),\" : \"),\"ractitioner\"),1,0))",
+    "engineConfig": {
+      "facets": [],
+      "mode": "record-based"
+    },
+    "columnName": "Pract",
+    "expression": "grel:if(row.index != row.record.fromRowIndex,null, if(contains(join(forEach(row.record.cells['Method Terms'].value,v,v),\" : \"),\"ractitioner\"),1,0))",
+    "onError": "keep-original",
+    "repeat": false,
+    "repeatCount": 10
+  },
+  {
+    "op": "core/text-transform",
+    "description": "Text transform on cells in column Rhetorical Analysis using expression grel:if(row.index != row.record.fromRowIndex,null, if(contains(join(forEach(row.record.cells['Method Terms'].value,v,v),\" : \"),\"hetorical\"),1,0))",
+    "engineConfig": {
+      "facets": [],
+      "mode": "record-based"
+    },
+    "columnName": "Rhet",
+    "expression": "grel:if(row.index != row.record.fromRowIndex,null, if(contains(join(forEach(row.record.cells['Method Terms'].value,v,v),\" : \"),\"hetorical\"),1,0))",
+    "onError": "keep-original",
+    "repeat": false,
+    "repeatCount": 10
+  },
+  {
+    "op": "core/text-transform",
+    "description": "Text transform on cells in column Survey using expression grel:if(row.index != row.record.fromRowIndex,null, if(contains(join(forEach(row.record.cells['Method Terms'].value,v,v),\" : \"),\"urvey\"),1,0))",
+    "engineConfig": {
+      "facets": [],
+      "mode": "record-based"
+    },
+    "columnName": "Surv",
+    "expression": "grel:if(row.index != row.record.fromRowIndex,null, if(contains(join(forEach(row.record.cells['Method Terms'].value,v,v),\" : \"),\"urvey\"),1,0))",
+    "onError": "keep-original",
+    "repeat": false,
+    "repeatCount": 10
+  }
+]

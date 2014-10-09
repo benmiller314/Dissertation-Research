@@ -1,0 +1,18 @@
+// 3. GoogleRefine Redo code
+// to create MethodCount column
+
+[
+    {
+    "op": "core/column-addition",
+    "description": "Create column MethodCount at index 13 based on column Method Terms using expression grel:if(row.index != row.record.fromRowIndex,null, length(forEach(row.record.cells['Method Terms'].value, v, v)))",
+    "engineConfig": {
+      "facets": [],
+      "mode": "record-based"
+    },
+    "newColumnName": "MethodCount",
+    "columnInsertIndex": 13,
+    "baseColumnName": "Method Terms",
+    "expression": "grel:if(row.index != row.record.fromRowIndex,null, length(forEach(row.record.cells['Method Terms'].value, v, v)))",
+    "onError": "set-to-blank"
+  },
+]

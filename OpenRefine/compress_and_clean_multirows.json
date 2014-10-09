@@ -1,0 +1,111 @@
+// 1. and 5. GoogleRefine Redo code
+// for squishing multi-valued records into single rows and removing untagged rows
+
+[
+  {
+    "op": "core/mass-edit",
+    "description": "Mass edit cells in column Flags",
+    "engineConfig": {
+      "facets": [],
+      "mode": "record-based"
+    },
+    "columnName": "Flags",
+    "expression": "value",
+    "edits": [
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "flag",
+          "Flag"
+        ],
+        "to": "flag"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "check",
+          "Check"
+        ],
+        "to": "check"
+      }
+    ]
+  },
+  {
+    "op": "core/text-transform",
+    "description": "Text transform on cells in column Method Terms using expression grel:forNonBlank(cells[\"Flags\"],flag,cell.value+\" ~\"+flag.value,cell.value)",
+    "engineConfig": {
+      "facets": [],
+      "mode": "record-based"
+    },
+    "columnName": "Method Terms",
+    "expression": "grel:forNonBlank(cells[\"Flags\"],flag,cell.value+\" ~\"+flag.value,cell.value)",
+    "onError": "keep-original",
+    "repeat": false,
+    "repeatCount": 10
+  },
+  {
+    "op": "core/multivalued-cell-join",
+    "description": "Join multi-valued cells in column Method Terms",
+    "columnName": "Method Terms",
+    "keyColumnName": "Pub number",
+    "separator": "|"
+  },
+  {
+    "op": "core/multivalued-cell-join",
+    "description": "Join multi-valued cells in column Subject",
+    "columnName": "Subject",
+    "keyColumnName": "Pub number",
+    "separator": "|"
+  },
+  {
+    "op": "core/multivalued-cell-join",
+    "description": "Join multi-valued cells in column KEYWORDS",
+    "columnName": "KEYWORDS",
+    "keyColumnName": "Pub number",
+    "separator": "|"
+  },
+  {
+    "op": "core/column-removal",
+    "description": "Remove column Flags",
+    "columnName": "Flags"
+  },
+  {
+    "op": "core/row-removal",
+    "description": "Remove rows",
+    "engineConfig": {
+      "facets": [
+        {
+          "query": "",
+          "name": "Method Terms",
+          "caseSensitive": false,
+          "columnName": "Method Terms",
+          "type": "text",
+          "mode": "text"
+        },
+        {
+          "query": "",
+          "name": "Method Terms",
+          "caseSensitive": false,
+          "columnName": "Method Terms",
+          "type": "text",
+          "mode": "text"
+        },
+        {
+          "expression": "value",
+          "invert": false,
+          "selectError": false,
+          "omitError": false,
+          "name": "Method Terms",
+          "selectBlank": true,
+          "columnName": "Method Terms",
+          "omitBlank": false,
+          "type": "list",
+          "selection": []
+        }
+      ],
+      "mode": "row-based"
+    }
+  }
+]

@@ -1,0 +1,63 @@
+// 6. GoogleRefine Redo code
+// to create "Exclude Level" column
+
+[
+  {
+    "op": "core/column-addition",
+    "description": "Create column Exclude.Level at index 13 based on column Method Terms using expression grel:if(value.contains(\"xclude ?\"),1,if(value.contains(\"xclude\"),2,0))",
+    "engineConfig": {
+      "facets": [
+        {
+          "invert": false,
+          "expression": "value",
+          "selectError": false,
+          "omitError": false,
+          "selectBlank": false,
+          "name": "Flags",
+          "omitBlank": false,
+          "columnName": "Flags",
+          "type": "list",
+          "selection": [
+            {
+              "v": {
+                "v": "Exclude",
+                "l": "Exclude"
+              }
+            },
+            {
+              "v": {
+                "v": "exclude ?",
+                "l": "exclude ?"
+              }
+            }
+          ]
+        },
+        {
+          "invert": false,
+          "expression": "value",
+          "selectError": false,
+          "omitError": false,
+          "selectBlank": false,
+          "name": "exclude.value",
+          "omitBlank": false,
+          "columnName": "exclude.value",
+          "type": "list",
+          "selection": [
+            {
+              "v": {
+                "v": 0,
+                "l": "0"
+              }
+            }
+          ]
+        }
+      ],
+      "mode": "record-based"
+    },
+    "newColumnName": "Exclude.Level",
+    "columnInsertIndex": 13,
+    "baseColumnName": "Method Terms",
+    "expression": "grel:if(value.contains(\"xclude ?\"),1,if(value.contains(\"xclude\"),2,0))",
+    "onError": "set-to-blank"
+  }
+]

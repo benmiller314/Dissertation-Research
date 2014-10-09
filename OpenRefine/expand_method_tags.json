@@ -1,0 +1,99 @@
+// 2. GoogleRefine Redo code
+// for expanding squished Methods into Methods and Flags
+
+[
+  {
+    "op": "core/multivalued-cell-split",
+    "description": "Split multi-valued cells in column Method Terms",
+    "columnName": "Method Terms",
+    "keyColumnName": "Pub number",
+    "separator": "|",
+    "mode": "plain"
+  },
+  {
+    "op": "core/column-addition",
+    "description": "Create column Flags at index 13 based on column Method Terms using expression grel:value.smartSplit(\"~\")[1]",
+    "engineConfig": {
+      "facets": [
+        {
+          "query": "~",
+          "name": "Method Terms",
+          "caseSensitive": false,
+          "columnName": "Method Terms",
+          "type": "text",
+          "mode": "regex"
+        }
+      ],
+      "mode": "row-based"
+    },
+    "newColumnName": "Flags",
+    "columnInsertIndex": 13,
+    "baseColumnName": "Method Terms",
+    "expression": "grel:value.smartSplit(\"~\")[1]",
+    "onError": "set-to-blank"
+  },
+  {
+    "op": "core/text-transform",
+    "description": "Text transform on cells in column Method Terms using expression grel:value.smartSplit(\"~\")[0]",
+    "engineConfig": {
+      "facets": [
+        {
+          "query": "~",
+          "name": "Method Terms",
+          "caseSensitive": false,
+          "columnName": "Method Terms",
+          "type": "text",
+          "mode": "regex"
+        }
+      ],
+      "mode": "row-based"
+    },
+    "columnName": "Method Terms",
+    "expression": "grel:value.smartSplit(\"~\")[0]",
+    "onError": "keep-original",
+    "repeat": false,
+    "repeatCount": 10
+  },
+  {
+    "op": "core/text-transform",
+    "description": "Text transform on cells in column Method Terms using expression value.trim()",
+    "engineConfig": {
+      "facets": [
+        {
+          "expression": "grel:isBlank(value)",
+          "invert": false,
+          "selectError": false,
+          "omitError": false,
+          "name": "Method Terms",
+          "selectBlank": false,
+          "columnName": "Method Terms",
+          "omitBlank": false,
+          "type": "list",
+          "selection": [
+            {
+              "v": {
+                "v": false,
+                "l": "false"
+              }
+            }
+          ]
+        }
+      ],
+      "mode": "record-based"
+    },
+    "columnName": "Method Terms",
+    "expression": "value.trim()",
+    "onError": "keep-original",
+    "repeat": false,
+    "repeatCount": 10
+  },
+  {
+    "op": "core/fill-down",
+    "description": "Fill down cells in column Year",
+    "engineConfig": {
+      "facets": [],
+      "mode": "record-based"
+    },
+    "columnName": "Year"
+  }
+]
