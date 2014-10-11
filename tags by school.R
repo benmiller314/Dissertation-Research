@@ -126,6 +126,7 @@ schoolwise <- function(dataset_name="noexcludes", tagset_name="tagnames",
 # close wrapper function
 }
 
+if (autorun) {
 	# call the functions for all relevant datasets
 	schoolwise("consorts", "tagnames", agn=T, hcl=F, dia=F)
 	schoolwise("nonconsorts", "tagnames", agn=T, hcl=F, dia=F)
@@ -138,6 +139,7 @@ schoolwise <- function(dataset_name="noexcludes", tagset_name="tagnames",
 	schoolwise("noexcludes", "tagnames.simple")
 	# schoolwise("consorts", "tagnames.simple", agfixedcols=c$ag$colInd, difixedcols=c$di$colInd)
 	# schoolwise("nonconsorts", "tagnames.simple", agfixedcols=c$ag$colInd, difixedcols=c$di$colInd)
+}
 
 
 # # explore the data

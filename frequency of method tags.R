@@ -20,13 +20,14 @@ get_tags <- function(dataset_name="noexcludes", tagset_name="tagnames") {
 	print(a2)
 }
 
-a <- get_tags(noexcludes)
-b <- get_tags(consorts)
-c <- get_tags(nonconsorts)
-e <- thresh("nonconsorts")
-e <- get_tags(e$thresh.data)
-e[order(e)]
-
+if(autorun) {
+	a <- get_tags("noexcludes")
+	b <- get_tags("consorts")
+	d <- get_tags("nonconsorts")
+	e <- thresh("nonconsorts")$thresh.data
+	e <- get_tags("e")
+	e[order(e)]
+}
 # Step 2. Graph 'em
 
 methodfreq_combined <- function(bigset="noexcludes", smallset="consorts", diffset="nonconsorts") {
@@ -119,8 +120,10 @@ compare_method_ranks <- function(set1="consorts", set2="nonconsorts", pcts=TRUE)
 	if (remake_figs) { dev.off() }
 }
 
-	
-if (remake_figs) { dev.off() }
+if(autorun) {
+	compare_method_ranks()
+	compare_method_ranks("nonconsorts", "top.nonconsorts")	
+}
 
 ## Test significance
 ## Update: performed Fischer Exact Test of Independence using online calculators and Excel

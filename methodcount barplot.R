@@ -46,6 +46,9 @@ methods.barplot <- function(dataset_name="noexcludes", tagset_name="tagnames") {
 	if (remake_figs) {dev.off()}
 }
 
-methods.barplot(noexcludes$Method.Count, "All Schools")
-methods.barplot(consorts$Method.Count, "Consortium Schools Only")
-methods.barplot(nonconsorts$Method.Count, "Non-Consortium Schools Only")
+if (autorun) {
+	methods.barplot("noexcludes")
+	methods.barplot("consorts")
+	methods.barplot("nonconsorts")
+	methods.barplot("top.nonconsorts", "blah")
+} 

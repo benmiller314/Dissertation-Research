@@ -9,7 +9,9 @@ setwd("/Users/benmiller314/Dropbox/coursework, etc/dissertation/R experiments/Di
 
 # Global variables called in many functions.
 # remake_figs: If TRUE, save new files for figures; if FALSE, display on screen only.
+# autorun: If TRUE, call the functions when files are sourced; if FALSE, load functions but do not call.
 remake_figs <- FALSE; 
+autorun <- FALSE;
 
 # dataprep: prepares working environment by loading helper functions and setting key variables (such as tagset).
 # dataprep 2: loads in a .csv file of tagged spreadsheet data, generate a tag array, and define various subsets.
