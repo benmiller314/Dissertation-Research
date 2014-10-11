@@ -1,4 +1,4 @@
-## GOAL: Given a tagged set of dissertation data and a tagging schema, aggregate tag frequency and distribution at each school in the dataset. After building the function for the analysis, run it on various subsets of data and tags.
+ ## GOAL: Given a tagged set of dissertation data and a tagging schema, aggregate tag frequency and distribution at each school in the dataset. After building the function for the analysis, run it on various subsets of data and tags.
 
 require(doBy)
 require(cluster)
@@ -27,13 +27,20 @@ schoolwise.data <- function(dataset_name="consorts", tagset_name="tagnames") {
 	# 2. do the summary of each method type for all schools. 
 	d1 <- summaryBy(. ~ School, data=dataset, FUN=mean)
 	d2 <- summaryBy(. ~ School, data=dataset, FUN=sum)
-	d3 <- summaryBy( ~ School, data=dataset, FUN=length)
+	d3 <- summaryBy(. ~ School, data=dataset, FUN=length)
 		
 	return(list("means" = d1, "sums" = d2, "counts" = d3))
 }
 
 # function for graphing data
-schoolwise <- function(dataset_name="noexcludes", tagset_name="tagnames", agfixedcols=NULL, difixedcols=NULL, agn=TRUE, hcl=TRUE, dia=TRUE, counts=FALSE) {
+schoolwise <- function(dataset_name="noexcludes", tagset_name="tagnames", 
+						agn=TRUE, 			# run agglomerative clustering (using agnes)?
+						hcl=TRUE, 			# run hierarchical clustering (using hclust)?
+						dia=TRUE, 			# run divisive clustering (using diana)?
+						counts=FALSE, 		# label each row with the number of dissertations per school?
+						agfixedcols=NULL, 	# optional pre-set order of columns for comparison btwn agnes plots
+						difixedcols=NULL) 	# optional pre-set order of columns for comparison btwn diana plots
+	{
 	
 	# 0. convert variable names to variables. we'll use the names later in the figure titles.
 	dataset <- get(dataset_name)
@@ -119,20 +126,18 @@ schoolwise <- function(dataset_name="noexcludes", tagset_name="tagnames", agfixe
 # close wrapper function
 }
 
-
-# call the functions for all relevant datasets
-schoolwise("consorts", "tagnames", agn=T, hcl=F, dia=F)
-schoolwise("nonconsorts", "tagnames", agn=T, hcl=F, dia=F)
-schoolwise("noexcludes", "tagnames")
-# schoolwise("nonconsorts", "tagnames", agfixedcols=a$ag$colInd, difixedcols=a$di$colInd)
-
-# next up: re-run with the simplified schema
-schoolwise("consorts", "tagnames.simple")
-schoolwise("nonconsorts", "tagnames.simple")
-schoolwise("noexcludes", "tagnames.simple")
-# schoolwise("consorts", "tagnames.simple", agfixedcols=c$ag$colInd, difixedcols=c$di$colInd)
-# schoolwise("nonconsorts", "tagnames.simple", agfixedcols=c$ag$colInd, difixedcols=c$di$colInd)
-
+	# call the functions for all relevant datasets
+	schoolwise("consorts", "tagnames", agn=T, hcl=F, dia=F)
+	schoolwise("nonconsorts", "tagnames", agn=T, hcl=F, dia=F)
+	schoolwise("noexcludes", "tagnames")
+	# schoolwise("nonconsorts", "tagnames", agfixedcols=a$ag$colInd, difixedcols=a$di$colInd)
+	
+	# next up: re-run with the simplified schema
+	schoolwise("consorts", "tagnames.simple")
+	schoolwise("nonconsorts", "tagnames.simple")
+	schoolwise("noexcludes", "tagnames.simple")
+	# schoolwise("consorts", "tagnames.simple", agfixedcols=c$ag$colInd, difixedcols=c$di$colInd)
+	# schoolwise("nonconsorts", "tagnames.simple", agfixedcols=c$ag$colInd, difixedcols=c$di$colInd)
 
 
 # # explore the data

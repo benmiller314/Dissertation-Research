@@ -5,13 +5,18 @@
 # 2. sort and plot as horizontal bars
 # 3. find a way to do this for multiple datasets but the same tags for a combined figure
 
-# Step 1. Sum the tag columns
 
-get_tags <- function(x, tagset_name="tagnames") {
+# Step 0. Make sure we're all set up.
+if(!exists("thresh", mode="function")) {source(file="start here.R")}
+
+# Step 1. Sum the tag columns
+get_tags <- function(dataset_name="noexcludes", tagset_name="tagnames") {
+	dataset <- get(dataset_name)
 	tagset <- get(tagset_name)
 	
-	a1 <- x[, tagset]
+	a1 <- dataset[, tagset]
 	a2 <- apply(a1, 2, sum)
+	message("Method tag frequency for ", dataset_name, ":")
 	print(a2)
 }
 
@@ -23,82 +28,102 @@ e <- get_tags(e$thresh.data)
 e[order(e)]
 
 # Step 2. Graph 'em
-main <- "Frequency of Assigned Method Tags"
-filename <- paste0(imageloc, main, ".pdf")
 
-if (remake_figs) { pdf(file=filename) }
-	par(mfrow=c(1,1))
-	
-	barplot(a[order(a)], horiz=TRUE, xpd=FALSE, las=1, axes=FALSE, main=main, col="gray80")
-	text(x=a[order(a)]+30, y=seq(from=0.7,to=18.7,length.out=16), labels=a[order(a)])
-	
-	barplot(b[order(a)], las=1, horiz=TRUE, xpd=FALSE, axes=FALSE, col="white", add=TRUE)
-	text(x=30, y=seq(from=0.7,to=18.7,length.out=16), labels=b[order(a)])
-	
-	# barplot(-c[order(a)], las=1, horiz=TRUE, xpd=FALSE, axes=FALSE, col="gray90")
-	text(x=a[order(a)]-c[order(a)]+30, y=seq(from=0.7,to=18.7,length.out=16), labels=c[order(a)])
-	
-	mtext("Tags are non-exclusive, so sum will be greater than the 2,711 dissertations.", side=1)
-	
-	legend(x="bottomright", c("Consortium Schools", "Non-Consortium Schools"), fill=c("white","gray80"), bty="n")
-	
-if (remake_figs) { dev.off() }
+methodfreq_combined <- function(bigset="noexcludes", smallset="consorts", diffset="nonconsorts") {
+	main <- "Frequency of Assigned Method Tags"
+	a=get_tags(bigset)
+	b=get_tags(smallset)
+	d=get_tags(diffset)
+	if (remake_figs) { filename <- paste0(imageloc, main, ".pdf"); pdf(file=filename) }
+		# plot noexcludes as a baseline
+		barplot(a[order(a)], horiz=TRUE, xpd=FALSE, las=1, axes=FALSE, main=main, col="gray80")
+		text(x=a[order(a)]+30, y=seq(from=0.7,to=18.7,length.out=16), labels=a[order(a)])
+		
+		# plot consorts as an overlay
+		barplot(b[order(a)], las=1, horiz=TRUE, xpd=FALSE, axes=FALSE, col="white", add=TRUE)
+		text(x=30, y=seq(from=0.7,to=18.7,length.out=16), labels=b[order(a)])
+		
+		# no need to plot nonconsorts: that's the gap where the baseline shows through. just add labels.
+		# barplot(-d[order(a)], las=1, horiz=TRUE, xpd=FALSE, axes=FALSE, col="gray90")
+		text(x=a[order(a)]-d[order(a)]+30, y=seq(from=0.7,to=18.7,length.out=16), labels=d[order(a)])
+		
+		mtext("Tags are non-exclusive, so sum will be greater than the 2,711 dissertations.", side=1)
+		
+		legend(x="bottomright", c(smallset, diffset), fill=c("white","gray80"), bty="n")
+	if (remake_figs) { dev.off() }
+}
+
+if(autorun) { 
+	methodfreq_combined() 
+}
 
 ## Step 3. Compare ranks of consorts vs. nonconsorts; leave out Othr
-# 3a. Version with raw counts
+compare_method_ranks <- function(set1="consorts", set2="nonconsorts", pcts=TRUE) {
+	b <- get_tags(set1)
+	d <- get_tags(set2)
+	
+	# 3a. Version with raw counts
 	b0 <- b[!names(b) %in% "Othr"]
 	b1 <- names(b0)[order(b0, decreasing=T)]
 	b2 <- paste0(b1, " (", b0[order(b0, decreasing=T)], ")")
 	
-	c0 <- c[!names(c) %in% "Othr"]
-	c1 <- names(c0)[order(c0, decreasing=T)]
-	c2 <- paste0(c1, " (", c0[order(c0, decreasing=T)], ")")
+	d0 <- d[!names(d) %in% "Othr"]
+	d1 <- names(d0)[order(d0, decreasing=T)]
+	d2 <- paste0(d1, " (", d0[order(d0, decreasing=T)], ")")
 
-	filename <- paste0(imageloc, "Ranks of methods in consorts v nonconsorts, no Othr.pdf")
-	
-# 3b. Version with percentages
-	b2 <- paste0(b1, " (", 
-							round(100*b0[order(b0, decreasing=T)]/nrow(consorts), 0), 
-					  ")")
-	c2 <- paste0(c1, " (", 
-							round(100*c0[order(c0, decreasing=T)]/nrow(nonconsorts), 0), 
-					  ")")
+	filename <- paste0(imageloc, "Ranks of methods in ", set1, " v ", set2, ", no Othr.pdf")
 
-	filename <- paste0(imageloc, "Ranks of methods in consorts v nonconsorts, no Othr, pcts.pdf")
+	# 3b. Version with percentages
+	if (pcts) {
+		b2 <- paste0(b1, " (", 
+								round(100*b0[order(b0, decreasing=T)]/nrow(get(set1)), 0), 
+						  ")")
+		d2 <- paste0(d1, " (", 
+								round(100*d0[order(d0, decreasing=T)]/nrow(get(set2)), 0), 
+						  ")")
 	
-
-if(remake_figs) { pdf(file=filename) }
-	# set up a blank plot
+		filename <- paste0(imageloc, "Ranks of methods in ", set1, " v ", set2, ", no Othr, pcts.pdf")
+	}	
 	
-	plot(x=0:length(tagnames)+1, y=0:length(tagnames)+1, axes=FALSE, type="n", xlab="", ylab="")
+	if(remake_figs) { pdf(file=filename) }
+		# set up a blank plot
+		plot(x=0:length(tagnames)+1, y=0:length(tagnames)+1, axes=FALSE, type="n", xlab="", ylab="")
+		
+		# arrange consorts in descending rank order on the left, nonconsorts on the right
+		text(labels=b2, 
+			 x=rep(4,length(b0)), 
+			 y=length(b2):1
+			 )
+		text(labels=d2, x=rep(length(tagnames)-4, length(d0)), y=length(d2):1)
+		
+		# draw a line from each tag's position on the left to the one on the right
+		lapply(tagnames[!tagnames %in% "Othr"], FUN=function(tag) {
+			segments(x0=5.7, y0=grep(tag, names(b0[order(b0)])),		 
+			         x1=length(tagnames)-5.7, y1=grep(tag, names(d0[order(d0)]))
+			)
+		})
+		
+		# extend those lines to point horizontally to the tags, to remove ambiguity
+		lapply(1:length(tagnames)-1, FUN=function(y) {
+			segments(x0=5.4, y0=y,
+					 x1=5.7, y1=y)
+			segments(x0=length(tagnames)-5.4, y0=y,
+					 x1=length(tagnames)-5.7, y1=y)		
+		})
+		
+		# label the two sides
+		text(labels=c(set1, set2), x=c(4,length(tagnames)-4), y=rep(length(tagnames)+1,2))
+		text(labels=c(paste0("(N=",nrow(get(set1)),")"), paste0("(N=",nrow(get(set2)),")")), x=c(4,length(tagnames)-4), y=rep(length(tagnames),2))
 	
-	# arrange consorts in descending rank order on the left, nonconsorts on the right
-	text(labels=b2, x=rep(4,length(b0)), y=length(b2):1)
-	text(labels=c2, x=rep(length(tagnames)-4, length(c0)), y=length(c2):1)
-	
-	# draw a line from each tag's position on the left to the one on the right
-	lapply(tagnames[!tagnames %in% "Othr"], FUN=function(tag) {
-		segments(x0=5.7, y0=grep(tag, names(b0[order(b0)])),		 
-		         x1=length(tagnames)-5.7, y1=grep(tag, names(c0[order(c0)]))
-		)
-	})
-	
-	# extend those lines to point horizontally to the tags, to remove ambiguity
-	lapply(1:length(tagnames)-1, FUN=function(y) {
-		segments(x0=5.4, y0=y,
-				 x1=5.7, y1=y)
-		segments(x0=length(tagnames)-5.4, y0=y,
-				 x1=length(tagnames)-5.7, y1=y)		
-	})
-	
-	# label the two sides
-	text(labels=c("Consortium Schools", "Non-consortium Schools"), x=c(4,length(tagnames)-4), y=rep(length(tagnames)+1,2))
-	text(labels=c(paste0("(N=",nrow(consorts),")"), paste0("(N=",nrow(nonconsorts),")")), x=c(4,length(tagnames)-4), y=rep(length(tagnames),2))
+		
+	if (remake_figs) { dev.off() }
+}
 
 	
 if (remake_figs) { dev.off() }
 
-## Test some significance via Chi-Squared (or is it Fisher Exact?) Test
+## Test significance
+## Update: performed Fischer Exact Test of Independence using online calculators and Excel
 
 # # # first vector: Tag in consorts vs. nonTag in consorts
 # x <- c(b["Expt"], 					# number of Tag in consorts

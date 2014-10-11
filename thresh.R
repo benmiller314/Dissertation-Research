@@ -1,7 +1,7 @@
 # function to subset data by threshold number of dissertations in a given timespan
-require(doBy)
-
 thresh <- function(dataset_name="noexcludes", tagset_name="tagnames", threshold=5, since=2006, until=2010) {
+	require(doBy)
+	
 	# 0. convert variable names to variables. we'll use the names later in the figure titles.
 	dataset <- get(dataset_name)
 	tagset <- get(tagset_name)

@@ -11,13 +11,9 @@
 ### TO DO: wrap this all up in a single function and clean up the file
 
 # Step 0. Make sure we're in familar territory.
-	if (!exists("tagnames")) { 
-		source(file="/Users/benmiller314/Dropbox/coursework, etc/dissertation/R experiments/Dissertation Research/dataprep.R") 
-	}
-	setwd(sourceloc)
-	if (!exists("noexcludes")) { 
-		source(file="/Users/benmiller314/Dropbox/coursework, etc/dissertation/R experiments/Dissertation Research/dataprep 2 - load data.R") 
-	}
+if (!exists("tagnames")) { 
+		source(file="/Users/benmiller314/Dropbox/coursework, etc/dissertation/R experiments/Dissertation Research/start here.R") 
+}
 	
 # Step 1. Get the matrix of texts and topics
 # # Choose dataset, number of topics -- now needed only for testing, so commented out
@@ -28,13 +24,14 @@
 
 ## 1. Edit the reshapeMallet.py script (in TextWrangler) to update filenames, 
 #    then run it here and read in the output.
+
 get.doctopic.grid <- function(dataset_name="consorts", ntopics=55, doplot=F) {
 	# get packages in case we've just restarted R
 	require(data.table)
 	
 	filename <- paste0(malletloc, "/", dataset_name, "k", ntopics, "_doc-all-topics.txt")
 	scope <- paste("cd", shQuote(sourceloc), "; cd 'Shell scripts and commands' ; ls ", filename)
-	if (system(scope)) {
+	if (system(scope)) {		# runs only if scope has an error, which returns a non-zero value
 		command <- paste("cd", shQuote(sourceloc), "; cd 'Shell scripts and commands' python reshapeMallet.py")
 		go <- readline("Have you updated reshapeMallet.py to reflect your current dataset/ntopics? (Y/N)\n")
 		if(tolower(go) != "y") { stop("Better fix that, then") } 
@@ -44,15 +41,17 @@ get.doctopic.grid <- function(dataset_name="consorts", ntopics=55, doplot=F) {
 		print("Oh, good, the file exists. Moving on...")
 	}
 	outputfile <- read.delim(filename, header=F)
+	
 	# switch from 0-indexed to 1-indexed so the topic numbers in topic_keys.dt are the same as row numbers
 	# NB: this seems to be necessary to avoid searching for column "0"
 	head(outputfile)
 	names(outputfile) <- c("Pub.number", (1:(ncol(outputfile)-1)))
 	head(outputfile)
-	library(data.table)
+	
 	outputfile.dt <- as.data.table(outputfile)
 	head(outputfile.dt)
-	## Step 2. Find overall top topics
+
+	## Find overall top topics
 	# Each cell gives the percentage the topic in that column contributes to the dissertation in that row.
 	# Summing these percentages and sorting gives us a rank based on percentage points.
 	colsums <- colSums(outputfile.dt)
@@ -60,12 +59,14 @@ get.doctopic.grid <- function(dataset_name="consorts", ntopics=55, doplot=F) {
 	head(colsums)
 	colsums.sort <- colsums[order(colsums, decreasing=TRUE)]
 	head(colsums.sort)
+	
 	# Divide the percentage point totals by the number of dissertations to get an overall percent contribution
 	colsums.sort.pct <- round((colsums.sort / nrow(outputfile)), 4) * 100
 	if(remake_figs) { 
 		filename <- paste0(imageloc, dataset_name, "k", ntopics, "_topic-ranks.csv")
 		write.csv(colsums.sort.pct[2:length(colsums.sort.pct)], filename)
 	}
+	
 	# Optionally get an overview of the topic sizes, as a scatterplot
 	if(doplot) {
 		plot(2:length(colsums), colsums.sort[2:length(colsums)], xlab="topic numbers (arbitrary)", ylab="sum of contributions", xaxt="n")
@@ -138,9 +139,6 @@ get.doc.composition <- function(dataset_name="consorts", ntopics=55) {
 	return(doc_topics.dt)
 }
 	
-noexcludes.dt <- as.data.table(noexcludes)
-setkey(noexcludes.dt, Pub.number)
-
 # Helper function: retrieve top five topics for a given Pub.number
 get.topics4doc <- function(pubnum, dataset_name="consorts", ntopics=55) {
 		# get packages in case we've just restarted R
@@ -256,13 +254,13 @@ top_topic_browser <- function(start.rank	 = 1, 				# assuming we're looping, sta
 }
 
 ## Run the big function above
-# if (remake_figs) { 
-	# filename <- paste0(imageloc, "top topics - ", dataset_name, ", K", ntopics, ".txt")
-	# readline(paste("About to capture browser output as", filename,"- <enter> to continue or <esc> to abort."))
-	# capture.output(top_topic_browser(), file=filename)
-# } else {
-	# top_topic_browser()
-# }
+if (remake_figs) { 
+	filename <- paste0(imageloc, "top topics - ", dataset_name, ", K", ntopics, ".txt")
+	readline(paste("About to capture browser output as", filename,"- <enter> to continue or <esc> to abort."))
+	capture.output(top_topic_browser(), file=filename)
+} else {
+	top_topic_browser()
+}
 
 
 

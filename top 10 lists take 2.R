@@ -11,7 +11,7 @@ toplists <- function(dataset_name="noexcludes", tagset_name="tagnames", howmany=
 	tagset <- get(tagset_name)
 
 
-	## 1. find schools with more than 5 dissertations in 2006-2010
+	## 1. find schools with more than (by default) 5 dissertations in 2006-2010 
 	if(!exists("thresh", mode="function")) { source(file="thresh.R") }
 	
 	d <- thresh(dataset_name, tagset_name, threshold, since, until)
@@ -95,7 +95,7 @@ toplists <- function(dataset_name="noexcludes", tagset_name="tagnames", howmany=
 	if(rank_by_pcts) {
 		title <- "Top 5 Schools by Methodological Focus (Ranked by Percentage)"
 	} else {
-		title <- "Top 5 Schools by Methodological Focus (Ranked by Number of Dissertations)"
+		title <- "Top 5 Schools by Methodological Output (Ranked by Number of Dissertations)"
 	}
 	subtitle2 <- "* indicates member of the Consortium of Doctoral Programs in Rhetoric and Composition"
 	names(b) <- tagset

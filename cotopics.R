@@ -10,7 +10,7 @@
 get.cotopics <- function(dataset_name="consorts", ntopics=55, level=.10, json=F) {
 	require(data.table)
 
-	source(file=paste0(sourceloc, "/top docs per topic.R"))		
+	if (!exists("get.doctopic.grid", mode="function") {source(file=paste0(sourceloc, "/top docs per topic.R"))}
 	grid <- get.doctopic.grid(dataset_name, ntopics)$outputfile
 		
 	cotopics <- data.frame(row.names=c("source","target"))	# start empty, build up
@@ -27,8 +27,8 @@ get.cotopics <- function(dataset_name="consorts", ntopics=55, level=.10, json=F)
 	# as a data.table, we can do a fast sort and more besides
 	cotopics <- data.table(cotopics, key=c("source", "target"))
 
-	# for example, let's find unique source/target pairs, and count their occurrences! whee!
-	cotopics <- cotopics[, list(weight=.N), by=list(source, target)]	
+	# for example, let's find unique source/target pairs, and count their occurrences! in one line! whee!
+	cotopics <- cotopics[, list(weight=.N), by=list(source, target)]
 
 	# print and optionally save the result	
 	print(cotopics)	
