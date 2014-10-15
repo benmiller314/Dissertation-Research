@@ -11,7 +11,7 @@ ans <- function() {
 	}
 	
 # set the working directories, taking into account the GitHub setup
-sourceloc <- "/Users/benmiller314/Dropbox/coursework, etc/dissertation/R experiments/Dissertation Research/"
+sourceloc <- "/Users/benmiller314/Dropbox/coursework, etc/dissertation/data, code, and figures/Dissertation Research/"
 setwd(sourceloc)
 imageloc <- paste0(sourceloc, "../Dissertation Research - Figures/")
 dataloc <- paste0(sourceloc, "../")
@@ -60,6 +60,9 @@ topnames <- lapply(topnames, FUN=function(x) substr(x,1,8))
 # otherwise, they'll display on screen only.
 if(!exists("remake_figs")) {
 	remake_figs <- FALSE
+}
+if(!exists("autorun")) {
+	autorun <- TRUE
 }
 
 ## prep some useful functions

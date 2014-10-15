@@ -1,11 +1,12 @@
 if (!exists("tagnames")) {
-	source(file="/Users/benmiller314/Dropbox/coursework, etc/dissertation/R experiments/Dissertation Research/dataprep.R")
+	source(file="/Users/benmiller314/Dropbox/coursework, etc/dissertation/data, code, and figures/Dissertation Research/dataprep.R")
 }
 
 ## now get the data 
 # The most recent file of dissertation metadata
-message("Select the most recent file of dissertation metadata.")
+ignore <- readline("Select the most recent file of dissertation metadata.")
 bigarray <- read.csv(file=file.choose())
+rm(ignore)
 
 # parse the method tags... including for the collapsed schema
 bigarray <- parse_tags(bigarray)

@@ -14,7 +14,7 @@ remake_figs <- FALSE;
 autorun <- FALSE;
 
 # dataprep: prepares working environment by loading helper functions and setting key variables (such as tagset).
-# dataprep 2: loads in a .csv file of tagged spreadsheet data, generate a tag array, and define various subsets.
+# dataprep 2: loads in a .csv file of tagged spreadsheet data, generates a tag array, and defines various subsets.
 # 	You will be prompted to select the file via file.choose().
 # NB: These two functions can be called jointly via source(file="start here.R")
 source(file="dataprep.R")

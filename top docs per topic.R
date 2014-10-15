@@ -12,7 +12,7 @@
 
 # Step 0. Make sure we're in familar territory.
 if (!exists("tagnames")) { 
-		source(file="/Users/benmiller314/Dropbox/coursework, etc/dissertation/R experiments/Dissertation Research/start here.R") 
+		source(file="/Users/benmiller314/Dropbox/coursework, etc/dissertation/data, code, and figures/Dissertation Research/start here.R") 
 }
 	
 # Step 1. Get the matrix of texts and topics
@@ -72,6 +72,7 @@ get.doctopic.grid <- function(dataset_name="consorts", ntopics=55, doplot=F) {
 		plot(2:length(colsums), colsums.sort[2:length(colsums)], xlab="topic numbers (arbitrary)", ylab="sum of contributions", xaxt="n")
 		text(x=1+2:length(colsums), y=1+colsums.sort[2:length(colsums)], labels=names(colsums.sort[2:length(colsums)]))
 	}
+	
 	# Return with the goods
 	list("colsums" = colsums,
 		 "colsums.sort" = colsums.sort,
@@ -103,7 +104,10 @@ get.topickeys <- function(dataset_name="consorts", ntopics=55) {
 # Step 3. Find top 5 docs for each overall top topic 
 # to get a sense of what's "real" and what's "interesting"
 
-	# Step 4. Find all the top-ranked topics for those docs: maybe that really popular topic isn't actually the main component of the docs that come up. We start with the doc-topic matrix from MALLET:
+	# Step 4. Find all the top-ranked topics for those docs: 
+	# maybe that really popular topic isn't actually the main component of the docs that come up. 
+	# We start with the doc-topic matrix from MALLET:
+
 get.doc.composition <- function(dataset_name="consorts", ntopics=55) {
 	# get packages in case we've just restarted R
 	require(data.table)
@@ -254,14 +258,15 @@ top_topic_browser <- function(start.rank	 = 1, 				# assuming we're looping, sta
 }
 
 ## Run the big function above
-if (remake_figs) { 
-	filename <- paste0(imageloc, "top topics - ", dataset_name, ", K", ntopics, ".txt")
-	readline(paste("About to capture browser output as", filename,"- <enter> to continue or <esc> to abort."))
-	capture.output(top_topic_browser(), file=filename)
-} else {
-	top_topic_browser()
+if (autorun) {
+	if (remake_figs) { 
+		filename <- paste0(imageloc, "top topics - ", dataset_name, ", K", ntopics, ".txt")
+		readline(paste("About to capture browser output as", filename,"- <enter> to continue or <esc> to abort."))
+		capture.output(top_topic_browser(), file=filename)
+	} else {
+		top_topic_browser()
+	}
 }
-
 
 
 # source("frameToD3.R")
