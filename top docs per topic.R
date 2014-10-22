@@ -31,7 +31,7 @@ get.doctopic.grid <- function(dataset_name="consorts", ntopics=55, doplot=F) {
 	
 	filename <- paste0(malletloc, "/", dataset_name, "k", ntopics, "_doc-all-topics.txt")
 	scope <- paste("cd", shQuote(sourceloc), "; cd 'Shell scripts and commands' ; ls ", filename)
-	if (system(scope)) {		# runs only if scope has an error, which returns a non-zero value
+	if (system(scope)) {		# runs only if file not found, which returns a non-zero error value
 		command <- paste("cd", shQuote(sourceloc), "; cd 'Shell scripts and commands' python reshapeMallet.py")
 		go <- readline("Have you updated reshapeMallet.py to reflect your current dataset/ntopics? (Y/N)\n")
 		if(tolower(go) != "y") { stop("Better fix that, then") } 

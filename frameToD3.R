@@ -15,8 +15,10 @@ ntopics <- 55
 cutoff <- 150	
 
 
-# Ben: get the outputfile
-if(!exists("get.doctopic.grid")) { source(file=paste0(sourceloc, "/top docs per topic.R")) }
+# Ben: Get topic weights for every document we have
+if(!exists("get.doctopic.grid")) { 
+	autorun.bk <- autorun; autorun <- F; source("top docs per topic.R"); autorun <- autorun.bk; rm(autorun.bk)
+}
 grid <- get.doctopic.grid(dataset_name, ntopics)$outputfile
 outputfile.dt <- as.data.table(grid)
 rm(grid)

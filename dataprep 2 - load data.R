@@ -4,7 +4,7 @@ if (!exists("tagnames")) {
 
 ## now get the data 
 # The most recent file of dissertation metadata
-ignore <- readline("Select the most recent file of dissertation metadata.")
+ignore <- readline("Select the most recent file of dissertation metadata. (Press <Enter> to continue.)")
 bigarray <- read.csv(file=file.choose())
 rm(ignore)
 
