@@ -6,7 +6,7 @@
 #  The total number of times dissertations are tagged X is returned separately.
 
 #  1. Calculate tag collocations, total dissertations per tag, and solo counts per tag.
-sumbytags <- function(dataset_name="noexcludes", tagset_name="tagnames") {
+sumbytags <- function(dataset_name="noexcludes", tagset_name="tagnames", doplot=T) {
 	dataset <- get(dataset_name)
 	tagset <- get(tagset_name)
 	
@@ -41,33 +41,41 @@ sumbytags <- function(dataset_name="noexcludes", tagset_name="tagnames") {
 	}
 	# print(sum.by.tags)
 	# print(total.counts)
-			
-	return (list("correlations" = as.matrix(sum.by.tags),
+
+	to.return <- list("correlations" = as.matrix(sum.by.tags),
 				 "solo.counts" = solo.counts,
-				 "total.counts" = total.counts))
+				 "total.counts" = total.counts)
+
+	if(doplot) {
+		if(!exists("heatmap.ben", mode="function")) {source(file="heatmap_ben.R")}
+		
+		# 2. Basic heatmap
+		if(remake_figs) {
+			filename <- paste0(imageloc, "Method Tag Co-Occurrence, N", diss.count, ".pdf")
+			pdf(filename) 
+		} 
+			heatmap.ben(to.return, diags=TRUE)
+			title(main="Method Tag Co-Occurrence")
+			mtext("A box in row Y, column X gives the number of \n 
+				dissertations tagged Y that are also tagged X", side=4)
+			mtext(paste0(dataset_name, ", N=", nrow(dataset)), side=3)
+		if(remake_figs) { dev.off() }
+		
+		# 3. Normed heatmap
+		if(remake_figs) { 
+			filename <- paste0(imageloc, "Method Tag Co-Occurrence (normed by row), N", diss.count,".pdf")
+			pdf(filename) 
+		}
+			heatmap.ben(to.return, rowscale=TRUE, diags=TRUE)
+			title(main="Method Tag Co-Occurrence \n (normed by row)")
+			mtext("A box in row Y, column X gives the probability \n 
+				that a dissertation tagged Y is also tagged X", side=4)
+			mtext(paste0(dataset_name, ", N=", nrow(dataset)), side=3)
+		if(remake_figs) { dev.off() }
+	}
+			
+	return (to.return)
 }
 
-# 1a. Run it when the file is called
+# Run it when the file is called
 sum.by.tags <- sumbytags()
-
-# 2. Basic heatmap
-if(remake_figs) {
-	filename <- paste0(imageloc, "Method Tag Co-Occurrence, N", diss.count, ".pdf")
-	pdf(filename) 
-} 
-	heatmap.ben(sum.by.tags, diags=TRUE)
-	title(main="Method Tag Co-Occurrence")
-	mtext("A box in row Y, column X gives the number of \n dissertations tagged Y that are also tagged X", side=4)
-	mtext(paste0("N=", diss.count), side=3)
-if(remake_figs) { dev.off() }
-
-# 3. Normed heatmap
-if(remake_figs) { 
-	filename <- paste0(imageloc, "Method Tag Co-Occurrence (normed by row), N", diss.count,".pdf")
-	pdf(filename) 
-}
-	heatmap.ben(sum.by.tags, rowscale=TRUE, diags=TRUE)
-	title(main="Method Tag Co-Occurrence")
-	mtext("A box in row Y, column X gives the probability \n that a dissertation tagged Y is also tagged X", side=4)
-	mtext(paste0("N=", diss.count), side=3)
-if(remake_figs) { dev.off() }
