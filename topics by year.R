@@ -106,10 +106,14 @@ for (i in 1:length(plot.me)) {
 # now that we're done looping, close the final file connection
 if(remake_figs) {dev.off()}
 
-# find year-to-year peak variation for each topic
-r1 <- apply(df[!names(df) %in% c("Year", "47", "2")], 2, FUN=function(x) {max(x)-min(x)} )
-max(r1)
-r2 <- apply(df[!names(df) %in% "Year"], 2, FUN=range)
 
+## Find year-to-year peak variation for each topic
+r1 <- apply(df[!names(df) %in% c("Year", bad.topics)], 2, FUN=function(x) {max(x)-min(x)} )
+r2 <- r1[order(r1, decreasing=T)]
+text(1:length(r2), r2, r2)
 
-
+# okay, this is interesting
+maintitle <- "Yearly Variation of Topic Proportions, 2001-2010"
+if(remake_figs) {filename <- paste0(imageloc, maintitle, ".pdf"); pdf(filename)}
+boxplot(df[!names(df) %in% "Year"][, plot.me], cex.axis=0.6, las=2, main=maintitle, xlab="Topic Number", ylab="Portion of Corpus (scaled to 1)")		
+if(remake_figs) {dev.off()}
