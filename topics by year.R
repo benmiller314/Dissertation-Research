@@ -92,11 +92,11 @@ for (i in 1:length(plot.me)) {
 			pdf(filename)	# start writing a new file
 		}
 		# set up a blank plot in a standard size
-		plot(df$Year, rep(yrange, length((df$Year))/2), type="n", xaxs="r", ylab="Portion of corpus (scaled to 1)", bty="n", main=maintitle)
+		plot(df$Year, rep(yrange, length((df$Year))/2), type="n", xaxs="r", ylab="Portion of corpus (scaled to 1)", xlab="Year", bty="n", main=maintitle)
 
 		# add a legend for up to five values
 		if(i <= 10) { legendloc <- "bottomright" } else { legendloc <- "topright"}
-		legend(legendloc, title=paste0("Topics, ranked ", i, "-",(i+4), " of ", ntopics), legend=paste0(plot.me[seq(i, i+4, 1)], ": ", topic.labels.dt[i:(i+4), Label]), fill=mycol[j:(j+4)], border=mycol[j:(j+4)], bty="n", cex=0.8)
+		legend(legendloc, title=paste0("Topics, ranked ", i, "-",(i+4), " of ", nrow(topic.labels.dt)), legend=paste0(plot.me[seq(i, i+4, 1)], ": ", topic.labels.dt[i:(i+4), Label]), fill=mycol[j:(j+4)], border=mycol[j:(j+4)], bty="n", cex=0.8)
 	}
 
 	# draw the line and loop back
