@@ -60,11 +60,16 @@ if (autorun) {
 	lapply(c(32, 8, 48, 15, 10), FUN=function(x) { methods_for_topic(mytopic=x) })
 }
 
-##
 # Side-by-side comparison of method ranks for two topics
-if(!exists("compare_method_ranks", mode="function")) { source(file="compare method ranks.R") }
+if(autorun) {
+	if(!exists("compare_method_ranks", mode="function")) { source(file="compare method ranks.R") }
+	if(!exists("get_topic_labels", mode="function")) { source(file="get topic labels.R") }
 
-tags.topic32 <- as.data.frame(methods_for_topic(mytopic=32)$set)
-tags.topic8 <- as.data.frame(methods_for_topic(mytopic=8)$set)
-undebug(compare_method_ranks)
-compare_method_ranks(set1="tags.topic32", set2="tags.topic8", pcts=T, colorful=T)
+	label1 <- paste("32:", get_topic_labels(dataset_name, ntopics)[32, Label])
+	label2 <- paste("8:", get_topic_labels(dataset_name, ntopics)[8, Label])
+
+	tags.topic32 <- as.data.frame(methods_for_topic(mytopic=32)$set)
+	tags.topic8 <- as.data.frame(methods_for_topic(mytopic=8)$set)
+
+	compare_method_ranks(set1="tags.topic32", set2="tags.topic8", pcts=T, colorful=T, betterlabels=c(label1, label2))
+}

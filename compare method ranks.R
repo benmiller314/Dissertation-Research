@@ -4,7 +4,12 @@
 #       by arranging method tags in two columns, and 
 #		connecting matching methods with lines for ease of comparison
 
-compare_method_ranks <- function(set1="consorts", set2="nonconsorts", pcts=TRUE, colorful=FALSE) {
+compare_method_ranks <- function(set1="consorts",			# Sets to compare. NB: use names, not variables,
+								 set2="nonconsorts", 		# so we can use them to label the figure.
+								 pcts=TRUE, 				# Label with percent of docs with that tag? 
+								 							# otherwise, use real counts. 
+								 colorful=FALSE, 			# Use multiple colors for lines?
+								 betterlabels=NULL) {		# Optional vector of length 2, giving labels for sets.
 	b <- get_tags(set1)
 	d <- get_tags(set2)
 	
@@ -81,9 +86,19 @@ compare_method_ranks <- function(set1="consorts", set2="nonconsorts", pcts=TRUE,
 					 x1=length(b)-5.7, y1=y.right,
 			         col=mycol[col.index])		
 		})
-		
+
 		# label the two columns
-		text(labels=c(set1, set2), x=c(4,length(b)-4), y=rep(length(b)+1,2))
+		if(!is.null(betterlabels)) { 
+			if(length(betterlabels)==2) {
+				text(labels=betterlabels, x=c(4,length(b)-4), y=rep(length(b)+1,2))
+			} else {
+				warning("Incorrect number of betterlabels: must be vector of length 2. Using set names.")
+				text(labels=c(set1, set2), x=c(4,length(b)-4), y=rep(length(b)+1,2))
+			}
+		} else {
+			text(labels=c(set1, set2), x=c(4,length(b)-4), y=rep(length(b)+1,2))			
+		}
+	
 		text(labels=c(paste0("(N=",nrow(get(set1)),")"), paste0("(N=",nrow(get(set2)),")")), x=c(4,length(b)-4), y=rep(length(b),2))
 	
 		
