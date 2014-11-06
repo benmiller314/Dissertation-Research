@@ -43,7 +43,8 @@ methods_for_topic <- function(	dataset_name = "consorts",
 	print(a5)
 
 	# Header information for the plot
-	if(!exists("get_topic_labels")) { source(file="topics by year.R") }
+	if(!exists("get_topic_labels", mode="function")) { source(file="get topic labels.R") }
+
 	label <- get_topic_labels(dataset_name, ntopics)[mytopic, Label]
 	main <- paste0("Frequency of Assigned Method Tags for Topic ", mytopic, " (", label, ")")
 
@@ -62,7 +63,7 @@ if (autorun) {
 
 ##
 # Side-by-side comparison of method ranks for two topics
-if(!exists("compare_method_ranks", function)) { source(file="compare method ranks.R") }
+if(!exists("compare_method_ranks", mode="function")) { source(file="compare method ranks.R") }
 
 tags.topic32 <- as.data.frame(methods_for_topic(mytopic=32)$set)
 tags.topic8 <- as.data.frame(methods_for_topic(mytopic=8)$set)
