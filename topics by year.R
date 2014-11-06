@@ -9,12 +9,7 @@ require(data.table)
 require(RColorBrewer)
 
 # Get topic weights for every document we have
-if(!exists("get.doctopic.grid")) { 
-	if(exists("autorun")){ autorun.bk <- autorun; } 
-	autorun <- F;
-	source("top docs per topic.R"); 
-	if(exists("autorun.bk")){ autorun <- autorun.bk; rm(autorun.bk) }
-}
+if(!exists("get.doctopic.grid")) { source("get doctopic grid.R") }
 
 grid <- data.table(get.doctopic.grid()$outputfile)
 

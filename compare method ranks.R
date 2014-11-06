@@ -17,9 +17,6 @@ compare_method_ranks <- function(set1="consorts", set2="nonconsorts", pcts=TRUE,
 	d1 <- names(d0)[order(d0, decreasing=T)]
 	d2 <- paste0(d1, " (", d0[order(d0, decreasing=T)], ")")
 
-
-	filename <- paste0(imageloc, "Ranks of methods in ", set1, " v ", set2, ", no Othr.pdf")
-
 	# 3b. Version with percentages
 	if (pcts) {
 		b2 <- paste0(b1, " (", 
@@ -32,35 +29,48 @@ compare_method_ranks <- function(set1="consorts", set2="nonconsorts", pcts=TRUE,
 		filename <- paste0(imageloc, "Ranks of methods in ", set1, " v ", set2, ", no Othr, pcts.pdf")
 	}	
 	
-	if(remake_figs) { pdf(file=filename) }
+	if(remake_figs) { 	
+		filename <- paste0(imageloc, "Ranks of methods in ", set1, " v ", set2, ", no Othr.pdf")
+		pdf(file=filename) 
+	}
+
 		# set up a blank plot
-		plot(x=0:length(tagnames)+1, y=0:length(tagnames)+1, axes=FALSE, type="n", xlab="", ylab="")
+		plot(x=0:length(b)+1, y=0:length(b)+1, axes=FALSE, type="n", xlab="", ylab="")
 		
-		# arrange consorts in descending rank order on the left, nonconsorts on the right
+		# arrange set1 in descending rank order on the left, set2 on the right
 		text(labels=b2, 
-			 x=rep(4,length(b0)), 
+			 x=rep(4,length(b2)), 
 			 y=length(b2):1
-			 )
-		text(labels=d2, x=rep(length(tagnames)-4, length(d0)), y=length(d2):1)
+		)
+		text(labels=d2, 
+			x=rep(length(d)-4, 
+			length(d2)), 
+			y=length(d2):1
+		)
 		
-		# draw a line from each tag's position on the left to the one on the right
-		lapply(tagnames[!tagnames %in% "Othr"], FUN=function(tag) {
-			segments(x0=5.7, y0=grep(tag, names(b0[order(b0)])),		 
-			         x1=length(tagnames)-5.7, y1=grep(tag, names(d0[order(d0)]))
+		# connect matching methods with lines for ease of comparison
+		lapply(b1, FUN=function(tag) {
+			# locate each tag on the plot
+			y.left  <- length(b2) - grep(tag, b1) + 1
+			y.right <- length(b2) - grep(tag, d1) + 1
+			
+			# draw a line from each tag's position on the left to the one on the right	
+			segments(x0=5.7, 
+					 y0=y.left,
+			         x1=length(b)-5.7, 
+			         y1=y.right
 			)
+			
+			# extend those lines to point horizontally to the tags, to remove ambiguity
+			segments(x0=5.4, y0=y.left,
+					 x1=5.7, y1=y.left)
+			segments(x0=length(b)-5.4, y0=y.right,
+					 x1=length(b)-5.7, y1=y.right)		
 		})
 		
-		# extend those lines to point horizontally to the tags, to remove ambiguity
-		lapply(1:length(tagnames)-1, FUN=function(y) {
-			segments(x0=5.4, y0=y,
-					 x1=5.7, y1=y)
-			segments(x0=length(tagnames)-5.4, y0=y,
-					 x1=length(tagnames)-5.7, y1=y)		
-		})
-		
-		# label the two sides
-		text(labels=c(set1, set2), x=c(4,length(tagnames)-4), y=rep(length(tagnames)+1,2))
-		text(labels=c(paste0("(N=",nrow(get(set1)),")"), paste0("(N=",nrow(get(set2)),")")), x=c(4,length(tagnames)-4), y=rep(length(tagnames),2))
+		# label the two columns
+		text(labels=c(set1, set2), x=c(4,length(b)-4), y=rep(length(b)+1,2))
+		text(labels=c(paste0("(N=",nrow(get(set1)),")"), paste0("(N=",nrow(get(set2)),")")), x=c(4,length(b)-4), y=rep(length(b),2))
 	
 		
 	if (remake_figs) { dev.off() }
