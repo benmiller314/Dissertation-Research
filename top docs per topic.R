@@ -26,25 +26,8 @@ if (!exists("tagnames")) {
 #    then run it here and read in the output.
 if(!exists("get.doctopic.grid", mode="function")) { source(file="get doctopic grid.R") }
 
-
-# Oh, and what were those topics, again?
-get.topickeys <- function(dataset_name="consorts", ntopics=55) {
-	# get packages in case we've just restarted R
-	require(data.table)
-	
-	filename <- paste0(malletloc, "/", dataset_name, "k", ntopics, "_keys.txt")
-	topic_keys.dt <- as.data.table(read.delim(filename, header=F))
-	setnames(topic_keys.dt, c("V1", "V2", "V3"), c("topic", "alpha", "top_words"))
-	names(topic_keys.dt)
-	head(topic_keys.dt)
-	
-	# switch from 0-indexed to 1-indexed so the topic numbers in topic_keys.dt are the same as row numbers
-	# NB: this seems to be necessary to avoid searching for column "0"
-	topic_keys.dt$topic <- 1:nrow(topic_keys.dt)
-	head(topic_keys.dt)
-	setkey(topic_keys.dt, topic)
-	return(topic_keys.dt)
-}
+# 2. Oh, and what were those topics, again?
+if(!exists("get.topickeys", mode="function")) { source(file="get topickeys.R") }
 
 # Step 3. Find top 5 docs for each overall top topic 
 # to get a sense of what's "real" and what's "interesting"
