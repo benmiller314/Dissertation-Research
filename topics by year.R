@@ -72,7 +72,7 @@ mycol <- brewer.pal(n=(5-length(plot.me) %% 5 + 1), name="Dark2")		# Use differe
 # plotchar <- seq(18, 18+length(plot.me), 1)					# Use different symbols for each plot?
 plotchar <- rep(20, length(plot.me))						# Nah, use same symbols for each plot
 maintitle <- "Average Topic Proportions over Time"
-}
+
 
 
 ## Draw 5 lines on the same plot, then start a new plot and repeat.

@@ -10,15 +10,7 @@
 if(!exists("thresh", mode="function")) {source(file="start here.R")}
 
 # Step 1. Sum the tag columns
-get_tags <- function(dataset_name="noexcludes", tagset_name="tagnames") {
-	dataset <- get(dataset_name)
-	tagset <- get(tagset_name)
-	
-	a1 <- dataset[, tagset]
-	a2 <- apply(a1, 2, sum)
-	message("Method tag frequency for ", dataset_name, ":")
-	print(a2)
-}
+if(!exists("get_tags", mode="function")) { source(file="get tags.R") }
 
 if(autorun) {
 	a <- get_tags("noexcludes")
@@ -59,7 +51,7 @@ if(autorun) {
 }
 
 ## Step 3. Compare ranks of consorts vs. nonconsorts; leave out Othr
-if(!exists("compare_method_ranks", function)) { source(file="compare method ranks.R") }
+if(!exists("compare_method_ranks", mode="function")) { source(file="compare method ranks.R") }
 
 if(autorun) {
 	compare_method_ranks("consorts", "nonconsorts")
