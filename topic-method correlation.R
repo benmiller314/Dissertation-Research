@@ -11,7 +11,6 @@ methods_for_topic <- function(	dataset_name = "consorts",
 
 	# Get the doc-topic grid
 	if(!exists("get.doctopic.grid", mode="function")) { source(file="get doctopic grid.R") }
-
 	
 	grid <- data.table(get.doctopic.grid(dataset_name, ntopics)$outputfile)
 		## Investigate topic-weight distribution, to verify that our cutoff makes sense
@@ -68,4 +67,4 @@ if(!exists("compare_method_ranks", mode="function")) { source(file="compare meth
 tags.topic32 <- as.data.frame(methods_for_topic(mytopic=32)$set)
 tags.topic8 <- as.data.frame(methods_for_topic(mytopic=8)$set)
 undebug(compare_method_ranks)
-compare_method_ranks("tags.topic32", "tags.topic8", pcts=F)
+compare_method_ranks(set1="tags.topic32", set2="tags.topic8", pcts=T, colorful=T)

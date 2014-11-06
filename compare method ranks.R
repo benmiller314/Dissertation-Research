@@ -4,7 +4,7 @@
 #       by arranging method tags in two columns, and 
 #		connecting matching methods with lines for ease of comparison
 
-compare_method_ranks <- function(set1="consorts", set2="nonconsorts", pcts=TRUE, colors=FALSE) {
+compare_method_ranks <- function(set1="consorts", set2="nonconsorts", pcts=TRUE, colorful=FALSE) {
 	b <- get_tags(set1)
 	d <- get_tags(set2)
 	
@@ -21,10 +21,10 @@ compare_method_ranks <- function(set1="consorts", set2="nonconsorts", pcts=TRUE,
 	if (pcts) {
 		b2 <- paste0(b1, " (", 
 								round(100*b0[order(b0, decreasing=T)]/nrow(get(set1)), 0), 
-						  ")")
+						  "%)")
 		d2 <- paste0(d1, " (", 
 								round(100*d0[order(d0, decreasing=T)]/nrow(get(set2)), 0), 
-						  ")")
+						  "%)")
 	
 		filename <- paste0(imageloc, "Ranks of methods in ", set1, " v ", set2, ", no Othr, pcts.pdf")
 	}	
@@ -48,24 +48,38 @@ compare_method_ranks <- function(set1="consorts", set2="nonconsorts", pcts=TRUE,
 			y=length(d2):1
 		)
 		
-		# connect matching methods with lines for ease of comparison
-		lapply(b1, FUN=function(tag) {
+		## connect matching methods with lines for ease of comparison
+
+		# optionally add color to lines to detangle spaghetti
+		if(colorful) {
+			require(RColorBrewer)
+			mycol <- brewer.pal(4, "Dark2")
+		} else {
+			mycol <- c("#000000")
+		}
+		
+		tag <- b1[1]
+		lapply(b1, mycol=mycol, FUN=function(tag, mycol) {
 			# locate each tag on the plot
 			y.left  <- length(b2) - grep(tag, b1) + 1
 			y.right <- length(b2) - grep(tag, d1) + 1
+			col.index <- (y.left-1) %% length(mycol) + 1
 			
 			# draw a line from each tag's position on the left to the one on the right	
 			segments(x0=5.7, 
 					 y0=y.left,
 			         x1=length(b)-5.7, 
-			         y1=y.right
+			         y1=y.right,
+			         col=mycol[col.index]
 			)
 			
 			# extend those lines to point horizontally to the tags, to remove ambiguity
 			segments(x0=5.4, y0=y.left,
-					 x1=5.7, y1=y.left)
+					 x1=5.7, y1=y.left,
+			         col=mycol[col.index])
 			segments(x0=length(b)-5.4, y0=y.right,
-					 x1=length(b)-5.7, y1=y.right)		
+					 x1=length(b)-5.7, y1=y.right,
+			         col=mycol[col.index])		
 		})
 		
 		# label the two columns
