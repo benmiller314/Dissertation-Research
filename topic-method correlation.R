@@ -10,12 +10,8 @@ methods_for_topic <- function(	dataset_name = "consorts",
 														# for the diss to count as 'in' the topic?
 
 	# Get the doc-topic grid
-	if(!exists("get.doctopic.grid")) { 
-		if(exists("autorun")){ autorun.bk <- autorun; } 
-		autorun <- F;
-		source("top docs per topic.R"); 				# TODO: move get.doctopic.grid() into its own file
-		if(exists("autorun.bk")){ autorun <- autorun.bk; rm(autorun.bk) }
-	}
+	if(!exists("get.doctopic.grid", mode="function")) { source(file="get doctopic grid.R") }
+
 	
 	grid <- data.table(get.doctopic.grid(dataset_name, ntopics)$outputfile)
 		## Investigate topic-weight distribution, to verify that our cutoff makes sense
