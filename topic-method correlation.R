@@ -76,4 +76,86 @@ if(autorun) {
 	tags.topic8 <- as.data.frame(methods_for_topic(mytopic=8)$set)
 
 	compare_method_ranks(set1="tags.topic32", set2="tags.topic8", pcts=T, colorful=T, betterlabels=c(label1, label2))
+# Compare methods within cotopics
+methods_in_cotopics <- function(dataset_name="consorts", ntopics=55, focal_topic=NULL, level=0.25, min=1) {
+	if(!exists("get.cotopics", mode="function")) { source(file="cotopics.R") }
+	if(!exists("compare_method_ranks", mode="function")) { source(file="compare method ranks.R") }
+	if(!exists("get_topic_labels", mode="function")) { source(file="get topic labels.R") }
+
+	# find out which topics co-occur within individual dissertations
+	test <- get.cotopics(dataset_name, ntopics, level)
+	
+	# if we're focusing on one topic, find just that topic (whether in source or target)	
+	if(!is.null(focal_topic)) { 
+		left <- test[(source==focal_topic), ]
+		right <- test[(target==focal_topic), ]
+		right_flip <- data.table(source=right$target, target=right$source, weight=right$weight)
+		test <- rbind(left, right_flip)
+		test
+		rm(left, right, right_flip)
+	}
+
+	# to reduce complexity, set a minimum number of co-occurrences
+	test <- test[which(weight > min), ]
+
+	setkey(test, source, weight)
+	test[order(-weight, source)]
+	print(test)
+
+	
+	for (i in nrow(test):1) {
+		topic_1 <- test[i, source]
+		topic_2 <- test[i, target]
+
+		set_1 <- as.data.frame(methods_for_topic(mytopic=topic_1, do.barplot=F)$set)
+		set_2 <- as.data.frame(methods_for_topic(mytopic=topic_2, do.barplot=F)$set)
+		
+		lab1 <- paste0(topic_1, ": ", get_topic_labels(dataset_name, ntopics)[topic_1, Label])
+		lab2 <- paste0(topic_2, ": ", get_topic_labels(dataset_name, ntopics)[topic_2, Label])
+		
+		compare_method_ranks("set_1", "set_2", pcts=T, colorful=T, betterlabels=c(lab1, lab2))
+		
+		title(main="Method ranks in co-occurring topics", sub=paste("# of co-occurrences:", test[i, weight]))
+	}
+}
+methods_in_cotopics(focal_topic=32)
+
+methods_in_cotopics_3d <- function(dataset_name="consorts", tagset_name="tagnames", ntopics=55, focal_topic=NULL, level=0.25) {
+	if(!exists("get.cotopics", mode="function")) { source(file="cotopics.R") }
+	if(!exists("get_topic_labels", mode="function")) { source(file="get topic labels.R") }
+
+	# find out which topics co-occur within individual dissertations
+	test <- get.cotopics(dataset_name, ntopics, level)
+	
+	# if we're focusing on one topic, find just that topic (whether in source or target)
+	if(!is.null(focal_topic)) { 
+		left <- test[(source==focal_topic), ]
+		right <- test[(target==focal_topic), ]
+		right_flip <- data.table(source=right$target, target=right$source, weight=right$weight)
+		test <- rbind(left, right_flip)
+		setkey(test, weight)
+		print(test)
+		rm(left, right, right_flip)
+	}
+
+	# now that we know the dimensions of the data, let's build a matrix. We'll start blank, then loop.
+	mat <- matrix(dimnames=list(tagnames), nrow=length(get(tagset_name)), ncol=(1+nrow(test)) )	
+	dat <- data.table(NA)
+	
+		# add the focal topic, if there is one
+		if(!is.null(focal_topic)) {
+			mat[, ncol(mat)] <- methods_for_topic(mytopic=focal_topic, do.barplot=F)$tags
+		}
+		
+		# now loop through the cotopics (or all topics--needs work)
+		for (i in nrow(test):1) {
+			topic <- test[i, target]
+			mat[, i] <- methods_for_topic(mytopic=topic, do.barplot=F)$tags
+			dat <- data.table(dat, topic=methods_for_topic(mytopic=topic, do.barplot=F)$tags)
+			names(dat) <- c(test[1, source], test[, target])
+		}
+		
+		lab1 <- paste0(topic_1, ": ", get_topic_labels(dataset_name, ntopics)[topic_1, Label])
+		lab2 <- paste0(topic_2, ": ", get_topic_labels(dataset_name, ntopics)[topic_2, Label])
+	
 }
