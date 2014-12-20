@@ -10,6 +10,7 @@ compare_method_ranks <- function(set1="consorts",			# Sets to compare. NB: use n
 								 							# otherwise, use real counts. 
 								 colorful=FALSE, 			# Use multiple colors for lines?
 								 betterlabels=NULL) {		# Optional vector of length 2, giving labels for sets.
+	if(!exists("get_tags", mode="function")) { source(file="get tags.R") }
 	b <- get_tags(set1)
 	d <- get_tags(set2)
 	
@@ -21,6 +22,8 @@ compare_method_ranks <- function(set1="consorts",			# Sets to compare. NB: use n
 	d0 <- d[!names(d) %in% "Othr"]
 	d1 <- names(d0)[order(d0, decreasing=T)]
 	d2 <- paste0(d1, " (", d0[order(d0, decreasing=T)], ")")
+
+	filename <- paste0(imageloc, "Ranks of methods in ", set1, " v ", set2, ", no Othr.pdf")
 
 	# 3b. Version with percentages
 	if (pcts) {
@@ -34,22 +37,18 @@ compare_method_ranks <- function(set1="consorts",			# Sets to compare. NB: use n
 		filename <- paste0(imageloc, "Ranks of methods in ", set1, " v ", set2, ", no Othr, pcts.pdf")
 	}	
 	
-	if(remake_figs) { 	
-		filename <- paste0(imageloc, "Ranks of methods in ", set1, " v ", set2, ", no Othr.pdf")
-		pdf(file=filename) 
-	}
+	if(remake_figs) { pdf(file=filename) }
 
 		# set up a blank plot
 		plot(x=0:length(b)+1, y=0:length(b)+1, axes=FALSE, type="n", xlab="", ylab="")
 		
 		# arrange set1 in descending rank order on the left, set2 on the right
 		text(labels=b2, 
-			 x=rep(4,length(b2)), 
+			 x=rep(4, length(b2)), 
 			 y=length(b2):1
 		)
 		text(labels=d2, 
-			x=rep(length(d)-4, 
-			length(d2)), 
+			x=rep(length(d)-4, length(d2)), 
 			y=length(d2):1
 		)
 		

@@ -7,17 +7,17 @@
 # 2. For all combinations of two elements in A, create a new row in a source-target table called "cotopics."
 	
 	
-get.cotopics <- function(dataset_name="consorts", ntopics=55, level=.10, json=F) {
+get.cotopics <- function(dataset_name="consorts", ntopics=55, level=.10, json=F, min=1) {
 	require(data.table)
 
-	if (!exists("get.doctopic.grid", mode="function") {source(file=paste0(sourceloc, "/top docs per topic.R"))}
+	if (!exists("get.doctopic.grid", mode="function")) { source(file="get doctopic grid.R") }
 	grid <- get.doctopic.grid(dataset_name, ntopics)$outputfile
 		
-	cotopics <- data.frame(row.names=c("source","target"))	# start empty, build up
-	for (i in 1:nrow(grid)) { 
-		A <- which(grid[i, 2:length(grid)] > level)
-		if (length(A) >= 2) {								# can't combine just one thing
-			cotopics <- cbind(cotopics, combn(A,2))
+	cotopics <- data.frame(row.names=c("source","target"))	# start empty, build up.
+	for (i in 1:nrow(grid)) { 								# loop through the documents (rows). in each,
+		A <- which(grid[i, 2:length(grid)] > level)			# find which topics (columns) make up a big chunk. 
+		if (length(A) >= 2) {								# can't combine just one thing.
+			cotopics <- cbind(cotopics, combn(A,2))			# find all pairs of those big-chunk topics.
 		} 
 	}
 	
@@ -29,9 +29,13 @@ get.cotopics <- function(dataset_name="consorts", ntopics=55, level=.10, json=F)
 
 	# for example, let's find unique source/target pairs, and count their occurrences! in one line! whee!
 	cotopics <- cotopics[, list(weight=.N), by=list(source, target)]
+	
+	# to reduce complexity, set a minimum number of co-occurrences
+	cotopics <- cotopics[which(weight > min), ]
 
 	# print and optionally save the result	
-	print(cotopics)	
+	if(autorun) { 
+	print(cotopics) 
 	
 	if(remake_figs) { 
 		if(json) {
@@ -43,12 +47,13 @@ get.cotopics <- function(dataset_name="consorts", ntopics=55, level=.10, json=F)
 		write.csv(cotopics, filename)
 		}
 	}
+	}
 	
 	# and pass it back to the calling environment
 	return(cotopics)
 }
 
-
+if(autorun) { get.cotopics(level=0.2, min=2) }
 
 # # cotopics <- get.cotopics()
 # cotopics20 <- get.cotopics(level=0.2)
