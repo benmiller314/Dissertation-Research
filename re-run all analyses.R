@@ -51,16 +51,18 @@ source(file="top 10 lists take 2.R")
 
 
 
-# source(file="collocation heatmap.R")
+source(file="collocation heatmap.R")	# method-method correlations (needs renaming)
 source(file="schools per year.R") 
 
 # source(file="map by school.R")		# per-method maps	# look for the individual files instead
 source(file="map by school 4 (comp-rhet superimposed on carnegie schools).R")
 
 ## Topic Modeling functions
-source(file="r2mallet with foreach.R")
-source(file="top docs per topic.R")
-source(file="frameToD3.R")
-source(file="cotopics.R")
-source(file="topics by year.R")
+source(file="r2mallet with foreach.R")				# generate a topic model
+source(file="top docs per topic.R")					# browse topics to generate labels
+source(file="cotopics.R")							# find topics that co-occur within documents
+source(file="frameToD3.R")							# output JSON file of topic model data for interactive visualizations
+source(file="topics by year.R")						# rank topics overall, aggregated per year
+source(file="variation of topic proportions.R")		# distribution of topic strength for all documents' top 10 topics 
+source(file="single topic strength vs rank.R")		# are overall top topics high-ranked in few documents, or evenly spread?
 
