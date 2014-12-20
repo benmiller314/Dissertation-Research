@@ -63,7 +63,7 @@ if(!exists("remake_figs")) {
 	remake_figs <- FALSE
 }
 if(!exists("autorun")) {
-	autorun <- TRUE
+	autorun <- FALSE
 }
 
 ## prep some useful functions
