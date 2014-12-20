@@ -51,26 +51,22 @@ sumbytags <- function(dataset_name="noexcludes", tagset_name="tagnames", doplot=
 		
 		# 2. Basic heatmap
 		if(remake_figs) {
-			filename <- paste0(imageloc, "Method Tag Co-Occurrence, N", diss.count, ".pdf")
+			filename <- paste0(imageloc, "Method Tag Co-Occurrence, ", dataset_name, ", N", nrow(dataset), ".pdf")
 			pdf(filename) 
 		} 
 			heatmap.ben(to.return, diags=TRUE)
-			title(main="Method Tag Co-Occurrence")
-			mtext("A box in row Y, column X gives the number of \n 
-				dissertations tagged Y that are also tagged X", side=4)
-			mtext(paste0(dataset_name, ", N=", nrow(dataset)), side=3)
+			title(main="Method Tag Co-Occurrence", sub=paste0(dataset_name, ", N", nrow(dataset)))
+			mtext("A box in row Y, column X gives the number of dissertations tagged Y that are also tagged X", side=4)
 		if(remake_figs) { dev.off() }
 		
 		# 3. Normed heatmap
 		if(remake_figs) { 
-			filename <- paste0(imageloc, "Method Tag Co-Occurrence (normed by row), N", diss.count,".pdf")
+			filename <- paste0(imageloc, "Method Tag Co-Occurrence (normed by row), ", dataset_name, ", N", nrow(dataset), ".pdf")
 			pdf(filename) 
 		}
 			heatmap.ben(to.return, rowscale=TRUE, diags=TRUE)
-			title(main="Method Tag Co-Occurrence \n (normed by row)")
-			mtext("A box in row Y, column X gives the probability \n 
-				that a dissertation tagged Y is also tagged X", side=4)
-			mtext(paste0(dataset_name, ", N=", nrow(dataset)), side=3)
+			title(main="Method Tag Co-Occurrence \n (normed by row)", sub=paste0(dataset_name, ", N", nrow(dataset)))
+			mtext("A box in row Y, column X gives the probability that a dissertation tagged Y is also tagged X", side=4)
 		if(remake_figs) { dev.off() }
 	}
 			
@@ -78,4 +74,4 @@ sumbytags <- function(dataset_name="noexcludes", tagset_name="tagnames", doplot=
 }
 
 # Run it when the file is called
-sum.by.tags <- sumbytags()
+if (autorun) { sum.by.tags <- sumbytags() }
