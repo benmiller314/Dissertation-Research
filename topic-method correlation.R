@@ -5,9 +5,10 @@
 methods_for_topic <- function(	dataset_name = "consorts",
 								tagset_name  = "tagnames",
 								ntopics		 = 55,		
-								mytopic 	 = 32,		# the top topic, 'students in the classroom'
-								cutoff 		 = 0.25) {	# what fraction of the diss must this topic contribute
+								mytopic 	 = 32,		# the top topic, 'students in the classroom', as numeric
+								cutoff 		 = 0.25,	# what fraction of the diss must this topic contribute
 														# for the diss to count as 'in' the topic?
+								do.barplot   = TRUE) {	# should we plot the results, or compute silently?
 
 	# Get the doc-topic grid
 	if(!exists("get.doctopic.grid", mode="function")) { source(file="get doctopic grid.R") }
@@ -47,11 +48,14 @@ methods_for_topic <- function(	dataset_name = "consorts",
 	label <- get_topic_labels(dataset_name, ntopics)[mytopic, Label]
 	main <- paste0("Frequency of Assigned Method Tags for Topic ", mytopic, " (", label, ")")
 
-
-	if (remake_figs) { filename <- paste0(imageloc, main, ".pdf"); pdf(file=filename) }
-		barplot(a5[order(a5)], horiz=TRUE, xpd=FALSE, las=1, axes=FALSE, main=main, col="gray80")
-		text(x=rep(2.5, length(a5)), y=seq(from=0.7, to=length(tagset)+2.5, length.out=length(tagset)), labels=a5[order(a5)])
-	if (remake_figs) { dev.off() }
+	if(autorun && do.barplot) {
+		if (remake_figs) { filename <- paste0(imageloc, main, ".pdf"); pdf(file=filename) }
+			barplot(a5[order(a5)], horiz=TRUE, xpd=FALSE, las=1, axes=FALSE, main=main, col="gray80")
+			text(x      = rep(2.5, length(a5)), 
+				 y      = seq(from=0.7, to=length(tagset)+2.5, length.out=length(tagset)), 
+				 labels = a5[order(a5)])
+		if (remake_figs) { dev.off() }
+	}
 
 	return(list("set"=subdata, "tags"=a5))
 }
