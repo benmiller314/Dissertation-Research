@@ -1,6 +1,6 @@
 # Forked from Rolf Fredheim at https://github.com/benmiller314/frameToD3/blob/master/frameToD3.r
 # as discussed in http://quantifyingmemory.blogspot.com/2013/11/d3-without-javascript.html
-# Most references to "my" below are his; I'll try to add mine with "Ben:" as needed.
+# Most references to "my" below are his; I'll try to mark mine with "Ben:" as needed.
 
 #My sample data is 1000 rows, with the first column a unique id, followed by 100 columns of data variables
 # Ben: and it's called 'dt'; in this case the ID = a filename, and the data = topic weights
@@ -88,8 +88,8 @@ frameToJSON <- function(dataset_name="consorts",
   #Rolf: We might want to know the size of each node. Let's add that
   # Ben: for a topic model, this will find the total %-point contribution of the topic to all docs;
   # that means we could divide by number of docs to scale to [0,1], but no need: it's proportional.
-  b$size <- colSums(outputfile.dt[,c(dataVars),with=F])
-  b$scaledsize <- b$size/nrow(outputfile.dt)
+  b$size <- colSums(dt[,c(dataVars),with=F])
+  b$scaledsize <- b$size/nrow(dt)
   
   #Rolf: sort the data so it aligns with the structure calculated using hclust()
   setkey(b,order)
@@ -148,7 +148,7 @@ frameToJSON <- function(dataset_name="consorts",
 }
 
 ## Hierarchical Edge Bundling between (possibly unrelated) topics. This one's all Ben, but trying to
-#  reconstruct a figure like http://fredheir.github.io/dendroArcs/pages/hierarc/page.html.
+#  reconstruct a figure like Rolf's http://fredheir.github.io/dendroArcs/pages/hierarc/page.html.
 #  Plan: From the combined hierarchical data structure above (named `b`), for each topic (row):
 #	  1) pull out the "name" field that combines location in hierarchy with label information
 #	  2) loop through the targets, and find the "name" corresponding to *that* target
