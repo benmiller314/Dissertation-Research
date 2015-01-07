@@ -9,10 +9,12 @@
 ## Ben: Here be the function
 frameToJSON <- function(dataset_name="consorts",
 						ntopics=55,
-						do.plot=TRUE,			# Use this the first time to find good cuts in the dendrogram.
-					    groupVars=NULL, 		# If not provided by the calling environment,
-					    dataVars=NULL, 			# these 3 parameters will be set to defaults within the function.
-					    outfile=NULL) {			# This should make the function more portable, I (Ben) hope.
+						do.plot=TRUE,			# Ben: Use this the first time to find good cuts in the dendrogram.
+					    groupVars=NULL, 		# Ben: If not provided by the calling environment,
+					    dataVars=NULL, 			#  these 3 parameters will be set to defaults within the function.
+					    outfile=NULL,			#  This should make the function more portable, I hope.
+					    bad.topics= c("2", "4", "22", "24", "47")		# exclude non-content-bearing topics
+					    ) {			
 
   #packages we will need:
   require(data.table)	
@@ -22,6 +24,9 @@ frameToJSON <- function(dataset_name="consorts",
   if(!exists("get.doctopic.grid", mode="function")) { source(file="get doctopic grid.R") }
   dt <- as.data.table(get.doctopic.grid(dataset_name, ntopics)$outputfile)
 
+  # Ben: Exclude non-content-bearing topics
+  dt <- dt[, !names(dt) %in% bad.topics, with=F]
+
   # Set parameter defaults if needed
   if(is.null(groupVars)) {				
 		groupVars <- c("Pub.number")	# Group by ID column
@@ -30,11 +35,12 @@ frameToJSON <- function(dataset_name="consorts",
   		dataVars <- colnames(dt)[!colnames(dt) %in% groupVars]	# any column that's not an ID is a datapoint
   }
   if(is.null(outfile)) {				# the desired location of the JSON file produced by the function
-  		outfile <- paste0(webloc, "/", dataset_name, "k", ntopics, "_clusters.json")
+  		outfile <- paste0(webloc, "/", dataset_name, "k", ntopics, "_clusters_nobads.json")
   }
 
   
   #Rolf: Here you may want to sort by colSums() to keep only the most relevant variables.
+
 
   #Rolf: calculate the correlation matrix
   t <- cor(dt[, dataVars, with=F])
@@ -49,15 +55,24 @@ frameToJSON <- function(dataset_name="consorts",
 	  
 	  # Ben: Try various cut levels until you find a set that seems interesting; 
 	  # Then adjust the memb# variables below, accordingly.
-	  rect.hclust(hc, k=50)
+	  rect.hclust(hc, k=50, col="#111111")
+	  # x <- identify(hc, n=13)
+	  # rect.hclust(hc, k=55, border="#9999FF")
 	
-	  rect.hclust(hc, h=1.5, border="blue")
-	  abline(1.5, 0)
-	  rect.hclust(hc, k=10, border="#99FF99")
-	  rect.hclust(hc, k=50, border="#FF9999")
-	  x <- identify(hc, n=13)
-	  rect.hclust(hc, k=55, border="#9999FF")
-
+	  abline(1.35, 0, col="#99FF99")
+	  rect.hclust(hc, k=32, border="#99FF99")
+	  abline(1.55, 0, col="#009900")
+	  rect.hclust(hc, k=16, border="#009900")	# with 5 bad.topics removed, memb16 looks attractive
+	  abline(1.7, 0, col="#FF9999")
+	  rect.hclust(hc, k=12, border="#FF9999")
+	  abline(1.85, 0, col="#9999FF")
+	  rect.hclust(hc, k=7, border="#9999FF")
+	  abline(1.95, 0, col="#990099")
+	  rect.hclust(hc, k=6, border="#990099")
+  	  abline(2.33, 0, col="#009999")
+  	  rect.hclust(hc, k=4, border="#009999")
+  	  abline(3.37, 0, col="#999900")
+  	  rect.hclust(hc, k=2, border="#999900")
   }
   
   #Rolf: now we split the data based on membership structure. We will take four levels:
@@ -65,26 +80,37 @@ frameToJSON <- function(dataset_name="consorts",
   ## Ben: so, essentially, we're going to look at plot(hc) and decide what the major branch points are,
   ## then cut the tree to find group assignments above/below those splits. NB cutree() also allows us to 
   ## split the tree at specific heights (on the y axis of that plot), if we don't want to count the groups.
-  memb2 <- as.character(cutree(hc, k = 2))
-  memb5 <- as.character(cutree(hc, k = 5))
-  memb10 <- as.character(cutree(hc, k = 10))
-  memb22 <- as.character(cutree(hc, k = 22))
+
+	# Ben: splits for consorts with 55 topics (i.e. including bad.topics)
+  # memb2 <- as.character(cutree(hc, k = 2))
+  # memb5 <- as.character(cutree(hc, k = 5))
+  # memb10 <- as.character(cutree(hc, k = 10))
+  # memb22 <- as.character(cutree(hc, k = 22))
   # memb55 <- as.character(cutree(hc, k = 55))
+
+	# Ben: splits for consorts with 50 topics (i.e. bad.topics removed)
+  memb2 <- as.character(cutree(hc, k = 2))
+  memb4 <- as.character(cutree(hc, k = 4))
+  memb6 <- as.character(cutree(hc, k = 6))
+  memb7 <- as.character(cutree(hc, k = 7))
+  memb12 <- as.character(cutree(hc, k = 12))
+  memb16 <- as.character(cutree(hc, k = 16))
+  memb32 <- as.character(cutree(hc, k = 32))
   
   # Ben: list these out so we can distinguish them from node and edge variables
-  membVars <- c("memb2", "memb5", "memb10", "memb22"
-   # , "memb55"
-   )
+  # splits <- c(2, 5, 10, 22)		# including bad.topics
+  splits <- c(2, 4, 6, 7, 12, 16, 32)	# after removing bad.topics
+  membVars <- paste0("memb", splits)
 
   # Ben: get topic labels, which you've composed elsewhere using 'top docs per topic.R'
   if(!exists("get_topic_labels", mode="function")) { source(file="get topic labels.R") }
   topic.labels.dt <- get_topic_labels(dataset_name, ntopics)
-  
+  topic.labels.dt <- topic.labels.dt[!Topic %in% bad.topics]
+    
   #Rolf: Now put this information into a table, together with the labels and the order in which they should appear:
-  b <- data.table(memb2,memb5,memb10,memb22
-  # , memb55
-  ,label=gsub(' ', '_', topic.labels.dt[, Label]), topwords=topic.labels.dt[, Top.Words], order=hc$order)
-  
+  # Ben adds: use gsub to remove spaces (this seems to help the d3 scrollover)
+  b <- data.table(sapply(membVars, get), label=gsub(' ', '_', topic.labels.dt[, Label]), topwords=topic.labels.dt[, Top.Words], order=hc$order)
+
   #Rolf: We might want to know the size of each node. Let's add that
   # Ben: for a topic model, this will find the total %-point contribution of the topic to all docs;
   # that means we could divide by number of docs to scale to [0,1], but no need: it's proportional.
@@ -99,7 +125,7 @@ frameToJSON <- function(dataset_name="consorts",
   
   # Ben: Save this data table to a csv for later inspection; this table will also be returned by the function.
   if(remake_figs) {
-  	filename <- paste0(imageloc, "topic clusters - ", dataset_name, ", K", ntopics, ".csv")
+  	filename <- paste0(imageloc, "topic clusters - ", dataset_name, ", K", ntopics, "bad topics removed.csv")
   	write.csv(b, filename)
   } else {
   	# print(b)
@@ -173,6 +199,11 @@ cotopic_edges <- function(dataset_name="consorts",
 	# that gives one-directional links; to ensure symmetry, flip source and target and combine.
 	cotopics_flip <- data.table(source=cotopics$target, target=cotopics$source, weight=cotopics$weight)
 	cotopics_both <- rbind(cotopics, cotopics_flip)
+	
+	# exclude non-content-bearing topics		****TO DO: Take care of this earlier, so the hierarchy still works****
+	cotopics_both <- cotopics_both[!(source %in% bad.topics)]
+	cotopics_both <- cotopics_both[!(target %in% bad.topics)]
+	
 	  
 	# aggregate all edges by source
 	edges <- cotopics_both[, .SD[, list("targets"=paste(target, collapse=","), "weights"=paste(weight, collapse=","))], by=source]
@@ -184,6 +215,10 @@ cotopic_edges <- function(dataset_name="consorts",
 	# add a column of topic numbers to our node table, just to help merge with the edge table
 	b$source <- 1:nrow(b)
 	setkey(b, source)
+	
+	# exclude non-content-bearing topics		****TO DO: Take care of this earlier, so the hierarchy still works****
+	b <- b[!(source %in% bad.topics)]
+
 	
 	# merge
 	b <- merge(b, edges, all.x=T) 
@@ -197,7 +232,7 @@ cotopic_edges <- function(dataset_name="consorts",
 	# We're going to build our JSON for edge bundling with a name, size, and (to take advantage of 
 	# Mike Bostock's http://mbostock.github.io/d3/talk/20111116/packages.js) we'll call the edges "imports"
 	# We start empty...
-	edge_bund <- data.table(name=rep("NA", nrow(b)), size=0.0, imports=list("NA"))
+	edge_bund <- data.table(name=rep("NA", max(b$source)), size=0.0, imports=list("NA"))
 	
 	# ... and then build up
 	for (i in b$source) {
@@ -219,8 +254,11 @@ cotopic_edges <- function(dataset_name="consorts",
 		}
 	}
 
+	# Now remove any lingering NAs introduced by cutting bad.topics
+	edge_bund <- edge_bund[!(name %in% "NA")]
+
 	jsonEdge <- toJSON(edge_bund, pretty=TRUE)
-	cat(jsonEdge, file=outfile)
+	cat(jsonEdge, file=paste0(outfile, " no bad topics"))
 	return(jsonEdge)
 }
 
@@ -228,6 +266,6 @@ if(autorun) { frameToJSON(dt,groupVars,dataVars,outfile="data.json") }
 if(autorun) { 
 	cotopic_edges(level=0.12, min=1)		# 12% determined by `variation of topic proportions.R` to include
 	cotopic_edges(level=0.12, min=2)		# nearly all primary topics and 3/4 of secondary topics;
-	a <- cotopic_edges(level=0.12, min=3)	# see `Variation of Topic Proportions, Top 10 Topics per Document.pdf`
+	cotopic_edges(level=0.12, min=3)	# see `Variation of Topic Proportions, Top 10 Topics per Document.pdf`
 	cotopic_edges(level=0.12, min=4)
 }
