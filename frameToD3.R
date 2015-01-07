@@ -154,7 +154,13 @@ frameToJSON <- function(dataset_name="consorts",
 #	  2) loop through the targets, and find the "name" corresponding to *that* target
 #	  3) convert to JSON.	
 
-cotopic_edges <- function(dataset_name="consorts", ntopics=55, level=0.1, min=1, outfile=NULL) {
+cotopic_edges <- function(dataset_name="consorts", 
+						  ntopics=55, 
+						  level=0.12, 	# topic must constitute how much of each doc?
+						  min=3, 		# how many times must a pair of topics co-occur?
+						  outfile=NULL,
+						  bad.topics= c("2", "4", "22", "24", "47")		# exclude non-content-bearing topics
+						  ){
 	# set default parameters if needed
 	if(is.null(outfile)) {				# the desired location of the JSON file produced by the function
   		outfile <- paste0(webloc, "/", "edges_", dataset_name, "k", ntopics, "_", level*100, "pct_min", min, ".json")
@@ -173,7 +179,7 @@ cotopic_edges <- function(dataset_name="consorts", ntopics=55, level=0.1, min=1,
 	setkey(edges, source)
 	
 	# Bring in the node table
-	b <- frameToJSON(do.plot=F)
+	b <- frameToJSON(dataset_name, ntopics, do.plot=F)
 	
 	# add a column of topic numbers to our node table, just to help merge with the edge table
 	b$source <- 1:nrow(b)
@@ -220,10 +226,6 @@ cotopic_edges <- function(dataset_name="consorts", ntopics=55, level=0.1, min=1,
 
 if(autorun) { frameToJSON(dt,groupVars,dataVars,outfile="data.json") }
 if(autorun) { 
-	cotopic_edges(level=0.1, min=1)		# this is the default
-	cotopic_edges(level=0.1, min=2)
-	cotopic_edges(level=0.2, min=1)
-	cotopic_edges(level=0.2, min=2)
 	cotopic_edges(level=0.12, min=1)		# 12% determined by `variation of topic proportions.R` to include
 	cotopic_edges(level=0.12, min=2)		# nearly all primary topics and 3/4 of secondary topics;
 	a <- cotopic_edges(level=0.12, min=3)	# see `Variation of Topic Proportions, Top 10 Topics per Document.pdf`
