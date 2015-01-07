@@ -201,10 +201,15 @@ cotopic_edges <- function(dataset_name="consorts", ntopics=55, level=0.1, min=1,
 				x <- as.integer(x)
 				b[x, name]
 			})
+		weights <- lapply(strsplit(b[i, weights], ","), FUN=function(x) {
+				x <- as.integer(x)
+			})	
 		if(!anyNA(imports)) { 
 			edge_bund[i, "imports"] <- list(imports) 		# list edges if there are any
+			edge_bund[i, "weights"] <- list(weights) 
 		} else {
 			edge_bund[i, "imports"] <- list(b[i, name])		# otherwise, make a loop back to itself
+			edge_bund[i, "weights"] <- list(1)			# and call the weight "1"
 		}
 	}
 
@@ -219,4 +224,8 @@ if(autorun) {
 	cotopic_edges(level=0.1, min=2)
 	cotopic_edges(level=0.2, min=1)
 	cotopic_edges(level=0.2, min=2)
+	cotopic_edges(level=0.12, min=1)		# 12% determined by `variation of topic proportions.R` to include
+	cotopic_edges(level=0.12, min=2)		# nearly all primary topics and 3/4 of secondary topics;
+	a <- cotopic_edges(level=0.12, min=3)	# see `Variation of Topic Proportions, Top 10 Topics per Document.pdf`
+	cotopic_edges(level=0.12, min=4)
 }
