@@ -146,8 +146,10 @@ frameToJSON <- function(dataset_name="consorts",
       lapply(names(listSplit), function(y){list(name=y,children=makeList(listSplit[[y]]))})
     }else{
       lapply(seq(nrow(x[1])), function(y){
-      	list(name=x[,1][y],
-      		 size=x[,2][y]
+      	list(name=x[,"label"][y],
+      		 size=x[,"size"][y],
+      		 scaledsize=x[,"scaledsize"][y],
+      		 topwords=x[,"topwords"][y]
       	)})
     }
   }
