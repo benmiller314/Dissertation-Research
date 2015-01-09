@@ -108,8 +108,8 @@ frameToJSON <- function(dataset_name="consorts",
   topic.labels.dt <- topic.labels.dt[!Topic %in% bad.topics]	# exclude non-content-bearing topics
     
   #Rolf: Now put this information into a table, together with the labels and the order in which they should appear:
-  # Ben adds: use gsub to remove spaces (this seems to help the d3 scrollover)
-  b <- data.table(sapply(membVars, get), label=gsub(' ', '_', topic.labels.dt[, Label]), topwords=topic.labels.dt[, Top.Words], order=hc$order)
+  # Ben adds: use gsub to remove spaces (this seems to help the d3 scrollover); add topic number to aid in merging w/ edge table later
+  b <- data.table(sapply(membVars, get), label=gsub(' ', '_', topic.labels.dt[, Label]), topic=topic.labels.dt[, Topic], topwords=topic.labels.dt[, Top.Words], order=hc$order)
 
   #Rolf: We might want to know the size of each node. Let's add that
   # Ben: for a topic model, this will find the total %-point contribution of the topic to all docs;
@@ -207,6 +207,7 @@ cotopic_edges <- function(dataset_name="consorts",
 	# aggregate all edges by source
 	edges <- cotopics_both[, .SD[, list("targets"=paste(target, collapse=","), "weights"=paste(weight, collapse=","))], by=source]
 	setkey(edges, source)
+	# head(edges)
 	
 	# Bring in the node table
 	b <- frameToJSON(dataset_name, ntopics, bad.topics=bad.topics, do.plot=F)
@@ -214,7 +215,7 @@ cotopic_edges <- function(dataset_name="consorts",
 	# head(b)
 	
 	# merge
-	b <- merge(b, edges, all.x=T) 
+	b <- edges[b, ]
 	
 	# Create a "name" column that collapses the hierarchical structure and topic label, 
 	# as per http://fredheir.github.io/dendroArcs/pages/hierarc/test.JSON
