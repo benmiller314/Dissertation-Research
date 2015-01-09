@@ -7,19 +7,30 @@
 # 2. For all combinations of two elements in A, create a new row in a source-target table called "cotopics."
 	
 	
-get.cotopics <- function(dataset_name="consorts", ntopics=55, level=.10, json=F, min=1) {
+get.cotopics <- function(dataset_name="consorts", 
+						 ntopics=55, 
+						 level=.12, 				# what fraction of the doc (out of 1) must each topic account for?
+						 json=F, 					# export to JSON?
+						 min=3,						# how many times must these topics co-occur to be "co-topics"?
+						 bad.topics=c("2", "4", "22", "24", "47")	# exclude non-content-bearing topics
+						 ) {
 	require(data.table)
 
 	if (!exists("get.doctopic.grid", mode="function")) { source(file="get doctopic grid.R") }
 	grid <- get.doctopic.grid(dataset_name, ntopics)$outputfile
-		
+	head(grid)
+	grid <- grid[, !names(grid) %in% bad.topics]
+	head(grid)
+
 	cotopics <- data.frame(row.names=c("source","target"))	# start empty, build up.
 	for (i in 1:nrow(grid)) { 								# loop through the documents (rows). in each,
 		A <- which(grid[i, 2:length(grid)] > level)			# find which topics (columns) make up a big chunk. 
 		if (length(A) >= 2) {								# can't combine just one thing.
+			A <- as.integer(names(grid[, 1+A]))				# don't forget to get topic names, not col numbers!
 			cotopics <- cbind(cotopics, combn(A,2))			# find all pairs of those big-chunk topics.
 		} 
 	}
+
 	
 	# the data.frame gave us a wide array; switch to a long one.
 	cotopics <- t(cotopics)
@@ -35,17 +46,17 @@ get.cotopics <- function(dataset_name="consorts", ntopics=55, level=.10, json=F,
 
 	# print and optionally save the result	
 	if(autorun) { 
-	print(cotopics) 
-	
-	if(remake_figs) { 
-		if(json) {
-			require(jsonlite)
-			filename <- paste0(imageloc, dataset_name, "k", ntopics, "_edges_", level*100, ".json")
-			cat(toJSON(cotopics), file=filename)
-		} else {
-		filename <- paste0(imageloc, "co-topic edge table, ", dataset_name, ", k", ntopics, ", ", level*100, "pct.csv")
-		write.csv(cotopics, filename)
-		}
+		print(cotopics) 
+		
+		if(remake_figs) { 
+			if(json) {
+				require(jsonlite)
+				filename <- paste0(imageloc, dataset_name, "k", ntopics, "_edges_", level*100, ".json")
+				cat(toJSON(cotopics), file=filename)
+			} else {
+			filename <- paste0(imageloc, "co-topic edge table, ", dataset_name, ", k", ntopics, ", ", level*100, "pct_nobads.csv")
+			write.csv(cotopics, filename)
+			}
 	}
 	}
 	

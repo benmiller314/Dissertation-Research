@@ -105,7 +105,7 @@ frameToJSON <- function(dataset_name="consorts",
   # Ben: get topic labels, which you've composed elsewhere using 'top docs per topic.R'
   if(!exists("get_topic_labels", mode="function")) { source(file="get topic labels.R") }
   topic.labels.dt <- get_topic_labels(dataset_name, ntopics)
-  topic.labels.dt <- topic.labels.dt[!Topic %in% bad.topics]
+  topic.labels.dt <- topic.labels.dt[!Topic %in% bad.topics]	# exclude non-content-bearing topics
     
   #Rolf: Now put this information into a table, together with the labels and the order in which they should appear:
   # Ben adds: use gsub to remove spaces (this seems to help the d3 scrollover)
@@ -189,36 +189,29 @@ cotopic_edges <- function(dataset_name="consorts",
 						  ){
 	# set default parameters if needed
 	if(is.null(outfile)) {				# the desired location of the JSON file produced by the function
-  		outfile <- paste0(webloc, "/", "edges_", dataset_name, "k", ntopics, "_", level*100, "pct_min", min, ".json")
+  		outfile <- paste0(webloc, "/", "edges_", dataset_name, "k", ntopics, "_", level*100, "pct_min", min, "_nobads.json")
 	}
 
 	# get co-occurring topics, for hierarchical edge bundling
 	if(!exists("get.cotopics")) { source(paste0(sourceloc, "cotopics.R")) }
 	cotopics <- get.cotopics(dataset_name, ntopics, level, min)
+
+	# # exclude non-content-bearing topics		# UPDATE: now taken care of in cotopics.R, but check to make sure.
+	# cotopics <- cotopics[!(source %in% bad.topics)]
+	# cotopics <- cotopics[!(target %in% bad.topics)]
 	  
 	# that gives one-directional links; to ensure symmetry, flip source and target and combine.
 	cotopics_flip <- data.table(source=cotopics$target, target=cotopics$source, weight=cotopics$weight)
 	cotopics_both <- rbind(cotopics, cotopics_flip)
-	
-	# exclude non-content-bearing topics		****TO DO: Take care of this earlier, so the hierarchy still works****
-	cotopics_both <- cotopics_both[!(source %in% bad.topics)]
-	cotopics_both <- cotopics_both[!(target %in% bad.topics)]
-	
 	  
 	# aggregate all edges by source
 	edges <- cotopics_both[, .SD[, list("targets"=paste(target, collapse=","), "weights"=paste(weight, collapse=","))], by=source]
 	setkey(edges, source)
 	
 	# Bring in the node table
-	b <- frameToJSON(dataset_name, ntopics, do.plot=F)
-	
-	# add a column of topic numbers to our node table, just to help merge with the edge table
-	b$source <- 1:nrow(b)
-	setkey(b, source)
-	
-	# exclude non-content-bearing topics		****TO DO: Take care of this earlier, so the hierarchy still works****
-	b <- b[!(source %in% bad.topics)]
-
+	b <- frameToJSON(dataset_name, ntopics, bad.topics=bad.topics, do.plot=F)
+	setkey(b, topic)
+	# head(b)
 	
 	# merge
 	b <- merge(b, edges, all.x=T) 
@@ -226,39 +219,40 @@ cotopic_edges <- function(dataset_name="consorts",
 	# Create a "name" column that collapses the hierarchical structure and topic label, 
 	# as per http://fredheir.github.io/dendroArcs/pages/hierarc/test.JSON
 	
-	b$name <- b[, paste(memb2, memb5, memb10, memb22, label, sep=".")]
+	b$name <- b[, paste(memb2, memb4, memb6, memb7, memb12, memb16, memb32, label, sep=".")]
 	# b$name <- b[, paste(memb2, memb5, memb10, memb22, paste0("_",as.character(source)), sep=".")]
 	 
 	# We're going to build our JSON for edge bundling with a name, size, and (to take advantage of 
 	# Mike Bostock's http://mbostock.github.io/d3/talk/20111116/packages.js) we'll call the edges "imports"
 	# We start empty...
-	edge_bund <- data.table(name=rep("NA", max(b$source)), size=0.0, imports=list("NA"))
+	edge_bund <- data.table(name=rep("NA", max(b$source)), topic=0, size=0.0, imports=list("NA"))
 	
 	# ... and then build up
 	for (i in b$source) {
-		edge_bund[i, "name"] <- b[i, name]
-		edge_bund[i, "size"] <- round(b[i, size], 0)
-		imports <- lapply(strsplit(b[i, targets], ","), FUN=function(x) {
-				x <- as.integer(x)
-				b[x, name]
+		edge_bund[i, "topic"] <- i
+		edge_bund[i, "name"] <- b[source %in% i, name]
+		edge_bund[i, "size"] <- round(b[source %in% i, size], 0)
+		imports <- lapply(strsplit(b[source %in% i, targets], ","), FUN=function(x) {		# extract targets' topic numbers
+				x <- as.integer(x)												# convert from string to numeric
+				b[source %in% x, name]											# match topic numbers to sources
 			})
-		weights <- lapply(strsplit(b[i, weights], ","), FUN=function(x) {
-				x <- as.integer(x)
+		weights <- lapply(strsplit(b[source %in% i, weights], ","), FUN=function(x) {
+				x <- as.integer(x)										# weights correspond by position in array
 			})	
-		if(!anyNA(imports)) { 
+		if(!anyNA(imports[[1]])) { 
 			edge_bund[i, "imports"] <- list(imports) 		# list edges if there are any
 			edge_bund[i, "weights"] <- list(weights) 
 		} else {
-			edge_bund[i, "imports"] <- list(b[i, name])		# otherwise, make a loop back to itself
+			edge_bund[i, "imports"] <- list(b[source %in% i, name])		# otherwise, make a loop back to itself
 			edge_bund[i, "weights"] <- list(1)			# and call the weight "1"
 		}
 	}
 
-	# Now remove any lingering NAs introduced by cutting bad.topics
+	# Now remove any empty rows introduced by cutting bad.topics
 	edge_bund <- edge_bund[!(name %in% "NA")]
 
 	jsonEdge <- toJSON(edge_bund, pretty=TRUE)
-	cat(jsonEdge, file=paste0(outfile, " no bad topics"))
+	cat(jsonEdge, file=outfile)
 	return(jsonEdge)
 }
 
