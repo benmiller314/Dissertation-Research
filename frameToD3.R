@@ -261,7 +261,11 @@ cotopic_edges <- function(dataset_name="consorts",
 	return(jsonEdge)
 }
 
-if(autorun) { frameToJSON(dt,groupVars,dataVars,outfile="data.json") }
+
+if(autorun) { 
+	# remake_figs <- F
+	frameToJSON(do.plot=FALSE) 
+}
 if(autorun) { 
 	cotopic_edges(level=0.12, min=1)		# 12% determined by `variation of topic proportions.R` to include
 	cotopic_edges(level=0.12, min=2)		# nearly all primary topics and 3/4 of secondary topics;
