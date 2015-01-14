@@ -109,7 +109,7 @@ frameToJSON <- function(dataset_name="consorts",
     
   #Rolf: Now put this information into a table, together with the labels and the order in which they should appear:
   # Ben adds: use gsub to remove spaces (this seems to help the d3 scrollover); add topic number to aid in merging w/ edge table later
-  b <- data.table(sapply(membVars, get), label=gsub(' ', '_', topic.labels.dt[, Label]), topic=topic.labels.dt[, Topic], topwords=topic.labels.dt[, Top.Words], order=hc$order)
+  b <- data.table(sapply(membVars, FUN=function(var){ get(as.character(var)) } ), label=gsub(' ', '_', topic.labels.dt[, Label]), topic=topic.labels.dt[, Topic], topwords=topic.labels.dt[, Top.Words], order=hc$order)
 
   #Rolf: We might want to know the size of each node. Let's add that
   # Ben: for a topic model, this will find the total %-point contribution of the topic to all docs;
