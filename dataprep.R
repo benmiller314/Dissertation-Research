@@ -16,7 +16,7 @@ setwd(sourceloc)
 imageloc <- paste0(sourceloc, "../Dissertation Research - Figures/")
 dataloc <- paste0(sourceloc, "../")
 malletloc <- "/Users/benmiller314/mallet-2.0.7"
-webloc <- "/Users/benmiller314/Documents/Webdev/radial_clusters"
+webloc <- "/Users/benmiller314/Documents/Webdev/datavis_testing"
 
 
 # name the method tags most of these analyses are interested in
