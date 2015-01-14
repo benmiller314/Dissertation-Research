@@ -235,6 +235,8 @@ cotopic_edges <- function(dataset_name="consorts",
 		edge_bund[i, "topic"] <- i
 		edge_bund[i, "name"] <- b[source %in% i, name]
 		edge_bund[i, "size"] <- round(b[source %in% i, size], 0)
+		edge_bund[i, "scaledsize"] <- round(b[source %in% i, scaledsize] * 100, 1)
+		edge_bund[i, "topwords"] <- b[source %in% i, topwords]
 		imports <- lapply(strsplit(b[source %in% i, targets], ","), FUN=function(x) {		# extract targets' topic numbers
 				x <- as.integer(x)												# convert from string to numeric
 				b[source %in% x, name]											# match topic numbers to sources
@@ -248,7 +250,7 @@ cotopic_edges <- function(dataset_name="consorts",
 		} else {
 			edge_bund[i, "imports"] <- list(b[source %in% i, name])		# otherwise, make a loop back to itself
 			edge_bund[i, "weights"] <- list(1)			# and call the weight "1"
-		}
+		}		
 	}
 
 	# Now remove any empty rows introduced by cutting bad.topics
