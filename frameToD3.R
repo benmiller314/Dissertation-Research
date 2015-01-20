@@ -25,7 +25,7 @@ frameToJSON <- function(dataset_name="consorts",
   dt <- as.data.table(get.doctopic.grid(dataset_name, ntopics)$outputfile)
 
   # Ben: Exclude non-content-bearing topics
-  dt <- dt[, !names(dt) %in% bad.topics, with=F]
+  if(!is.null(bad.topics)) { dt <- dt[, !names(dt) %in% bad.topics, with=F] }
 
   # Set parameter defaults if needed
   if(is.null(groupVars)) {				
@@ -51,13 +51,19 @@ frameToJSON <- function(dataset_name="consorts",
   # Ben: I'm making this section optional, because it makes the most sense early on and has diminishing returns.
   if(do.plot) {  
 	  #Rolf: take a look at your strucutre:
-	  plot(hc)
+	  # Ben: optionally save clustering figure
+	  main <- paste0("Cluster Dendrogram: ", dataset_name, ", ", ntopics, " topics")
+	  if(remake_figs) { pdf(file=paste0(imageloc, main, ".pdf")) }
+	  plot(hc, main=main)
 	  
 	  # Ben: Try various cut levels until you find a set that seems interesting; 
 	  # Then adjust the memb# variables below, accordingly.
-	  rect.hclust(hc, k=50, col="#111111")
+	  abline(1.475, 0, col="#990099")
+	  # rect.hclust(hc, k=55, border="#111111")
 	  # x <- identify(hc, n=13)
-	  # rect.hclust(hc, k=55, border="#9999FF")
+	  rect.hclust(hc, k=55, border="#EE99EE")
+	
+	  		if(remake_figs) { dev.off() }
 	
 	  abline(1.35, 0, col="#99FF99")
 	  rect.hclust(hc, k=32, border="#99FF99")
@@ -105,11 +111,14 @@ frameToJSON <- function(dataset_name="consorts",
   # Ben: get topic labels, which you've composed elsewhere using 'top docs per topic.R'
   if(!exists("get_topic_labels", mode="function")) { source(file="get topic labels.R") }
   topic.labels.dt <- get_topic_labels(dataset_name, ntopics)
-  topic.labels.dt <- topic.labels.dt[!Topic %in% bad.topics]	# exclude non-content-bearing topics
+	# str(topic.labels.dt)
+  
+  # exclude non-content-bearing topics
+  if(!is.null(bad.topics)) { topic.labels.dt <- topic.labels.dt[!Topic %in% bad.topics]	}
     
   #Rolf: Now put this information into a table, together with the labels and the order in which they should appear:
   # Ben adds: use gsub to remove spaces (this seems to help the d3 scrollover); add topic number to aid in merging w/ edge table later
-  b <- data.table(sapply(membVars, FUN=function(var){ get(as.character(var)) } ), label=gsub(' ', '_', topic.labels.dt[, Label]), topic=topic.labels.dt[, Topic], topwords=topic.labels.dt[, Top.Words], order=hc$order)
+  b <- data.table(sapply(membVars, FUN=function(var){ get(as.character(var)) } ), label=gsub(' ', '_', topic.labels.dt[, Label]), topic=topic.labels.dt[, Topic], topwords=topic.labels.dt[, Top.Words], rank=topic.labels.dt[, Rank], order=hc$order)
 
   #Rolf: We might want to know the size of each node. Let's add that
   # Ben: for a topic model, this will find the total %-point contribution of the topic to all docs;
@@ -149,7 +158,9 @@ frameToJSON <- function(dataset_name="consorts",
       	list(name=x[,"label"][y],
       		 size=x[,"size"][y],
       		 scaledsize=x[,"scaledsize"][y],
-      		 topwords=x[,"topwords"][y]
+      		 topwords=x[,"topwords"][y],
+      		 topic=x[,"topic"][y],
+      		 rank=x[,"rank"][y]
       	)})
     }
   }
@@ -158,7 +169,7 @@ frameToJSON <- function(dataset_name="consorts",
   b.df <- data.frame(b)
   out <- makeList(b.df)
   # str(out)
-  toJSON(out)
+  # toJSON(out)
 
   # Have a look at the structure this creates:
   if(autorun) { print (head(out)) }
@@ -221,7 +232,6 @@ cotopic_edges <- function(dataset_name="consorts",
 	
 	# Create a "name" column that collapses the hierarchical structure and topic label, 
 	# as per http://fredheir.github.io/dendroArcs/pages/hierarc/test.JSON
-	
 	b$name <- b[, paste(memb2, memb4, memb6, memb7, memb12, memb16, memb32, label, sep=".")]
 	# b$name <- b[, paste(memb2, memb5, memb10, memb22, paste0("_",as.character(source)), sep=".")]
 	 
@@ -234,6 +244,7 @@ cotopic_edges <- function(dataset_name="consorts",
 	for (i in b$source) {
 		edge_bund[i, "topic"] <- i
 		edge_bund[i, "name"] <- b[source %in% i, name]
+		edge_bund[i, "rank"] <- b[source %in% i, rank]
 		edge_bund[i, "size"] <- round(b[source %in% i, size], 0)
 		edge_bund[i, "scaledsize"] <- round(b[source %in% i, scaledsize] * 100, 1)
 		edge_bund[i, "topwords"] <- b[source %in% i, topwords]
@@ -263,8 +274,9 @@ cotopic_edges <- function(dataset_name="consorts",
 
 
 if(autorun) { 
-	# remake_figs <- F
-	frameToJSON(do.plot=FALSE) 
+	remake_figs
+	frameToJSON(do.plot=FALSE)
+	frameToJSON(ntopics=150, bad.topics=NULL)
 }
 if(autorun) { 
 	cotopic_edges(level=0.12, min=1)		# 12% determined by `variation of topic proportions.R` to include
