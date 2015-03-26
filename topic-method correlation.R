@@ -6,7 +6,7 @@ methods_for_topic <- function(	dataset_name = "consorts",
 								tagset_name  = "tagnames",
 								ntopics		 = 55,		
 								mytopic 	 = 32,		# the top topic, 'students in the classroom', as numeric
-								cutoff 		 = 0.25,	# what fraction of the diss must this topic contribute
+								cutoff 		 = 0.12,	# what fraction of the diss must this topic contribute
 														# for the diss to count as 'in' the topic?
 								do.barplot   = TRUE) {	# should we plot the results, or compute silently?
 
