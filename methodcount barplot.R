@@ -47,8 +47,10 @@ methods.barplot <- function(dataset_name="noexcludes", tagset_name="tagnames") {
 }
 
 if (autorun) {
+	remake_figs
 	methods.barplot("noexcludes")
 	methods.barplot("consorts")
 	methods.barplot("nonconsorts")
 	methods.barplot("top.nonconsorts", "blah")
+	methods.barplot("consorts.plus")
 } 
