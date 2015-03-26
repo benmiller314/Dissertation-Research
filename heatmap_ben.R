@@ -7,12 +7,14 @@ heatmap.ben <- function (
 	lowval   = "#FAFAFA",	# lightest color
 	numCols  = 10,			# how many different shades?
 	rowscale = FALSE,		# should we norm each row by tag totals?
-	verbose  = TRUE			# should we add a subtitle explaining about solo tags?
+	verbose  = TRUE,		# should we add a subtitle explaining about solo tags?
+	legend   = TRUE,		# should we output a separate file with a legend for the color map?
 	) {
-	
+
 	# extract the matrix, if need be
 	if(!is.matrix(sum.by.tags)) {
 		sum.by.tags.s <- sum.by.tags$correlations
+		if(is.null(sum.by.tags.s)) { sum.by.tags.s <- as.matrix(sum.by.tags) }
 	} else { sum.by.tags.s <- sum.by.tags }
 	
 	# is it symmetrical?
@@ -45,19 +47,48 @@ heatmap.ben <- function (
 		totals <- sum.by.tags$total.counts			# get the totals from the sumbytags() list object
 		totals <- totals[rowInd]					# put it in the same order as the rows
 		sum.by.tags.s <- apply(sum.by.tags.s, 1, 	# divide each row by the total of that row's tag
-			FUN=function(x) {x/totals})
+			FUN=function(x) { x/totals })
 		sum.by.tags.s <- round(sum.by.tags.s, 2) 	# round to make it prettier
+		sapply(sum.by.tags.s, FUN=function(x) { if(is.na(x)) x <- 0 })
     }
 
 	# color function
-	colorme <- function (val) {
+		if(rowscale) {					# if we're norming rows, use white for 0 and black for 100%
+			max.val <- 1
+			min.val <- 0
+			highval <- "#000000"
+			lowval  <- "#FFFFFF"
+		} else {
+			if(any(sum.by.tags.s == 0)) { lowval <- "#FFFFFF" }
+			max.val <- max(sum.by.tags.s)
+			min.val <- min(sum.by.tags.s)
+		}
+
 		pal <- colorRampPalette(c(lowval, highval))
 		cols <- pal(numCols)
-		max.val <- max(sum.by.tags.s)
-		min.val <- min(sum.by.tags.s)
+
+	colorme <- function (val) {
 		colIndex <- round(numCols * (val - min.val) / (max.val - min.val))
 		colIndex <- max(1,colIndex)
 		return(cols[colIndex])
+	}
+	
+	if(legend) {
+		if(remake_figs) { 
+			if(rowscale) {
+				filename <- paste0(imageloc, "color legend for ", sum.by.tags$dataset, " method correlations, normed.pdf")
+			} else {
+				filename <- paste0(imageloc, "color legend for ", sum.by.tags$dataset, " method correlations, raw.pdf")
+			}
+			pdf(filename)
+		}
+		xleft <- seq(0, 1, length.out=numCols)
+		xdiff <- xleft[2]-xleft[1]
+		plot(0, 0, xlim=c(0,1+xdiff), ylim=c(0,1), type="n", xaxt="n", yaxt="n", xlab="", ylab="", bty="n")
+		rect(xleft=xleft, xright=xleft+xdiff, ybottom=1, ytop=1-xdiff, col=cols)
+		text(x=xleft+xdiff/2, y=1-2*xdiff, labels=round(seq(min.val, max.val, length.out=numCols), 1))
+
+		if(remake_figs) { dev.off() }
 	}
 
 	# set up a blank canvas of the right size
