@@ -176,7 +176,7 @@ frameToJSON <- function(dataset_name="consorts",
   
   #Rolf: Basically we have made a list of lists containing the information from the tree diagram.
   #Finally we put everything into a list, convert this to json format and save it as data.json
-  jsonOut<-toJSON(list(name="1of1",children=out))
+  jsonOut<-toJSON(list(name="1of1",children=out), digits=6, pretty=TRUE)
 
   #Rolf: We use the cat function here, because in some cases you may want to add separators, or a prefix and suffix to make the formatting just right
 	# Ben adds: to avoid overwriting, only save this file if remake_figs is TRUE
@@ -245,8 +245,8 @@ cotopic_edges <- function(dataset_name="consorts",
 		edge_bund[i, "topic"] <- i
 		edge_bund[i, "name"] <- b[source %in% i, name]
 		edge_bund[i, "rank"] <- b[source %in% i, rank]
-		edge_bund[i, "size"] <- round(b[source %in% i, size], 0)
-		edge_bund[i, "scaledsize"] <- round(b[source %in% i, scaledsize] * 100, 1)
+		edge_bund[i, "size"] <- b[source %in% i, size]
+		edge_bund[i, "scaledsize"] <- b[source %in% i, scaledsize] * 100
 		edge_bund[i, "topwords"] <- b[source %in% i, topwords]
 		imports <- lapply(strsplit(b[source %in% i, targets], ","), FUN=function(x) {		# extract targets' topic numbers
 				x <- as.integer(x)												# convert from string to numeric
