@@ -27,7 +27,7 @@ methodfreq_combined <- function(bigset="noexcludes", smallset="consorts", diffse
 	a=get_tags(bigset)
 	b=get_tags(smallset)
 	d=get_tags(diffset)
-	if (remake_figs) { filename <- paste0(imageloc, main, ".pdf"); pdf(file=filename) }
+	if (remake_figs) { filename <- paste0(imageloc, main, ", ", smallset," within ", bigset, ".pdf"); pdf(file=filename) }
 		# plot noexcludes as a baseline
 		barplot(a[order(a)], horiz=TRUE, xpd=FALSE, las=1, axes=FALSE, main=main, col="gray80")
 		text(x=a[order(a)]+30, y=seq(from=0.7,to=18.7,length.out=16), labels=a[order(a)])
@@ -40,14 +40,15 @@ methodfreq_combined <- function(bigset="noexcludes", smallset="consorts", diffse
 		# barplot(-d[order(a)], las=1, horiz=TRUE, xpd=FALSE, axes=FALSE, col="gray90")
 		text(x=a[order(a)]-d[order(a)]+30, y=seq(from=0.7,to=18.7,length.out=16), labels=d[order(a)])
 		
-		mtext("Tags are non-exclusive, so sum will be greater than the 2,711 dissertations.", side=1)
-		
+		mtext(paste("Tags are non-exclusive, so sum will be greater than the", nrow(get(bigset)), "included dissertations.", side=1))
 		legend(x="bottomright", c(smallset, diffset), fill=c("white","gray80"), bty="n")
 	if (remake_figs) { dev.off() }
 }
 
-if(autorun) { 
+if(autorun) {
+	remake_figs
 	methodfreq_combined() 
+	methodfreq_combined(bigset="consorts.plus", smallset="consorts", diffset="top.nonconsorts") 
 }
 
 ## Step 3. Compare ranks of consorts vs. nonconsorts; leave out Othr
