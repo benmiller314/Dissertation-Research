@@ -130,8 +130,10 @@ if (autorun) {
 	# call the functions for all relevant datasets
 	schoolwise("consorts", "tagnames", agn=T, hcl=F, dia=F)
 	schoolwise("nonconsorts", "tagnames", agn=T, hcl=F, dia=F)
+	schoolwise("top.nonconsorts", "tagnames", agn=T, hcl=F, dia=F)
 	schoolwise("noexcludes", "tagnames")
 	# schoolwise("nonconsorts", "tagnames", agfixedcols=a$ag$colInd, difixedcols=a$di$colInd)
+	schoolwise("consorts.plus", agn=T, hcl=F, dia=F)
 	
 	# next up: re-run with the simplified schema
 	schoolwise("consorts", "tagnames.simple")
