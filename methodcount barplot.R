@@ -1,7 +1,7 @@
 # 'methodcount barplot.R'
 # Produces a bar plot of method-tag counts per dissertation
 
-if(!exists("noexcludes") {source(file="start here.R")}
+if (!exists("noexcludes")) {source('/Users/benmiller314/Dropbox/coursework, etc/dissertation/data, code, and figures/Dissertation Research/start here.R')}
 
 methods.barplot <- function(dataset_name="noexcludes", tagset_name="tagnames") {
 	if(tagset_name=="tagnames" || tagset_name=="tagnames.long") {

@@ -52,7 +52,7 @@ frameToJSON <- function(dataset_name="consorts",
   if(do.plot) {  
 	  #Rolf: take a look at your strucutre:
 	  # Ben: optionally save clustering figure
-	  main <- paste0("Cluster Dendrogram: ", dataset_name, ", ", ntopics, " topics")
+	  main <- paste0("Cluster Dendrogram, ", dataset_name, ", ", ntopics, " topics")
 	  if(remake_figs) { pdf(file=paste0(imageloc, main, ".pdf")) }
 	  plot(hc, main=main)
 	  
@@ -274,7 +274,7 @@ cotopic_edges <- function(dataset_name="consorts",
 
 
 if(autorun) { 
-	remake_figs
+	remake_figs <- F
 	frameToJSON(do.plot=FALSE)
 	frameToJSON(ntopics=150, bad.topics=NULL)
 }
@@ -283,4 +283,5 @@ if(autorun) {
 	cotopic_edges(level=0.12, min=2)		# nearly all primary topics and 3/4 of secondary topics;
 	cotopic_edges(level=0.12, min=3)	# see `Variation of Topic Proportions, Top 10 Topics per Document.pdf`
 	cotopic_edges(level=0.12, min=4)
+	cotopic_edges(level=0.12, min=5)
 }

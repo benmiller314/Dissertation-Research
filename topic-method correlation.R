@@ -25,7 +25,7 @@ methods_for_topic <- function(	dataset_name = "consorts",
 	# Extract only the docs with high levels of that topic
 	index <- a1[, as.character(mytopic), with=F] > cutoff
 	mydocs <- as.data.frame(a1)[index,]$Pub.number		# data.table is being super-stinky 
-														# about subsetting; e.g. a1[index, ] 
+	# a1[as.vector(index),]								# about subsetting; e.g. a1[index, ] 
 														# is returning an error, even when 
 														# a1 has only one column (mytopic)
 
@@ -48,7 +48,7 @@ methods_for_topic <- function(	dataset_name = "consorts",
 	label <- get_topic_labels(dataset_name, ntopics)[mytopic, Label]
 	main <- paste0("Frequency of Assigned Method Tags for Topic ", mytopic, " (", label, ")")
 
-	if(autorun && do.barplot) {
+	if(do.barplot) {
 		if (remake_figs) { filename <- paste0(imageloc, main, ".pdf"); pdf(file=filename) }
 			barplot(a5[order(a5)], horiz=TRUE, xpd=FALSE, las=1, axes=FALSE, main=main, col="gray80")
 			text(x      = rep(2.5, length(a5)), 
@@ -141,8 +141,11 @@ methods_in_cotopics <- function(dataset_name="consorts", ntopics=55, focal_topic
 		title(main="Method ranks in co-occurring topics", sub=paste("# of co-occurrences:", test[i, weight]))
 	}
 }
-methods_in_cotopics(focal_topic=32)
+if(autorun) {
+	methods_in_cotopics(focal_topic=32)
+}
 
+## TO DO: methods_in_cotopics_3d
 methods_in_cotopics_3d <- function(dataset_name="consorts", tagset_name="tagnames", ntopics=55, focal_topic=NULL, level=0.25) {
 	if(!exists("get.cotopics", mode="function")) { source(file="cotopics.R") }
 	if(!exists("get_topic_labels", mode="function")) { source(file="get topic labels.R") }

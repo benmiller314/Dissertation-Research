@@ -52,6 +52,7 @@ get.doctopic.grid <- function(dataset_name="consorts", ntopics=55, doplot=F) {
 	# Optionally get an overview of the topic sizes, as a scatterplot
 	if(doplot) {
 		plot(2:length(colsums), colsums.sort[2:length(colsums)], xlab="topic numbers (arbitrary)", ylab="sum of contributions", xaxt="n")
+		# barplot(colsums.sort[2:length(colsums)], xlab="topic numbers (arbitrary)", ylab="sum of contributions", xaxt="n", xpd=F)
 		text(x=1+2:length(colsums), y=1+colsums.sort[2:length(colsums)], labels=names(colsums.sort[2:length(colsums)]))
 	}
 	
