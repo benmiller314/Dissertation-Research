@@ -9,6 +9,7 @@ heatmap.ben <- function (
 	rowscale = FALSE,		# should we norm each row by tag totals?
 	verbose  = TRUE,		# should we add a subtitle explaining about solo tags?
 	legend   = TRUE,		# should we output a separate file with a legend for the color map?
+	dendro	 = FALSE		# should we output dendrograms showing method clustering?
 	) {
 
 	# extract the matrix, if need be
@@ -111,6 +112,7 @@ heatmap.ben <- function (
 	# add axis labels
 	axis(side=2, at=n.row:1, labels=rownames(sum.by.tags.s), pos=0.5, las=2, col="white")
 	axis(side=1, at=1:n.col, labels=colnames(sum.by.tags.s), pos=0.5, las=2, col="white")
+	plot(ddc)
 	
 	# add subtitle indicating scaled / not scaled
 	if (verbose) {
@@ -123,5 +125,28 @@ heatmap.ben <- function (
 		}
 		
 		title(sub=h2)
+	}
+	
+	if(dendro) {
+		if(remake_figs) { 
+			if(rowscale) {
+				filename <- paste0(imageloc, "dendrogram for ", sum.by.tags$dataset, " method column correlations.pdf")
+			} else {
+				filename <- paste0(imageloc, "dendrogram for ", sum.by.tags$dataset, " method correlations, raw.pdf")
+			}
+			pdf(filename)
+		}
+		plot(ddc)
+		if(remake_figs) { dev.off() }
+		
+		if(rowscale) { 
+			if(remake_figs) {
+				filename <- paste0(imageloc, "dendrogram for ", sum.by.tags$dataset, " method row correlations.pdf")
+				pdf(filename)
+			} 
+		plot(ddr)
+			if(remake_figs) { dev.off() }
+
+		}
 	}
 }
