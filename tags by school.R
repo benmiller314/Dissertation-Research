@@ -9,8 +9,6 @@ if(!exists("imageloc")) {
 	source(file="dataprep.R")
 }
 
-# set broad parameters
-myCol <- brewer.pal(9, "PuRd")
 
 # function for getting data
 schoolwise.data <- function(dataset_name="consorts", tagset_name="tagnames") {
@@ -39,8 +37,13 @@ schoolwise <- function(dataset_name="noexcludes", tagset_name="tagnames",
 						dia=TRUE, 			# run divisive clustering (using diana)?
 						counts=FALSE, 		# label each row with the number of dissertations per school?
 						agfixedcols=NULL, 	# optional pre-set order of columns for comparison btwn agnes plots
-						difixedcols=NULL) 	# optional pre-set order of columns for comparison btwn diana plots
+						difixedcols=NULL, 	# optional pre-set order of columns for comparison btwn diana plots
+						myCol=NULL)			# optional color palette
 	{
+	
+	# if colors are not provided, default to black and white
+	require(RColorBrewer)
+	if(is.null(myCol)) { myCol <- brewer.pal(9, "Greys") }
 	
 	# 0. convert variable names to variables. we'll use the names later in the figure titles.
 	dataset <- get(dataset_name)
