@@ -74,4 +74,12 @@ sumbytags <- function(dataset_name="noexcludes", tagset_name="tagnames", doplot=
 }
 
 # Run it when the file is called
-if (autorun) { sum.by.tags <- sumbytags() }
+if (autorun) { 
+	remake_figs 
+	# sum.by.tags <- sumbytags() 
+	sumbytags("consorts.plus")
+	sumbytags("consorts.plus", normed=T)
+	sumbytags("top.nonconsorts")
+	sumbytags("consorts", dendro=T, normed=T)
+}
+
