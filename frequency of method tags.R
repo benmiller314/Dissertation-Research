@@ -52,23 +52,3 @@ if(autorun) {
 
 ## Step 3. Compare ranks of consorts vs. nonconsorts; leave out Othr
 if(!exists("compare_method_ranks", mode="function")) { source(file="compare method ranks.R") }
-
-if(autorun) {
-	compare_method_ranks("consorts", "nonconsorts")
-	compare_method_ranks("nonconsorts", "top.nonconsorts")	
-}
-
-## Test significance
-## Update: performed Fischer Exact Test of Independence using online calculators and Excel
-
-# # # first vector: Tag in consorts vs. nonTag in consorts
-# x <- c(b["Expt"], 					# number of Tag in consorts
-	   # c["Expt"])
-
-# # second vector: Tag in consorts vs. nonTag in consorts
-# y <- c(nrow(consorts)-b["Expt"]), 	# total consorts diss-count minus number of Tag in consorts
-	   # nrow(nonconsorts)-c["Expt"])
-	   
-# chisq.test(as.matrix(x,y), correct=F)
-# z <- data.matrix(c(50,50), c(400,400))
-# chisq.test
