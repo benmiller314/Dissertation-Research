@@ -72,21 +72,33 @@ get.doc.composition <- function(dataset_name="consorts", ntopics=55) {
 }
 	
 # Helper function: retrieve top five topics for a given Pub.number
-get.topics4doc <- function(pubnum, dataset_name="consorts", ntopics=55) {
+get.topics4doc <- function(pubnum, dataset_name="consorts", ntopics=55, howmany=5, showlabels=FALSE) {
 		# get packages in case we've just restarted R
 		require(data.table)
 		
 		# pubnum <- "3051708"; doc_tops <- doc_topics.dt	# test values
+		
 		if (!is.character(pubnum)) { pubnum <- as.character(pubnum) }
-		
 		doc_tops <- get.doc.composition(dataset_name, ntopics)
-		topic_keys <- get.topickeys(dataset_name, ntopics)
-		
+		topic_keys <- data.table(get.topickeys(dataset_name, ntopics))
+		topic_keys <- topic_keys[as.numeric(doc_tops[pubnum, paste0("top", 1:howmany), with=F])]
+
+		if(showlabels) { 
+			if(!exists("get_topic_labels", mode="function")) { source(file="get topic labels.R") }
+			topic_labels <- data.table(get_topic_labels(dataset_name, ntopics), key="Topic")
+			topic_keys$current_label <- topic_labels[topic_keys$topic, Label]
+			topic_keys <- topic_keys[, list(topic, alpha, current_label, top_words)]
+			topic_keys
+		}
 		list("title" = noexcludes.dt[pubnum, c("Title", "Pub.number", tagnames), with=F],
-			"doc_tops" = doc_tops[pubnum, paste0(c("top","wgt"), rep(1:5, each=2)), with=F],
-			"keys" = topic_keys[as.numeric(doc_tops[pubnum, paste0("top", 1:5), with=F])],
+			"doc_tops" = doc_tops[pubnum, paste0(c("top","wgt"), rep(1:howmany, each=2)), with=F],
+			"keys" = topic_keys,
 			"abstract" = noexcludes.dt[pubnum, c("KEYWORDS", "ABSTRACT"), with=F]		
 			)
+
+	# if(autorun) {
+		# get.topics4doc(3028763, howmany=10, showlabels=T)
+	# }
 }
 
 # Browse through the top topics and their top-proportioned dissertations
@@ -99,7 +111,7 @@ top_topic_browser <- function(start.rank	 = 1, 				# assuming we're looping, sta
 	# get packages in case we've just restarted R
 	require(data.table)
 	
-	# load the data from the functions above
+	# load the data from the functions defined or imported above
 	doc_topics.dt <- get.doc.composition(dataset_name, ntopics)
 	topic_keys.dt <- get.topickeys(dataset_name, ntopics)
 	grids <- get.doctopic.grid(dataset_name, ntopics)
