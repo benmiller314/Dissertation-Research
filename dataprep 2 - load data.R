@@ -63,11 +63,13 @@ setequal(nonconsorts, (noexcludes[-consorts.index,]))
 
 # find top nonconsorts
 top.nonconsorts <- thresh("nonconsorts")$thresh.data
+consorts.plus <- rbind(consorts, top.nonconsorts)
 
 # re-factor all factor columns in all data subsets
 consorts <- refactor.all("consorts")
 nonconsorts <- refactor.all("nonconsorts")
 top.nonconsorts <- refactor.all("top.nonconsorts")
+consorts.plus <- refactor.all("consorts.plus")
 
 # make noexcludes easy to index and search
 library(data.table)
