@@ -82,12 +82,14 @@ get.topics4doc <- function(pubnum, dataset_name="consorts", ntopics=55, howmany=
 		doc_tops <- get.doc.composition(dataset_name, ntopics)
 		topic_keys <- data.table(get.topickeys(dataset_name, ntopics))
 		topic_keys <- topic_keys[as.numeric(doc_tops[pubnum, paste0("top", 1:howmany), with=F])]
+		topic_keys[,weight:=as.numeric(doc_tops[pubnum, paste0("wgt", 1:howmany), with=F])]
+		topic_keys <- topic_keys[, list(topic, weight, alpha, top_words)]
 
 		if(showlabels) { 
 			if(!exists("get_topic_labels", mode="function")) { source(file="get topic labels.R") }
 			topic_labels <- data.table(get_topic_labels(dataset_name, ntopics), key="Topic")
-			topic_keys$current_label <- topic_labels[topic_keys$topic, Label]
-			topic_keys <- topic_keys[, list(topic, alpha, current_label, top_words)]
+			topic_keys[, current_label:=topic_labels[topic_keys$topic, Label]]
+			topic_keys <- topic_keys[, list(topic, weight, alpha, current_label, top_words)]
 			topic_keys
 		}
 		list("title" = noexcludes.dt[pubnum, c("Title", "Pub.number", tagnames), with=F],
@@ -95,10 +97,6 @@ get.topics4doc <- function(pubnum, dataset_name="consorts", ntopics=55, howmany=
 			"keys" = topic_keys,
 			"abstract" = noexcludes.dt[pubnum, c("KEYWORDS", "ABSTRACT"), with=F]		
 			)
-
-	# if(autorun) {
-		# get.topics4doc(3028763, howmany=10, showlabels=T)
-	# }
 }
 
 # Browse through the top topics and their top-proportioned dissertations
