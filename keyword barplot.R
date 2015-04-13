@@ -20,8 +20,12 @@ keyword_barplot <- function(dataset_name="consorts.plus", 		# by default, show c
 	kw.count <- length(kw.table)
 	kw.mean <- mean(kw.table)
 	kw.median <- median(kw.table)
-	
-	how.many <- 30
+
+	# if no cutoff is given, default to showing all keywords (even if that's a crazy long tail)
+	if(is.null(how.many)) {
+		how.many <- kw.count
+	}
+
 	how.wide <- 10 * ceiling(1 + max(kw.table)/10)
 	
 	filename <- paste0(imageloc, "keyword barplot, top ", how.many, ", N",diss.count,".pdf")
