@@ -47,6 +47,52 @@ topic.proportions <- function(dataset_name="consorts", ntopics=55, bad.topics=NU
 		outliers <- outliers[order(outliers$V1, decreasing=T), ]
 		
 		# boxplot(outliers[, 2:ncol(outliers)])
+		
+		#####
+		# I have a hypothesis that these are mostly language-based topics. Let's look at the top topics represented here. 
+		# STRATEGY:
+		# 1. For each Pub.number, get top-ranked topic number by finding the max within that row of `grid`.
+		# 2. Make a table of these topic numbers.
+		# 3. Retrieve the labels for each topic in the table.
+		
+		mytopics <- c()							# start empty and build up
+		myvalues <- c()							# let's also see what those high percent-of-text values are
+		for (i in outliers$Pub.number) {
+			# i <- outliers$Pub.number[2] 		# testing value
+			row <- grid[which(grid$Pub.number==i), 2:ncol(grid), with=F]
+			mytopic <- which(row == max(row))
+			mytopics <- c(mytopics, mytopic)
+			myvalues <- c(myvalues, max(row))
+		}
+
+		# count 'em up
+		mytopics.t <- table(mytopics)
+
+		# get labels
+		if(!exists("get_topic_labels", mode="function")) { source(file="get topic labels.R") }
+		labels <- get_topic_labels(dataset_name, ntopics)
+		labels.t <- labels[unique(mytopics), Label, key=Topic]
+
+		# merge in the counts
+		labels.t[, "Outlier Count"] <- mytopics.t		
+
+		# merge in the values
+		b <- aggregate(data.frame(mytopics, myvalues), by=list(mytopics), FUN=c)
+		labels.t <- labels.t[b, ][,mytopics:=NULL]
+	
+		# sort by descending outlier frequency
+		labels.t <- labels.t[order(mytopics.t, decreasing=T), ]
+		
+		# report back
+		message("Upper outliers for top-ranked topics:")
+		print(labels.t)
+		
+		# Okay,	my hypothesis is false! All sorts of topics here. Interesting. 
+		# Still, I may want to remove the language topics, since they do tend to dominate their dissertations.
+		
+		
+		
+		
 		## Browse details of these outlier dissertations
 		if(!exists("get.topics4doc", mode="function")) { source(file="top docs per topic.R") }
 		if (!remake_figs) { 
