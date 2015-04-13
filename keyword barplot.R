@@ -28,25 +28,32 @@ keyword_barplot <- function(dataset_name="consorts.plus", 		# by default, show c
 
 	how.wide <- 10 * ceiling(1 + max(kw.table)/10)
 	
-	filename <- paste0(imageloc, "keyword barplot, top ", how.many, ", N",diss.count,".pdf")
-	pdf(file=filename)
-	
-	barplot(sort(kw.table[1:how.many],decreasing=FALSE),horiz=TRUE,main=paste("Top",how.many,"Keywords by Frequency"), axisnames=TRUE,width=c(10,10),space=0.4,las=1, pty="m")
-	mai=c(5,10,8,5))
-	
-	for(i in 1:how.many) {
-		# add a label where x = frequency and y = "device height" or something
-			text(x=(kw.table[[i]] + 20), y=(par()$din[2]), labels=kw.table[[i]],pos=4)
+	if(remake_figs) {
+		filename <- paste0(imageloc, "keyword barplot, top ", how.many, ", N", nrow(dataset), ".pdf")
+		pdf(file=filename)
 	}
 	
-	mtext(paste(diss.count,"theses,",kw.count,"keywords, median =",kw.median,", mean =",kw.mean,collapse=" "))
+	if(!horizontal) {
+		barplot(kw.table, las=1, xlab="Keywords", ylab="Frequency", axisnames=F, main="Author-Provided Keywords by Frequency Have Very Little Overlap")
+	} else {
+		barplot(sort(kw.table[1:how.many],decreasing=FALSE), horiz=TRUE, main=paste("Top",how.many,"Keywords by Frequency"), axisnames=TRUE,width=c(10,10),space=0.4,las=1, pty="m")
+	}
+	# mai=c(5,10,8,5))
 	
-	dev.off()
+	# for(i in 1:how.many) {
+		# # add a label where x = frequency and y = "device height" or something
+			# text(x=(kw.table[[i]] + 20), y=(par()$din[2]), labels=kw.table[[i]],pos=4)
+	# }
 	
-	filename <- paste0(imageloc, "keyword terms barplot, below",how.many,", above median, N",diss.count,".pdf")
-	pdf(file=filename)
+	mtext(paste(nrow(dataset), "dissertations,", kw.count, "keywords, median =", kw.median, ", mean =", kw.mean))
 	
-	barplot(kw.table[how.many+1:length(kw.table)/2],horiz=FALSE,main=paste0("Frequency of Subject Terms below ",how.many,", above median"), axisnames=TRUE,width=c(10,10),space=0.4,las=2, pty="m",mai=c(5,10,8,5))
+	if(remake_figs) { dev.off() }
+	
+	# if(remake_figs) {	
+		# filename <- paste0(imageloc, "keyword terms barplot, below",how.many,", above median, N",diss.count,".pdf")
+		# pdf(file=filename)
+	# }	
+	# barplot(kw.table[how.many+1:length(kw.table)/2],horiz=FALSE,main=paste0("Frequency of Subject Terms below ",how.many,", above median"), axisnames=TRUE,width=c(10,10),space=0.4,las=2, pty="m",mai=c(5,10,8,5))
 	
 	# if(remake_figs) { dev.off() }
 }
