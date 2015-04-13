@@ -39,4 +39,45 @@ topic.proportions <- function(dataset_name="consorts", ntopics=55, bad.topics=NU
 	if(remake_figs) { dev.off() }
 
 
+	## Optionally extract top-topic outliers for further examination
+	if(explore.outliers) {
+		upper.whisker <- boxplot.stats(grid.sorted[, 1])$stats[5]
+		outliers.index <- which(grid.sorted[, 1] > upper.whisker)
+		outliers <- cbind(grid[outliers.index, "Pub.number", with=F], grid.sorted[outliers.index, 1:10])
+		outliers <- outliers[order(outliers$V1, decreasing=T), ]
+		
+		# boxplot(outliers[, 2:ncol(outliers)])
+		## Browse details of these outlier dissertations
+		if(!exists("get.topics4doc", mode="function")) { source(file="top docs per topic.R") }
+		if (!remake_figs) { 
+			a <- readline("Press <enter> for more detail on these docs, or S to skip to the end\n") 
+		} else { 
+			a <- ""
+		}
+
+		while (tolower(a) != "s") {
+			for(i in outliers$Pub.number) {
+				print(get.topics4doc(i, dataset_name, ntopics))
+				if (!remake_figs) { 
+					a <- readline("Press <enter> for next doc, D for more details, or S to skip to the end\n") 
+				} else { 
+					a <- ""
+				}
+				
+				if (tolower(a) == "s") { 
+					break 
+				} else if (tolower(a) == "d") { 
+					print(noexcludes.dt[i]) 
+					a <- readline("Press <enter> for next doc or S to skip to the next topic\n")
+				}
+			}
+			a <- "s"
+		}
+
+		
+		
+		
+		
+		
+	}
 }
