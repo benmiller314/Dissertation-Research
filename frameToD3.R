@@ -13,7 +13,8 @@ frameToJSON <- function(dataset_name="consorts",
 					    groupVars=NULL, 		# Ben: If not provided by the calling environment,
 					    dataVars=NULL, 			#  these 3 parameters will be set to defaults within the function.
 					    outfile=NULL,			#  This should make the function more portable, I hope.
-					    bad.topics= c("2", "4", "22", "24", "47")		# exclude non-content-bearing topics
+					    bad.topics= c("2", "4", "22", "24", "47", 	# exclude non-content-bearing topics
+					    				"50", "13")					# (incl. Spanish and Italian languages)
 					    ) {			
 
   #packages we will need:
@@ -35,7 +36,7 @@ frameToJSON <- function(dataset_name="consorts",
   		dataVars <- colnames(dt)[!colnames(dt) %in% groupVars]	# any column that's not an ID is a datapoint
   }
   if(is.null(outfile)) {				# the desired location of the JSON file produced by the function
-  		outfile <- paste0(webloc, "/", dataset_name, "k", ntopics, "_clusters_nobads.json")
+  		outfile <- paste0(webloc, "/", dataset_name, "k", ntopics, "_clusters_", ntopics-length(bad.topics), ".json")
   }
 
   
@@ -61,25 +62,41 @@ frameToJSON <- function(dataset_name="consorts",
 	  abline(1.475, 0, col="#990099")
 	  # rect.hclust(hc, k=55, border="#111111")
 	  # x <- identify(hc, n=13)
-	  rect.hclust(hc, k=55, border="#EE99EE")
-	
-	  		if(remake_figs) { dev.off() }
-	
-	  abline(1.35, 0, col="#99FF99")
-	  rect.hclust(hc, k=32, border="#99FF99")
-	  abline(1.55, 0, col="#009900")
-	  rect.hclust(hc, k=16, border="#009900")	# with 5 bad.topics removed, memb16 looks attractive
-	  abline(1.7, 0, col="#FF9999")
-	  rect.hclust(hc, k=12, border="#FF9999")
-	  abline(1.85, 0, col="#9999FF")
-	  rect.hclust(hc, k=7, border="#9999FF")
-	  abline(1.95, 0, col="#990099")
-	  rect.hclust(hc, k=6, border="#990099")
-  	  abline(2.33, 0, col="#009999")
-  	  rect.hclust(hc, k=4, border="#009999")
-  	  abline(3.37, 0, col="#999900")
-  	  rect.hclust(hc, k=2, border="#999900")
-  }
+	  rect.hclust(hc, k=(ntopics-length(bad.topics)-1), border="#EE99EE")
+	  if(remake_figs) { dev.off() }
+	  
+	  # with 5 bad.topics removed	
+	  if(dataset_name=="consorts" && ntopics==55 && length(bad.topics) == 5) {
+			plot(hc, main=main)
+			abline(1.35, 0, col="#99FF99")			
+			rect.hclust(hc, k=32, border="#99FF99")	
+			abline(1.55, 0, col="#009900")			
+			rect.hclust(hc, k=16, border="#009900")	
+			abline(1.7, 0, col="#FF9999")
+			rect.hclust(hc, k=12, border="#FF9999")
+			abline(1.85, 0, col="#9999FF")
+			rect.hclust(hc, k=7, border="#9999FF")
+			abline(1.95, 0, col="#990099")
+			rect.hclust(hc, k=6, border="#990099")
+			abline(2.33, 0, col="#009999")
+			rect.hclust(hc, k=4, border="#009999")
+			abline(3.37, 0, col="#999900")
+			rect.hclust(hc, k=2, border="#999900")
+		}
+  	  # with 7 bad.topics removed	
+  	  if(dataset_name=="consorts" && ntopics==55 && length(bad.topics) == 7) {
+		  plot(hc, main=main)
+		  abline(1.45, 0, col="#99FF99")		
+		  rect.hclust(hc, k=21, border="#99FF99")	
+		  abline(1.73, 0, col="#009900")			
+		  rect.hclust(hc, k=11, border="#009900")
+		  abline(1.955, 0, col="#FF9999")
+		  rect.hclust(hc, k=6, border="#FF9999")
+		  rect.hclust(hc, k=4, border="#009999")
+	  	  rect.hclust(hc, k=2, border="#999900")	  
+	  }		
+	  
+  }	  # end of if(do.plot)
   
   #Rolf: now we split the data based on membership structure. We will take four levels:
   #(basically this means we will calculate which group each variable belongs in for different levels of the tree strucutre)
@@ -88,13 +105,20 @@ frameToJSON <- function(dataset_name="consorts",
   ## split the tree at specific heights (on the y axis of that plot), if we don't want to count the groups.
 
 	# Ben: splits for consorts with 55 topics (i.e. including bad.topics)
-  # memb2 <- as.character(cutree(hc, k = 2))
-  # memb5 <- as.character(cutree(hc, k = 5))
-  # memb10 <- as.character(cutree(hc, k = 10))
-  # memb22 <- as.character(cutree(hc, k = 22))
-  # memb55 <- as.character(cutree(hc, k = 55))
+if(dataset_name=="consorts" && ntopics==55 && length(bad.topics) == 0) {
+  splits <- c(2, 5, 10, 22, 55)
+  
+  memb2 <- as.character(cutree(hc, k = 2))
+  memb5 <- as.character(cutree(hc, k = 5))
+  memb10 <- as.character(cutree(hc, k = 10))
+  memb22 <- as.character(cutree(hc, k = 22))
+  memb55 <- as.character(cutree(hc, k = 55))
+}
 
-	# Ben: splits for consorts with 50 topics (i.e. bad.topics removed)
+	# Ben: splits for consorts with 50 topics (i.e. 5 bad.topics removed for bad OCR or boilerplate)
+if(dataset_name=="consorts" && ntopics==55 && length(bad.topics) == 5) {
+  splits <- c(2, 4, 6, 7, 12, 16, 32)
+
   memb2 <- as.character(cutree(hc, k = 2))
   memb4 <- as.character(cutree(hc, k = 4))
   memb6 <- as.character(cutree(hc, k = 6))
@@ -102,10 +126,21 @@ frameToJSON <- function(dataset_name="consorts",
   memb12 <- as.character(cutree(hc, k = 12))
   memb16 <- as.character(cutree(hc, k = 16))
   memb32 <- as.character(cutree(hc, k = 32))
+}  
   
-  # Ben: list these out so we can distinguish them from node and edge variables
-  # splits <- c(2, 5, 10, 22)		# including bad.topics
-  splits <- c(2, 4, 6, 7, 12, 16, 32)	# after removing bad.topics
+
+	# Ben: splits for consorts with 48 topics (i.e. 7 bad.topics removed for bad OCR, boilerplate, or non-English lang)
+if(dataset_name=="consorts" && ntopics==55 && length(bad.topics) == 7) {
+  splits <- c(2, 4, 6, 11, 21)
+
+  memb2 <- as.character(cutree(hc, k = 2))
+  memb4 <- as.character(cutree(hc, k = 4))
+  memb6 <- as.character(cutree(hc, k = 6))
+  memb11 <- as.character(cutree(hc, k = 11))
+  memb21 <- as.character(cutree(hc, k = 21))
+}   
+
+  # Make note of group names for later; same operation for all numbers of bad.topics
   membVars <- paste0("memb", splits)
 
   # Ben: get topic labels, which you've composed elsewhere using 'top docs per topic.R'
@@ -198,11 +233,11 @@ cotopic_edges <- function(dataset_name="consorts",
 						  level=0.12, 	# topic must constitute how much of each doc?
 						  min=3, 		# how many times must a pair of topics co-occur?
 						  outfile=NULL,
-						  bad.topics= c("2", "4", "22", "24", "47")		# exclude non-content-bearing topics
+						  bad.topics= c("2", "4", "22", "24", "47", "50", "13")	# exclude non-content-bearing topics
 						  ){
 	# set default parameters if needed
 	if(is.null(outfile)) {				# the desired location of the JSON file produced by the function
-  		outfile <- paste0(webloc, "/", "edges_", dataset_name, "k", ntopics, "_", level*100, "pct_min", min, "_nobads.json")
+  		outfile <- paste0(webloc, "/", "edges_", dataset_name, "k", ntopics, "_", ntopics-length(bad.topics), "_", level*100, "pct_min", min, "_nobads.json")
 	}
 
 	# get co-occurring topics, for hierarchical edge bundling
