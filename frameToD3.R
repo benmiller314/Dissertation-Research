@@ -264,10 +264,17 @@ cotopic_edges <- function(dataset_name="consorts",
 	
 	# merge
 	b <- edges[b, ]
-	
+	str(b)
+		
 	# Create a "name" column that collapses the hierarchical structure and topic label, 
 	# as per http://fredheir.github.io/dendroArcs/pages/hierarc/test.JSON
-	b$name <- b[, paste(memb2, memb4, memb6, memb7, memb12, memb16, memb32, label, sep=".")]
+	# This is what the d3 edge bundling code in packages.js will parse to recreate the hierarchy
+
+	# first re-derive `membVars` from the names of b that include "memb"	
+	membVars <- names(b)[grep("memb", names(b))]
+
+	b$name <- sapply(1:nrow(b), FUN=function(x) { paste(b[x, c(membVars, "label"), with=F], collapse=".") })
+	# b$name <- b[, paste(memb2, memb4, memb6, memb7, memb12, memb16, memb32, label, sep=".")]
 	# b$name <- b[, paste(memb2, memb5, memb10, memb22, paste0("_",as.character(source)), sep=".")]
 	 
 	# We're going to build our JSON for edge bundling with a name, size, and (to take advantage of 
