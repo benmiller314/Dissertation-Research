@@ -18,7 +18,7 @@ keyword_barplot <- function(dataset_name="consorts.plus", 		# by default, show c
 	kw.table <- sort(kw.table,decreasing=TRUE)
 	
 	kw.count <- length(kw.table)
-	kw.mean <- mean(kw.table)
+	kw.mean <- round(mean(kw.table), 2)
 	kw.median <- median(kw.table)
 
 	# if no cutoff is given, default to showing all keywords (even if that's a crazy long tail)
