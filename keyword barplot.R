@@ -3,9 +3,13 @@
 
 # TO DO: convert the whole thing to a function, to allow for various datasets.
 # See 'methodcount barplot.R'
-	
+keyword_barplot <- function(dataset_name="consorts.plus", 		# by default, show consortium + 5 or more in last 5 years
+							how.many=NULL,						# number of keywords to plot; defaults to all
+							horizontal=FALSE) {
+
 	# First get the terms:
-	extract_subjects(noexcludes$KEYWORDS) -> kw.list
+	dataset <- get(dataset_name)
+	kw.list <- extract_subjects(dataset$KEYWORDS)
 	
 	# Get the frequency chart. maxsum is needed to avoid "othering" half the list.
 	kw.table <- summary(kw.list, maxsum=10000)
@@ -40,4 +44,11 @@
 	
 	barplot(kw.table[how.many+1:length(kw.table)/2],horiz=FALSE,main=paste0("Frequency of Subject Terms below ",how.many,", above median"), axisnames=TRUE,width=c(10,10),space=0.4,las=2, pty="m",mai=c(5,10,8,5))
 	
-	dev.off()
+	# if(remake_figs) { dev.off() }
+}
+
+if(autorun) {
+	remake_figs=T
+	keyword_barplot()
+}
+
