@@ -61,6 +61,7 @@ source(file="map by school 4 (comp-rhet superimposed on carnegie schools).R")
 ## Topic Modeling functions
 source(file="r2mallet with foreach.R")				# generate a topic model
 source(file="top docs per topic.R")					# browse topics to generate labels
+source(file="get topics for author.R")				# retrieve topic information about a dissertation by author name
 source(file="cotopics.R")							# find topics that co-occur within documents
 source(file="get doctopic grid.R")					# get weights of every topic for all documents
 
