@@ -93,7 +93,6 @@ get.topics4doc <- function(pubnum, dataset_name="consorts", ntopics=55, howmany=
 			topic_keys
 		}
 		list("title" = noexcludes.dt[pubnum, c("Title", "Pub.number", tagnames), with=F],
-			"doc_tops" = doc_tops[pubnum, paste0(c("top","wgt"), rep(1:howmany, each=2)), with=F],
 			"keys" = topic_keys,
 			"abstract" = noexcludes.dt[pubnum, c("KEYWORDS", "ABSTRACT"), with=F]		
 			)
@@ -104,7 +103,9 @@ top_topic_browser <- function(start.rank	 = 1, 				# assuming we're looping, sta
 								topic		 = NULL,			# alternately, browse one specified topic
 								dataset_name = "consorts",
 								ntopics		 = 55, 
-								cutoff		 = get("ntopics")	# if lots of topics, where to stop?
+								cutoff		 = get("ntopics"),	# if lots of topics, where to stop?
+								depth		 = 5,				# how many docs to show for each topic?
+								showlabels	 = FALSE			# show current topic labels for individual docs?
 	){
 	# get packages in case we've just restarted R
 	require(data.table)
@@ -132,13 +133,27 @@ top_topic_browser <- function(start.rank	 = 1, 				# assuming we're looping, sta
 		else { message("\nTopic of rank ", topic.rank, ":\n") }
 			
 		# get Pub.numbers for dissertations with the max proportion of that topic
-		row.ind <- order(outputfile[, which(names(outputfile)==topic.num)], decreasing=TRUE)[1:5]
+		row.ind <- order(outputfile[, which(names(outputfile)==topic.num)], decreasing=TRUE)[1:depth]
 		diss.ind <- outputfile[row.ind, "Pub.number"]
 
 		print(topic_keys.dt[topic.num])
-		
-		topdocs <- noexcludes.dt[as.character(diss.ind), c("Pub.number", "Title", tagnames), with=F]
+
+		# list of top 1:depth documents for this topic
+		topdocs <- noexcludes.dt[as.character(diss.ind), c("Pub.number", "Title", tagnames), with=F]			
+
+			# add a column with the weights this topic has in these docs
+			doc_tops <- get.doc.composition(dataset_name, ntopics)
+			weights <- ranks <- c()
+			for(j in 1:length(diss.ind)) {
+				topic.col <- match(topic.num, doc_tops[as.character(diss.ind)][j])
+				weights[j] <- doc_tops[as.character(diss.ind)][j, (topic.col+1), with=F]
+				ranks[j] <- topic.col/2
+			}
+			topdocs[, topic_weight:=unlist(weights)]
+			topdocs[, rank_in_doc:=unlist(ranks)]
+			topdocs <- topdocs[, c("Pub.number", "Title", "topic_weight", "rank_in_doc", tagnames), with=F]
 		print(topdocs)
+		
 		if (!remake_figs) { a <- readline("Press <enter> for more detail on these docs, or S to skip to the next topic\n") } else { a <- ""}
 
 		while (tolower(a) != "s") {
