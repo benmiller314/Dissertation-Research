@@ -53,20 +53,14 @@ frameToJSON <- function(dataset_name="consorts",
   if(do.plot) {  
 	  #Rolf: take a look at your strucutre:
 	  # Ben: optionally save clustering figure
-	  main <- paste0("Cluster Dendrogram, ", dataset_name, ", ", ntopics, " topics")
-	  if(remake_figs) { pdf(file=paste0(imageloc, main, ".pdf")) }
-	  plot(hc, main=main)
-	  
+	  main <- paste0("Cluster Dendrogram, ", dataset_name, ", ", ntopics - length(bad.topics), " topics")
+	
 	  # Ben: Try various cut levels until you find a set that seems interesting; 
 	  # Then adjust the memb# variables below, accordingly.
-	  abline(1.475, 0, col="#990099")
-	  # rect.hclust(hc, k=55, border="#111111")
-	  # x <- identify(hc, n=13)
-	  rect.hclust(hc, k=(ntopics-length(bad.topics)-1), border="#EE99EE")
-	  if(remake_figs) { dev.off() }
-	  
+	
 	  # with 5 bad.topics removed	
 	  if(dataset_name=="consorts" && ntopics==55 && length(bad.topics) == 5) {
+	      if(remake_figs) { pdf(file=paste0(imageloc, main, ".pdf")) }
 			plot(hc, main=main)
 			abline(1.35, 0, col="#99FF99")			
 			rect.hclust(hc, k=32, border="#99FF99")	
@@ -82,20 +76,34 @@ frameToJSON <- function(dataset_name="consorts",
 			rect.hclust(hc, k=4, border="#009999")
 			abline(3.37, 0, col="#999900")
 			rect.hclust(hc, k=2, border="#999900")
+	 	  if(remake_figs) { dev.off() } 
 		}
   	  # with 7 bad.topics removed	
-  	  if(dataset_name=="consorts" && ntopics==55 && length(bad.topics) == 7) {
-		  plot(hc, main=main)
-		  abline(1.45, 0, col="#99FF99")		
-		  rect.hclust(hc, k=21, border="#99FF99")	
-		  abline(1.73, 0, col="#009900")			
-		  rect.hclust(hc, k=11, border="#009900")
-		  abline(1.955, 0, col="#FF9999")
-		  rect.hclust(hc, k=6, border="#FF9999")
-		  rect.hclust(hc, k=4, border="#009999")
-	  	  rect.hclust(hc, k=2, border="#999900")	  
+  	  else if(dataset_name=="consorts" && ntopics==55 && length(bad.topics) == 7) {
+	      if(remake_figs) { pdf(file=paste0(imageloc, main, ".pdf")) }
+    		  plot(hc, main=main)
+			  abline(1.45, 0, col="#99FF99")		
+			  rect.hclust(hc, k=21, border="#99FF99")	
+			  abline(1.73, 0, col="#009900")			
+			  rect.hclust(hc, k=11, border="#009900")
+			  abline(1.955, 0, col="#FF9999")
+			  rect.hclust(hc, k=6, border="#FF9999")
+			  rect.hclust(hc, k=4, border="#009999")
+		  	  rect.hclust(hc, k=2, border="#999900")	  
+	 	  if(remake_figs) { dev.off() } 
 	  }		
 	  
+	  # TO DO: Find splits for model with 150 topics
+	  else {
+	      if(remake_figs) { pdf(file=paste0(imageloc, main, ".pdf")) }
+			  plot(hc, main=main)
+	 	  if(remake_figs) { dev.off() } 
+		  
+		  # If we're plotting, we probably wanted to locate splits. Exit the function here.
+		  message("Exiting function.")
+		  message("Using abline() and rect.hclust(), try various cut levels until you find a set that seems promising.")
+		  return()
+	  }  
   }	  # end of if(do.plot)
   
   #Rolf: now we split the data based on membership structure. We will take four levels:
@@ -105,7 +113,7 @@ frameToJSON <- function(dataset_name="consorts",
   ## split the tree at specific heights (on the y axis of that plot), if we don't want to count the groups.
 
 	# Ben: splits for consorts with 55 topics (i.e. including bad.topics)
-if(dataset_name=="consorts" && ntopics==55 && length(bad.topics) == 0) {
+if(dataset_name=="consorts" && ntopics==55 && is.null(bad.topics)) {
   splits <- c(2, 5, 10, 22, 55)
   
   memb2 <- as.character(cutree(hc, k = 2))
@@ -140,6 +148,8 @@ if(dataset_name=="consorts" && ntopics==55 && length(bad.topics) == 7) {
   memb21 <- as.character(cutree(hc, k = 21))
 }   
 
+	# TO DO: Add splits for model with 150 topics
+
   # Make note of group names for later; same operation for all numbers of bad.topics
   membVars <- paste0("memb", splits)
 
@@ -147,13 +157,18 @@ if(dataset_name=="consorts" && ntopics==55 && length(bad.topics) == 7) {
   if(!exists("get_topic_labels", mode="function")) { source(file="get topic labels.R") }
   topic.labels.dt <- get_topic_labels(dataset_name, ntopics)
 	# str(topic.labels.dt)
-  
+	  
   # exclude non-content-bearing topics
   if(!is.null(bad.topics)) { topic.labels.dt <- topic.labels.dt[!Topic %in% bad.topics]	}
     
   #Rolf: Now put this information into a table, together with the labels and the order in which they should appear:
   # Ben adds: use gsub to remove spaces (this seems to help the d3 scrollover); add topic number to aid in merging w/ edge table later
-  b <- data.table(sapply(membVars, FUN=function(var){ get(as.character(var)) } ), label=gsub(' ', '_', topic.labels.dt[, Label]), topic=topic.labels.dt[, Topic], topwords=topic.labels.dt[, Top.Words], rank=topic.labels.dt[, Rank], order=hc$order)
+  b <- data.table(sapply(membVars, FUN=function(var){ get(as.character(var)) } ), 
+  		label = gsub(' ', '_', topic.labels.dt[, Label]), 
+  		topic = topic.labels.dt[, Topic], 
+  		topwords = topic.labels.dt[, Top.Words], 
+  		rank = topic.labels.dt[, Rank], 
+  		order = hc$order)
 
   #Rolf: We might want to know the size of each node. Let's add that
   # Ben: for a topic model, this will find the total %-point contribution of the topic to all docs;
@@ -316,8 +331,9 @@ cotopic_edges <- function(dataset_name="consorts",
 
 
 if(autorun) { 
-	remake_figs <- F
-	frameToJSON(do.plot=FALSE)
+	remake_figs 
+	# debug(frameToJSON)
+	frameToJSON(do.plot=F)
 	frameToJSON(ntopics=150, bad.topics=NULL)
 }
 if(autorun) { 
