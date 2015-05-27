@@ -105,7 +105,8 @@ top_topic_browser <- function(start.rank	 = 1, 				# assuming we're looping, sta
 								ntopics		 = 55, 
 								cutoff		 = get("ntopics"),	# if lots of topics, where to stop?
 								depth		 = 5,				# how many docs to show for each topic?
-								showlabels	 = FALSE			# show current topic labels for individual docs?
+								showlabels	 = FALSE,			# show current topic labels for individual docs?
+								for.bind	 = FALSE			# invisibly return results and exit early?
 	){
 	# get packages in case we've just restarted R
 	require(data.table)
@@ -158,7 +159,15 @@ top_topic_browser <- function(start.rank	 = 1, 				# assuming we're looping, sta
 			topdocs <- topdocs[, c("Pub.number", "Title", "topic_weight", "rank_in_doc", tagnames), with=F]
 		print(topdocs)
 		
-		if (!remake_figs) { a <- readline("Press <enter> for more detail on these docs, or S to skip to the next topic\n") } else { a <- ""}
+		# if we're just looking at one topic, maybe we want to save that list of docs and their metadata, and exit.
+		if(for.bind) {
+			return(topdocs)			
+		}
+
+		# if we're saving all output, automatically cycle through everything. but by default, prompt the user.
+		if (!remake_figs) { 
+			a <- readline("Press <enter> for more detail on these docs, or S to skip to the next topic\n") 
+		} else { a <- ""}
 
 		while (tolower(a) != "s") {
 			for(i in topdocs$Pub.number) {
