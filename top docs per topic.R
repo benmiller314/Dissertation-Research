@@ -111,8 +111,12 @@ top_topic_browser <- function(start.rank	 = 1, 				# assuming we're looping, sta
 	require(data.table)
 	
 	# load the data from the functions defined or imported above
-	doc_topics.dt <- get.doc.composition(dataset_name, ntopics)
+	doc_composition <- paste0("doc_topics_", dataset_name, "_", ntopics, ".dt");
+	if(!exists(doc_composition)) { doc_topics.dt <- get.doc.composition(dataset_name, ntopics) 
+		} else { doc_topics.dt <- get(doc_composition) }
+		
 	topic_keys.dt <- get.topickeys(dataset_name, ntopics)
+	
 	grids <- get.doctopic.grid(dataset_name, ntopics)
 		colsums <- grids$colsums
 		colsums.sort <- grids$colsums.sort
@@ -158,7 +162,7 @@ top_topic_browser <- function(start.rank	 = 1, 				# assuming we're looping, sta
 
 		while (tolower(a) != "s") {
 			for(i in topdocs$Pub.number) {
-				print(get.topics4doc(i, dataset_name, ntopics))
+				print(get.topics4doc(i, dataset_name, ntopics, showlabels=showlabels))
 				if (!remake_figs) { a <- readline("Press <enter> for next doc, D for more details, or S to skip to the next topic\n") } else { a <- ""}
 				if (tolower(a) == "s") { break }
 				else if (tolower(a) == "d") { 
@@ -168,10 +172,11 @@ top_topic_browser <- function(start.rank	 = 1, 				# assuming we're looping, sta
 			}
 			a <- "s"
 		}
+		
 
 		
 	} else {
-		# Loop through the top topics and their top-proportioned dissertations,  
+		# If we haven't pre-specified a topic, loop through the top topics and their top-proportioned dissertations,  
 		# optionally showing abstracts and top 5 topics for each of those dissertations
 	message("Top ", cutoff, " topics:")
 	print(topic_keys.dt[ind])							# top words for each topic
@@ -182,7 +187,7 @@ top_topic_browser <- function(start.rank	 = 1, 				# assuming we're looping, sta
 		topic.num <- ind[i]	
 		
 		# Search outputfile for the dissertations with max proportion of that topic, and get the Pub.numbers
-		row.ind <- order(outputfile[, which(names(outputfile)==topic.num)], decreasing=TRUE)[1:5]
+		row.ind <- order(outputfile[, which(names(outputfile)==topic.num)], decreasing=TRUE)[1:depth]
 		diss.ind <- outputfile[row.ind, "Pub.number"]
 
 		if (remake_figs) { 	print(paste0("Topic of rank ", i, ":")) } 
@@ -190,13 +195,28 @@ top_topic_browser <- function(start.rank	 = 1, 				# assuming we're looping, sta
 		
 		print(topic_keys.dt[topic.num])
 		
+		# list of top 1:depth documents for this topic
 		topdocs <- noexcludes.dt[as.character(diss.ind), c("Pub.number", "Title", tagnames), with=F]
+
+			# add a column with the weights this topic has in these docs
+			doc_tops <- get.doc.composition(dataset_name, ntopics)
+			weights <- ranks <- c()
+			for(j in 1:length(diss.ind)) {
+				topic.col <- match(topic.num, doc_tops[as.character(diss.ind)][j])
+				weights[j] <- doc_tops[as.character(diss.ind)][j, (topic.col+1), with=F]
+				ranks[j] <- topic.col/2
+			}
+			topdocs[, topic_weight:=unlist(weights)]
+			topdocs[, rank_in_doc:=unlist(ranks)]
+			topdocs <- topdocs[, c("Pub.number", "Title", "topic_weight", "rank_in_doc", tagnames), with=F]
+			
 		print(topdocs)
+		
 		if (!remake_figs) { a <- readline("Press <enter> for more detail on these docs, or S to skip to the next topic\n") } else { a <- ""}
 
 		while (tolower(a) != "s") {
 			for(i in topdocs$Pub.number) {
-				print(get.topics4doc(i))
+				print(get.topics4doc(i, showlabels=showlabels))
 				if (!remake_figs) { a <- readline("Press <enter> for next doc, D for more details, or S to skip to the next topic\n") } else { a <- ""}
 				if (tolower(a) == "s") { break }
 				else if (tolower(a) == "u") {i <- i-1}
@@ -222,6 +242,7 @@ if (autorun) {
 }
 
 
+# }
 # source("frameToD3.R")
 # dt <- as.data.table(outputfile)
 # groupVars <- c("Pub.number")	# Ben: this is the name of that first (ID) column. replace accordingly.
