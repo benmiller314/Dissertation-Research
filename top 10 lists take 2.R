@@ -1,10 +1,21 @@
-## Top 10 Lists, take 2
+## Top Schools by Method
+# GOAL: For each method in a given tagset, produce a list of the top X schools by either 
+#		methodological output (number of dissertations using that method at that school) or 
+#		methodological focus (percentage of dissertations using that method at that school)
+
 require(doBy)
 
 
-
 # open wrapper function
-toplists <- function(dataset_name="noexcludes", tagset_name="tagnames", howmany=5, threshold=5, since=2006, until=2010, rank_by_pcts=TRUE, combine=TRUE) {
+toplists <- function(dataset_name = "noexcludes", 
+					 tagset_name  = "tagnames", 
+					 howmany	  = 5, 				# How many schools in the list for each method?
+					 threshold	  = 5, 				# Set a minimum number of dissertations
+					 since		  = 2006, 			#  over a specified span of years.
+					 until		  = 2010, 			#  Gets passed to function from thresh.R.
+					 rank_by_pcts = TRUE, 			# Use methodological focus (T) or raw output (F)?
+					 combine	  = TRUE) 			# Display focus and output in one column (T) or two (F)?
+{
 	
 	## 0. convert variable names to variables. we'll use the names later in the figure titles.
 	dataset <- get(dataset_name)
@@ -66,12 +77,12 @@ toplists <- function(dataset_name="noexcludes", tagset_name="tagnames", howmany=
 			if(rank_by) {
 				a6 <- a5[, c("School", "P", "D", "T")] 	
 				filename <- paste0(imageloc, 
-						"Top 5 Schools by Methodological Focus (Ranked by Percentage), ",
+						"Top ", howmany, " Schools by Methodological Focus (Ranked by Percentage), ",
 						dataset_name, ", ", tagset_name, ".csv")
 			} else {
 				a6 <- a5[, c("School", "T", "D", "P")] 	
 				filename <- paste0(imageloc,
-						"Top 5 Schools by Methodological Focus (Ranked by Number of Dissertations), ",
+						"Top ", howmany, " Schools by Methodological Focus (Ranked by Number of Dissertations), ",
 						dataset_name, ", ", tagset_name, ".csv")
 			}
 				
@@ -87,15 +98,15 @@ toplists <- function(dataset_name="noexcludes", tagset_name="tagnames", howmany=
 		}
 		
 		return(a6)	
-	}
+	}	# end of toplist.onetag()
 	
 	# 3b. Apply the function to each tag in the tagset
 	b <- lapply(tagset, FUN=function(x) {toplist.onetag(a=a, tag=x, rank_by=rank_by_pcts)})
 
 	if(rank_by_pcts) {
-		title <- "Top 5 Schools by Methodological Focus (Ranked by Percentage)"
+		title <- paste0("Top ", howmany, " Schools by Methodological Focus (Ranked by Percentage)")
 	} else {
-		title <- "Top 5 Schools by Methodological Output (Ranked by Number of Dissertations)"
+		title <- paste0("Top ", howmany, " Schools by Methodological Output (Ranked by Number of Dissertations)")
 	}
 	subtitle2 <- "* indicates member of the Consortium of Doctoral Programs in Rhetoric and Composition"
 	names(b) <- tagset
@@ -108,11 +119,11 @@ toplists <- function(dataset_name="noexcludes", tagset_name="tagnames", howmany=
 
 # call function
 # TO DO: Write the output to a file for easier porting to Word, Scrivener, etc.
-
-toplists(rank_by_pcts=T, combine=F)
-
-toplists(rank_by_pcts=F)
-
+if(autorun) {
+	remake_figs
+	toplists(rank_by_pcts=T, combine=F)
+	toplists(rank_by_pcts=F)
+}
 
 
 # # clean up working variables (only needed during testing)
