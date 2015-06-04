@@ -37,7 +37,7 @@ source(file="methodcount barplot.R")
 # source(file="keyword barplot.R")
 
 ## 
-# frequency of method tags: tabulates and plots the number of times a dissertation is tagged with each method.
+# `frequency of method tags.R`: tabulates and plots the number of times a dissertation is tagged with each method.
 # Provides three functions:
 #	get_tags(dataset_name, tagset_name): returns a named vector of frequencies for each method in the tagset
 #	methodfreq_combined(bigset, smallset, diffset): plots an overlaid horizontal bar graph of method frequencies;
@@ -47,8 +47,11 @@ source(file="methodcount barplot.R")
 source(file="frequency of method tags.R")
 
 
-
-source(file="top 10 lists take 2.R")
+## `top schools by method.R`: For each method in a given tagset, produce a list of the top X schools by either 
+#	methodological output (number of dissertations using that method at that school) or methodological focus 
+#	(percentage of dissertations using that method at that school).
+#	Provides one function: toplists(dataset_name, tagset_name, howmany, threshold, since, until, rank_by_pcts, combine)
+source(file="top schools by method.R")	
 
 
 
