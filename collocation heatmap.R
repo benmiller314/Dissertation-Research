@@ -6,13 +6,15 @@
 #  The total number of times dissertations are tagged X is returned separately.
 
 #  1. Calculate tag collocations, total dissertations per tag, and solo counts per tag.
-sumbytags <- function(dataset_name="noexcludes", 
-					tagset_name="tagnames", 
-					doplot=T,
-					normed=F,
-					dendro	 = FALSE		# should we output dendrograms showing method clustering?
-					) {
-	dataset <- get(dataset_name)
+sumbytags <- function(dataset_name	= "noexcludes", 
+					tagset_name		= "tagnames", 
+					doplot			= TRUE,
+					normed			= FALSE,	# should we divide by total dissertations per row?
+					dendro	 		= FALSE		# should we output dendrograms showing method clustering?
+					) 
+{
+	# get values from variable name; we'll use names later for filenames and figure titles
+	dataset <- get(dataset_name)				
 	tagset <- get(tagset_name)
 	
 	# make a fresh start	
@@ -22,21 +24,21 @@ sumbytags <- function(dataset_name="noexcludes",
 		# select the tag
 		tag <- tagset[i]
 		
-		# debug
-		# if(tag %in% c("Poet", "Prac")) { print(sum.by.tags) }
+			# debug
+			# if(tag %in% c("Poet", "Prac")) { print(sum.by.tags) }
 		
 		# sum columns where the tag is 0 and where it's 1; 
 		# this produces an array with two rows.
 		tagsum <- aggregate(dataset[, tagset], list(dataset[, tag]), FUN=sum)
 		
-		# debug
-		# if(tag %in% c("Poet", "Prac")) { print(sum.by.tags) }
+			# debug
+			# if(tag %in% c("Poet", "Prac")) { print(sum.by.tags) }
 		
-		# Save the row in which the tag is "on", i.e. row 2. 
+		# Save the row in which the tag is "on" (i.e. set to 1). 
 		# If no such row exists, fill with zeroes to avoid NA results.
-		# First column is the on/off status, so get rid of it.
-		if (nrow(tagsum) == 1) { sum.by.tags <- rbind(sum.by.tags, rep(0, ncol(tagsum)-1)) }
-		else { sum.by.tags <- rbind(sum.by.tags, tagsum[2, 2:ncol(tagsum)]) }
+		# First column is the on/off status, so leave it out.
+		if (nrow(tagsum) == 1 && tagsum[, 1] == 0) { sum.by.tags <- rbind(sum.by.tags, rep(0, ncol(tagsum)-1)) } 
+		else { sum.by.tags <- rbind(sum.by.tags, tagsum[which(tagsum[1,] == 1), 2:ncol(tagsum)]) }
 		
 		# Name the row we've just added by the tag we're currently summarizing.
 		row.names(sum.by.tags)[i] <- tag
@@ -57,14 +59,14 @@ sumbytags <- function(dataset_name="noexcludes",
 
 	to.return <- list("dataset" = dataset_name,
 				 "correlations" = as.matrix(sum.by.tags),
-				 "solo.counts" = solo.counts,
+				 "solo.counts"  = solo.counts,
 				 "total.counts" = total.counts)
 
 	if(doplot) {
 		if(!exists("heatmap.ben", mode="function")) {source(file="heatmap_ben.R")}
 		
-		if(!normed) {
-			# 2. Basic heatmap
+		if(!normed) {			# 2. Basic heatmap
+
 			if(remake_figs) {
 				filename <- paste0(imageloc, "Method Tag Co-Occurrence, ", dataset_name, ", N", nrow(dataset), ".pdf")
 				pdf(filename) 
@@ -73,8 +75,9 @@ sumbytags <- function(dataset_name="noexcludes",
 				title(main="Method Tag Co-Occurrence", sub=paste0(dataset_name, ", N", nrow(dataset)))
 				mtext("A box in row Y, column X gives the number of dissertations tagged Y that are also tagged X", side=4)
 			if(remake_figs) { dev.off() }
-		} else {
-			# 3. Normed heatmap
+			
+		} else {				# 3. Normed heatmap
+
 			if(remake_figs) { 
 				filename <- paste0(imageloc, "Method Tag Co-Occurrence (normed by row), ", dataset_name, ", N", nrow(dataset), ".pdf")
 				pdf(filename) 
@@ -99,3 +102,9 @@ if (autorun) {
 	sumbytags("consorts", dendro=T, normed=T)
 }
 
+## testing
+# testtags <- c("tag1", "tag2", "tag3")
+# testframe <- data.frame(names=c("row1", "row2", "row3"), tag1=c(1,1,1), tag2=c(0,0,0), tag3=c(1,0,1))
+# testframe$Method.Count <- apply(testframe[, 2:ncol(testframe)], 1, sum)
+# print(testframe)
+# sumbytags(dataset_name="testframe", tagset_name="testtags", doplot=F)
