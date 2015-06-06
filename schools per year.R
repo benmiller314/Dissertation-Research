@@ -1,35 +1,51 @@
-## Goal: for each year, find the number of institutions and plot them as a line graph
+## Goal: for each year, find the number of institutions and their dissertation outputs; 
+#  optionally plot these numbers as a line graph
 
-if(!exists("noexcludes")) {
-	source(file="dataprep.R")
-}
-attach(noexcludes)
+peryear <- function(dataset_name	= "noexcludes", 
+					do.plot			= TRUE
+					)
+{
+	dataset <- get(dataset_name)	
 
-# spy = schools per year; dpy = dissertations per year
-spy <- dpy <- c()
-
-for (i in 2001:2010) {
-	s <- noexcludes[which(Year == i),]		# filter by year
-	n <- factor(s$School)					# merge duplicate schools
-	spy[i-2000] <- length(levels(n))		# store count of schools
-	d <- nrow(s)							# count dissertations	
-	dpy[i-2000] <- d						# store count of dissertations
+	# Schools per year
+	spy <- aggregate(dataset$School, by=list(dataset$Year), FUN=function(s) {
+		length(levels(factor(s)))
+	})
 	
-	per.year <- data.frame(spy,dpy)
+	# Dissertations per year
+	dpy <- aggregate(dataset$Title, by=list(dataset$Year), FUN=length)
+
+	to.return <- merge(spy, dpy, by="Group.1")
+	names(to.return) <- c("Year", "Schools", "Dissertations")
+	
+	if(do.plot)	{
+		main <- "Dissertations and Granting Institutions by Year"
+		sub <- paste0(dataset_name, ", N", nrow(dataset))
+	
+		if(remake_figs) {
+			filename <- paste0(imageloc, main,", ", dataset_name, ", N",diss.count,".pdf") 
+			pdf(filename)
+		}
+		
+		# set plot limits
+		plot(to.return$Year, seq(from=0, to=max(to.return$Dissertations), length.out=nrow(to.return)), bty="n", type="n", lab=c(nrow(to.return), 5, 7), xlab="Year", ylab="", main=main)
+		mtext(sub)
+
+		# add lines for data
+		lines(x=to.return$Year, y=to.return$Dissertations, col="blue", type="b", pch=16)
+		lines(x=to.return$Year, y=to.return$Schools, col="red", type="b", pch=17)
+		
+		# add legend
+		legend("bottomright",legend=c("Dissertations","Schools"),pch=c(16,17),col=c("blue","red"),bty="n")
+
+		if(remake_figs) {	dev.off()	}
+	}
+	
+	return(to.return)
 }
 
-
-names(per.year) <- c("Schools","Dissertations")
-row.names(per.year) <- c(2001:2010)		# label counts by year
-per.year
-
-main <- "Dissertations and Granting Institutions by Year"
-filename <- paste0(imageloc, main,", N",diss.count,".pdf") 
-pdf(filename)
-	max.y <- round(max(per.year)/10) * 10
-	plot(x=c(2001:2010), y=seq(from=0,to=max.y,length.out=10), type="n", main=main, ylab="Count", xlab="", bty="l")
-	lines(x=c(2001:2010),y=per.year$Dissertations,col="blue",type="b",pch=16)
-	lines(x=c(2001:2010),y=per.year$Schools,col="red",type="b",pch=17)
-	legend("bottomright",legend=c("Dissertations","Schools"),pch=c(16,17),col=c("blue","red"),bty="n")
-	rm(main,filename)
-dev.off()
+if(autorun) {
+	remake_figs
+	peryear()
+	peryear("consorts.plus")
+}
