@@ -15,15 +15,15 @@ remake_figs <- FALSE;
 autorun <- FALSE;
 
 ## 
-# dataprep: prepares working environment by loading helper functions and setting key variables (such as tagset).
-# dataprep 2: loads in a .csv file of tagged spreadsheet data, generates a tag array, and defines various subsets.
+# `dataprep`: prepares working environment by loading helper functions and setting key variables (such as tagset).
+# `dataprep 2`: loads in a .csv file of tagged spreadsheet data, generates a tag array, and defines various subsets.
 # 	You will be prompted to select the file via file.choose().
 # NB: These two functions can be called jointly via source(file="start here.R")
 source(file="dataprep.R")
 source(file="dataprep 2 - load data.R")
 
 ## 
-# tags by school: generates heat plots of methods used in dissertations, aggregated by school.
+# `tags by school`: generates heat plots of methods used in dissertations, aggregated by school.
 # 	Provides two functions:
 #	schoolwise.data(dataset_name, tagset_name): returns a list of tag means, sums, and counts,
 #		each aggregated by school.
@@ -31,13 +31,13 @@ source(file="dataprep 2 - load data.R")
 source(file="tags by school.R")
 
 ## 
-# methodcount barplot: produces a bar plot of method-tag counts per dissertation, for a given method tagset.
-# keyword barplot: produces a bar plot of author-provided keyword-tag counts per dissertation. Not so useful.
+# `methodcount barplot`: produces a bar plot of method-tag counts per dissertation, for a given method tagset.
+# `keyword barplot`: produces a bar plot of author-provided keyword-tag counts per dissertation. Not so useful.
 source(file="methodcount barplot.R")
 # source(file="keyword barplot.R")
 
 ## 
-# `frequency of method tags.R`: tabulates and plots the number of times a dissertation is tagged with each method.
+# `frequency of method tags`: tabulates and plots the number of times a dissertation is tagged with each method.
 # Provides three functions:
 #	get_tags(dataset_name, tagset_name): returns a named vector of frequencies for each method in the tagset
 #	methodfreq_combined(bigset, smallset, diffset): plots an overlaid horizontal bar graph of method frequencies;
@@ -47,15 +47,22 @@ source(file="methodcount barplot.R")
 source(file="frequency of method tags.R")
 
 
-## `top schools by method.R`: For each method in a given tagset, produce a list of the top X schools by either 
+## 
+# `top schools by method.R`: For each method in a given tagset, produce a list of the top X schools by either 
 #	methodological output (number of dissertations using that method at that school) or methodological focus 
 #	(percentage of dissertations using that method at that school).
 #	Provides one function: toplists(dataset_name, tagset_name, howmany, threshold, since, until, rank_by_pcts, combine)
 source(file="top schools by method.R")	
 
 
+## 
+# `collocation heatmap`: If a dissertation is tagged X, how many times is it also tagged Y? Aggregates methods tags
+# by other methods tags, with an option to norm by dividing the sums by each method's total count. 
+# Optionally plots a heatmap of results as an adjacency matrix. Requires `ben_heatmap.R`.
+source(file="collocation heatmap.R")
 
-source(file="collocation heatmap.R")	# method-method correlations (needs renaming)
+# `schools per year`: for each year, finds the number of institutions and number of dissertations.
+# Optionally plots these numbers as a line graph
 source(file="schools per year.R") 
 
 # source(file="map by school.R")		# per-method maps	# look for the individual files instead
