@@ -1,0 +1,109 @@
+[
+  {
+    "op": "core/multivalued-cell-split",
+    "description": "Split multi-valued cells in column KEYWORDS",
+    "columnName": "KEYWORDS",
+    "keyColumnName": "Pub number",
+    "separator": "|",
+    "mode": "plain"
+  },
+  {
+    "op": "core/row-removal",
+    "description": "Remove rows",
+    "engineConfig": {
+      "facets": [
+        {
+          "expression": "grel:isNotNull(value.match(/[A-Z,(\\W)?,(\\d)?]+/))",
+          "invert": false,
+          "selectError": false,
+          "omitError": false,
+          "name": "KEYWORDS",
+          "selectBlank": false,
+          "columnName": "KEYWORDS",
+          "omitBlank": false,
+          "type": "list",
+          "selection": [
+            {
+              "v": {
+                "v": true,
+                "l": "true"
+              }
+            }
+          ]
+        },
+        {
+          "expression": "grel:isNotNull(value)",
+          "invert": false,
+          "selectError": false,
+          "omitError": false,
+          "name": "Pub number",
+          "selectBlank": false,
+          "columnName": "Pub number",
+          "omitBlank": false,
+          "type": "list",
+          "selection": [
+            {
+              "v": {
+                "v": false,
+                "l": "false"
+              }
+            }
+          ]
+        }
+      ],
+      "mode": "row-based"
+    }
+  },
+  {
+    "op": "core/text-transform",
+    "description": "Text transform on cells in column KEYWORDS using expression null",
+    "engineConfig": {
+      "facets": [
+        {
+          "expression": "grel:isNotNull(value.match(/[A-Z,(\\W)?,(\\d)?]+/))",
+          "invert": false,
+          "selectError": false,
+          "omitError": false,
+          "name": "KEYWORDS",
+          "selectBlank": false,
+          "columnName": "KEYWORDS",
+          "omitBlank": false,
+          "type": "list",
+          "selection": [
+            {
+              "v": {
+                "v": true,
+                "l": "true"
+              }
+            }
+          ]
+        },
+        {
+          "expression": "grel:isNotNull(value)",
+          "invert": false,
+          "selectError": false,
+          "omitError": false,
+          "name": "Pub number",
+          "selectBlank": false,
+          "columnName": "Pub number",
+          "omitBlank": false,
+          "type": "list",
+          "selection": [
+            {
+              "v": {
+                "v": true,
+                "l": "true"
+              }
+            }
+          ]
+        }
+      ],
+      "mode": "row-based"
+    },
+    "columnName": "KEYWORDS",
+    "expression": "null",
+    "onError": "keep-original",
+    "repeat": false,
+    "repeatCount": 10
+  }
+]

@@ -1,0 +1,4426 @@
+[
+  {
+    "op": "core/multivalued-cell-split",
+    "description": "Split multi-valued cells in column KEYWORDS",
+    "columnName": "KEYWORDS",
+    "keyColumnName": "Pub number",
+    "separator": "|",
+    "mode": "plain"
+  },
+  {
+    "op": "core/mass-edit",
+    "description": "Mass edit cells in column KEYWORDS",
+    "engineConfig": {
+      "facets": [],
+      "mode": "record-based"
+    },
+    "columnName": "KEYWORDS",
+    "expression": "value",
+    "edits": [
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Burke, Kenneth",
+          "Kenneth Burke"
+        ],
+        "to": "Burke, Kenneth"
+      }
+    ]
+  },
+  {
+    "op": "core/mass-edit",
+    "description": "Mass edit cells in column KEYWORDS",
+    "engineConfig": {
+      "facets": [],
+      "mode": "record-based"
+    },
+    "columnName": "KEYWORDS",
+    "expression": "value",
+    "edits": [
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Creative nonfiction",
+          "Creative non-fiction"
+        ],
+        "to": "Creative nonfiction"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Bourdieu, Pierre",
+          "Pierre Bourdieu"
+        ],
+        "to": "Bourdieu, Pierre"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Paul, Saint",
+          "Saint Paul"
+        ],
+        "to": "Saint Paul"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Derrida, Jacques",
+          "Jacques Derrida"
+        ],
+        "to": "Derrida, Jacques"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Heidegger, Martin",
+          "Martin Heidegger"
+        ],
+        "to": "Heidegger, Martin"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Freire, Paulo",
+          "Paulo Freire"
+        ],
+        "to": "Freire, Paulo"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Irigaray, Luce",
+          "Luce Irigaray"
+        ],
+        "to": "Irigaray, Luce"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "King, Martin Luther, Jr.",
+          "King, Martin Luther, Jr"
+        ],
+        "to": "King, Martin Luther, Jr."
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Lacan, Jacques",
+          "Jacques Lacan"
+        ],
+        "to": "Lacan, Jacques"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Deleuze, Gilles",
+          "Gilles Deleuze"
+        ],
+        "to": "Deleuze, Gilles"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Chaucer, Geoffrey",
+          "Geoffrey Chaucer"
+        ],
+        "to": "Chaucer, Geoffrey"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Perelman, Chaim",
+          "Chaim Perelman"
+        ],
+        "to": "Perelman, Chaim"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Kristeva, Julia",
+          "Julia Kristeva"
+        ],
+        "to": "Kristeva, Julia"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Rogers, Carl",
+          "Carl Rogers"
+        ],
+        "to": "Rogers, Carl"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "World Wide Web",
+          "World wide web"
+        ],
+        "to": "World Wide Web"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Marx, Karl",
+          "Karl Marx"
+        ],
+        "to": "Marx, Karl"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Kierkegaard, Soren",
+          "Soren Kierkegaard"
+        ],
+        "to": "Kierkegaard, Soren"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Ensler, Eve",
+          "Eve Ensler"
+        ],
+        "to": "Ensler, Eve"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Levinas, Emmanuel",
+          "Emmanuel Levinas"
+        ],
+        "to": "Levinas, Emmanuel"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Scott, Fred Newton",
+          "Fred Newton Scott"
+        ],
+        "to": "Scott, Fred Newton"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Blanchot, Maurice",
+          "Maurice Blanchot"
+        ],
+        "to": "Blanchot, Maurice"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Email",
+          "E-mail"
+        ],
+        "to": "Email"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Stein, Gertrude",
+          "Gertrude Stein"
+        ],
+        "to": "Stein, Gertrude"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Deirdre McCloskey",
+          "McCloskey, Deirdre"
+        ],
+        "to": "McCloskey, Deirdre"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Carson, Rachel",
+          "Rachel Carson"
+        ],
+        "to": "Carson, Rachel"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "New literacy studies",
+          "New Literacy Studies"
+        ],
+        "to": "New Literacy Studies"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Spenser, Edmund",
+          "Edmund Spenser"
+        ],
+        "to": "Spenser, Edmund"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Arendt, Hannah",
+          "Hannah Arendt"
+        ],
+        "to": "Arendt, Hannah"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Bush, George H. W.",
+          "George H. W. Bush"
+        ],
+        "to": "Bush, George H. W."
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Cather, Willa",
+          "Willa Cather"
+        ],
+        "to": "Cather, Willa"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Reagan, Ronald",
+          "Ronald Reagan"
+        ],
+        "to": "Reagan, Ronald"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Edward Said",
+          "Said, Edward"
+        ],
+        "to": "Said, Edward"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Writing in the disciplines",
+          "Writing in the Disciplines"
+        ],
+        "to": "Writing in the Disciplines"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Nietzsche, Friedrich",
+          "Friedrich Nietzsche"
+        ],
+        "to": "Nietzsche, Friedrich"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "English Studies",
+          "English studies"
+        ],
+        "to": "English Studies"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Clinton, Bill",
+          "Bill Clinton"
+        ],
+        "to": "Clinton, Bill"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Richard Whately",
+          "Whately, Richard"
+        ],
+        "to": "Whately, Richard"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Campbell, George",
+          "George Campbell"
+        ],
+        "to": "Campbell, George"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "James, William",
+          "William James"
+        ],
+        "to": "James, William"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Joyce, James",
+          "James Joyce"
+        ],
+        "to": "Joyce, James"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Lev Semenovich Vygotskii",
+          "Vygotskii, Lev Semenovich"
+        ],
+        "to": "Vygotskii, Lev Semenovich"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Day, Dorothy",
+          "Dorothy Day"
+        ],
+        "to": "Day, Dorothy"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Foucault, Michel",
+          "Michel Foucault"
+        ],
+        "to": "Foucault, Michel"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Faulkner, William",
+          "William Faulkner"
+        ],
+        "to": "Faulkner, William"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Emerson, Ralph Waldo",
+          "Ralph Waldo Emerson"
+        ],
+        "to": "Emerson, Ralph Waldo"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Franz Kafka",
+          "Kafka, Franz"
+        ],
+        "to": "Kafka, Franz"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Winfrey, Oprah",
+          "Oprah Winfrey"
+        ],
+        "to": "Winfrey, Oprah"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Neoliberalism",
+          "Neo-liberalism"
+        ],
+        "to": "Neo-liberalism"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Donne, John",
+          "John Donne"
+        ],
+        "to": "Donne, John"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Kempe, Margery",
+          "Margery Kempe"
+        ],
+        "to": "Kempe, Margery"
+      }
+    ]
+  },
+  {
+    "op": "core/mass-edit",
+    "description": "Mass edit cells in column KEYWORDS",
+    "engineConfig": {
+      "facets": [],
+      "mode": "record-based"
+    },
+    "columnName": "KEYWORDS",
+    "expression": "value",
+    "edits": [
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Memoirs",
+          "Memoir(s)"
+        ],
+        "to": "Memoir(s)"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Bush, George W.",
+          "George W. Bush"
+        ],
+        "to": "Bush, George W."
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Language arts",
+          "Language Arts"
+        ],
+        "to": "Language Arts"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Shakespeare, William",
+          "William Shakespeare"
+        ],
+        "to": "Shakespeare, William"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Freshman composition",
+          "Freshman Composition"
+        ],
+        "to": "Freshman composition"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Post-process",
+          "Postprocess"
+        ],
+        "to": "Post-process"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Common sense",
+          "Common Sense"
+        ],
+        "to": "Common sense"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "with Original writing",
+          "With Original writing"
+        ],
+        "to": "with original writing"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Qur'an",
+          "Quran"
+        ],
+        "to": "Quran"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Composition studies",
+          "Composition Studies"
+        ],
+        "to": "Composition Studies"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Bakhtin, Mikhail",
+          "Mikhail Bakhtin"
+        ],
+        "to": "Bakhtin, Mikhail"
+      }
+    ]
+  },
+  {
+    "op": "core/mass-edit",
+    "description": "Mass edit cells in column KEYWORDS",
+    "engineConfig": {
+      "facets": [],
+      "mode": "record-based"
+    },
+    "columnName": "KEYWORDS",
+    "expression": "value",
+    "edits": [
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Writing course"
+        ],
+        "to": "Writing courses"
+      }
+    ]
+  },
+  {
+    "op": "core/mass-edit",
+    "description": "Mass edit cells in column KEYWORDS",
+    "engineConfig": {
+      "facets": [],
+      "mode": "record-based"
+    },
+    "columnName": "KEYWORDS",
+    "expression": "value",
+    "edits": [
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Writing conference"
+        ],
+        "to": "Writing conferences"
+      }
+    ]
+  },
+  {
+    "op": "core/mass-edit",
+    "description": "Mass edit cells in column KEYWORDS",
+    "engineConfig": {
+      "facets": [],
+      "mode": "record-based"
+    },
+    "columnName": "KEYWORDS",
+    "expression": "value",
+    "edits": [
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Writing curriculum"
+        ],
+        "to": "Writing curricula"
+      }
+    ]
+  },
+  {
+    "op": "core/mass-edit",
+    "description": "Mass edit cells in column KEYWORDS",
+    "engineConfig": {
+      "facets": [],
+      "mode": "record-based"
+    },
+    "columnName": "KEYWORDS",
+    "expression": "value",
+    "edits": [
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Writing group"
+        ],
+        "to": "Writing groups"
+      }
+    ]
+  },
+  {
+    "op": "core/mass-edit",
+    "description": "Mass edit cells in column KEYWORDS",
+    "engineConfig": {
+      "facets": [],
+      "mode": "record-based"
+    },
+    "columnName": "KEYWORDS",
+    "expression": "value",
+    "edits": [
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "De Man, Paul",
+          "Paul de Man"
+        ],
+        "to": "Paul de Man"
+      }
+    ]
+  },
+  {
+    "op": "core/mass-edit",
+    "description": "Mass edit cells in column KEYWORDS",
+    "engineConfig": {
+      "facets": [],
+      "mode": "record-based"
+    },
+    "columnName": "KEYWORDS",
+    "expression": "value",
+    "edits": [
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Bronte, Charlotte",
+          "Charlotte Bronte"
+        ],
+        "to": "Charlotte Bronte"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Aldo Leopold",
+          "Leopold, Aldo"
+        ],
+        "to": "Aldo Leopold"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Norris, Frank",
+          "Frank Norris"
+        ],
+        "to": "Frank Norris"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Berry, Wendell",
+          "Wendell Berry"
+        ],
+        "to": "Wendell Berry"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Annie M. Green",
+          "Green, Annie M."
+        ],
+        "to": "Annie M. Green"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Mill, John Stuart",
+          "John Stuart Mill"
+        ],
+        "to": "John Stuart Mill"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Alexis Massol",
+          "Massol, Alexis"
+        ],
+        "to": "Alexis Massol"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Lettie Hamlett Rogers",
+          "Rogers, Lettie Hamlett"
+        ],
+        "to": "Lettie Hamlett Rogers"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Bernal Diaz del Castillo",
+          "Diaz del Castillo, Bernal"
+        ],
+        "to": "Bernal Diaz del Castillo"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Giambattista Vico",
+          "Vico, Giambattista"
+        ],
+        "to": "Giambattista Vico"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Otto, Rudolf",
+          "Rudolf Otto"
+        ],
+        "to": "Rudolf Otto"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Grusin, Richard",
+          "Richard Grusin"
+        ],
+        "to": "Richard Grusin"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Georg Lukacs",
+          "Lukacs, Georg"
+        ],
+        "to": "Georg Lukacs"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Albert Gore",
+          "Gore, Albert"
+        ],
+        "to": "Albert Gore"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Annie Pike Greenwood",
+          "Greenwood, Annie Pike"
+        ],
+        "to": "Annie Pike Greenwood"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "LaHaye, Tim F.",
+          "Tim F. LaHaye"
+        ],
+        "to": "Tim F. LaHaye"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Dangarembga, Tsitsi",
+          "Tsitsi Dangarembga"
+        ],
+        "to": "Tsitsi Dangarembga"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Daniel Defoe",
+          "Defoe, Daniel"
+        ],
+        "to": "Daniel Defoe"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Anne Hebert",
+          "Hebert, Anne"
+        ],
+        "to": "Anne Hebert"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Hume, David",
+          "David Hume"
+        ],
+        "to": "David Hume"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Edson, Margaret",
+          "Margaret Edson"
+        ],
+        "to": "Margaret Edson"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Fawaz Turki",
+          "Turki, Fawaz"
+        ],
+        "to": "Fawaz Turki"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Nancy Sommers",
+          "Sommers, Nancy"
+        ],
+        "to": "Nancy Sommers"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Eva Marie Kelly",
+          "Kelly, Eva Marie"
+        ],
+        "to": "Eva Marie Kelly"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Friere, Paulo",
+          "Paulo Friere"
+        ],
+        "to": "Paulo Friere"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Abraham Flexner",
+          "Flexner, Abraham"
+        ],
+        "to": "Abraham Flexner"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Campbell, Ernest T.",
+          "Ernest T. Campbell"
+        ],
+        "to": "Ernest T. Campbell"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Prewriting",
+          "Pre-writing"
+        ],
+        "to": "Prewriting"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Gaines, William M.",
+          "William M. Gaines"
+        ],
+        "to": "William M. Gaines"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "James Cowles Prichard",
+          "Prichard, James Cowles"
+        ],
+        "to": "James Cowles Prichard"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Darwin, Charles",
+          "Charles Darwin"
+        ],
+        "to": "Charles Darwin"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Joseph R. McCarthy",
+          "McCarthy, Joseph R."
+        ],
+        "to": "Joseph R. McCarthy"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Dickinson, Emily",
+          "Emily Dickinson"
+        ],
+        "to": "Emily Dickinson"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Maria Amparo Ruiz de Burton",
+          "Ruiz de Burton, Maria Amparo"
+        ],
+        "to": "Maria Amparo Ruiz de Burton"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Benjamin, Walter",
+          "Walter Benjamin"
+        ],
+        "to": "Walter Benjamin"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Dan De Quille",
+          "De Quille, Dan"
+        ],
+        "to": "Dan De Quille"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "David Morgan",
+          "Morgan, David"
+        ],
+        "to": "David Morgan"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Johnson, Phillip",
+          "Phillip Johnson"
+        ],
+        "to": "Phillip Johnson"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Al-Amin, Jamil",
+          "Jamil Al-Amin"
+        ],
+        "to": "Jamil Al-Amin"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "John Steinbeck",
+          "Steinbeck, John"
+        ],
+        "to": "John Steinbeck"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Assata Shakur",
+          "Shakur, Assata"
+        ],
+        "to": "Assata Shakur"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Fish, Stanley",
+          "Stanley Fish"
+        ],
+        "to": "Stanley Fish"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Bishop, Wendy",
+          "Wendy Bishop"
+        ],
+        "to": "Wendy Bishop"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Des Forets, Louis-Rene",
+          "Louis-Rene Des Forets"
+        ],
+        "to": "Louis-Rene Des Forets"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Abdala Bucaram",
+          "Bucaram, Abdala"
+        ],
+        "to": "Abdala Bucaram"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Carey, Peter",
+          "Peter Carey"
+        ],
+        "to": "Peter Carey"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Augustine, Saint, Bishop of Hippo",
+          "Saint Augustine, Bishop of Hippo"
+        ],
+        "to": "Saint Augustine, Bishop of Hippo"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Allen Newell",
+          "Newell, Allen"
+        ],
+        "to": "Allen Newell"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Douglas, J. Yellowlees",
+          "J. Yellowlees Douglas"
+        ],
+        "to": "J. Yellowlees Douglas"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Girard, Rene",
+          "Rene Girard"
+        ],
+        "to": "Rene Girard"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Hultgreen, Kara",
+          "Kara Hultgreen"
+        ],
+        "to": "Kara Hultgreen"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Ludwig Wittgenstein",
+          "Wittgenstein, Ludwig"
+        ],
+        "to": "Ludwig Wittgenstein"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Dewey, John",
+          "John Dewey"
+        ],
+        "to": "John Dewey"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Garcia Moreno",
+          "Moreno, Garcia"
+        ],
+        "to": "Garcia Moreno"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Hanson, Victor Davis",
+          "Victor Davis Hanson"
+        ],
+        "to": "Victor Davis Hanson"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Massinger, Philip",
+          "Philip Massinger"
+        ],
+        "to": "Philip Massinger"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Francesco Vettori",
+          "Vettori, Francesco"
+        ],
+        "to": "Francesco Vettori"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Beti, Mongo",
+          "Mongo Beti"
+        ],
+        "to": "Mongo Beti"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Basic writing",
+          "Basic Writing"
+        ],
+        "to": "Basic Writing"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Marc Antoine Gerard, sieur de Saint-Amant",
+          "Saint-Amant, Marc Antoine Gerard, sieur de"
+        ],
+        "to": "Marc Antoine Gerard, sieur de Saint-Amant"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Arnold, Mary-Kim",
+          "Mary-Kim Arnold"
+        ],
+        "to": "Mary-Kim Arnold"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Percy, Walker",
+          "Walker Percy"
+        ],
+        "to": "Walker Percy"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Babeuf, Francois-Noel",
+          "Francois-Noel Babeuf"
+        ],
+        "to": "Francois-Noel Babeuf"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Frances E. W. Harper",
+          "Harper, Frances E. W."
+        ],
+        "to": "Frances E. W. Harper"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "David O. Selznick",
+          "Selznick, David O."
+        ],
+        "to": "David O. Selznick"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Charles Peguy",
+          "Peguy, Charles"
+        ],
+        "to": "Charles Peguy"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Andre Gide",
+          "Gide, Andre"
+        ],
+        "to": "Andre Gide"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Bertolt Brecht",
+          "Brecht, Bertolt"
+        ],
+        "to": "Bertolt Brecht"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Leone, Sergio",
+          "Sergio Leone"
+        ],
+        "to": "Sergio Leone"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Butler, Samuel",
+          "Samuel Butler"
+        ],
+        "to": "Samuel Butler"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Spanish-English",
+          "Spanish/English"
+        ],
+        "to": "Spanish/English"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Sidney, Sir Philip",
+          "Sir Philip Sidney"
+        ],
+        "to": "Sir Philip Sidney"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Laurence Sterne",
+          "Sterne, Laurence"
+        ],
+        "to": "Laurence Sterne"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Michael Walzer",
+          "Walzer, Michael"
+        ],
+        "to": "Michael Walzer"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Hemingway, Ernest",
+          "Ernest Hemingway"
+        ],
+        "to": "Ernest Hemingway"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Menendez Pidal, Ramon",
+          "Ramon Menendez Pidal"
+        ],
+        "to": "Ramon Menendez Pidal"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "G. Stanley Hall",
+          "Hall, G. Stanley"
+        ],
+        "to": "G. Stanley Hall"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Beckett, Samuel",
+          "Samuel Beckett"
+        ],
+        "to": "Samuel Beckett"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Hildegard von Bingen, Saint",
+          "Saint Hildegard von Bingen"
+        ],
+        "to": "Saint Hildegard von Bingen"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Gerda Lerner",
+          "Lerner, Gerda"
+        ],
+        "to": "Gerda Lerner"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Fernando de Rojas",
+          "Rojas, Fernando de"
+        ],
+        "to": "Fernando de Rojas"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Ramon del Valle-Inclan",
+          "Valle-Inclan, Ramon del"
+        ],
+        "to": "Ramon del Valle-Inclan"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Joseph Stalin",
+          "Stalin, Joseph"
+        ],
+        "to": "Joseph Stalin"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Diane Greco",
+          "Greco, Diane"
+        ],
+        "to": "Diane Greco"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Alanis Morissette",
+          "Morissette, Alanis"
+        ],
+        "to": "Alanis Morissette"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Thomas Wilson",
+          "Wilson, Thomas"
+        ],
+        "to": "Thomas Wilson"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Herbert Simon",
+          "Simon, Herbert"
+        ],
+        "to": "Herbert Simon"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Alan P. Lightman",
+          "Lightman, Alan P."
+        ],
+        "to": "Alan P. Lightman"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Angel Day",
+          "Day, Angel"
+        ],
+        "to": "Angel Day"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Behn, Aphra",
+          "Aphra Behn"
+        ],
+        "to": "Aphra Behn"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Revelation (Book of)",
+          "Revelation (book of)"
+        ],
+        "to": "Revelation (Book of)"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Ahmed, Leila",
+          "Leila Ahmed"
+        ],
+        "to": "Leila Ahmed"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Isabel Plumpton",
+          "Plumpton, Isabel"
+        ],
+        "to": "Isabel Plumpton"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Downing, Ellen Mary",
+          "Ellen Mary Downing"
+        ],
+        "to": "Ellen Mary Downing"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Burns, Janice",
+          "Janice Burns"
+        ],
+        "to": "Janice Burns"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Pryor, Richard",
+          "Richard Pryor"
+        ],
+        "to": "Richard Pryor"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Chappell, Clovis G.",
+          "Clovis G. Chappell"
+        ],
+        "to": "Clovis G. Chappell"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Nathalie Sarraute",
+          "Sarraute, Nathalie"
+        ],
+        "to": "Nathalie Sarraute"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Jean-Jacques Rousseau",
+          "Rousseau, Jean-Jacques"
+        ],
+        "to": "Jean-Jacques Rousseau"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Gold, Michael",
+          "Michael Gold"
+        ],
+        "to": "Michael Gold"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "McCracken, Robert J.",
+          "Robert J. McCracken"
+        ],
+        "to": "Robert J. McCracken"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Harvey, Steve",
+          "Steve Harvey"
+        ],
+        "to": "Steve Harvey"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Behe, Michael",
+          "Michael Behe"
+        ],
+        "to": "Michael Behe"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "DeLuca, Kevin",
+          "Kevin DeLuca"
+        ],
+        "to": "Kevin DeLuca"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Ida Pruitt",
+          "Pruitt, Ida"
+        ],
+        "to": "Ida Pruitt"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Luis Munoz Marin",
+          "Munoz Marin, Luis"
+        ],
+        "to": "Luis Munoz Marin"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Desalvo, Louise A.",
+          "Louise A. DeSalvo"
+        ],
+        "to": "Louise A. DeSalvo"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Allie Light",
+          "Light, Allie"
+        ],
+        "to": "Allie Light"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Bernanos, Georges",
+          "Georges Bernanos"
+        ],
+        "to": "Georges Bernanos"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Pedro Zamora",
+          "Zamora, Pedro"
+        ],
+        "to": "Pedro Zamora"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Finley, Karen",
+          "Karen Finley"
+        ],
+        "to": "Karen Finley"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Pinera, Virgilio",
+          "Virgilio Pinera"
+        ],
+        "to": "Virgilio Pinera"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Carolyn Forche",
+          "Forche, Carolyn"
+        ],
+        "to": "Carolyn Forche"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Fredric Wertham",
+          "Wertham, Fredric"
+        ],
+        "to": "Fredric Wertham"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Joseph Mayer Rice",
+          "Rice, Joseph Mayer"
+        ],
+        "to": "Joseph Mayer Rice"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "American History",
+          "American history"
+        ],
+        "to": "American History"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Felix Guattari",
+          "Guattari, Felix"
+        ],
+        "to": "Felix Guattari"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Edmund Husserl",
+          "Husserl, Edmund"
+        ],
+        "to": "Edmund Husserl"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Dwight D. Eisenhower",
+          "Eisenhower, Dwight D."
+        ],
+        "to": "Dwight D. Eisenhower"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Donna Haraway",
+          "Haraway, Donna"
+        ],
+        "to": "Donna Haraway"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Penrose, Roger",
+          "Roger Penrose"
+        ],
+        "to": "Roger Penrose"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Browne, Sir Thomas",
+          "Sir Thomas Browne"
+        ],
+        "to": "Sir Thomas Browne"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Writer's workshop",
+          "Writers workshop"
+        ],
+        "to": "Writer's workshop"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Twain, Mark",
+          "Mark Twain"
+        ],
+        "to": "Mark Twain"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Abu-Jamal, Mumia",
+          "Mumia Abu-Jamal"
+        ],
+        "to": "Mumia Abu-Jamal"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Elizabeth Stonor",
+          "Stonor, Elizabeth"
+        ],
+        "to": "Elizabeth Stonor"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Sigourney, Lydia",
+          "Lydia Sigourney"
+        ],
+        "to": "Lydia Sigourney"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Paul the Apostle, Saint",
+          "Saint Paul the Apostle"
+        ],
+        "to": "Saint Paul the Apostle"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Genesis (Book of)",
+          "Genesis (book of)"
+        ],
+        "to": "Genesis (Book of)"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Dierdre McCloskey",
+          "McCloskey, Dierdre"
+        ],
+        "to": "Dierdre McCloskey"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Dreiser, Theodore",
+          "Theodore Dreiser"
+        ],
+        "to": "Theodore Dreiser"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "David Payne",
+          "Payne, David"
+        ],
+        "to": "David Payne"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Freire, Paolo",
+          "Paolo Freire"
+        ],
+        "to": "Paolo Freire"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Ian McHarg",
+          "McHarg, Ian"
+        ],
+        "to": "Ian McHarg"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Curley, James M.",
+          "James M. Curley"
+        ],
+        "to": "James M. Curley"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Brown, Hallie Quinn",
+          "Hallie Quinn Brown"
+        ],
+        "to": "Hallie Quinn Brown"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Eliza Farnham",
+          "Farnham, Eliza"
+        ],
+        "to": "Eliza Farnham"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Carolyn Guyer",
+          "Guyer, Carolyn"
+        ],
+        "to": "Carolyn Guyer"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Deborah Hoffmann",
+          "Hoffmann, Deborah"
+        ],
+        "to": "Deborah Hoffmann"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Bakhtin, Mikhail M.",
+          "Mikhail M. Bakhtin"
+        ],
+        "to": "Mikhail M. Bakhtin"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Frye, Northrup",
+          "Northrup Frye"
+        ],
+        "to": "Northrup Frye"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Bolter, J. David",
+          "J. David Bolter"
+        ],
+        "to": "J. David Bolter"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Guinier, Lani",
+          "Lani Guinier"
+        ],
+        "to": "Lani Guinier"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Fuller, Margaret",
+          "Margaret Fuller"
+        ],
+        "to": "Margaret Fuller"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Birgitta of Sweden, Saint",
+          "Saint Birgitta of Sweden"
+        ],
+        "to": "Saint Birgitta of Sweden"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Barthes, Roland",
+          "Roland Barthes"
+        ],
+        "to": "Roland Barthes"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Griffin, Paul",
+          "Paul Griffin"
+        ],
+        "to": "Paul Griffin"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Truth, Sojourner",
+          "Sojourner Truth"
+        ],
+        "to": "Sojourner Truth"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Michael Polanyi",
+          "Polanyi, Michael"
+        ],
+        "to": "Michael Polanyi"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Chiang Kai-shek, Madame",
+          "Madame Chiang Kai-shek"
+        ],
+        "to": "Madame Chiang Kai-shek"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Hobbes, Thomas",
+          "Thomas Hobbes"
+        ],
+        "to": "Thomas Hobbes"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Cixous, Helene",
+          "Helene Cixous"
+        ],
+        "to": "Helene Cixous"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "DeLillo, Don",
+          "Don DeLillo"
+        ],
+        "to": "Don DeLillo"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Bresson, Robert",
+          "Robert Bresson"
+        ],
+        "to": "Robert Bresson"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Helen Hunt Jackson",
+          "Jackson, Helen Hunt"
+        ],
+        "to": "Helen Hunt Jackson"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Diamela Eltit",
+          "Eltit, Diamela"
+        ],
+        "to": "Diamela Eltit"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "John Henry Newman",
+          "Newman, John Henry"
+        ],
+        "to": "John Henry Newman"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Lucie Olbrects-Tyteca",
+          "Olbrects-Tyteca, Lucie"
+        ],
+        "to": "Lucie Olbrects-Tyteca"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Barrett, Linda",
+          "Linda Barrett"
+        ],
+        "to": "Linda Barrett"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Agnes Plumpton",
+          "Plumpton, Agnes"
+        ],
+        "to": "Agnes Plumpton"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Co-authoring",
+          "Coauthoring"
+        ],
+        "to": "Coauthoring"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Charles Dickens",
+          "Dickens, Charles"
+        ],
+        "to": "Charles Dickens"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Juana Ines de la Cruz, Sor",
+          "Sor Juana Ines de la Cruz"
+        ],
+        "to": "Sor Juana Ines de la Cruz"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Francine Pascal",
+          "Pascal, Francine"
+        ],
+        "to": "Francine Pascal"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Carter, Heyward",
+          "Heyward Carter"
+        ],
+        "to": "Heyward Carter"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Beecher, Catharine",
+          "Catharine Beecher"
+        ],
+        "to": "Catharine Beecher"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Coetzee, J. M.",
+          "J. M. Coetzee"
+        ],
+        "to": "J. M. Coetzee"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Bates, Dolly",
+          "Dolly Bates"
+        ],
+        "to": "Dolly Bates"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Barry M. Goldwater",
+          "Goldwater, Barry M."
+        ],
+        "to": "Barry M. Goldwater"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Edgar Allan Poe",
+          "Poe, Edgar Allan"
+        ],
+        "to": "Edgar Allan Poe"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Ben Jonson",
+          "Jonson, Ben"
+        ],
+        "to": "Ben Jonson"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "George Herbert",
+          "Herbert, George"
+        ],
+        "to": "George Herbert"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Adorno, Theodor W.",
+          "Theodor W. Adorno"
+        ],
+        "to": "Theodor W. Adorno"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Giovanni Battista Vico",
+          "Vico, Giovanni Battista"
+        ],
+        "to": "Giovanni Battista Vico"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Madame de Stael",
+          "Stael, Madame de"
+        ],
+        "to": "Madame de Stael"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Clarence E. Macartney",
+          "Macartney, Clarence E."
+        ],
+        "to": "Clarence E. Macartney"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Locke, Richard Adams",
+          "Richard Adams Locke"
+        ],
+        "to": "Richard Adams Locke"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Coppin, Frances Jackson",
+          "Frances Jackson Coppin"
+        ],
+        "to": "Frances Jackson Coppin"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Ida M. Tarbell",
+          "Tarbell, Ida M."
+        ],
+        "to": "Ida M. Tarbell"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Brooks, Rodney",
+          "Rodney Brooks"
+        ],
+        "to": "Rodney Brooks"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Dove, Rita",
+          "Rita Dove"
+        ],
+        "to": "Rita Dove"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Dos Passos, John",
+          "John Dos Passos"
+        ],
+        "to": "John Dos Passos"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Jean-Francois Varlet",
+          "Varlet, Jean-Francois"
+        ],
+        "to": "Jean-Francois Varlet"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Jamil Mahuat",
+          "Mahuat, Jamil"
+        ],
+        "to": "Jamil Mahuat"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Ferrand, Jacques",
+          "Jacques Ferrand"
+        ],
+        "to": "Jacques Ferrand"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Eliot, George",
+          "George Eliot"
+        ],
+        "to": "George Eliot"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Langland, William",
+          "William Langland"
+        ],
+        "to": "William Langland"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Professional and technical communication",
+          "Technical and professional communication"
+        ],
+        "to": "Professional and technical communication"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Borges, Jorge Luis",
+          "Jorge Luis Borges"
+        ],
+        "to": "Jorge Luis Borges"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Cervantes Saavedra, Miguel de",
+          "Miguel de Cervantes Saavedra"
+        ],
+        "to": "Miguel de Cervantes Saavedra"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Charlotte Lennox",
+          "Lennox, Charlotte"
+        ],
+        "to": "Charlotte Lennox"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Frederic Jameson",
+          "Jameson, Frederic"
+        ],
+        "to": "Frederic Jameson"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Daniel Myrick",
+          "Myrick, Daniel"
+        ],
+        "to": "Daniel Myrick"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Bataille, Georges",
+          "Georges Bataille"
+        ],
+        "to": "Georges Bataille"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Clark Kerr",
+          "Kerr, Clark"
+        ],
+        "to": "Clark Kerr"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "William Butler Yeats",
+          "Yeats, William Butler"
+        ],
+        "to": "William Butler Yeats"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "John Broadus Watson",
+          "Watson, John Broadus"
+        ],
+        "to": "John Broadus Watson"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Bacon, Francis",
+          "Francis Bacon"
+        ],
+        "to": "Francis Bacon"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Machiavelli, Niccolo",
+          "Niccolo Machiavelli"
+        ],
+        "to": "Niccolo Machiavelli"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "International Teaching Assistants",
+          "International teaching assistants"
+        ],
+        "to": "International teaching assistants"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Buck, Pearl S.",
+          "Pearl S. Buck"
+        ],
+        "to": "Pearl S. Buck"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Judith Sargent Murray",
+          "Murray, Judith Sargent"
+        ],
+        "to": "Judith Sargent Murray"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Balzac, Honore de",
+          "Honore de Balzac"
+        ],
+        "to": "Honore de Balzac"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Harriet Beecher Stowe",
+          "Stowe, Harriet Beecher"
+        ],
+        "to": "Harriet Beecher Stowe"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Cramer, Thomas",
+          "Thomas Cramer"
+        ],
+        "to": "Thomas Cramer"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Coffin, William Sloane, Jr.",
+          "William Sloane Coffin, Jr."
+        ],
+        "to": "William Sloane Coffin, Jr."
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Margaret Paston",
+          "Paston, Margaret"
+        ],
+        "to": "Margaret Paston"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Catherine of Siena, Saint",
+          "Saint Catherine of Siena"
+        ],
+        "to": "Saint Catherine of Siena"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Bridwell-Bowles, Lillian",
+          "Lillian Bridwell-Bowles"
+        ],
+        "to": "Lillian Bridwell-Bowles"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Rowson, Susanna Haswell",
+          "Susanna Haswell Rowson"
+        ],
+        "to": "Susanna Haswell Rowson"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Benjamin R. Tillman",
+          "Tillman, Benjamin R."
+        ],
+        "to": "Benjamin R. Tillman"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Self-Regulated Strategy Development",
+          "Self-regulated strategy development"
+        ],
+        "to": "Self-Regulated Strategy Development"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Henry Peacham",
+          "Peacham, Henry"
+        ],
+        "to": "Henry Peacham"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Patricia J. Williams",
+          "Williams, Patricia J."
+        ],
+        "to": "Patricia J. Williams"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Francois de Malherbe",
+          "Malherbe, Francois de"
+        ],
+        "to": "Francois de Malherbe"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Hill, Walter",
+          "Walter Hill"
+        ],
+        "to": "Walter Hill"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Rushdie, Salman",
+          "Salman Rushdie"
+        ],
+        "to": "Salman Rushdie"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Hildegard of Bingen, Saint",
+          "Saint Hildegard of Bingen"
+        ],
+        "to": "Saint Hildegard of Bingen"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Finkelstein, Norman G.",
+          "Norman G. Finkelstein"
+        ],
+        "to": "Norman G. Finkelstein"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Bartolomeo Cerretani",
+          "Cerretani, Bartolomeo"
+        ],
+        "to": "Bartolomeo Cerretani"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Hale, Sarah Josepha",
+          "Sarah Josepha Hale"
+        ],
+        "to": "Sarah Josepha Hale"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Ryan White",
+          "White, Ryan"
+        ],
+        "to": "Ryan White"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Dyer, Leonidas C.",
+          "Leonidas C. Dyer"
+        ],
+        "to": "Leonidas C. Dyer"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Christopher Marlowe",
+          "Marlowe, Christopher"
+        ],
+        "to": "Christopher Marlowe"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Mbeki, Thabo",
+          "Thabo Mbeki"
+        ],
+        "to": "Thabo Mbeki"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Marianne Moore",
+          "Moore, Marianne"
+        ],
+        "to": "Marianne Moore"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Theophile de Viau",
+          "Viau, Theophile de"
+        ],
+        "to": "Theophile de Viau"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Harrison Ross Steeves",
+          "Steeves, Harrison Ross"
+        ],
+        "to": "Harrison Ross Steeves"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Child, Lydia Maria",
+          "Lydia Maria Child"
+        ],
+        "to": "Lydia Maria Child"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Shelby Steele",
+          "Steele, Shelby"
+        ],
+        "to": "Shelby Steele"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Adele Givens",
+          "Givens, Adele"
+        ],
+        "to": "Adele Givens"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Cicero, Marcus Tullius",
+          "Marcus Tullius Cicero"
+        ],
+        "to": "Marcus Tullius Cicero"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Bale, John",
+          "John Bale"
+        ],
+        "to": "John Bale"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Roosevelt, Franklin D.",
+          "Franklin D. Roosevelt"
+        ],
+        "to": "Franklin D. Roosevelt"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Bohr, Niels",
+          "Niels Bohr"
+        ],
+        "to": "Niels Bohr"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Jenkins, Jerry",
+          "Jerry Jenkins"
+        ],
+        "to": "Jerry Jenkins"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Melville, Herman",
+          "Herman Melville"
+        ],
+        "to": "Herman Melville"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Fosdick, Harry Emerson",
+          "Harry Emerson Fosdick"
+        ],
+        "to": "Harry Emerson Fosdick"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Jose Maria Velasco Ibarra",
+          "Velasco Ibarra, Jose Maria"
+        ],
+        "to": "Jose Maria Velasco Ibarra"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Alasdair MacIntyre",
+          "MacIntyre, Alasdair"
+        ],
+        "to": "Alasdair MacIntyre"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "James, Henry",
+          "Henry James"
+        ],
+        "to": "Henry James"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Irving Saraf",
+          "Saraf, Irving"
+        ],
+        "to": "Irving Saraf"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Augustine, Saint",
+          "Saint Augustine"
+        ],
+        "to": "Saint Augustine"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Eduardo Sanchez II",
+          "Sanchez, Eduardo, II"
+        ],
+        "to": "Eduardo Sanchez II"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Joubert, Laurent",
+          "Laurent Joubert"
+        ],
+        "to": "Laurent Joubert"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Burroughs, William S.",
+          "William S. Burroughs"
+        ],
+        "to": "William S. Burroughs"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Alice Randall",
+          "Randall, Alice"
+        ],
+        "to": "Alice Randall"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Doolittle, Hilda",
+          "Hilda Doolittle"
+        ],
+        "to": "Hilda Doolittle"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Franz Schubert",
+          "Schubert, Franz"
+        ],
+        "to": "Franz Schubert"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Erskine, John",
+          "John Erskine"
+        ],
+        "to": "John Erskine"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Benjamin Franklin",
+          "Franklin, Benjamin"
+        ],
+        "to": "Benjamin Franklin"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Progressive Education",
+          "Progressive education"
+        ],
+        "to": "Progressive education"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Bob Owen",
+          "Owen, Bob"
+        ],
+        "to": "Bob Owen"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "T. Minh-Ha Trinh",
+          "Trinh, T. Minh-Ha"
+        ],
+        "to": "T. Minh-Ha Trinh"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Denney, Joseph Villiers",
+          "Joseph Villiers Denney"
+        ],
+        "to": "Joseph Villiers Denney"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Wells, Ida B.",
+          "Ida B. Wells"
+        ],
+        "to": "Ida B. Wells"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Catharine Maria Sedgwick",
+          "Sedgwick, Catharine Maria"
+        ],
+        "to": "Catharine Maria Sedgwick"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Dembski, William",
+          "William Dembski"
+        ],
+        "to": "William Dembski"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Janette Miller",
+          "Miller, Janette"
+        ],
+        "to": "Janette Miller"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Women religious",
+          "Religious women"
+        ],
+        "to": "Women religious"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Harriet Jacobs",
+          "Jacobs, Harriet"
+        ],
+        "to": "Harriet Jacobs"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Ambroise Pare",
+          "Pare, Ambroise"
+        ],
+        "to": "Ambroise Pare"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Klass, Perri",
+          "Perri Klass"
+        ],
+        "to": "Perri Klass"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Adam Smith",
+          "Smith, Adam"
+        ],
+        "to": "Adam Smith"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Querry, Ronald B.",
+          "Ronald B. Querry"
+        ],
+        "to": "Ronald B. Querry"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Charles Swindoll",
+          "Swindoll, Charles"
+        ],
+        "to": "Charles Swindoll"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Bell, Derrick",
+          "Derrick Bell"
+        ],
+        "to": "Derrick Bell"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Grimke, Sarah Moore",
+          "Sarah Moore Grimke"
+        ],
+        "to": "Sarah Moore Grimke"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "James Weldon Johnson",
+          "Johnson, James Weldon"
+        ],
+        "to": "James Weldon Johnson"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Shakur, Tupac",
+          "Tupac Shakur"
+        ],
+        "to": "Tupac Shakur"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Flipper, Henry Ossian",
+          "Henry Ossian Flipper"
+        ],
+        "to": "Henry Ossian Flipper"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Randall Robinson",
+          "Robinson, Randall"
+        ],
+        "to": "Randall Robinson"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Jackson, Shelley",
+          "Shelley Jackson"
+        ],
+        "to": "Shelley Jackson"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Foster, Hannah Webster",
+          "Hannah Webster Foster"
+        ],
+        "to": "Hannah Webster Foster"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Brodkey, Linda",
+          "Linda Brodkey"
+        ],
+        "to": "Linda Brodkey"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Askew, Anne",
+          "Anne Askew"
+        ],
+        "to": "Anne Askew"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "John G. Neihardt",
+          "Neihardt, John G."
+        ],
+        "to": "John G. Neihardt"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Blair, Hugh",
+          "Hugh Blair"
+        ],
+        "to": "Hugh Blair"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Heather McHugh",
+          "McHugh, Heather"
+        ],
+        "to": "Heather McHugh"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Denton, Michael",
+          "Michael Denton"
+        ],
+        "to": "Michael Denton"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Brown, Charles Brockden",
+          "Charles Brockden Brown"
+        ],
+        "to": "Charles Brockden Brown"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Kant, Immanuel",
+          "Immanuel Kant"
+        ],
+        "to": "Immanuel Kant"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Aydelotte, Frank",
+          "Frank Aydelotte"
+        ],
+        "to": "Frank Aydelotte"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Darryl F. Zanuck",
+          "Zanuck, Darryl F."
+        ],
+        "to": "Darryl F. Zanuck"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Alcott, Louisa May",
+          "Louisa May Alcott"
+        ],
+        "to": "Louisa May Alcott"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Diego de San Pedro",
+          "San Pedro, Diego de"
+        ],
+        "to": "Diego de San Pedro"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Ramos, Rosa Hilda",
+          "Rosa Hilda Ramos"
+        ],
+        "to": "Rosa Hilda Ramos"
+      }
+    ]
+  },
+  {
+    "op": "core/mass-edit",
+    "description": "Mass edit cells in column KEYWORDS",
+    "engineConfig": {
+      "facets": [
+        {
+          "invert": false,
+          "expression": "value",
+          "selectError": false,
+          "omitError": false,
+          "selectBlank": false,
+          "name": "KEYWORDS",
+          "omitBlank": false,
+          "columnName": "KEYWORDS",
+          "type": "list",
+          "selection": [
+            {
+              "v": {
+                "v": "2004 presidential election",
+                "l": "2004 presidential election"
+              }
+            },
+            {
+              "v": {
+                "v": "Presidential election of 2000",
+                "l": "Presidential election of 2000"
+              }
+            },
+            {
+              "v": {
+                "v": "Presidential election of 2008",
+                "l": "Presidential election of 2008"
+              }
+            },
+            {
+              "v": {
+                "v": "Presidential election of 2004",
+                "l": "Presidential election of 2004"
+              }
+            },
+            {
+              "v": {
+                "v": "Presidential election",
+                "l": "Presidential election"
+              }
+            },
+            {
+              "v": {
+                "v": "Presidential elections",
+                "l": "Presidential elections"
+              }
+            }
+          ]
+        }
+      ],
+      "mode": "record-based"
+    },
+    "columnName": "KEYWORDS",
+    "expression": "value",
+    "edits": [
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Presidential election"
+        ],
+        "to": "Presidential elections"
+      }
+    ]
+  },
+  {
+    "op": "core/mass-edit",
+    "description": "Mass edit cells in column KEYWORDS",
+    "engineConfig": {
+      "facets": [
+        {
+          "invert": false,
+          "expression": "value",
+          "selectError": false,
+          "omitError": false,
+          "selectBlank": false,
+          "name": "KEYWORDS",
+          "omitBlank": false,
+          "columnName": "KEYWORDS",
+          "type": "list",
+          "selection": [
+            {
+              "v": {
+                "v": "Composition course",
+                "l": "Composition course"
+              }
+            }
+          ]
+        }
+      ],
+      "mode": "record-based"
+    },
+    "columnName": "KEYWORDS",
+    "expression": "value",
+    "edits": [
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Composition course"
+        ],
+        "to": "Composition courses"
+      }
+    ]
+  },
+  {
+    "op": "core/mass-edit",
+    "description": "Mass edit cells in column KEYWORDS",
+    "engineConfig": {
+      "facets": [],
+      "mode": "record-based"
+    },
+    "columnName": "KEYWORDS",
+    "expression": "value",
+    "edits": [
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Robinson, Haddon",
+          "Robinson, Haddon W."
+        ],
+        "to": "Robinson, Haddon"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Paolo Freire",
+          "Paulo Friere"
+        ],
+        "to": "Paulo Friere"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Learning community",
+          "Learning communities"
+        ],
+        "to": "Learning communities"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "College students",
+          "College student"
+        ],
+        "to": "College students"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Reader response",
+          "Reader-response"
+        ],
+        "to": "Reader response"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Stewart, Maria",
+          "Stewart, Maria W."
+        ],
+        "to": "Stewart, Maria"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Web sites",
+          "Websites"
+        ],
+        "to": "Websites"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Identity negotiation",
+          "Identity negotiations"
+        ],
+        "to": "Identity negotiation"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Public intellectuals",
+          "Public intellectual"
+        ],
+        "to": "Public intellectuals"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Multimodal composition",
+          "Multimodal compositions"
+        ],
+        "to": "Multimodal composition"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Multimodal literacies",
+          "Multimodal literacy"
+        ],
+        "to": "Multimodal literacies"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Literacy narratives",
+          "Literacy narrative"
+        ],
+        "to": "Literacy narratives"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Writing workshop",
+          "Writing workshops"
+        ],
+        "to": "Writing workshops"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "State of the Union Address",
+          "State of the Union addresses"
+        ],
+        "to": "State of the Union addresses"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Literature discussion",
+          "Literature discussions"
+        ],
+        "to": "Literature discussions"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Collective identity",
+          "Collective identities"
+        ],
+        "to": "Collective identities"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Hip-hop",
+          "Hip hop"
+        ],
+        "to": "Hip-hop"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Vice president",
+          "Vice-president"
+        ],
+        "to": "Vice president"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Web site",
+          "Website"
+        ],
+        "to": "Website"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Agenda setting",
+          "Agenda-setting"
+        ],
+        "to": "Agenda setting"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Missile defense",
+          "Missile defenses"
+        ],
+        "to": "Missile defense"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Writing pedagogy",
+          "Writing pedagogies"
+        ],
+        "to": "Writing pedagogy"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Communication technologies",
+          "Communication technology"
+        ],
+        "to": "Communication technologies"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Composition pedagogy",
+          "Composition pedagogies"
+        ],
+        "to": "Composition pedagogy"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "At risk",
+          "At-risk"
+        ],
+        "to": "At-risk"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Du Bois, W. E. B.",
+          "Du Bois, W.E.B."
+        ],
+        "to": "Du Bois, W. E. B."
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Writing across the curriculum",
+          "Writing-across-the-curriculum"
+        ],
+        "to": "Writing across the curriculum"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Writing courses",
+          "Writing ccourses"
+        ],
+        "to": "Writing courses"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Writing classroom",
+          "Writing classrooms"
+        ],
+        "to": "Writing classroom"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Video games",
+          "Videogames"
+        ],
+        "to": "Video games"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Rhetorical tradition",
+          "Rhetorical traditions"
+        ],
+        "to": "Rhetorical traditions"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Creative process",
+          "Creative processes"
+        ],
+        "to": "Creative processes"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Rhetorical situation",
+          "Rhetorical situations"
+        ],
+        "to": "Rhetorical situation"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Writing-to-learn",
+          "Writing to learn"
+        ],
+        "to": "Writing to learn"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Writing assessment",
+          "Writing assessments"
+        ],
+        "to": "Writing assessment"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "English department",
+          "English departments"
+        ],
+        "to": "English departments"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Digital rhetoric",
+          "Digital rhetorics"
+        ],
+        "to": "Digital rhetorics"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Peer response",
+          "Peer responses"
+        ],
+        "to": "Peer response"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Language switching",
+          "Language-switching"
+        ],
+        "to": "Language switching"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Saint Hildegard of Bingen",
+          "Saint Hildegard von Bingen"
+        ],
+        "to": "Saint Hildegard of Bingen"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Alternate discourse",
+          "Alternate discourses"
+        ],
+        "to": "Alternate discourses"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Academic literacy",
+          "Academic literacies"
+        ],
+        "to": "Academic literacies"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Teacher research",
+          "Teacher-research"
+        ],
+        "to": "Teacher research"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Graduate students",
+          "Graduate student"
+        ],
+        "to": "Graduate students"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Life writing",
+          "Life-writing"
+        ],
+        "to": "Life writing"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Habermas, Juergen",
+          "Habermas, Jurgen"
+        ],
+        "to": "Habermas, Jurgen"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Said, Edward",
+          "Said, Edward W."
+        ],
+        "to": "Said, Edward"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Think-aloud protocol",
+          "Think-aloud protocols"
+        ],
+        "to": "Think-aloud protocols"
+      }
+    ]
+  },
+  {
+    "op": "core/mass-edit",
+    "description": "Mass edit cells in column KEYWORDS",
+    "engineConfig": {
+      "facets": [],
+      "mode": "record-based"
+    },
+    "columnName": "KEYWORDS",
+    "expression": "value",
+    "edits": [
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Instructors",
+          "Instructor"
+        ],
+        "to": "Instructors"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Preachers",
+          "Preacher"
+        ],
+        "to": "Preachers"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Writing-intensive",
+          "Writing intensive"
+        ],
+        "to": "Writing intensive"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Research paper",
+          "Research papers"
+        ],
+        "to": "Research papers"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Portfolios",
+          "Portfolio"
+        ],
+        "to": "Portfolios"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Reader",
+          "Readers"
+        ],
+        "to": "Readers"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "E-portfolios",
+          "E-portfolio"
+        ],
+        "to": "E-portfolios"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Motivation",
+          "Motivations"
+        ],
+        "to": "Motivation"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Revision",
+          "Revisions"
+        ],
+        "to": "Revision"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Computer games",
+          "Computer game"
+        ],
+        "to": "Computer games"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Classroom designs",
+          "Classroom design"
+        ],
+        "to": "Classroom design"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Electronic texts",
+          "Electronic text"
+        ],
+        "to": "Electronic texts"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Workshop",
+          "Workshops"
+        ],
+        "to": "Workshops"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Magazine",
+          "Magazines"
+        ],
+        "to": "Magazines"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Cultural rhetorics",
+          "Cultural rhetoric"
+        ],
+        "to": "Cultural rhetorics"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Peer tutors",
+          "Peer tutor"
+        ],
+        "to": "Peer tutors"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Manifesto",
+          "Manifestos"
+        ],
+        "to": "Manifestos"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "High-stakes tests",
+          "High-stakes test"
+        ],
+        "to": "High-stakes tests"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Authors",
+          "Author"
+        ],
+        "to": "Authors"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Adolescent",
+          "Adolescents"
+        ],
+        "to": "Adolescents"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Handwriting",
+          "Hand writing"
+        ],
+        "to": "Handwriting"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Eighteenth century",
+          "Eighteenth-century"
+        ],
+        "to": "Eighteenth century"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Closing arguments",
+          "Closing argument"
+        ],
+        "to": "Closing arguments"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Undergraduate",
+          "Undergraduates"
+        ],
+        "to": "Undergraduate"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Weblogs",
+          "Weblog"
+        ],
+        "to": "Weblogs"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Peace movements",
+          "Peace movement"
+        ],
+        "to": "Peace movements"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Personal narratives",
+          "Personal narrative"
+        ],
+        "to": "Personal narratives"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Colleges",
+          "College"
+        ],
+        "to": "Colleges"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Enthymemes",
+          "Enthymeme"
+        ],
+        "to": "Enthymemes"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "College-level",
+          "College level"
+        ],
+        "to": "College-level"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Museums",
+          "Museum"
+        ],
+        "to": "Museums"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Philosophical hermeneutics",
+          "Philosophical hermeneutic"
+        ],
+        "to": "Philosophical hermeneutics"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Young adult",
+          "Young adults"
+        ],
+        "to": "Young adults"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Immigrants",
+          "Immigrant"
+        ],
+        "to": "Immigrants"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Writing teachers",
+          "Writing teacher"
+        ],
+        "to": "Writing teachers"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "American Indian rhetorics",
+          "American Indian rhetoric"
+        ],
+        "to": "American Indian rhetorics"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Dissertations",
+          "Dissertation"
+        ],
+        "to": "Dissertations"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Peer revision",
+          "Peer revisions"
+        ],
+        "to": "Peer revision"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Narrative structures",
+          "Narrative structure"
+        ],
+        "to": "Narrative structures"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Audience",
+          "Audiences"
+        ],
+        "to": "Audience"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Motives",
+          "Motive"
+        ],
+        "to": "Motives"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Metaphor",
+          "Metaphors"
+        ],
+        "to": "Metaphor"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Representation",
+          "Representations"
+        ],
+        "to": "Representation"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Presidential campaigns",
+          "Presidential campaign"
+        ],
+        "to": "Presidential campaigns"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Senior citizen",
+          "Senior citizens"
+        ],
+        "to": "Senior citizens"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Social network",
+          "Social networks"
+        ],
+        "to": "Social networks"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Newspapers",
+          "Newspaper"
+        ],
+        "to": "Newspapers"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Teachers",
+          "Teacher"
+        ],
+        "to": "Teachers"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Technical communicator",
+          "Technical communicators"
+        ],
+        "to": "Technical communicators"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Discourse function",
+          "Discourse functions"
+        ],
+        "to": "Discourse function"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Writing assignments",
+          "Writing assignment"
+        ],
+        "to": "Writing assignments"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Emotion",
+          "Emotions"
+        ],
+        "to": "Emotion"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "First-year students",
+          "First-year student"
+        ],
+        "to": "First-year students"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Research articles",
+          "Research article"
+        ],
+        "to": "Research articles"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Negotiation",
+          "Negotiations"
+        ],
+        "to": "Negotiation"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Textbooks",
+          "Textbook"
+        ],
+        "to": "Textbooks"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Teaching assistants",
+          "Teaching assistant"
+        ],
+        "to": "Teaching assistants"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Student-teacher relationships",
+          "Student-teacher relationship"
+        ],
+        "to": "Student-teacher relationships"
+      },
+      {
+        "fromBlank": false,
+        "fromError": false,
+        "from": [
+          "Gesture",
+          "Gestures"
+        ],
+        "to": "Gesture"
+      }
+    ]
+  },
+  {
+    "op": "core/multivalued-cell-join",
+    "description": "Join multi-valued cells in column KEYWORDS",
+    "columnName": "KEYWORDS",
+    "keyColumnName": "Pub number",
+    "separator": "|"
+  },
+  {
+    "op": "core/text-transform",
+    "description": "Text transform on cells in column KEYWORDS using expression grel:forEach(value.split(\"|\"),v,v.trim()).uniques().join(\"|\")",
+    "engineConfig": {
+      "facets": [
+        {
+          "query": "",
+          "name": "KEYWORDS",
+          "caseSensitive": false,
+          "columnName": "KEYWORDS",
+          "type": "text",
+          "mode": "text"
+        }
+      ],
+      "mode": "record-based"
+    },
+    "columnName": "KEYWORDS",
+    "expression": "grel:forEach(value.split(\"|\"),v,v.trim()).uniques().join(\"|\")",
+    "onError": "keep-original",
+    "repeat": false,
+    "repeatCount": 10
+  }
+]

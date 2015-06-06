@@ -1,0 +1,62 @@
+[
+  {
+    "op": "core/column-split",
+    "description": "Split column Adviser by separator",
+    "engineConfig": {
+      "facets": [
+        {
+          "expression": "grel:isNotNull(value.match(/[A-Z,(\\W)?,(\\d)?]+/))",
+          "invert": false,
+          "selectError": false,
+          "omitError": false,
+          "name": "KEYWORDS",
+          "selectBlank": false,
+          "columnName": "KEYWORDS",
+          "omitBlank": false,
+          "type": "list",
+          "selection": [
+            {
+              "v": {
+                "v": false,
+                "l": "false"
+              }
+            }
+          ]
+        }
+      ],
+      "mode": "record-based"
+    },
+    "columnName": "Adviser",
+    "guessCellType": true,
+    "removeOriginalColumn": true,
+    "mode": "separator",
+    "separator": ": ",
+    "regex": false,
+    "maxColumns": 2
+  },
+  {
+    "op": "core/column-rename",
+    "description": "Rename column Adviser 1 to Advisor type",
+    "oldColumnName": "Adviser 1",
+    "newColumnName": "Advisor type"
+  },
+  {
+    "op": "core/column-rename",
+    "description": "Rename column Adviser 2 to Advisor Name",
+    "oldColumnName": "Adviser 2",
+    "newColumnName": "Advisor Name"
+  },
+  {
+    "op": "core/text-transform",
+    "description": "Text transform on cells in column Advisor Name using expression value.trim()",
+    "engineConfig": {
+      "facets": [],
+      "mode": "record-based"
+    },
+    "columnName": "Advisor Name",
+    "expression": "value.trim()",
+    "onError": "keep-original",
+    "repeat": false,
+    "repeatCount": 10
+  }
+]
