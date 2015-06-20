@@ -70,6 +70,11 @@ get.doc.composition <- function(dataset_name="consorts", ntopics=55) {
 	head(doc_topics.dt)
 	return(doc_topics.dt)
 }
+
+# Run `get.doc.composition()` when file is sourced, so we don't have to recreate this multiple times for the same dataset if we're running `top_topic_browser()` using the `for.bind` option.
+# TO DO: Make this happen within get.doc.composition() -- i.e. give the function the side effect of creating this object -- so it's responsive to dataset_name and ntopics.
+doc_topics_consorts_55.dt <- get.doc.composition("consorts", 55)
+
 	
 # Helper function: retrieve top five topics for a given Pub.number
 get.topics4doc <- function(pubnum, dataset_name="consorts", ntopics=55, howmany=5, showlabels=FALSE) {
