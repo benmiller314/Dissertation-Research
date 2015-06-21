@@ -62,7 +62,7 @@ strength_v_rank <- function(my.topic,
 	legendtext <- paste0("topic: ", my.topic, "\n'",topic.label, "'\noverall rank: ", overall.rank)
 	
 	# plot it
-	if(remake_figs) { filename <- paste0(imageloc, maintitle, ".pdf"); pdf(filename) }
+	if(remake_figs) { filename <- paste0(imageloc, maintitle, " ", subtitle, ".pdf"); pdf(filename) }
 	plot(my.ranks, 											# x values
 		 my.contribs, 										# y values
 		 main=maintitle, 									# title of figure
