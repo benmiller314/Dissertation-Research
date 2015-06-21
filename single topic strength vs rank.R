@@ -4,10 +4,17 @@
 #  Rationale: I want to know whether some topics with high overall rank are secretly low-but-consistent across lots of docs
 
 
-strength_v_rank <- function(my.topic, dataset_name="consorts", ntopics=55) {
+strength_v_rank <- function(my.topic, 
+							dataset_name = "consorts", 
+							ntopics		 = 55,
+							bad.topics	 = NULL
+							) 
+{
 	# Exclude non-content-bearing topics
-	bad.topics <- c("4", "47", "22", "2", "24", 	# bad OCR or ProQuest boilerplate
+	if(is.null(bad.topics) && dataset_name="consorts" && ntopics=55) {
+		bad.topics <- c("4", "47", "22", "2", "24", 	# bad OCR or ProQuest boilerplate
 					"13", "50")						# language markers (Italian, Spanish)
+	}
 					
 	if(my.topic %in% bad.topics) { warning(paste("Topic", my.topic, "has been identified as non-content-bearing")) }	
 	
@@ -82,7 +89,7 @@ if(autorun) {
 	head(topic.labels.dt)
 	
 	# Exclude non-content-bearing topics
-	bad.topics <- c("4", "47", "22", "2", "24")
+	bad.topics <- c("4", "47", "22", "2", "24", "13", "50")
 	topic.labels.dt <- topic.labels.dt[!(Topic %in% bad.topics)]
 	setkey(topic.labels.dt, Rank)
 	topics.by.rank <- head(topic.labels.dt[, Topic], 10)
