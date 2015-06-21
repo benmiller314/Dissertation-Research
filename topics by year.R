@@ -1,16 +1,14 @@
 ## topics by year.R
 ## GOAL: To graph the rising and falling contributions to the corpus of each (or specified) topic over time.
 
-## hard-code parameters during testing; later, pass to wraparound function
-# dataset_name <- "consorts"
-# ntopics <- 55
 
 topics.by.year <- function(dataset_name = "consorts", 
-							ntopics = 55,
-							to.plot = NULL,		# any pre-set topics to plot?
-							do.plot = TRUE		# should we draw it, or just return the df?
-							){
+							ntopics		= 55,
+							to.plot		= NULL,		# any pre-set topics to plot?
 							do.plot		= TRUE,		# should we draw it, or just return the dataframe?
+							per.plot	= 5			# how many lines per plot, at maximum?
+							)
+{
 require(data.table)
 require(RColorBrewer)
 
@@ -36,7 +34,7 @@ require(RColorBrewer)
 	
 	df <- as.data.frame(topic.year.avg)
 	
-	# Helper function: get_topic_labels (now moved to its own file, 'get topic labels.R')
+
 	# Get topic labels, which you've composed elsewhere using 'top docs per topic.R', to use in figure legends
 	if(!exists("get_topic_labels", mode="function")) { source(file="get topic labels.R") }
 	topic.labels.dt <- get_topic_labels("consorts", 55)
@@ -48,7 +46,9 @@ require(RColorBrewer)
 	setkey(topic.labels.dt, Rank)
 	head(topic.labels.dt)
 	
-	# Set graphing parameters; see http://www.statmethods.net/graphs/line.html
+
+
+	# We'll use plot.me in the other function, so figure it out even if we're not actually plotting.
 	if (!is.null(to.plot)) { 							# any pre-set topics to plot?
 		plot.me <- to.plot 
 	} else {
@@ -68,20 +68,72 @@ require(RColorBrewer)
 		
 		
 		
-		# After each set of 5 topics, start a new plot
-		if (i %in% enough) {
-			if(remake_figs) {
-				dev.off()		# cancel open file connection from the previous loop, if there is one
-				filename <- paste0(imageloc, maintitle, ", Topics ranked ", i, "-", (i+4), ".pdf")
-				pdf(filename)	# start writing a new file
+		## Draw `per.plot` (by default, 5) lines on the same plot, then start a new plot and repeat.
+		
+		# start recording to file if desired
+		if(remake_figs) {
+			if(is.null(to.plot)) {
+				filename <- paste0(imageloc, maintitle, ", Topics ranked ", i, "-", (i+per.plot-1), ".pdf")
+			} else {
+				filename <- paste0(imageloc, maintitle, ", Topics ", to.plot[i], "-", to.plot[i+per.plot-1], ".pdf")
 			}
-			# set up a blank plot in a standard size
-			plot(df$Year, rep(yrange, length((df$Year))/2), type="n", xaxs="r", ylab="Portion of corpus (scaled to 1)", xlab="Year", bty="n", main=maintitle)
-	
-			# add a legend for up to five values
-			if(i <= 10) { legendloc <- "bottomright" } else { legendloc <- "topright"}
-			legend(legendloc, title=paste0("Topics, ranked ", i, "-",(i+4), " of ", nrow(topic.labels.dt)), legend=paste0(plot.me[seq(i, i+4, 1)], ": ", topic.labels.dt[i:(i+4), Label]), fill=mycol[j:(j+4)], border=mycol[j:(j+4)], bty="n", cex=0.8)
+			
+			pdf(filename)
 		}
+		
+		# set a target for when to repeat
+		enough <- seq(1, length(plot.me), by=per.plot)
+		
+		for (i in 1:length(plot.me)) {
+			# Get a per-plot index to rotate through colors
+			j <- ((i-1) %% per.plot) + 1
+			
+			
+			# After each set of `per.plot` topics, start a new plot
+			if (i %in% enough) {
+				
+				# make sure we don't print extra nulls at the end
+				if((length(plot.me) - i) > per.plot) {
+					legend.offset <- (per.plot-i) %% per.plot
+				} else {
+					legend.offset <- length(plot.me) - i
+				}
+				
+				if(remake_figs) {
+					dev.off()		# close an open file connection from the previous loop, if there is one
+					if(is.null(to.plot)) {
+						filename <- paste0(imageloc, maintitle, ", Topics ranked ", i, "-", (i+legend.offset), ".pdf")
+					} else {
+						filename <- paste0(imageloc, maintitle, ", Topics ", to.plot[i], "-", to.plot[(i+legend.offset)], ".pdf")
+					}
+					pdf(filename)	# start writing a new file
+				}
+				# set up a blank plot in a standard size
+				plot(df$Year, rep(yrange, length((df$Year))/2), type="n", xaxs="r", ylab="Portion of corpus (scaled to 1)", xlab="Year", bty="n", main=maintitle)
+		
+				# add a legend for up to five values
+				if(i <= 10) { legendloc <- "bottomright" } else { legendloc <- "topright" }
+				
+				
+				
+				if(is.null(to.plot)) { 
+					legend(legendloc, title=paste0("Topics, ranked ", i, "-",(i+legend.offset), " of ", nrow(topic.labels.dt)),
+						legend=paste0(plot.me[seq(i, (i+legend.offset), 1)], ": ", 
+						topic.labels.dt[Topic %in% plot.me[i:(i+legend.offset)], Label]), 
+						fill=mycol[j:(j+legend.offset)], border=mycol[j:(j+legend.offset)], bty="n", cex=0.8)
+				} else {
+					legend(legendloc, title="Topics", legend=paste0(plot.me[seq(i, (i+legend.offset), 1)], ": ", 
+						topic.labels.dt[Topic %in% plot.me[i:(i+legend.offset)], Label]), 
+						fill=mycol[j:(j+legend.offset)], border=mycol[j:(j+legend.offset)], bty="n", cex=0.8)
+				}
+			}	# end new plot + legend
+		
+			# draw the line and loop back
+			lines(x=df$Year, y=df[,as.character(plot.me[i])], type="l", pch=plotchar[j], col=mycol[j])
+		}
+		
+		# now that we're done looping, close the final file connection
+		if(remake_figs) {dev.off()}
 	} # end if(do.plot)
 	
 		# draw the line and loop back
@@ -101,7 +153,8 @@ require(RColorBrewer)
 
 topic.variation <- function(dataset_name = "consorts", 
 							ntopics = 55,
-							to.plot = NULL		# any pre-set topics to plot?
+							to.plot = NULL,		# any pre-set topics to plot?
+							notch	= FALSE
 							) {
 # okay, this is interesting
 	df <- topics.by.year(dataset_name, ntopics, to.plot, do.plot=F)
