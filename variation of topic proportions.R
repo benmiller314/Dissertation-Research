@@ -6,6 +6,7 @@
 topic.proportions <- function(dataset_name	   = "consorts", 
 							  ntopics		   = 55, 
 							  bad.topics	   = NULL, 			# uses defaults if default dataset and ntopics are used
+							  use.notch		   = FALSE,			# draw notch in barplot to check for overlap?
 							  explore.outliers = FALSE) 
 {
 	require(data.table)
@@ -38,7 +39,7 @@ topic.proportions <- function(dataset_name	   = "consorts",
 	if(remake_figs) { 
 		pdf(file=paste0(imageloc, maintitle, ".pdf")) 
 	}
-		boxplot(grid.sorted[, 1:10], cex.axis=0.6, las=1, main=maintitle, sub=subtitle, xlab="Topic Rank", ylab="Portion of Document (scaled to 1)", yaxp=c(0, 1, 10))
+		boxplot(grid.sorted[, 1:10], cex.axis=1, las=1, main=maintitle, sub=subtitle, xlab="Topic Rank", ylab="Portion of Document (scaled to 1)", yaxp=c(0, 1, 10), notch=T)
 		# abline(h=0.12) 	# includes top three quartiles for the 2nd-ranked topic, but only the top quartile for 3rd
 	if(remake_figs) { dev.off() }
 
