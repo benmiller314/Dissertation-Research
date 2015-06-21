@@ -42,7 +42,7 @@ require(RColorBrewer)
 	head(topic.labels.dt)
 	
 	# Exclude non-content-bearing topics
-	bad.topics <- c("4", "47", "22", "2", "24")
+	bad.topics <- c("4", "47", "22", "2", "24", "13", "50")
 	topic.labels.dt <- topic.labels.dt[!(Topic %in% bad.topics)]
 	setkey(topic.labels.dt, Rank)
 	head(topic.labels.dt)
