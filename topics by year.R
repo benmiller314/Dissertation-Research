@@ -10,6 +10,7 @@ topics.by.year <- function(dataset_name = "consorts",
 							to.plot = NULL,		# any pre-set topics to plot?
 							do.plot = TRUE		# should we draw it, or just return the df?
 							){
+							do.plot		= TRUE,		# should we draw it, or just return the dataframe?
 require(data.table)
 require(RColorBrewer)
 
@@ -55,25 +56,17 @@ require(RColorBrewer)
 		# plot.me <- 2:ncol(df)-1									# gives 1:ntopics
 		plot.me <- topic.labels.dt[order(Rank), Topic]				# gives all topics in order of rank
 	}
-	xrange <- range(df$Year)									# X axis will be years
-	yrange <- c(0, max(df[, !names(df) %in% "Year"]))			# Y axis will be % of the corpus contributed by topic
-	mycol <- brewer.pal(n=(5-length(plot.me) %% 5 + 1), name="Dark2")		# Use different colors for each plot
-	# plotchar <- seq(18, 18+length(plot.me), 1)					# Use different symbols for each plot?
-	plotchar <- rep(20, length(plot.me))						# Nah, use same symbols for each plot
-	maintitle <- "Average Topic Proportions over Time"
-	
-	
-	
-	## Draw 5 lines on the same plot, then start a new plot and repeat.
-	
-	# start recording to file if desired
-	if(remake_figs) {filename <- paste0(imageloc, maintitle, ", Topics ", i, "-", (i+4), ".pdf"); pdf(filename)}
-	
-	enough <- seq(1, length(plot.me), by=5)
-	
-	for (i in 1:length(plot.me)) {
-		# Get a per-plot index to rotate through colors
-		j <- ((i-1) %% 5) + 1
+
+	# Set graphing parameters; see http://www.statmethods.net/graphs/line.html.
+	if(do.plot) {
+		xrange <- range(df$Year)									# X axis will be years
+		yrange <- c(0, max(df[, !names(df) %in% "Year"]))			# Y axis will be % of the corpus contributed by topic
+		mycol <- brewer.pal(n=per.plot, name="Dark2")				# Use different colors for each plot
+		# plotchar <- seq(18, 18+length(plot.me), 1)				# Use different symbols for each plot?
+		plotchar <- rep(20, length(plot.me))						# Nah, use same symbols for each plot
+		maintitle <- "Average Topic Proportions over Time"
+		
+		
 		
 		# After each set of 5 topics, start a new plot
 		if (i %in% enough) {
@@ -89,6 +82,7 @@ require(RColorBrewer)
 			if(i <= 10) { legendloc <- "bottomright" } else { legendloc <- "topright"}
 			legend(legendloc, title=paste0("Topics, ranked ", i, "-",(i+4), " of ", nrow(topic.labels.dt)), legend=paste0(plot.me[seq(i, i+4, 1)], ": ", topic.labels.dt[i:(i+4), Label]), fill=mycol[j:(j+4)], border=mycol[j:(j+4)], bty="n", cex=0.8)
 		}
+	} # end if(do.plot)
 	
 		# draw the line and loop back
 		lines(x=df$Year, y=df[,as.character(plot.me[i])], type="l", pch=plotchar[j], col=mycol[j])
