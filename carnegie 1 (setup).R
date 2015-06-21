@@ -1,5 +1,5 @@
 # read in and parse the Carnegie Classification data
-carnegie.all <- read.csv(file="../cc2010_classification_data_datasheet_06.03.2013.csv")
+carnegie.all <- read.csv(file=paste0(dataloc, "cc2010_classification_data_datasheet_06.03.2013.csv"))
 attach(carnegie.all)
 
 # identify and subset out schools in my dataset
