@@ -136,14 +136,7 @@ require(RColorBrewer)
 		if(remake_figs) {dev.off()}
 	} # end if(do.plot)
 	
-		# draw the line and loop back
-		lines(x=df$Year, y=df[,as.character(plot.me[i])], type="l", pch=plotchar[j], col=mycol[j])
-	}
-	
-	# now that we're done looping, close the final file connection
-	if(remake_figs) {dev.off()}
-	
-	invisible(df)
+	invisible(list("df"=df, "rank.order"=plot.me))
 }
 
 # ## Find year-to-year peak variation for each topic
@@ -157,7 +150,10 @@ topic.variation <- function(dataset_name = "consorts",
 							notch	= FALSE
 							) {
 # okay, this is interesting
-	df <- topics.by.year(dataset_name, ntopics, to.plot, do.plot=F)
+	df <- topics.by.year(dataset_name, ntopics, to.plot, do.plot=FALSE)
+	rank.order <- df$rank.order
+	df <- df$df
+
 	
 	maintitle <- "Yearly Variation of Topic Proportions Generally Preserves Topic Rank"
 	if(dataset_name == "consorts") {
