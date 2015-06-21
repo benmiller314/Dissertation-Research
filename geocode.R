@@ -1,5 +1,7 @@
 # Geocoding instructions from http://allthingsr.blogspot.com/2012/01/geocode-your-data-using-r-json-and.html
 
+# NB: This file will be called by `map by school 1 (setup).R`
+
 library("RJSONIO") #Load Library
 
 getGeoCode <- function(gcStr)
@@ -84,6 +86,8 @@ levels(all_schools[,3])
 rm(l2,l3,geoCols)
 
 #save that file!
-filename <- paste0(dataloc, "geocoding by school, N", diss.count,".csv")
-write.csv(all_schools,file=filename)
+if(remake_figs) {
+	filename <- paste0(dataloc, "geocoding by school, N", diss.count,".csv")
+	write.csv(all_schools,file=filename)
+}
 
