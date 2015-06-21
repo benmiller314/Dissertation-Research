@@ -68,7 +68,8 @@ strength_v_rank <- function(my.topic,
 		 main=maintitle, 									# title of figure
 		 xlab="Topic Rank within Document", 				# x-axis label
 		 ylab="Topic Contribution within Document", 		# y-axis label
-		 ylim=c(0, ymax)									# use the same y-axis for better comparison between plots
+		 ylim=c(0, ymax),									# use the same y-axis for better comparison between plots
+		 xlim=c(0, ncol(grid)),								# same for x-axis
 	)
 	mtext(subtitle)
 	legend("topright", legendtext, bty="n")
