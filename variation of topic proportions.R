@@ -140,9 +140,14 @@ topic.proportions <- function(dataset_name	   = "consorts",
 		}
 
 		
-		
-		
-		
-		
-	}
+	} # end if(explore.outliers)
+	
+	message("Stats for contributions of topics at various ranks within dissertations:")	
+	return(stats)
+}
+
+if(autorun) {
+	remake_figs
+	topic.proportions()
+	topic.proportions(explore.outliers=T)
 }
