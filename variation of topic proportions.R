@@ -47,7 +47,7 @@ topic.proportions <- function(dataset_name	   = "consorts",
 	
 	## Time to make the plot
 	maintitle <- "Variation of Topic Proportions, Top 10 Topics per Document"
-	subtitle <- paste0(dataset_name, ", N=", nrow(get(dataset_name)))
+	subtitle <- paste0(dataset_name, ", N=", nrow(grid))
 
 	if(remake_figs) { 
 		pdf(file=paste0(imageloc, maintitle, ".pdf")) 
