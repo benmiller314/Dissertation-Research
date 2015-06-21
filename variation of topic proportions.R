@@ -12,7 +12,7 @@ topic.proportions <- function(dataset_name	   = "consorts",
 	require(data.table)
 	if(!exists("get.doctopic.grid", mode="function")) { source("get doctopic grid.R") }
 	grid <- data.table(get.doctopic.grid()$outputfile, key="Pub.number")
-	str(grid)
+	# str(grid)
 	head(grid)
 	
 	# Exclude non-content-bearing topics
@@ -20,7 +20,7 @@ topic.proportions <- function(dataset_name	   = "consorts",
 		bad.topics <- c("4", "47", "22", "2", "24", "50", "13") 
 	}
 	grid.clean <- grid[, !(names(grid) %in% c(bad.topics, "Pub.number")), with=F]
-	head(grid.clean)
+	print(head(grid.clean))
 
 		
 	# decreasing sort across each row -- ignore column (i.e. topic) names
@@ -29,7 +29,20 @@ topic.proportions <- function(dataset_name	   = "consorts",
 	# each row is a dissertation; we lose topic numbers, but now column 1 is the weight of the top-ranked topic 
 	# for that row, column 2 the weight of the 2nd-ranked topic, and so on. 
 	# Let's look at the 10 top-ranked topics for every dissertation.
-	head(grid.sorted[, 1:10])
+	print(head(grid.sorted[, 1:10]))
+	
+	stats <- data.frame()		# start empty, build up
+	for (i in 1:3) {
+		# message(paste0("Stats for ", i, "-ranked topic within dissertations:"))
+		stats <- rbind(stats, boxplot.stats(grid.sorted[, i])$stats)
+	}
+
+	# lower whisker, lower ‘hinge’, median, upper ‘hinge’, upper whisker
+	names(stats) <- c("lower", "Lhinge", "median", "Uhinge", "upper")
+	stats <- cbind("rank of topic within diss"=c(1, 2, 3), stats)
+	
+	# we'll return the stats data.frame later.
+
 	
 	
 	## Time to make the plot
@@ -91,6 +104,7 @@ topic.proportions <- function(dataset_name	   = "consorts",
 		# report back
 		message("Upper outliers for top-ranked topics:")
 		print(labels.t)
+		message(paste("Total outliers for top-ranked topic:", sum(labels.t[, "Outlier Count", with=F])))
 		
 		# Okay,	my hypothesis is false! All sorts of topics here. Interesting. 
 		# Still, I may want to remove the language topics, since they do tend to dominate their dissertations.
@@ -108,7 +122,7 @@ topic.proportions <- function(dataset_name	   = "consorts",
 
 		while (tolower(a) != "s") {
 			for(i in outliers$Pub.number) {
-				print(get.topics4doc(i, dataset_name, ntopics))
+				print(get.topics4doc(i, dataset_name, ntopics, showlabels=TRUE))
 				if (!remake_figs) { 
 					a <- readline("Press <enter> for next doc, D for more details, or S to skip to the end\n") 
 				} else { 
