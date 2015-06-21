@@ -68,6 +68,7 @@ get.doc.composition <- function(dataset_name="consorts", ntopics=55) {
 	doc_topics.dt <- as.data.table(doc_topics)
 	setkey(doc_topics.dt, Pub.number)
 	head(doc_topics.dt)
+	
 	return(doc_topics.dt)
 }
 
@@ -76,7 +77,7 @@ get.doc.composition <- function(dataset_name="consorts", ntopics=55) {
 doc_topics_consorts_55.dt <- get.doc.composition("consorts", 55)
 
 	
-# Helper function: retrieve top five topics for a given Pub.number
+### Helper function: retrieve top five topics for a given Pub.number
 get.topics4doc <- function(pubnum, dataset_name="consorts", ntopics=55, howmany=5, showlabels=FALSE) {
 		# get packages in case we've just restarted R
 		require(data.table)
@@ -103,7 +104,7 @@ get.topics4doc <- function(pubnum, dataset_name="consorts", ntopics=55, howmany=
 			)
 }
 
-# Browse through the top topics and their top-proportioned dissertations
+### Browse through the top topics and their top-proportioned dissertations
 top_topic_browser <- function(start.rank	 = 1, 				# assuming we're looping, start where?
 								topic		 = NULL,			# alternately, browse one specified topic
 								dataset_name = "consorts",

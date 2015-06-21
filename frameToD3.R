@@ -339,7 +339,7 @@ if(autorun) {
 if(autorun) { 
 	cotopic_edges(level=0.12, min=1)		# 12% determined by `variation of topic proportions.R` to include
 	cotopic_edges(level=0.12, min=2)		# nearly all primary topics and 3/4 of secondary topics;
-	cotopic_edges(level=0.12, min=3)	# see `Variation of Topic Proportions, Top 10 Topics per Document.pdf`
+	cotopic_edges(level=0.12, min=3)		# see `Variation of Topic Proportions, Top 10 Topics per Document.pdf`
 	cotopic_edges(level=0.12, min=4)
 	cotopic_edges(level=0.12, min=5)
 }

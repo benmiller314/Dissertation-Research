@@ -3,7 +3,11 @@
 #  aggregated over all documents, as a boxplot of contribution (y-axis) sorted by topic rank (x-axis).
 #  Rationale: I want to know at what level to cut off "cotopics": what's a realistic scenario?
 
-topic.proportions <- function(dataset_name="consorts", ntopics=55, bad.topics=NULL, explore.outliers=F) {
+topic.proportions <- function(dataset_name	   = "consorts", 
+							  ntopics		   = 55, 
+							  bad.topics	   = NULL, 			# uses defaults if default dataset and ntopics are used
+							  explore.outliers = FALSE) 
+{
 	require(data.table)
 	if(!exists("get.doctopic.grid", mode="function")) { source("get doctopic grid.R") }
 	grid <- data.table(get.doctopic.grid()$outputfile, key="Pub.number")
@@ -11,7 +15,7 @@ topic.proportions <- function(dataset_name="consorts", ntopics=55, bad.topics=NU
 	head(grid)
 	
 	# Exclude non-content-bearing topics
-	if(is.null(bad.topics) && dataset_name=="consorts" && ntopics==55) { 
+	if(is.null(bad.topics) && dataset_name=="consorts" && ntopics==55) { 		# defaults
 		bad.topics <- c("4", "47", "22", "2", "24", "50", "13") 
 	}
 	grid.clean <- grid[, !(names(grid) %in% c(bad.topics, "Pub.number")), with=F]
@@ -27,7 +31,7 @@ topic.proportions <- function(dataset_name="consorts", ntopics=55, bad.topics=NU
 	head(grid.sorted[, 1:10])
 	
 	
-	# Time to make the plot
+	## Time to make the plot
 	maintitle <- "Variation of Topic Proportions, Top 10 Topics per Document"
 	subtitle <- paste0(dataset_name, ", N=", nrow(get(dataset_name)))
 
@@ -42,7 +46,7 @@ topic.proportions <- function(dataset_name="consorts", ntopics=55, bad.topics=NU
 	## Optionally extract top-topic outliers for further examination
 	if(explore.outliers) {
 		upper.whisker <- boxplot.stats(grid.sorted[, 1])$stats[5]
-		outliers.index <- which(grid.sorted[, 1] > upper.whisker)
+		outliers.index <- which(grid.sorted[, 1] > upper.whisker)		# just look at #1 topic
 		outliers <- cbind(grid[outliers.index, "Pub.number", with=F], grid.sorted[outliers.index, 1:10])
 		outliers <- outliers[order(outliers$V1, decreasing=T), ]
 		
