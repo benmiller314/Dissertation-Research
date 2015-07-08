@@ -4,9 +4,11 @@
 
 library("RJSONIO") #Load Library
 
-getGeoCode <- function(gcStr)
+getGeoCode <- function( gcStr, 				# what location should we find lat/lng for?
+						throttle = 2)		# how long to wait, in seconds, between requests?
 {
-  throttle <- 2		# how long to wait, in seconds, between requests?
+  
+  # correct for locations that GoogleMaps API can't find the names of
   if (gcStr == "Aquinas Institute of Theology") {
   	gcStr <- "3 South Spring Avenue St. Louis, Missouri"
   } else if (gcStr == "Emmanuel College of Victoria University (Canada)") {
@@ -40,54 +42,63 @@ getGeoCode <- function(gcStr)
 
   Sys.sleep(throttle)
   return (gcodes)
-}
+} 	# end of getGeoCode()
 
-# For each school found, use the function above to create new Lat and Long columns.
-all_schools <- levels(noexcludes$School)
+geoCodeAll <- function(dataset_name="noexcludes", schoolColName=c("School", "NAME")) {
 
-geoCols <- lapply(all_schools,function(val){getGeoCode(val)})
-
-geoCols <- t(data.frame(geoCols))			# Lat/long is in rows; flip it
-all_schools <- cbind(all_schools,geoCols)
-row.names(all_schools) <- NULL	
-all_schools <- data.frame(all_schools)
-names(all_schools.m) <- c("all_schools", "Lat", "Lng")
-
-
-# now to fix the ones that didn't match:
-	# first, get city and state data from "carnegie 1 (setup).R"
-all_schools <- merge(all_schools, carnegie.all[,2:4], by.x="all_schools", by.y="NAME", all.x=T, all.y=F)
-
-for (i in 1:nrow(all_schools)) {
-	# for all rows, combine the city and state for ease of search
-	all_schools[i,6] <- paste(all_schools$CITY[i], "," ,all_schools$STABBR[i])
-
-	if (is.na(all_schools[i,2]) || is.na(all_schools[i,3])) {
-		# if blank, get Lat/Lng values based on city and state
-		geoCols <- getGeoCode(all_schools[i,6])
-		
-		# add the new Lat/Lng values to the levels, so they won't get rejected
-		l2 <- levels(all_schools[,2])
-		l2 <- c(l2, geoCols[[1]])		# Lat
-		levels(all_schools[,2]) <- l2
-		
-		l3 <- levels(all_schools[,3])
-		l3 <- c(l3, geoCols[[2]]) 		# Lng
-		levels(all_schools[,3]) <- l3
-		
-		# add the new values to the appropriate Lat/Lng cells
-		all_schools[i,2] <- geoCols[[1]]
-		all_schools[i,3] <- geoCols[[2]]
+	dataset <- get(dataset_name)
+	if (schoolColName == "NAME") {
+		all_schools <- levels(factor(dataset$NAME))
+	} else {
+		all_schools <- levels(factor(dataset$School))
 	}
-}
-levels(all_schools[,2])
-levels(all_schools[,3])
+	
+	# For each school found, use the function above to create new Lat and Long columns.	
+	geoCols <- lapply(all_schools, function (val) { getGeoCode(val) } )
+	
+	# geoCols gives Lat/long in rows; flip it and add to school names
+	all_schools.geo <- data.frame(all_schools, t(data.frame(geoCols)) )	
+		head(all_schools.geo)
+	row.names(all_schools.geo) <- NULL	
+		head(all_schools.geo)
+	
+	# now to fix the ones that didn't match:
+		# 1. get city and state data from "carnegie 1 (setup).R"
+		all_schools.geo <- merge(all_schools.geo, carnegie.all[,c("NAME", "CITY", "STABBR")], by.x="all_schools", by.y="NAME", all.x=T, all.y=F)
+		head(all_schools.geo)
+	
+		# 2. combine the city and state for ease of search
+		all_schools.geo$City.State <- paste0(all_schools.geo$CITY, ", " ,all_schools.geo$STABBR)
+	
+		# 3. find blank Lat or Lng 
+		blanks.index <- which(is.na(all_schools.geo$Lat))
+	
+		# 4. search based on city and state
+		for (i in blanks.index) {
+			lookup <- getGeoCode(all_schools.geo[i, "City.State"])
+				
+			# add the new Lat/Lng values to the levels, so they won't get rejected
+			levels(all_schools.geo$Lat) <- c(levels(all_schools.geo$Lat), lookup[["Lat"]])
+			levels(all_schools.geo$Lng) <- c(levels(all_schools.geo$Lng), lookup[["Lng"]])		
+			
+			# add the new values to the appropriate Lat/Lng cells
+			all_schools.geo[i, "Lat"] <- lookup[["Lat"]]
+			all_schools.geo[i, "Lng"] <- lookup[["Lng"]]
+		}
 
-rm(l2,l3,geoCols)
+	# check output
+	print(all_schools.geo)
+	
+	# convert Lat/Lng factors to numbers
+	all_schools.geo$Lat <- as.numeric(levels(all_schools.geo$Lat)[all_schools.geo$Lat])
+	all_schools.geo$Lng <- as.numeric(levels(all_schools.geo$Lng)[all_schools.geo$Lng])
 
-#save that file!
-if(remake_figs) {
-	filename <- paste0(dataloc, "geocoding by school, N", diss.count,".csv")
-	write.csv(all_schools,file=filename)
-}
-
+	# save that file!
+	if(remake_figs) {
+		filename <- paste0(dataloc, "geocoding by school, ", dataset_name, ", N", nrow(dataset),".csv")
+		write.csv(all_schools.geo, file=filename)
+	}
+	
+	return(all_schools.geo)
+	
+} 	# end of wrapper function geoCodeAll

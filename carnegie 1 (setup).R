@@ -4,32 +4,53 @@ attach(carnegie.all)
 
 # identify and subset out schools in my dataset
 # all schools with at least one doctoral program
-disses.all.fields <- carnegie.all$PROF_D + carnegie.all$SOC_D + carnegie.all$STEM_D + carnegie.all$HUM_D
 
-
-cdoc2010 <- carnegie.all[which(IPGRAD2010 > 11),]
+cdoc2010 <<- carnegie.all[which(carnegie.all$IPGRAD2010 > 11),]
 cdoc2005 <- carnegie.all[which(CCIPGRAD > 11),]
 cdoc2000 <- carnegie.all[which(CC2000 %in% c(15,16)),]
 
-rows <- with(carnegie.all, !which(NAME %in% noexcludes$School))
-
-cdoc2010.geo <- merge(cdoc2010,all_schools[,1:3], by.x="NAME", by.y="School")
 
 
-s <- schools.geo[,1:3]
-c <- carnegie.all[,2:4]
+detach(carnegie.all)
+if (!exists("cdoc2010.geo")) {
+		action <- readline("Geocoding data is missing for Carnegie Classification doctoral schools. To load a pre-created file, press L; to geocode now, press G.")
+		if (tolower(action) == "l") { 
+			invisible(readline("Select the geocoding csv file from geocode.R. (Filename is like 'geocoding by school, cdoc2010, N449.csv'; press <Enter> when ready."))
+			cdoc2010.geo <<- read.csv(file=file.choose())
+			
+			# trim the first column, which is just the row number added on file save
+			cdoc2010.geo <<- data.frame(cdoc2010.geo[,2:ncol(cdoc2010.geo)])
+			head(cdoc2010.geo)	
+			
+		} else if (tolower(action) == "g") {
+			if(!exists("geoCodeAll", mode="function")) { source(file="geocode.R") }
+			cdoc2010.geo <<- geoCodeAll("cdoc2010", "NAME")					# takes about 15 minutes
+			
+		} else {
+			warning("Selection for geocoding action not understood; trying default for cdoc2010.")		
+			filename <- paste0(dataloc, "geocoding by school, cdoc2010, N", nrow(cdoc2010),".csv")
+			cdoc2010.geo <<- read.csv(filename)
 
-cc <- merge(s,c,all.x=T,all.y=F,by.x="School",by.y="NAME")
-cc			# hmm. a lot of missed matches. may need to get creative. or just use Refine.
-o <- paste("Still missing", length(which(is.na(cc$CITY)))," of ",nrow(schools.geo),"schools.")
-o
-rm(s,c,o)
+			# trim the first column, which is just the row number added on file save
+			cdoc2010.geo <<- data.frame(cdoc2010.geo[,2:ncol(cdoc2010.geo)])
+			head(cdoc2010.geo)
+		}
+	} else {
+		message("Found cdoc2010.geo, using existing data frame.")
+	}
 
+# cdoc2010.geo <- merge(cdoc2010, all_schools.geo[, c("all_schools", "Lat", "Lng")], by.x="NAME", by.y="all_schools")
 
-# determine whether these schools changed classification between 2000 and 2010
+# inspect the results
+if(any(is.na(cdoc2010.geo$Lat))) {
+	warning(paste("Still missing", length(which(is.na(cc$Lat)))," of ", nrow(schools.geo),"schools. Try OpenRefine."))
+} else {
+	message("All Carnegie-indexed doctoral schools geocoded and saved as cdoc2010.geo.")
+}
 
+# TO DO: determine whether these schools changed classification between 2000 and 2010
 
-# analyses to try in further documents:
+# TO DO: analyses to try in further documents:
 # 1. all comp/rhet dissertations by school classification (try different levels of drill-down; see 2010classifications_logic.pdf / http://classifications.carnegiefoundation.org/methodology/grad_program.php)
-# 2. map of all schools vs. map of schools with comp/rhet 
+# 2. map of all schools vs. map of schools with comp/rhet  [done]
 # 3. correlation table of school classification vs. method tag
