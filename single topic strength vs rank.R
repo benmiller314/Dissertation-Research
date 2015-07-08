@@ -11,7 +11,7 @@ strength_v_rank <- function(my.topic,
 							) 
 {
 	# Exclude non-content-bearing topics
-	if(is.null(bad.topics) && dataset_name="consorts" && ntopics=55) {
+	if(is.null(bad.topics) && dataset_name == "consorts" && ntopics == 55) {
 		bad.topics <- c("4", "47", "22", "2", "24", 	# bad OCR or ProQuest boilerplate
 					"13", "50")						# language markers (Italian, Spanish)
 	}
