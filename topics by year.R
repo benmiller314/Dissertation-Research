@@ -162,9 +162,33 @@ topic.variation <- function(dataset_name = "consorts",
 		subtitle <- paste0(dataset_name, " dissertations, N", nrow(grid), ", years 2001-2010") 
 	}
 	
+		
+	# Get topic labels, which you've composed elsewhere using 'top docs per topic.R', to use in figure legends
+	if(!exists("get_topic_labels", mode="function")) { source(file="get topic labels.R") }
+	topic.labels.dt <- get_topic_labels("consorts", 55)
+	head(topic.labels.dt)
+	
+	# Exclude non-content-bearing topics
+	bad.topics <- c("4", "47", "22", "2", "24", "13", "50")
+	topic.labels.dt <- topic.labels.dt[!(Topic %in% bad.topics)]
+	setkey(topic.labels.dt, Rank)
+	head(topic.labels.dt)
+
+
+	# draw the plot	
 	if(remake_figs) { filename <- paste0(imageloc, maintitle, ".pdf"); pdf(filename) }
-		boxplot(df[!names(df) %in% "Year"][, plot.me], cex.axis=0.6, las=2, main=maintitle, xlab="Topic Number, Arranged by Overall Rank within Corpus", ylab="Portion of Corpus (scaled to 1)")
-		mtext(subtitle)	
+	
+	boxplot(df[!names(df) %in% "Year"][, rank.order], 
+		main=maintitle, 
+		# xlab="Topic Number, Arranged by Overall Rank within Corpus", cex.axis=0.6, las=2, 
+		ylab="Portion of Corpus (scaled to 1)",
+		xaxt="n",
+		notch=notch
+		)
+	axis(1, at=seq_along(df[!names(df) %in% "Year"][, rank.order]), labels=topic.labels.dt[Topic %in% rank.order, Label], las = 2, lheight=0.5)
+		mtext(subtitle, side=3)	
+	# abline(v=(0.5+seq(from=5,to=length(plot.me), by=5)), lty="dotdash")
+	
 	if(remake_figs) {dev.off()}
 }
 
