@@ -1,5 +1,4 @@
 ## Get some basic output stats for a set of schools
-# TO DO: merge with 'tags by school.R', since that's really what's going on here
 
 setwise.data <- function(dataset_name="consorts") {
 	require(doBy)
@@ -13,12 +12,19 @@ setwise.data <- function(dataset_name="consorts") {
 	set.median <- median(b$Counts)
 	set.total <- sum(b$Counts)
 
-	return(list(total = set.total, 
+	if(remake_figures) {
+		filename <- paste0(imageloc, "Counts by school, " dataset_name, ".txt")
+		write(b, filename)
+	}
+
+	return(list(set = b,
+				total = set.total, 
 				mean = set.mean, 
 				median = set.median))	
 }
 
 if(autorun) {
+	setwise.data("noexcludes")
 	setwise.data("consorts")
 	setwise.data("top.nonconsorts")	
 	setwise.data("consorts.plus")
@@ -97,7 +103,8 @@ plot.outputs <- function(dataset_name="consorts.plus", show.stats=TRUE, show.lab
 }
 
 if(autorun) {
-	remake_figs=F
+	remake_figs
 	plot.outputs("consorts.plus", show.stats=F)
 	plot.outputs("consorts.plus", subset_name="top.nonconsorts", show.stats=T, show.labels=F, subset.labels=F, subset.color="red")
+	plot.outputs("noexcludes", show.labels=F)
 }
