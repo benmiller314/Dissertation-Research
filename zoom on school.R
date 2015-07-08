@@ -87,6 +87,10 @@ if(remake_figs) { dev.off() }
 if(!exists("compare_method_ranks", mode="function")) { source(file="compare method ranks.R") }
 compare_method_ranks("cuny.data", "s.data", colorful=T, pcts=T, betterlabels=c(cuny.short, s.short))
 
+pitt.english <- s.data[grep("English", s.data$Department), ]
+pitt.comm <- s.data[grep("Communication", s.data$Department), ]
+
+compare_method_ranks("pitt.english", "pitt.comm", colorful=T, betterlabels=c("Pitt English", "Pitt Communication"), pcts=F)
 
 
 
