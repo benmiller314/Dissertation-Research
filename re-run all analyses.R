@@ -1,4 +1,4 @@
-##
+################################################################################
 # Overview of analyses 
 # This file is a run-down of the programs that could re-create my figures from prepared data.
 # For initial data cleaning, I used GoogleRefine (now OpenRefine); see files in the OpenRefine directory.
@@ -18,7 +18,9 @@ autorun <- FALSE;
 # `dataprep`: prepares working environment by loading helper functions and setting key variables (such as tagset).
 # `dataprep 2`: loads in a .csv file of tagged spreadsheet data, generates a tag array, and defines various subsets.
 # 	You will be prompted to select the file via file.choose().
-# NB: These two functions can be called jointly via source(file="start here.R")
+# Dependencies:
+#	"extract subjects.R", "Factor-Bug fixing.R", "heatmap_ben.R", "heatmap fixedcols.R", "method tag array.R", "thresh.R", "simplifying the schema.R", "check count.R", library(data.table)
+# NB: These two functions can be called jointly via `source(file="start here.R")`
 source(file="dataprep.R")
 source(file="dataprep 2 - load data.R")
 
@@ -28,6 +30,8 @@ source(file="dataprep 2 - load data.R")
 #	schoolwise.data(dataset_name, tagset_name): returns a list of tag means, sums, and counts,
 #		each aggregated by school.
 #	schoolwise(dataset_name, tagset_name, ...): make one or more heatplots from the output of schoolwise.data().
+# Dependencies:
+#	library(doBy), library(cluster), library(RColorBrewer)
 source(file="tags by school.R")
 
 ## 
@@ -43,24 +47,24 @@ source(file="methodcount barplot.R")
 #	methodfreq_combined(bigset, smallset, diffset): plots an overlaid horizontal bar graph of method frequencies;
 #		by default the three sets are noexcludes, consorts, and nonconsorts, respectively (but others are possible).
 # 	compare_method_ranks(set1, set2, ...): creates a side-by-side plot of methods in descending rank order, 
-#		with lines connecting the same methods to quickly reveal changes in rank.
+#		with lines connecting the same methods to quickly reveal changes in rank across the two sets.
 source(file="frequency of method tags.R")
 
 
 ## 
-# `top schools by method.R`: For each method in a given tagset, produce a list of the top X schools by either 
-#	methodological output (number of dissertations using that method at that school) or methodological focus 
-#	(percentage of dissertations using that method at that school).
-#	Provides one function: toplists(dataset_name, tagset_name, howmany, threshold, since, until, rank_by_pcts, combine)
+# `top schools by method`: For each method in a given tagset, produces a list of the top X schools by either 
+# methodological output (number of dissertations using that method at that school) or methodological focus 
+# (percentage of dissertations using that method at that school). Provides one function: 
+#	toplists(dataset_name, tagset_name, howmany, threshold, ...)
 source(file="top schools by method.R")	
 
 
 ## 
 # `collocation heatmap`: If a dissertation is tagged X, how many times is it also tagged Y? 
 # Provides one function:
-#   sumbytags(dataset_name, tagset_name, doplot, normed, dendro): Aggregates methods tags by other method tags,
-#	   with an option to norm by dividing the sums by each method's total count. Optionally plots a heatmap 
-#	   of results as an adjacency matrix. 
+#   sumbytags(dataset_name, tagset_name, doplot, normed, dendro): Aggregates methods tags by each method tag,
+#	   with an option to norm by dividing the sums by the aggregating method's total count. 
+#	   Optionally plots a heatmap of results as an adjacency matrix. 
 # Dependencies:
 #   ben_heatmap.R
 source(file="collocation heatmap.R")
@@ -75,7 +79,7 @@ source(file="schools per year.R")
 #	This situation needs fixing.
 # Dependencies:
 #	package(maps), package(mapdata), package(mapplots), package(maptools), package(scales),
-#	map by school 1 (setup).R, carnegie 1 (setup).R
+#	map by school 1 (setup).R, carnegie 1 (setup).R, geocode.R
 source(file="map by school 4 (comp-rhet superimposed on carnegie schools).R")
 
 #####  Topic Modeling functions  #####
