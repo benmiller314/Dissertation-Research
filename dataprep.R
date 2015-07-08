@@ -1,8 +1,9 @@
+################################################################################
 # dataprep.R
 #
 # A file to configure my usual working directories, variables, and functions.
 # Follow up by running 'dataprep2 - load data.R'; see 'run all analyses.R' for further steps.
-###
+########
 
 # define some broad parameters, since this file will always be run first
 # make a shortcut for retrieving the last entered value

@@ -85,6 +85,8 @@ strength_v_rank <- function(my.topic,
 # Okay, now I want to run that function on multiple topics
 
 if(autorun) {
+	remake_figs
+	
 	# Use get_topic_labels() to retrieve ranks
 	if(!exists("get_topic_labels", mode="function")) { source(file="get topic labels.R") }
 	topic.labels.dt <- get_topic_labels()
@@ -97,10 +99,13 @@ if(autorun) {
 	topics.by.rank <- head(topic.labels.dt[, Topic], 10)
 	
 	lapply(topics.by.rank, strength_v_rank)
-	strength_v_rank(my.topic=14)
+	strength_v_rank(my.topic=10)
 	
-	# tryCatch(lapply(c(10, 4, 15), strength_v_rank), err=function(e) e, finally="done")
-	# strength_v_rank(4)
+	# lapply(topic.labels.dt[, Topic], strength_v_rank)
 	
-	topic.labels.dt[Topic==14, Label]
+	# tryCatch(lapply(c(10, 15), strength_v_rank), err=function(e) e, finally="done")
+	
+	topic.labels.dt[Topic==10, Label]
+	
+	
 }

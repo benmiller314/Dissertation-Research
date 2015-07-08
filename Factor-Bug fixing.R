@@ -10,7 +10,7 @@
 #  to.remove - the entry you wish to replace, if editing. optional.
 #
 ## Usage:
-#  some.factor <- fix_factor(some.factor, to.add=some.new.text)
+#  some.factor <- fix_factor(some.factor, to.add="some.new.text")
 
 fix_factor <- function(f, to.add, to.remove = NULL) {
 	ff <- as.character(f)
@@ -24,7 +24,7 @@ fix_factor <- function(f, to.add, to.remove = NULL) {
 }
 
 ## Re-factor all factor columns to remove holdovers from supersets
-#  Rationale: When you subset a data.frame, the factors can have more values than there are rows.
+#  Rationale: When you subset a data.frame, the factors can have more levels than there are rows.
 #             We want to fix that.
 #  Usage:
 #  consorts <- refactor.all("consorts")

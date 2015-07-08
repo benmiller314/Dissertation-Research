@@ -1,12 +1,21 @@
+################################################################################
+# dataprep 2 - load data.R
+#
+# A file to read in dissertation metadata from a csv file. Binds key subsets 
+# of data to variables and encodes method tags for easier analysis.
+#
+# NB: To identify schools in the Consortium of Doctoral Programs in Rhetoric and
+# Composition, requires a separate csv file listing those schools.
+########
+
 if (!exists("tagnames")) {
 	source(file="/Users/benmiller314/Dropbox/coursework, etc/dissertation/data, code, and figures/Dissertation Research/dataprep.R")
 }
 
 ## now get the data 
 # The most recent file of dissertation metadata
-ignore <- readline("Select the most recent file of dissertation metadata. (Press <Enter> to continue.)")
+invisible(readline("Select the most recent file of dissertation metadata. (Press <Enter> to continue.)"))
 bigarray <- read.csv(file=file.choose())
-rm(ignore)
 
 # parse the method tags... including for the collapsed schema
 bigarray <- parse_tags(bigarray)
@@ -41,6 +50,8 @@ data.matrix(tagarray) -> tagarray.m
 
 # tag.totals <- tagtotals(tagarray, skip=0)
 # barplot(tag.totals)
+
+## Store reference variables for schools
 
 consortium <- read.csv(file=paste0(dataloc,"doctoral-consortium-schools-programs, reconciled to carnegie.csv"))
 conschools <- factor(consortium$University)
