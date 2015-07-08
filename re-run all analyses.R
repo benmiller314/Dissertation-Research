@@ -88,6 +88,7 @@ source(file="top docs per topic.R")					# browse topics to generate labels
 source(file="get topics for author.R")				# retrieve topic information about a dissertation by author name
 source(file="cotopics.R")							# find topics that co-occur within documents
 source(file="get doctopic grid.R")					# get weights of every topic for all documents
+source(file="topic cluster reach.R")				# find dissertations with high levels of a cluster of topics
 
 ##
 # `frameToD3`: outputs JSON file of topic model data for interactive visualizations.
