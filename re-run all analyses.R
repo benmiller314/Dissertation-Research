@@ -5,7 +5,7 @@
 
 
 # Set working directory to the location of R script files.
-setwd("/Users/benmiller314/Dropbox/coursework, etc/dissertation/data, code, and figures/Dissertation Research")
+    setwd("~/Dropbox/coursework, etc/dissertation/data, code, and figures/Dissertation Research")
 
 ## 
 # Global variables called in many functions.

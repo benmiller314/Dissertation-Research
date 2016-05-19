@@ -12,12 +12,17 @@ ans <- function() {
 	}
 	
 # set the working directories, taking into account the GitHub setup
-sourceloc <- "/Users/benmiller314/Dropbox/coursework, etc/dissertation/data, code, and figures/Dissertation Research/"
-setwd(sourceloc)
+sourceloc <- "~/Dropbox/coursework, etc/dissertation/data, code, and figures/Dissertation Research/"
+unixsourceloc <- "~/'Dropbox/coursework, etc/dissertation/data, code, and figures/Dissertation Research/'"
+if(getwd() != sourceloc) {
+	setwd(sourceloc)
+}
+
 imageloc <- paste0(sourceloc, "../Dissertation Research - Figures/")
 dataloc <- paste0(sourceloc, "../")
-malletloc <- "/Users/benmiller314/mallet-2.0.7"
-webloc <- "/Users/benmiller314/Documents/Webdev/datavis_testing"
+malletloc <- "~/Applications/mallet/"
+webloc <- "~/Documents/Webdev/datavis_testing"
+tmloc <- "~/Documents/tm/"
 
 
 # name the method tags most of these analyses are interested in

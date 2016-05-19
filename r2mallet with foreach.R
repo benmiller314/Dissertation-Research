@@ -55,6 +55,12 @@ foreach(dataset_name = datasets) %do% {
 	} else { 
 		print("Oh, good, the instance file exists. Moving on...")
 	}	
+	# What's the directory within which to find text files for the corpus?
+	importroot <- "~/Documents/fulltext_dissertations/"
+
+	# What's the directory within which to output mallet files?
+	outputroot <- "~/Documents/tm/"
+
 	
 	# Train the model. Topic-number dependent.
 	# 4a. Start looping for each number of topics. kseq is defined at the top of this file.
@@ -67,9 +73,15 @@ foreach(dataset_name = datasets) %do% {
 		outputdoctopics <- paste0(dataset_name, "k", k, "_composition.txt")
 		wordtopics <- paste0(dataset_name, "k", k, "_wordtopics.txt")
 	
+		# 1a. Locate the folder containing txt files for MALLET to work on.
+		importdir <-
+			paste0(importroot, "clean_", dataset_name, "_only")
 		
 		# 4c. String together command to send to MALLET via the shell  
 		train <- paste(mallet_cmd, "train-topics  --input", output, "--num-topics", ntopics, "--optimize-interval",  optint, "--optimize-burn-in", optburnin, "--output-state", outputstate,  "--output-topic-keys", outputtopickeys, "--num-iterations", numiterations, "--output-doc-topics", outputdoctopics, "--word-topic-counts-file", wordtopics)
+		# 1b. Locate the instance list. This will be stable for a given dataset,
+		# regardless of the number of topics.
+		output <- paste0(malletloc, dataset_name, "_instances.mallet")
 		
 		# 4d. Run the command in the shell.	
 		system(train)
