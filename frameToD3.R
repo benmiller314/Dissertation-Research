@@ -22,8 +22,10 @@ frameToJSON <- function(dataset_name="consorts",
   require(jsonlite)		# Ben: was RJSONIO, but now jsonlite, as per http://bit.ly/1jXAC5M
   
   # Ben: Get topic weights for every document we have 
-  if(!exists("get.doctopic.grid", mode="function")) { source(file="get doctopic grid.R") }
-  dt <- as.data.table(get.doctopic.grid(dataset_name, ntopics)$outputfile)
+  if(!exists("get.doctopic.grid", mode="function")) { 
+        source(file="get doctopic grid.R") 
+  }
+  dt <- as.data.table(get.doctopic.grid(dataset_name, ntopics, subset_name)$outputfile)
 
   # Ben: Exclude non-content-bearing topics
   if(!is.null(bad.topics)) { dt <- dt[, !names(dt) %in% bad.topics, with=F] }

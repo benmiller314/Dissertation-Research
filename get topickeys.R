@@ -5,7 +5,7 @@ get.topickeys <- function(dataset_name="consorts", ntopics=55) {
 	# get packages in case we've just restarted R
 	require(data.table)
 	
-	filename <- paste0(malletloc, "/", dataset_name, "k", ntopics, "_keys.txt")
+	filename <- paste0(tmloc, dataset_name, "k", ntopics, "_keys.txt")
 	topic_keys.dt <- as.data.table(read.delim(filename, header=F))
 	setnames(topic_keys.dt, c("V1", "V2", "V3"), c("topic", "alpha", "top_words"))
 	names(topic_keys.dt)

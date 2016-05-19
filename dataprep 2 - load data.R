@@ -55,10 +55,38 @@ data.matrix(tagarray) -> tagarray.m
 
 consortium <- read.csv(file=paste0(dataloc,"doctoral-consortium-schools-programs, reconciled to carnegie.csv"))
 conschools <- factor(consortium$University)
+
+# helper function to find dissertations from actual Consortium programs, as determined elsewhere
+real_consorts <- function(dataset_name="noexcludes") {
+    dataset <- get(dataset_name)
+    
+    # get the department-matching data
+    invisible(readline("Select the most recent file of consortium program finding: \n probably something like department-gathering2.csv. (Press <Enter> to continue.)"))
+    a <- read.csv(file=file.choose())
+    
+    # read out just the Pub.numbers from confirmed dissertations in Consortium programs
+    index.by.pub <- a[which(a$Consortium == "yes"), "Pub.number"]
+    
+    # use those numbers to subset from noexcludes
+    b <- dataset[dataset$Pub.number %in% index.by.pub,] 
+    
+    # sanity check 1: confirm that we're only getting dissertations at Consortium schools
+    if (all(b$School %in% conschools)) {
+        message(paste("Found", length(index.by.pub), "dissertations from Consortium programs."))
+    } else {
+        warning("This file indexes non-Consortium schools. Time to debug!")
+    }
+    
+    # return the subset
+    return(b)
+}
+
+realconsorts <- real_consorts()
+
 consorts.index <- which(noexcludes$School %in% conschools)
 consorts <- noexcludes[consorts.index,]
-conschoolsfound <- factor(consorts$School)
-consort.count <- nrow(consorts)
+conschoolsfound <- factor(realconsorts$School)
+consort.count <- nrow(realconsorts)
 
 # print("Consortium Schools Found:")
 # print(levels(conschoolsfound))
@@ -69,14 +97,15 @@ missing_conschools <- setdiff(levels(conschools),levels(conschoolsfound))
 non_conschools <- setdiff(levels(noexcludes$School),levels(conschools))
 nonconsorts <- noexcludes[(which(noexcludes$School %in% non_conschools)),]
 
-# confirm that nonconsorts gets all the schools not in consorts
-setequal(nonconsorts, (noexcludes[-consorts.index,]))
+## confirm that nonconsorts gets all the schools not in consorts
+# setequal(nonconsorts, (noexcludes[-consorts.index,]))
 
 # find top nonconsorts
 top.nonconsorts <- thresh("nonconsorts")$thresh.data
 consorts.plus <- rbind(consorts, top.nonconsorts)
 
 # re-factor all factor columns in all data subsets
+realconsorts <- refactor.all("realconsorts")
 consorts <- refactor.all("consorts")
 nonconsorts <- refactor.all("nonconsorts")
 top.nonconsorts <- refactor.all("top.nonconsorts")
@@ -92,6 +121,7 @@ setkey(noexcludes.dt, Pub.number)
 write(levels(factor(noexcludes$Pub.number)), file=paste0(sourceloc, "Shell scripts and commands/file list noexcludes.txt"), sep="\n")
 write(levels(factor(consorts$Pub.number)), file=paste0(sourceloc, "Shell scripts and commands/file list consorts.txt"), sep="\n")
 write(levels(factor(nonconsorts$Pub.number)), file=paste0(sourceloc, "Shell scripts and commands/file list nonconsorts.txt"), sep="\n")
+write(levels(factor(realconsorts$Pub.number)), file=paste0(sourceloc, "Shell scripts and commands/file list realconsorts.txt"), sep="\n")
 
 # TO DO (maybe): split out multiple advisors
 

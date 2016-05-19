@@ -13,7 +13,7 @@ setwise.data <- function(dataset_name="consorts") {
 	set.total <- sum(b$Counts)
 
 	if(remake_figures) {
-		filename <- paste0(imageloc, "Counts by school, " dataset_name, ".txt")
+		filename <- paste0(imageloc, "Counts by school, ", dataset_name, ".txt")
 		write(b, filename)
 	}
 
@@ -107,4 +107,5 @@ if(autorun) {
 	plot.outputs("consorts.plus", show.stats=F)
 	plot.outputs("consorts.plus", subset_name="top.nonconsorts", show.stats=T, show.labels=F, subset.labels=F, subset.color="red")
 	plot.outputs("noexcludes", show.labels=F)
+	plot.outputs("realconsorts", show.stats=F, show.labels=T, label.top=4)
 }
