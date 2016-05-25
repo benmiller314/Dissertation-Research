@@ -84,11 +84,30 @@ source(file="map by school 4 (comp-rhet superimposed on carnegie schools).R")
 
 #####  Topic Modeling functions  #####
 source(file="r2mallet with foreach.R")				# generate a (series of) topic model(s)
-source(file="top docs per topic.R")					# browse topics to generate labels
-source(file="get topics for author.R")				# retrieve topic information about a dissertation by author name
 source(file="cotopics.R")							# find topics that co-occur within documents
 source(file="get doctopic grid.R")					# get weights of every topic for all documents
 source(file="topic cluster reach.R")				# find dissertations with high levels of a cluster of topics
+source(file="get topics for author.R")				# retrieve topic information about a dissertation by author name
+
+
+# Tools for topic exploration
+## Provides four functions:
+#  get.doc.composition(dataset, ntopics): helper function. retrieves a
+#    pre-existing matrix, output by MALLET, with topic proportions for each 
+#    document in corpus
+#  get.topics4doc(pubnum, dataset_name, ntopics, howmany, showlabels): 
+#    helper function. Retrieves top `howmany` topics for a document 
+#    specified by `pubnum`.
+#  top_topic_browser(...): browse topics to generate labels. 
+#     For a specified topic or range of topics, shows the top `howmany`
+#     documents and their method tags, with optional detail view showing top
+#     topics for each document at a time. See below for parameters. By default,
+#     uses an interactive mode, but can also output basic info for a topic by
+#     using the for.bind option.
+#  shareable_topic(topic, ...): Given a topic of interest, compiles clean data
+#     to share with others about the top `depth` docs from that topic; outputs
+#     a .csv file when remake_figs is true.
+source(file="top docs per topic.R")	
 
 ##
 # `frameToD3`: outputs JSON file of topic model data for interactive visualizations.
