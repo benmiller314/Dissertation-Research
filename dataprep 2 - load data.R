@@ -56,33 +56,10 @@ data.matrix(tagarray) -> tagarray.m
 consortium <- read.csv(file=paste0(dataloc,"doctoral-consortium-schools-programs, reconciled to carnegie.csv"))
 conschools <- factor(consortium$University)
 
-# helper function to find dissertations from actual Consortium programs, as determined elsewhere
-real_consorts <- function(dataset_name="noexcludes") {
-    dataset <- get(dataset_name)
-    
-    # get the department-matching data
-    invisible(readline("Select the most recent file of consortium program finding: \n probably something like department-gathering2.csv. (Press <Enter> to continue.)"))
-    a <- read.csv(file=file.choose())
-    
-    # read out just the Pub.numbers from confirmed dissertations in Consortium programs
-    index.by.pub <- a[which(a$Consortium == "yes"), "Pub.number"]
-    
-    # use those numbers to subset from noexcludes
-    b <- dataset[dataset$Pub.number %in% index.by.pub,] 
-    
-    # sanity check 1: confirm that we're only getting dissertations at Consortium schools
-    if (all(b$School %in% conschools)) {
-        message(paste("Found", length(index.by.pub), "dissertations from Consortium programs."))
-    } else {
-        warning("This file indexes non-Consortium schools. Time to debug!")
-    }
-    
-    # return the subset
-    return(b)
-}
+source(file="update realconsorts.R")
 
-realconsorts <- real_consorts()
-
+realconsorts.index <- which(noexcludes$realconsort == 1)
+realconsorts <- noexcludes[realconsorts.index,]
 consorts.index <- which(noexcludes$School %in% conschools)
 consorts <- noexcludes[consorts.index,]
 conschoolsfound <- factor(realconsorts$School)
@@ -118,11 +95,12 @@ setkey(noexcludes.dt, Pub.number)
 
 
 ## Export file lists for subsets of data
-write(levels(factor(noexcludes$Pub.number)), file=paste0(sourceloc, "Shell scripts and commands/file list noexcludes.txt"), sep="\n")
-write(levels(factor(consorts$Pub.number)), file=paste0(sourceloc, "Shell scripts and commands/file list consorts.txt"), sep="\n")
-write(levels(factor(nonconsorts$Pub.number)), file=paste0(sourceloc, "Shell scripts and commands/file list nonconsorts.txt"), sep="\n")
-write(levels(factor(realconsorts$Pub.number)), file=paste0(sourceloc, "Shell scripts and commands/file list realconsorts.txt"), sep="\n")
-
+if(remake_figs || update_realconsorts) {
+    write(levels(factor(noexcludes$Pub.number)), file=paste0(sourceloc, "Shell scripts and commands/file list noexcludes.txt"), sep="\n")
+    write(levels(factor(consorts$Pub.number)), file=paste0(sourceloc, "Shell scripts and commands/file list consorts.txt"), sep="\n")
+    write(levels(factor(nonconsorts$Pub.number)), file=paste0(sourceloc, "Shell scripts and commands/file list nonconsorts.txt"), sep="\n")
+    write(levels(factor(realconsorts$Pub.number)), file=paste0(sourceloc, "Shell scripts and commands/file list realconsorts.txt"), sep="\n")
+}
 # TO DO (maybe): split out multiple advisors
 
 # if "function scratchpad.R" is being used, clean up unneeded variables
