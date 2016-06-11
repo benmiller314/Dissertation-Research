@@ -1,22 +1,19 @@
-## GOAL: given method terms in one column, create and append an array of tag labels, 0 or 1,
-## and append columns for Method Count and Exclude Level (0=keep, 1=maybe throw out, 2=throw out).
-## Note that this used to be done in GoogleRefine, but I want it more automate-able.
-
-
-# # Make sure we have data to work with during testing
-# if(!exists("tagnames")) {
-	# source(file="dataprep.R")
-# }
-
-# if(!exists("bigarray")) {
-	# source(file="dataprep 2 - load data.R")
-# }
-# data <- head(bigarray)
+#############################################################################
+# method tag array.R
+#
+# GOAL: given method terms in one column, create and append an array of tag
+# labels, 0 or 1, and append columns for Method Count and Exclude Level
+# (0=keep, 1=maybe throw out, 2=throw out). Note that this used to be done in
+# GoogleRefine, but I want it more automate-able.
+#
+# This file is sourced during `dataprep 2 - load data.R`
+#####
 
 parse_tags <- function(data) {
 	# Check that the columns we're adding don't already exist
 	while(any(names(data) %in% tagnames)) {
-		c <- readline("Looks like data has already been parsed. Overwrite (O) or Abort (A)? \n parse_tags > ")
+		c <- readline(paste("Looks like data has already been parsed.", 
+							"Overwrite (O) or Abort (A)? \n parse_tags > "))
 		if(c == "A") {
 			warning("Parse_tags not applied; data already parsed.")
 			return()
@@ -52,11 +49,15 @@ parse_tags <- function(data) {
 	
 	# For each method tag, deduce from Method.Terms what tags are present.
 	mt <- data[, "Method.Terms"]
-	searchterms <- c("Clinical","Hermeneutical",
-	# "Cultural",
-	"Discourse","Ethnographic","Experimental","Historical","Interview","Meta-Analy","Model","Philosophical","Poetic","Practitioner","Rhetorical", "Survey", "Other")
+	searchterms <- c("Clinical", "Hermeneutical",
+					# "Cultural",
+					"Discourse", "Ethnographic", "Experimental",
+					"Historical", "Interview", "Meta-Analy", "Model",
+					"Philosophical", "Poetic", "Practitioner", "Rhetorical",
+					"Survey", "Other")
 	
-	searchresults <- lapply(searchterms, FUN=function(x) grep(x, mt, ignore.case=F))
+	searchresults <- lapply(searchterms, FUN=function(x) { 
+							grep(x, mt, ignore.case=F) } )
 	
 	## bug-hunting
 	# grep("Clinical", a[,"Method.Terms"], ignore.case=F)
@@ -70,13 +71,15 @@ parse_tags <- function(data) {
 		tags[i,"Method.Count"] <- sum(tags[i,tagnames])
 	}	
 	
-	# Account for Method.Count==0, which means that the only tag was excluded above
-	print(noquote(paste("Converting", length(which(tags$Method.Count==0)), "dissertations with solo tags now excluded from the schema to solo 'Other'")))
+	# Account for Method.Count==0, which means that the only tag was excluded
+	# above
+	print(noquote(paste("Converting", length(which(tags$Method.Count==0)),
+						"dissertations with solo tags now excluded",
+						"from the schema to solo 'Other'")))
 	zeroindex <- which(tags$Method.Count==0)
 	tags[zeroindex, "Othr"] <- 1
 	tags[zeroindex, "Method.Count"] <- 1
 	
-
 	
 	# Populate Exclude.Level 
 	el <- grep("xclude", mt, fixed=T)
@@ -88,8 +91,8 @@ parse_tags <- function(data) {
 	
 	# make sure it worked
 	head(data.frame(				
-			"Method.Terms" = data[which(tags$Exclude.Level > 0),"Method.Terms"], 
-			"Exclude.Level" = tags[which(tags$Exclude.Level > 0),"Exclude.Level"]
+		"Method.Terms" = data[which(tags$Exclude.Level > 0), "Method.Terms"], 
+		"Exclude.Level" = tags[which(tags$Exclude.Level> 0), "Exclude.Level"]
 	    ), 30)
 	
 	
@@ -100,7 +103,8 @@ parse_tags <- function(data) {
 	# lapply(tags[a,tagnames],sum)
 	# a <- which(tags$Cult == 1 & tags$Method.Count ==1)
 	# noexcludes[a,c("Title","ABSTRACT")]
-	# cbind(noexcludes[a,c("Method.Terms","Method.Count")], tags[a,"Method.Count"])
+	# cbind(noexcludes[a,c("Method.Terms","Method.Count")], 
+	# 		tags[a, "Method.Count"])
 	# head(tags)
 	# head(mt)
 	
@@ -108,6 +112,3 @@ parse_tags <- function(data) {
 	data[, names(tags)] <- tags
 	return(data)
 }
-
-# clean up the workspace -- not needed after function notation is put in
-# rm(a, mt, n, data, searchterms, searchresults, el, el2)

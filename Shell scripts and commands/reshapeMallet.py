@@ -1,9 +1,12 @@
 # Rolf Fredheim, October 2013 (https://github.com/fredheir/mallet-to-R)
 # forked by benmiller314 June 2014
 
-# Read one line at a time: avoids loading everything into memory
-writer=open("reshapedMallet11.txt","w+")
-with open("/Users/benmiller314/mallet-2.0.7/consorts_composition.txt") as f:
+## Read one line at a time: avoids loading everything into memory
+# writer=open("reshapedMallet11.txt","w+")
+# with open("/Users/benmiller314/mallet-2.0.7/consorts_composition.txt") as f:
+
+writer=open("/Users/millerb/Documents/tm/realconsortsk500_doc-all-topics.txt","w+")
+with open("/Users/millerb/Documents/tm/realconsortsk500_composition.txt") as f:
     count=0
     for line in f:
         dict = {}

@@ -13,25 +13,38 @@ cdoc2000 <- carnegie.all[which(CC2000 %in% c(15,16)),]
 
 detach(carnegie.all)
 if (!exists("cdoc2010.geo")) {
-		action <- readline("Geocoding data is missing for Carnegie Classification doctoral schools. To load a pre-created file, press L; to geocode now, press G.")
+		action <- readline("Geocoding data is missing for Carnegie 
+						Classification doctoral schools. To load a
+						pre-created file, press L; to geocode now, press G.")
+						
 		if (tolower(action) == "l") { 
-			invisible(readline("Select the geocoding csv file from geocode.R. (Filename is like 'geocoding by school, cdoc2010, N449.csv'; press <Enter> when ready."))
+			invisible(readline("Select the geocoding csv file from geocode.R.
+						 (Filename is like 'geocoding by school, cdoc2010,
+						  N449.csv'; press <Enter> when ready."))
+						  
 			cdoc2010.geo <<- read.csv(file=file.choose())
 			
-			# trim the first column, which is just the row number added on file save
+			# trim the first column, which is just the row number 
+			# added when the file is saved
 			cdoc2010.geo <<- data.frame(cdoc2010.geo[,2:ncol(cdoc2010.geo)])
 			head(cdoc2010.geo)	
 			
 		} else if (tolower(action) == "g") {
-			if(!exists("geoCodeAll", mode="function")) { source(file="geocode.R") }
-			cdoc2010.geo <<- geoCodeAll("cdoc2010", "NAME")					# takes about 15 minutes
+			if(!exists("geoCodeAll", mode="function")) {
+				 source(file="geocode.R") 
+			}
+			# takes about 15 minutes to geocode from scratch
+			cdoc2010.geo <<- geoCodeAll("cdoc2010", "NAME")	
 			
 		} else {
-			warning("Selection for geocoding action not understood; trying default for cdoc2010.")		
-			filename <- paste0(dataloc, "geocoding by school, cdoc2010, N", nrow(cdoc2010),".csv")
+			warning("Selection for geocoding action not understood; 
+					trying default for cdoc2010.")		
+			filename <- paste0(dataloc, "geocoding by school, cdoc2010, N",
+					nrow(cdoc2010),".csv")
 			cdoc2010.geo <<- read.csv(filename)
 
-			# trim the first column, which is just the row number added on file save
+			# trim the first column, which is just the row number 
+			# added when the file is saved
 			cdoc2010.geo <<- data.frame(cdoc2010.geo[,2:ncol(cdoc2010.geo)])
 			head(cdoc2010.geo)
 		}
@@ -43,14 +56,15 @@ if (!exists("cdoc2010.geo")) {
 
 # inspect the results
 if(any(is.na(cdoc2010.geo$Lat))) {
-	warning(paste("Still missing", length(which(is.na(cc$Lat)))," of ", nrow(schools.geo),"schools. Try OpenRefine."))
+	warning(paste("Still missing", length(which(is.na(cc$Lat)))," of ",
+					nrow(schools.geo),"schools. Try OpenRefine."))
 } else {
-	message("All Carnegie-indexed doctoral schools geocoded and saved as cdoc2010.geo.")
+	message("All Carnegie-indexed doctoral schools geocoded 
+			and saved as cdoc2010.geo.")
 }
 
 # TO DO: determine whether these schools changed classification between 2000 and 2010
 
-# TO DO: analyses to try in further documents:
+# TO DO: related analyses to try
 # 1. all comp/rhet dissertations by school classification (try different levels of drill-down; see 2010classifications_logic.pdf / http://classifications.carnegiefoundation.org/methodology/grad_program.php)
-# 2. map of all schools vs. map of schools with comp/rhet  [done]
-# 3. correlation table of school classification vs. method tag
+# 2. correlation table of school classification vs. aggregate method tags

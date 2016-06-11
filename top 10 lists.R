@@ -1,4 +1,4 @@
-stop("This file has been deprecated. Instead of using 'top 10 lists.R', please call the toplists() function from source(file='top 10 lists take 2.R').")
+stop("This file has been deprecated. Instead of using 'top 10 lists.R', please call the toplists() function from source(file='top schools by method.R').")
 
 
 ## Goal: list the 10(e.g.) most frequently occurring schools overall and by method tag

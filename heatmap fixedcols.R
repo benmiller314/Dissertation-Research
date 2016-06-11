@@ -1,14 +1,34 @@
+#############################################################################
+# heatmap fixedcols.R
+#
+# Slightly modifies the built-in heatmap function to allow for pre-set column
+# order (lines 46-69). Loaded by `dataprep.R`, and optionally called in `tags
+# by school.R`.
 
-## slightly modifies the built-in heatmap function to allow for pre-set column order (lines 46-69)
-
-heatmap.fixedcols <- function (x, myColInd, Rowv = NULL, Colv = if (symm) "Rowv" else NULL, 
-    distfun = dist, hclustfun = hclust, reorderfun = function(d, 
-        w) reorder(d, w), add.expr, symm = FALSE, revC = identical(Colv, 
-        "Rowv"), scale = c("row", "column", "none"), na.rm = TRUE, 
-    margins = c(5, 5), ColSideColors, RowSideColors, cexRow = 0.2 + 
-        1/log10(nr), cexCol = 0.2 + 1/log10(nc), labRow = NULL, 
-    labCol = NULL, main = NULL, xlab = NULL, ylab = NULL, keep.dendro = FALSE, 
-    verbose = getOption("verbose"), ...) 
+heatmap.fixedcols <- function (x, 
+							   myColInd, 
+							   Rowv = NULL, 
+							   Colv = if (symm) "Rowv" else NULL, 
+							   distfun = dist, 
+							   hclustfun = hclust, 
+							   reorderfun = function(d, w) reorder(d, w),
+							   add.expr, 
+							   symm = FALSE, 
+							   revC = identical(Colv, "Rowv"), 
+							   scale = c("row", "column", "none"), 
+							   na.rm = TRUE, 
+							   margins = c(5, 5), 
+							   ColSideColors, 
+							   RowSideColors, 
+							   cexRow = 0.2 + 1/log10(nr), 
+							   cexCol = 0.2 + 1/log10(nc), 
+							   labRow = NULL, 
+							   labCol = NULL, 
+							   main = NULL, 
+							   xlab = NULL, 
+							   ylab = NULL, 
+							   keep.dendro = FALSE, 
+							   verbose = getOption("verbose"), ...) 
 {
     scale <- if (symm && missing(scale)) 
         "none"
@@ -43,7 +63,7 @@ heatmap.fixedcols <- function (x, myColInd, Rowv = NULL, Colv = if (symm) "Rowv"
     }
     else rowInd <- 1L:nr
     
-    # here's where the original function sets column order
+    # Ben says: Here's where the original function sets column order
     if (doCdend) {
         if (inherits(Colv, "dendrogram")) 
             ddc <- Colv
@@ -65,7 +85,8 @@ heatmap.fixedcols <- function (x, myColInd, Rowv = NULL, Colv = if (symm) "Rowv"
     }
     else colInd <- 1L:nc
     
-    # okay, whatever, I'm over-riding all that with my pre-chosen column order
+    # Ben says: Okay, whatever, I'm over-riding all that 
+    # with my pre-chosen column order
     colInd <- myColInd
     
     x <- x[rowInd, colInd]
@@ -96,14 +117,16 @@ heatmap.fixedcols <- function (x, myColInd, Rowv = NULL, Colv = if (symm) "Rowv"
     if (!missing(ColSideColors)) {
         if (!is.character(ColSideColors) || length(ColSideColors) != 
             nc) 
-            stop("'ColSideColors' must be a character vector of length ncol(x)")
+            stop(paste("'ColSideColors' must be a character vector",
+			           "of length ncol(x)"))
         lmat <- rbind(lmat[1, ] + 1, c(NA, 1), lmat[2, ] + 1)
         lhei <- c(lhei[1L], 0.2, lhei[2L])
     }
     if (!missing(RowSideColors)) {
         if (!is.character(RowSideColors) || length(RowSideColors) != 
             nr) 
-            stop("'RowSideColors' must be a character vector of length nrow(x)")
+            stop(paste("'RowSideColors' must be a character vector",
+            		   "of length nrow(x)"))
         lmat <- cbind(lmat[, 1] + 1, c(rep(NA, nrow(lmat) - 1), 
             1), lmat[, 2] + 1)
         lwid <- c(lwid[1L], 0.2, lwid[2L])
@@ -164,6 +187,8 @@ heatmap.fixedcols <- function (x, myColInd, Rowv = NULL, Colv = if (symm) "Rowv"
         par(xpd = NA)
         title(main, cex.main = 1.5 * op[["cex.main"]])
     }
-    invisible(list(rowInd = rowInd, colInd = colInd, Rowv = if (keep.dendro && 
-        doRdend) ddr, Colv = if (keep.dendro && doCdend) ddc))
+    invisible(list(rowInd = rowInd, colInd = colInd, 
+    	Rowv = if (keep.dendro && doRdend) ddr, 
+    	Colv = if (keep.dendro && doCdend) ddc)
+    )
 }
