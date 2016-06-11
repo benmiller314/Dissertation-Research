@@ -9,12 +9,12 @@
 
 ## Declare some basics: source and destination. NB: these will likely change often!
 DATASET=$1
-PDF="/Users/benmiller314/Documents/fulltext_dissertations/morepdfs"
-SRC="/Users/benmiller314/Documents/fulltext_dissertations/morepdfs/as text files"
-DST="/Users/benmiller314/Documents/fulltext_dissertations/clean_""$DATASET""_only"
+PDF=~/"Documents/fulltext_dissertations/morepdfs"
+SRC=~/"Documents/fulltext_dissertations/morepdfs/as text files"
+DST=~/"Documents/fulltext_dissertations/clean_""$DATASET""_only"
 
 # Store cumulative data in its own directory
-CUMUL="/Users/benmiller314/Documents/fulltext_dissertations/cumulative"
+CUMUL=~/"Documents/fulltext_dissertations/cumulative"
 
 
 ## for testing purposes
