@@ -5,7 +5,7 @@
 ## saving the results into new files to avoid accidental overwriting.
 ## Based on scripts by Micki Kaufman (https://twitter.com/MickiKaufman)
 ##
-## TO DO: set up PDF, SRC, and DST as parameters to pass in from the command line.
+## TO DO: set up PDF, SRC, and DST as parameters to pass in from the command line. Maybe.
 
 ## Declare some basics: source and destination. NB: these will likely change often!
 DATASET=$1
@@ -39,11 +39,11 @@ function extract()
 	# Start the loop.
 	while read line1; do
 		PUB=`printf $line1 | awk 'BEGIN { FS="." } { print $1; }'`
-		printf "Converting $line1 to $PUB.txt ... "				# progress report
-		pdftotext "$PDF/$line1"									# convert the file.
-		if [ $? = 0 ] ; then printf "File made " ; fi			# progress report
-		mv "$PDF/$PUB.txt" "$SRC/$PUB.txt"						# move to txt folder.
-		if [ $? = 0 ] ; then echo "and moved." ; fi				# progress report
+		printf "Converting $line1 to $PUB.txt ... "		# progress report
+		pdftotext "$PDF/$line1"							# convert file.
+		if [ $? = 0 ] ; then printf "File made " ; fi	# progress report
+		mv "$PDF/$PUB.txt" "$SRC/$PUB.txt"				# move to txt folder.
+		if [ $? = 0 ] ; then echo "and moved." ; fi		# progress report
 	
 	# Close the loop.
 	done
@@ -63,7 +63,7 @@ function clean ()
 	while read line1; do
 
 	## Step 1. Copy the file to a new directory, making changes as it goes
-	echo "Cleaning from SRC $line1 to DST $DST/$line1"			# progress report
+	echo "Cleaning from SRC $line1 to DST $DST/$line1"		# progress report
 	
 	# 1a. Convert text encoding from ISO 8859-1 (Latin-1) to UTF-8 (unicode standard)
 	# 1b. Using tr, delete all characters except for line breaks and Western characters
@@ -73,10 +73,11 @@ function clean ()
 
 	iconv -f ISO_8859-1 -t UTF-8 "$SRC/$line1" | \
 	tr -cd '\11\12\40-\176' | \
-	sed "1,/-1346/d" > "$DST/cleaned_$line1"
+	sed "1,/-1346/d" \
+	> "$DST/cleaned_$line1"
 	
-		# catch the case where we've stripped too much (i.e. the file has 0 bytes)
-		# and do it again without sed
+	# catch the case where we've stripped too much (ie. the file has 0 bytes)
+	# and do it again without sed
 		if ! [ -s "$DST/cleaned_$line1" ] ; then
 			iconv -f ISO_8859-1 -t UTF-8 "$SRC/$line1" | \
 			tr -cd '\11\12\40-\176' > "$DST/cleaned_$line1"
@@ -110,7 +111,7 @@ function combine ()
 	## interpreted as a sequence of word tokens."
 	
 	while read line1; do
-		printf "adding $line1..."										# progress report
+		printf "adding $line1..."						# progress report
 	
 		# 2a. Using awk, strip '.txt' and 'cleaned_' off the filename to get the
 		# Pub.number of the diss. We'll use these as instance names in MALLET.		
