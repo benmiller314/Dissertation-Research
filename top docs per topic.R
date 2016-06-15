@@ -43,8 +43,8 @@ get.doc.composition <- function(dataset_name="consorts", ntopics=55)
     # get packages in case we've just restarted R
     require(data.table)
     
-    filename <- paste0(tmloc, dataset_name, "k", ntopics,
-                      "_composition.txt")
+    filename <- file.path(tmloc, paste0(dataset_name, "k", ntopics,
+                      "_composition.txt"))
     doc_topics <- read.delim(filename, header=F, skip=1)
     head(doc_topics)
     
@@ -418,7 +418,7 @@ if (autorun) {
 # dt <- as.data.table(outputfile)
 # groupVars <- c("Pub.number")  # Ben: this is the name of that first (ID) column. replace accordingly.
 # dataVars <- colnames(dt)[!colnames(dt) %in% groupVars]    # Ben: any column that's not an ID is a datapoint 
-# filename <- paste0(tmloc, "/", dataset_name, "k", ntopics, "_clusters.json")
+# filename <- file.path(tmloc, paste0(dataset_name, "k", ntopics, "_clusters.json")
 # frameToJSON(outputfile,groupVars,dataVars,outfile=filename)
 
 ########

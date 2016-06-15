@@ -19,8 +19,8 @@ get.doctopic.grid <- function(dataset_name="consorts",
     require(data.table)
     
     # Locate the doc/topic grid, or create it if it doesn't yet exist.
-    filename <- paste0(tmloc, dataset_name, "k", ntopics, 
-                        "_doc-all-topics.txt")
+    filename <- file.path(tmloc, paste0(dataset_name, "k", ntopics, 
+                        "_doc-all-topics.txt"))
     scope <- paste("cd", tmloc, ";  ls", filename)
 
     if (system(scope))  # runs only if file not found, 
