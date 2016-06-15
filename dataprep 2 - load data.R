@@ -1,3 +1,4 @@
+
 ################################################################################
 # dataprep 2 - load data.R
 #
@@ -69,7 +70,7 @@ consort.count <- nrow(realconsorts)
 # print(levels(conschoolsfound))
 # print("Did you remember to reconcile schools?")
 
-# figure out which consortium schools are not showing up
+## figure out which consortium schools are not showing up
 missing_conschools <- setdiff(levels(conschools),levels(conschoolsfound))
 non_conschools <- setdiff(levels(noexcludes$School),levels(conschools))
 nonconsorts <- noexcludes[(which(noexcludes$School %in% non_conschools)),]

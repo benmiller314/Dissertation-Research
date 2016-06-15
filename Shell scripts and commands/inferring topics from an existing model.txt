@@ -1,0 +1,5 @@
+bin/mallet train-classifier --input consorts.mallet --output-classifier /Users/benmiller314/Documents/topic_inference_test/txt/classifier.mallet
+
+bin/mallet import-file --input /Users/benmiller314/Documents/topic_inference_test/txt/dissertation_final_miller_combined.txt --use-pipe-from consorts.mallet --remove-stopwords TRUE --output /Users/benmiller314/Documents/topic_inference_test/txt/dissertation_final_miller_combined.vectors
+
+bin/mallet infer-topics --input /Users/benmiller314/Documents/topic_inference_test/txt/dissertation_final_miller_combined.vectors --doc-topics-threshold 0.08 --output-doc-topics /Users/benmiller314/Documents/topic_inference_test/txt/dissertation_final_miller_combined.doctopics

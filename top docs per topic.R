@@ -3,6 +3,7 @@
 #
 # Tools for topic exploration
 #
+
 # Provides four functions:
 #         * get.doc.composition(dataset, ntopics): retrieves a pre-existing 
 #           matrix, output by MALLET, with topic proportions for each 
@@ -17,6 +18,7 @@
 #           but can also output basic info for a topic by using the for.bind option.
 #         * shareable_topic(topic, ...): Given a topic of interest, 
 #           get clean data to share with others about the top "depth" docs
+#           time. See below for parameters.
 ##### 
 
     
@@ -229,12 +231,12 @@ top_topic_browser <- function(
             topdocs[, rank_in_doc:=unlist(ranks)]
             topdocs <- topdocs[, c("Pub.number", "Title", "topic_weight",
                                    "rank_in_doc", tagnames), with=F]
-        print(topdocs)
-        
+        # print(topdocs)
+
         # if we're just looking at one topic, maybe we want to save that list
         # of docs and their metadata, and exit.
         if(for.bind) {
-            return(topdocs)         
+            return(topdocs)
         }
 
         # if we're saving all output, automatically cycle through everything.
@@ -245,6 +247,7 @@ top_topic_browser <- function(
         } else { 
             a <- ""
         }
+
 
         while (tolower(a) != "s") {
             for(i in topdocs$Pub.number) {
