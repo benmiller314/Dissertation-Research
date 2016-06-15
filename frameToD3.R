@@ -22,7 +22,7 @@
 
 frameToJSON <- function(dataset_name="consorts",
                         ntopics=55,
-                        subset_name=NULL,
+                        subset_name="realconsorts",
                         do.plot=TRUE,   # Ben: Use this the first time to 
                                         # find good cuts in the dendrogram.
                         groupVars=NULL, # Ben: If not provided by the calling 
@@ -239,11 +239,28 @@ if(dataset_name=="consorts" && is.null(subset_name) && ntopics==55 && length(bad
   topic.labels.dt <- get_topic_labels(dataset_name, ntopics, subset_name)
     # str(topic.labels.dt)
       
+  
+  # Also add top dissertation titles
+  filename <- paste0("top_titles_per_topic-", dataset_name, "k", ntopics, subset_name, ".csv")
+  filename <- paste0(imageloc, filename)
+  
+  if (!file.exists(filename))  {
+      # if there isn't yet a file with top titles for each topic, create it now
+      if(!exists("find_topic_titles", mode="function")) {
+          source(file="find topic titles.R")
+      }
+      titles_all <- find_topic_titles(dataset_name, ntopics, subset_name)
+  } else {
+      # if the file does exist, just load it now
+      titles_all <- read.csv(filename)
+  }
+  
   # exclude non-content-bearing topics
   if(!is.null(bad.topics)) { 
-        topic.labels.dt <- topic.labels.dt[!Topic %in% bad.topics]  
+      topic.labels.dt <- topic.labels.dt[!Topic %in% bad.topics]  
+      titles_all <- titles_all[!titles_all$i %in% bad.topics,]
   }
-    
+        
   #Rolf: Now put this information into a table, together with the labels and
   #the order in which they should appear:
   # Ben adds: use gsub to remove spaces (this seems to help the d3
@@ -257,7 +274,7 @@ if(dataset_name=="consorts" && is.null(subset_name) && ntopics==55 && length(bad
         topwords = topic.labels.dt[, Top.Words], 
         rank = topic.labels.dt[, Rank], 
         order = hc$order,
-        titles = top_topic_browser(for.bind = T, subset_name="realconsorts", topic=32)$Title
+        titles = titles_all[, "one_topic_titles"]
         )
 
   #Rolf: We might want to know the size of each node. Let's add that.
@@ -266,8 +283,6 @@ if(dataset_name=="consorts" && is.null(subset_name) && ntopics==55 && length(bad
   # scale to [0,1], but no need: it's proportional.
   b$size <- colSums(dt[,c(dataVars),with=F])
   b$scaledsize <- b$size/nrow(dt)
-  
-  # TO DO: Also add top dissertation titles
   
   
   #Rolf: sort the data so it aligns with the structure calculated using
@@ -498,11 +513,6 @@ if(autorun) {
     # 11% determined by `variation of topic proportions.R` to include nearly
     # all primary topics and 3/4 of secondary topics for *realconsorts*; 
     # see `Variation of Topic Proportions, Top 10 Topics per Document.pdf`
-    cotopic_edges(level=0.11, min=1, subset_name="realconsorts")
-    cotopic_edges(level=0.11, min=2, subset_name="realconsorts")
-    cotopic_edges(level=0.11, min=3, subset_name="realconsorts")
-    cotopic_edges(level=0.11, min=4, subset_name="realconsorts")
-    cotopic_edges(level=0.11, min=5, subset_name="realconsorts")
     
 }
 
