@@ -1,3 +1,5 @@
+stop("This file is deprecated. Please use `r2mallet wtih foreach.R` or `topic modeling 3.R`.")
+
 require(mallet)
 require(doBy)
 
