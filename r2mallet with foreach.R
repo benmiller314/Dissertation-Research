@@ -25,14 +25,13 @@ library(foreach)
 #   on line 10: "MEMORY=" etc.
 
 	# What is the command that runs MALLET?
-	mallet_cmd <- paste0(malletloc, "bin/mallet")
+	mallet_cmd <- file.path(malletloc, "bin", "mallet")
 	
 	# What's the directory within which to find text files for the corpus?
 	importroot <- "~/Documents/fulltext_dissertations/"
 
 	# What's the directory within which to output mallet files?
-	outputroot <- "~/Documents/tm/"
-
+	outputroot <- tmloc
 	
 # start of wrapper function	
 r2mallet <- function(
@@ -55,12 +54,11 @@ r2mallet <- function(
 	# then (3) build models w/varying numbers of topics.
 	foreach(dataset_name = datasets) %do% {
 		# 1a. Locate the folder containing txt files for MALLET to work on.
-		importdir <-
-			paste0(importroot, "clean_", dataset_name, "_only")
+		importdir <- file.path(importroot, paste0(importroot, "clean_", dataset_name, "_only"))
 		
 		# 1b. Locate the instance list. This will be stable for a given dataset,
 		# regardless of the number of topics.
-		output <- paste0(malletloc, dataset_name, "_instances.mallet")
+		output <- file.path(malletloc, paste0(dataset_name, "_instances.mallet"))
 		
 		# Check to see if the instance list has already been created. If so,
 		# then system(scope) will return 0; otherwise, run the import script now.

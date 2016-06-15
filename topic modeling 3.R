@@ -46,9 +46,8 @@ system(paste0("'", sourceloc, 'Shell scripts and commands/ben_clean_and_consolid
 # so now it just outputs a string to run manually in Terminal.
 ben.mallet.import <- function(dataset_name="noexcludes", remove_stopwords=T, extra_stopwords=F) {
 	require(mallet)
-	# 2a.1. where is MALLET, and what is the command that runs it?
-	MALLET_HOME <- "~/Applications/mallet"			
-	mallet_cmd <- paste0(MALLET_HOME, "/bin/mallet")
+	# 2a.1. where is the command that runs MALLET? (NB: malletloc is set in `dataprep.R`)
+	mallet_cmd <- file.path(malletloc, "bin", "mallet")
 	
 	# 2a.2. Where is the import file? (determined by the shell script in Step 1)
 	import_file <- paste0("~/Documents/fulltext_dissertations/cumulative/",dataset_name,"_cumulative.txt")

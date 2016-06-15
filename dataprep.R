@@ -20,7 +20,7 @@ if(getwd() != sourceloc) {
 
 imageloc <- paste0(sourceloc, "../Dissertation Research - Figures/")
 dataloc <- paste0(sourceloc, "../")
-malletloc <- "~/Applications/mallet/"
+malletloc <- "~/Applications/mallet"
 webloc <- "~/Documents/Webdev/datavis_testing"
 tmloc <- "~/Documents/tm"
 
