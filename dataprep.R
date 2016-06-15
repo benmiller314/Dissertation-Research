@@ -22,7 +22,7 @@ imageloc <- paste0(sourceloc, "../Dissertation Research - Figures/")
 dataloc <- paste0(sourceloc, "../")
 malletloc <- "~/Applications/mallet/"
 webloc <- "~/Documents/Webdev/datavis_testing"
-tmloc <- "~/Documents/tm/"
+tmloc <- "~/Documents/tm"
 
 
 # name the method tags most of these analyses are interested in

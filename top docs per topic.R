@@ -40,8 +40,8 @@ get.doc.composition <- function(dataset_name="consorts", ntopics=55)
     # get packages in case we've just restarted R
     require(data.table)
     
-    filename <- paste0(tmloc, dataset_name, "k", ntopics,
-                      "_composition.txt")
+    filename <- file.path(tmloc, paste0(dataset_name, "k", ntopics,
+                      "_composition.txt"))
     doc_topics <- read.delim(filename, header=F, skip=1)
     head(doc_topics)
     
@@ -226,12 +226,12 @@ top_topic_browser <- function(
             topdocs[, rank_in_doc:=unlist(ranks)]
             topdocs <- topdocs[, c("Pub.number", "Title", "topic_weight",
                                    "rank_in_doc", tagnames), with=F]
-        print(topdocs)
+        # print(topdocs)
         
         # if we're just looking at one topic, maybe we want to save that list
         # of docs and their metadata, and exit.
         if(for.bind) {
-            return(topdocs)         
+            return(topdocs)
         }
 
         # if we're saving all output, automatically cycle through everything.
