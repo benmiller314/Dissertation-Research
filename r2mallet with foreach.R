@@ -12,6 +12,7 @@
 
 # Load required libraries
 library(foreach)
+library(parallel)
 
 ## Set up stable elements of the working environment
 # 	# Let's assume we're typically going to need more Java heap space;
@@ -22,7 +23,7 @@ library(foreach)
 # 	    heap_param <- paste("-Xmx","15g",sep="") 
 # 	    options(java.parameters=heap_param)
 #   Never mind, this is set by MALLET in $malletloc/bin/mallet, 
-#   on line 10: "MEMORY=" etc.
+#   on line 10: "MEMORY=" etc. But see also $malletloc/bin/mallet.bat, line 14, "set MALLET_MEMORY="
 
 	# What is the command that runs MALLET?
 	mallet_cmd <- file.path(malletloc, "bin", "mallet")
@@ -45,8 +46,10 @@ r2mallet <- function(
 				# Default choices are from Mimno's library(mallet)
 					optint = 20,
 					optburnin = 50,
-					numiterations = 250
-) {		
+					numiterations = 250,
+				
+				# To make pseudo-random results exactly replicable, specify a seed value
+				    seed = 8675309) {		
 
 
 	# Loop through each dataset and (1) import instances 
@@ -58,7 +61,7 @@ r2mallet <- function(
 		
 		# 1b. Locate the instance list. This will be stable for a given dataset,
 		# regardless of the number of topics.
-		output <- file.path(malletloc, paste0(dataset_name, "_instances.mallet"))
+		output <- file.path(tmloc, paste0(dataset_name, "_instances.mallet"))
 		
 		# Check to see if the instance list has already been created. If so,
 		# then system(scope) will return 0; otherwise, run the import script now.
@@ -92,10 +95,11 @@ r2mallet <- function(
 		foreach(k = kseq) %do% {
 			
 			# 2a. File names for output of model (extensions must be as shown)
-			outputstate <- paste0(outputroot, dataset_name, "k", k, "_topic-state.gz")
-			outputtopickeys <- paste0(outputroot, dataset_name, "k", k, "_keys.txt")
-			outputdoctopics <- paste0(outputroot, dataset_name, "k", k, "_composition.txt")
-			wordtopics <- paste0(outputroot, dataset_name, "k", k, "_wordtopics.txt")
+			outputstate <- file.path(outputroot, paste0(dataset_name, "k", k, "_topic-state.gz"))
+			outputtopickeys <- file.path(outputroot, paste0(dataset_name, "k", k, "_keys.txt"))
+			outputdoctopics <- file.path(outputroot, paste0(dataset_name, "k", k, "_composition.txt"))
+			wordtopics <- file.path(outputroot, paste0(dataset_name, "k", k, "_wordtopics.txt"))
+			diagnostics <- file.path(outputroot, paste0(dataset_name, "k", k, "_diagnostics.xml"))
 			
 			# 2b. Check that the files above exist. If not, create blank ones.
 			if (system(paste0("[ -s ", outputstate, " ]"))) {
@@ -111,16 +115,21 @@ r2mallet <- function(
 			# 3b. String together command to send to MALLET via the shell  
 			train <- paste(mallet_cmd, "train-topics  --input", output,
 						 "--num-topics", k, 
-						 "--optimize-interval",  optint, 
+						 "--optimize-interval", optint, 
 						 "--optimize-burn-in", optburnin, 
 						 "--output-state", outputstate,  
 						 "--output-topic-keys", outputtopickeys,
 						 "--num-iterations", numiterations, 
 						 "--output-doc-topics", outputdoctopics, 
-						 "--word-topic-counts-file", wordtopics)
+						 "--word-topic-counts-file", wordtopics,
+						 "--num-threads", parallel::detectCores()-1,
+						 "--diagnostics-file", diagnostics,
+						 "--random-seed", seed)
 			
-			# 3c. Run the command in the shell.	
+			# 3c. Run the command in the shell.
+			message(paste("Starting at", Sys.time(), "using this command: \n", train))
 			system(train)
+			message(paste("Finished at", Sys.time()))
 		}
 		
 	} # close the loop of datasets
@@ -128,7 +137,7 @@ r2mallet <- function(
 } # close the wrapper function
 
 if(autorun) {
-	r2mallet()
+	r2mallet(datasets=c("realconsorts"), kseq=c(55))
 #     r2mallet("consorts")
 #     r2mallet("real.consorts")
 } else {
