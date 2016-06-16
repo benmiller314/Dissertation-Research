@@ -49,24 +49,39 @@ system(paste0("'", sourceloc, 'Shell scripts and commands/ben_clean_and_consolid
 # (This use of system() inspired by https://gist.github.com/benmarwick/4537873, 
 # via https://gist.github.com/drlabratory/6198388). Instructions for MALLET import
 # are online at http://mallet.cs.umass.edu/import.php.
-#
-# UGH: I couldn't get the function call to resolve properly using system(), 
-# so now it just outputs a string to run manually in Terminal.
-ben.mallet.import <- function(dataset_name="noexcludes", remove_stopwords=T, extra_stopwords=F) {
+
+ben.mallet.import <- function(dataset_name="noexcludes", 
+                              remove_stopwords=T, 
+                              extra_stopwords=F,
+                              # seed=NULL,
+                              token_regex='"\\p{L}[-\\p{L}\\p{Po}]+\\p{L}"') {
 	require(mallet)
 	# 2a.1. where is the command that runs MALLET? (NB: malletloc is set in `dataprep.R`)
 	mallet_cmd <- file.path(malletloc, "bin", "mallet")
 	
+	# TO DO: Replace this file with a directory
 	# 2a.2. Where is the import file? (determined by the shell script in Step 1)
-	import_file <- paste0("~/Documents/fulltext_dissertations/cumulative/",dataset_name,"_cumulative.txt")
+	importroot <- "~/Documents/fulltext_dissertations"
+	importdir <- file.path(importroot, paste0("clean_", dataset_name, "_only"))
 	
+	# import_file <- paste0("~/Documents/fulltext_dissertations/cumulative/",
+	#                       dataset_name, "_cumulative.txt")
+	# 
 	# 2a.3. Where should we save the instances created by the import? (we'll need this in Step 2b)
-	imported_file <- paste0("~/Documents/tm/",dataset_name,"_instances.mallet")
+	instance_list <- file.path(tmloc, paste0(dataset_name, "_instances.mallet"))
 	
 	# 2a.4. What counts as a token?
-	token_regex <- '"\\p{L}[-\\p{L}\\p{Po}]+\\p{L}"'
-		# NB: Instead of the default [A-Za-z]*, or Mimno's original p{P} (any punctuation) in the middle of the word, I modded the regex above to search for p{Po} -- that's "any kind of punctuation character that is not a dash, bracket, quote or connector," per http://www.regular-expressions.info/unicode.html -- plus hyphens. This was necessary to break words at em-dashes.
-		# NB as well that this regex as structured defines words to be at least three characters long: a letter, plus a letter or punctuation, plus a letter. At some later point I may be curious about the use of the words "I," "me," "we," etc, and that would require a different regex.
+	# token_regex <- '"\\p{L}[-\\p{L}\\p{Po}]+\\p{L}"'      # now set as parameter
+		# NB: Instead of the default [A-Za-z]*, or Mimno's original p{P} (any
+		# punctuation) in the middle of the word, I modded the regex above to search
+		# for p{Po} -- that's "any kind of punctuation character that is not a dash,
+		# bracket, quote or connector," per
+		# http://www.regular-expressions.info/unicode.html -- plus hyphens. This was
+		# necessary to break words at em-dashes. NB as well that this regex as
+		# structured defines words to be at least three characters long: a letter,
+		# plus a letter or punctuation, plus a letter. At some later point I may be
+		# curious about the use of the words "I," "me," "we," etc, and that would
+		# require a different regex.
 	
 	# 2a.5. Any other parameters for tokenizing?
 		# stoplist_file: use in addition to the standard English stopwords. 
@@ -77,27 +92,51 @@ ben.mallet.import <- function(dataset_name="noexcludes", remove_stopwords=T, ext
 			stop_options <- "" 
 		}
 		if (extra_stopwords) { 	
-			stoplist_file <- paste0(MALLET_HOME, "/stoplists/top-and-bottom-plus.txt")
+			stoplist_file <- file.path(malletloc, "stoplists", "top-and-bottom-plus.txt")
 			stop_options <- paste(stop_options, "--extra-stopwords", stoplist_file) 
 		} else { 
 			stop_options <- paste(stop_options, "") 
 		}
-	
+	    # if (!is.null(seed)) {
+	    #     seed_option <- paste("--random-seed=", seed)
+	    # } else {
+	    #     seed_option <- ""
+	    # }
+	    # 
 	# 2a.6. Set the import command to include the parameters set above.
-	import_cmd <- paste(mallet_cmd, 
-						"import-file --input", import_file, 
-						"--output", imported_file, 
-						stop_options,
-						"--token-regex", token_regex
-					)
+	# Check to see if the instance list has already been created. If so,
+	# then system(scope) will return 0; otherwise, run the import script now.
+	# NB: This assumes you've already moved the files into their own directory.
+	scope <- paste0("cd ", "~/'", substr(sourceloc, 3, nchar(sourceloc)), "'",
+	                "; cd 'Shell scripts and commands' ; ls ", instance_list)
 	
-	# # 2a.7. Trigger the import.
-	# do.call(system, list(command=shQuote(import_cmd)), quote=FALSE)
-	## Not sure why this isn't working, since it's fine in Terminal, but for now 
-	## just print out import_cmd and run it manually.
-	message("Run the following command in terminal:")
-	print(noquote(import_cmd))
-
+	if (system(scope)) {
+	    import_cmd <- paste(mallet_cmd, 
+	                        # "import-file --input", import_file, 
+	                        "import-dir --input", importdir,
+	                        "--output", instance_list, 
+	                        stop_options,
+	                        "--keep-sequence TRUE",
+	                        "--token-regex", token_regex
+	    )
+	    
+	    # # 2a.7. Trigger the import.
+	    go <- readline(paste("About to import instance list with the following command: \n",
+	                         mallet_cmd, "\n",
+	                         "Is that what you meant to do? (Y/N)\n"))
+	    if(tolower(go) != "y") { 
+	        stop("Never mind, then.") 
+	    } 
+	    
+	    print("Beginning import now...")
+	    if(! system(import_cmd)) { 
+	        print("Done.")      # If successful, report back.
+	    }
+	    
+	} else {  # if system(scope) succeeds, it returns 0 and triggers this:
+	    print("Oh, good, the instance file exists. Moving on...")
+	}
+	
 # close the mallet import function
 }
 
