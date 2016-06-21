@@ -46,6 +46,9 @@ frameToJSON <- function(dataset_name="consorts",
   }
   dt <- as.data.table(get.doctopic.grid(dataset_name, ntopics, subset_name, iter_index)$outputfile)
 
+  # Ben: Exclude any NA rows included accidentally by the index file
+  dt <- na.omit(dt)
+  
   # Ben: Exclude non-content-bearing topics
   if(!is.null(bad.topics)) { dt <- dt[, !names(dt) %in% bad.topics, with=F] }
 
@@ -63,7 +66,7 @@ frameToJSON <- function(dataset_name="consorts",
                          "_clusters_", ntopics-length(bad.topics), iter_index, ".json")
   }
 
-  
+ 
   #Rolf: Here you may want to sort by colSums() 
   #to keep only the most relevant variables.
 
