@@ -40,13 +40,13 @@ if(!exists("get.topickeys", mode="function")) {
     # come up. 
     
     # We start with the doc-topic matrix from MALLET:
-get.doc.composition <- function(dataset_name="consorts", ntopics=55) 
+get.doc.composition <- function(dataset_name="consorts", ntopics=55, iter_index="") 
 {
     # get packages in case we've just restarted R
     require(data.table)
     
     filename <- file.path(tmloc, paste0(dataset_name, "k", ntopics,
-                      "_composition.txt"))
+                      "_composition", iter_index, ".txt"))
     doc_topics <- read.delim(filename, header=F, skip=1)
     head(doc_topics)
     
@@ -92,7 +92,7 @@ get.doc.composition <- function(dataset_name="consorts", ntopics=55)
 # TO DO: Make this happen within get.doc.composition() -- i.e. give the
 # function the side effect of creating this object -- so it's responsive to
 # dataset_name and ntopics.
-doc_topics_consorts_55.dt <- get.doc.composition("consorts", 55)
+doc_topics_consorts_55.dt <- get.doc.composition("consorts", 55, iter_index=iter_index)
 
     
 ### Helper function: retrieve top five topics for a given Pub.number
@@ -100,7 +100,8 @@ get.topics4doc <- function(pubnum,
                            dataset_name = "consorts", 
                            ntopics = 55, 
                            howmany = 5, 
-                           showlabels = FALSE) 
+                           showlabels = FALSE,
+                           iter_index = "") 
 {
     # get packages in case we've just restarted R
     require(data.table)
@@ -111,8 +112,8 @@ get.topics4doc <- function(pubnum,
         pubnum <- as.character(pubnum) 
     }
     
-    doc_tops <- get.doc.composition(dataset_name, ntopics)
-    topic_keys <- data.table(get.topickeys(dataset_name, ntopics))
+    doc_tops <- get.doc.composition(dataset_name, ntopics, iter_index=iter_index)
+    topic_keys <- data.table(get.topickeys(dataset_name, ntopics, iter_index=iter_index))
     topic_keys <- topic_keys[as.numeric(doc_tops[pubnum, paste0("top",
                                                  1:howmany), with=F])]
     topic_keys[,weight:=as.numeric(doc_tops[pubnum, paste0("wgt", 1:howmany),
@@ -123,7 +124,7 @@ get.topics4doc <- function(pubnum,
         if(!exists("get_topic_labels", mode="function")) { 
             source(file="get topic labels.R") 
         }
-        topic_labels <- data.table(get_topic_labels(dataset_name, ntopics),
+        topic_labels <- data.table(get_topic_labels(dataset_name, ntopics, iter_index=iter_index),
                                                     key="Topic")
         topic_keys[, current_label:=topic_labels[topic_keys$topic, Label]]
         topic_keys <- topic_keys[, list(topic, weight, alpha, current_label,
@@ -154,6 +155,9 @@ top_topic_browser <- function(
                               # do we want to show the full dataset, or a subset?
                               subset_name = NULL,
                               
+                              # if we've run the params above many times, which one now?
+                              iter_index = "",
+                              
                               # if lots of topics, where to stop?
                               cutoff = get("ntopics"),  
                               
@@ -172,16 +176,16 @@ top_topic_browser <- function(
     
     # load the data from the functions defined or imported above
     doc_composition <- paste0("doc_topics_", dataset_name, "_", 
-                             ntopics, ".dt");
+                             ntopics, iter_index, ".dt");
     if(!exists(doc_composition)) { 
-        doc_topics.dt <- get.doc.composition(dataset_name, ntopics) 
+        doc_topics.dt <- get.doc.composition(dataset_name, ntopics, iter_index=iter_index) 
     } else { 
         doc_topics.dt <- get(doc_composition) 
     }
         
-    topic_keys.dt <- get.topickeys(dataset_name, ntopics)
+    topic_keys.dt <- get.topickeys(dataset_name, ntopics, iter_index=iter_index)
     
-    grids <- get.doctopic.grid(dataset_name=dataset_name, ntopics=ntopics, subset_name=subset_name)
+    grids <- get.doctopic.grid(dataset_name=dataset_name, ntopics=ntopics, subset_name=subset_name, iter_index=iter_index)
         colsums <- grids$colsums
         colsums.sort <- grids$colsums.sort
         outputfile <- grids$outputfile
@@ -218,7 +222,7 @@ top_topic_browser <- function(
                                 c("Pub.number", "Title", tagnames), with=F]         
 
             # add a column with the weights this topic has in these docs
-            doc_tops <- get.doc.composition(dataset_name, ntopics)
+            doc_tops <- get.doc.composition(dataset_name, ntopics, iter_index=iter_index)
             weights <- ranks <- c()
             for(j in 1:length(diss.ind)) {
                 topic.col <- match(topic.num, 
@@ -252,7 +256,7 @@ top_topic_browser <- function(
         while (tolower(a) != "s") {
             for(i in topdocs$Pub.number) {
                 print(get.topics4doc(i, dataset_name, ntopics, 
-                                    showlabels = showlabels))
+                                    showlabels = showlabels, iter_index=iter_index))
                 if (!remake_figs) { 
                     a <- readline(paste("Press <enter> for next doc,", 
                         "D for more details, or", 
@@ -302,7 +306,7 @@ top_topic_browser <- function(
                         c("Pub.number", "Title", tagnames), with=F]
 
             # add a column with the weights this topic has in these docs
-            doc_tops <- get.doc.composition(dataset_name, ntopics)
+            doc_tops <- get.doc.composition(dataset_name, ntopics, iter_index=iter_index)
             weights <- ranks <- c()
             for(j in 1:length(diss.ind)) {
                 topic.col <- match(topic.num, 
@@ -328,7 +332,7 @@ top_topic_browser <- function(
 
         while (tolower(a) != "s") {
             for(i in topdocs$Pub.number) {
-                print(get.topics4doc(i, showlabels=showlabels))
+                print(get.topics4doc(i, showlabels=showlabels, iter_index=iter_index))
                 if (!remake_figs) { 
                     a <- readline(paste("Press <enter> for next doc,",
                                         "D for more details, or",
@@ -440,6 +444,9 @@ shareable_topic <- function(  topic,
                               
                               # show current topic labels for indiv. docs?  
                               showlabels = TRUE
+                              
+                              # if we've run this model multiple times, which iteration?
+                              iter_index = ""
 ) {
     a <- top_topic_browser(topic=topic, 
                            dataset_name=dataset_name, 
@@ -447,6 +454,7 @@ shareable_topic <- function(  topic,
                            subset_name=NULL, 
                            depth=depth,
                            showlabels=showlabels,
+                           iter_index=iter_index,
                            for.bind=T)
     
     index <- as.character(a$Pub.number)
@@ -468,7 +476,7 @@ shareable_topic <- function(  topic,
     
     if(remake_figs) {
         filename <- paste0(imageloc, "top ", depth, " documents for topic ", topic, ", ", 
-                       dataset_name, "k", ntopics, subset_name, ".csv")
+                       dataset_name, "k", ntopics, subset_name, iter_index, ".csv")
         write.csv(docs, filename)
     } else {
         warning("This function usually saves to .csv, but remake_figs is off.")

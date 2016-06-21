@@ -6,10 +6,10 @@
 # topic.R'
 #####
 
-get_topic_labels <- function(dataset_name="consorts", ntopics=55, subset_name=NULL) 
+get_topic_labels <- function(dataset_name="consorts", ntopics=55, subset_name=NULL, iter_index="") 
 {
 	filename <- paste0(imageloc, "topic labeling - ", dataset_name, ", K",
-						 ntopics, ".csv")
+						 ntopics, iter_index, ".csv")
 	
 	# get the labels derived from the larger (or only) set
 	topic.labels.dt <- tryCatch(
@@ -18,7 +18,7 @@ get_topic_labels <- function(dataset_name="consorts", ntopics=55, subset_name=NU
 	  		message("File not found; using top words instead.")
 	  		keys <- get.topickeys(dataset_name, ntopics)
 	  		outfile <- paste0(webloc, "/", dataset_name, "k", ntopics,
-	  						 "_clusters_topwords.json")	
+	  						 "_clusters_topwords", iter_index, ".json")	
 	  		return(data.table(Topic = 1:ntopics, 
 	  						  Label = keys$top_words))
 	  	},
@@ -28,8 +28,8 @@ get_topic_labels <- function(dataset_name="consorts", ntopics=55, subset_name=NU
 	# update the percent-contributed and rankings for the subset, as determined by 
 	# get.doctopic.grid
 	if(! is.null(subset_name)) {
-	    filename <- paste0(imageloc, dataset_name, "k", ntopics, "--", subset_name,
-	                       "_topic-ranks.csv")
+	    filename <- paste0(imageloc, dataset_name, "k", ntopics, "--", subset_name, 
+	                       "_topic-ranks", iter_index, ".csv")
 	    ranked_topics <- read.csv(filename)
 	    names(ranked_topics) <- c("Topic", "Pct.Contrib")
 	    ranked_topics$Rank <- 1:nrow(ranked_topics)

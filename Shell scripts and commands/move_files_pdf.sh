@@ -17,15 +17,23 @@ INDEX_DIR=~/'Dropbox/coursework, etc/dissertation/data, code, and figures/Disser
 function subset_copy
 {
 	DATASET=$1
-	
+	FILETYPE=$2
+
 	# Where are the files to move? 
-	# use clean text output by ben_clean_and_consolidate.sh
-	SRC=~/'Documents/fulltext_dissertations/clean'
-	
+	if [ "$FILETYPE" == "txt" ] ; then
+		# use clean text output by ben_clean_and_consolidate.sh
+		SRC=~/'Documents/fulltext_dissertations/clean'
+	elif [ "$FILETYPE" == "pdf" ] ; then
+		# use original documents from ProQuest
+		SRC=~/'Documents/fulltext_dissertations' 
+	fi
 
 	# Make sure we have a place to copy the files to.
-	DST="$SRC/../clean_""$DATASET""_only"
-	
+	if [ "$FILETYPE" == "txt" ] ; then
+		DST="$SRC/../""$DATASET""_""$FILETYPE"
+	elif [ "$FILETYPE" == "pdf" ] ; then
+		DST="$SRC/../""$FILETYPE""_""$DATASET""_only" 
+	fi
 # 	ls "$DST"
 
 	if ! [ -d "$DST" ] ; then
@@ -38,17 +46,16 @@ function subset_copy
 	# Convert file numbers to proper filenames, and copy to destination folder.
 	j=0; k=0									# reset counters
 	while read i; do							# start the loop
-		FILE="cleaned_$i.txt"
+		FILE="$i.""$FILETYPE"
+		printf "Copying $FILE to folder for ""$DATASET"" files only... "
 		
-		if [ -e "$SRC/$FILE" ] ; then
-			printf "Creating symlink from $FILE in folder for ""$DATASET"" files only... "
-			ln -s "$SRC/$FILE" "$DST/$FILE"
-			if [ $? == 0 ] ; then 					# did it work? if so,
-				echo "Done." 						# report back, and
-				j=$((j+1))							# increment the counter.
-			fi
-		else 
-			printf "$FILE not found."		
+		# TO DO: USE SYMLINK INSTEAD, TO SAVE ON MEMORY AND STORAGE; 
+		# need to see if it works with 
+		ln -s "$SRC/$FILE" "$DST/$FILE"
+		# cp "$SRC/$FILE" "$DST/$FILE"
+		if [ $? == 0 ] ; then 					# did it work? if so,
+			echo "Done." 						# report back, and
+			j=$((j+1))							# increment the counter.
 		fi
 		k=$((k+1))
 	done < "$INDEX_DIR/file list ""$DATASET"".txt"		# draw `i` from the file
@@ -60,5 +67,5 @@ function subset_copy
 # subset_copy consorts
 # subset_copy nonconsorts
 # subset_copy noexcludes
-subset_copy realconsorts
+subset_copy realconsorts txt
 

@@ -12,6 +12,7 @@
 get.doctopic.grid <- function(dataset_name="consorts", 
                               ntopics=55, 
                               subset_name=NULL,
+                              iter_index="",
                               doplot=F,
                               do_reshape=F
                               ) {
@@ -20,7 +21,7 @@ get.doctopic.grid <- function(dataset_name="consorts",
     
     # Locate the doc/topic grid, or create it if it doesn't yet exist.
     filename <- file.path(tmloc, paste0(dataset_name, "k", ntopics, 
-                        "_doc-all-topics.txt"))
+                        "_doc-all-topics", iter_index, ".txt"))
     scope <- paste("cd", tmloc, ";  ls", filename)
 
     if (system(scope))  # runs only if file not found, 
@@ -82,11 +83,11 @@ get.doctopic.grid <- function(dataset_name="consorts",
     # Optionally save to file
     if(remake_figs) { 
         if(! is.null(subset_name)) {
-            filename <- paste0(imageloc, dataset_name, "k", ntopics, "--", subset_name,
-                               "_topic-ranks.csv")    
+            filename <- paste0(imageloc, dataset_name, "k", ntopics, "--", subset_name, 
+                               "_topic-ranks", iter_index, ".csv")    
         } else {
             filename <- paste0(imageloc, dataset_name, "k", ntopics,
-                             "_topic-ranks.csv")
+                             "_topic-ranks", iter_index, ".csv")
         }
         out <- colsums.sort.pct[2:length(colsums.sort.pct)]
         

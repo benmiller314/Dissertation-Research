@@ -18,7 +18,6 @@
 	if (!exists(sourceloc)) { 
 		source(file="~/Dropbox/coursework, etc/dissertation/R experiments/Dissertation Research/dataprep.R") 
 	}
-	setwd(sourceloc)
 	
 	# # Assume we're typically going to need more Java heap space, set maximum allocation
 	# # for a 4GB MacBook Pro:
@@ -29,11 +28,11 @@
 	# 	    options(java.parameters=heap_param)
 	# # Never mind, this is set by MALLET in $malletloc/bin/mallet, 
 	# # on line 10: "MEMORY=" etc. Leaving it here in case both need to be set.
-	heap_param <- paste("-Xmx","15g",sep="")
+	heap_param <- paste("-Xmx","7g",sep="")
 	options(java.parameters=heap_param)
 	
 	# What's our dataset?
-	dataset_name <- "consorts.plus"
+	dataset_name <- "realconsorts"
 	
 	
 ## Step 1. Compress the files, if they haven't been compressed already
@@ -192,12 +191,12 @@ ben.mallet.tm <- function(K=10, 						# how many topics?
 		# 2b.4.c. Create a new stoplist
 		tandb.stoplist <- word.freqs.sorted[c(top.words.index, bottom.words.index), "words"]
 		tandb.stoplist <- sort(as.character(tandb.stoplist))
-		write(tandb.stoplist, file=paste0(MALLET_HOME, "/stoplists/top-and-bottom.txt"))
+		write(tandb.stoplist, file=file.path(malletloc, "stoplists", "top-and-bottom.txt"))
 		
 		# 2b.4.d. Any other words that seem like they need pruning?
 		extra.stoplist <- c(tandb.stoplist, "dissertation", "chapter", "UMI")
 		extra.stoplist <- sort(as.character(extra.stoplist))
-		write(extra.stoplist, file=paste0(MALLET_HOME, "/stoplists/top-and-bottom-plus.txt"))
+		write(extra.stoplist, file=file.path(malletloc, "stoplists", "top-and-bottom-plus.txt"))
 		
 	# end of stoplist vocabulary curation; we can pick it up again in another call to ben.mallet.import
 	}
@@ -225,11 +224,13 @@ ben.mallet.tm <- function(K=10, 						# how many topics?
 	
 	# 2b.8.a. matrix with documents in rows, topics in columns; raw used only for testing.
 	# These are huge files, so use big.matrix again.
-	doc.topics <- as.big.matrix(mallet.doc.topics(topic.model, smoothed=T, normalized=T), backingfile=paste0(MALLET_HOME, "/", dataset_name, "K", K, "_doc_topics"))
+	doc.topics <- as.big.matrix(mallet.doc.topics(topic.model, smoothed=T, normalized=T), 
+	                            backingfile=file.path(malletloc, paste0(dataset_name, "K", K, "_doc_topics")))
 	# doc.topics.raw <- as.big.matrix(mallet.doc.topics(topic.model, smoothed=F, normalized=F))
 	
 	# 2b.8.b. matrix with topics in rows, words in columns; raw used only for testing.
-	topic.words <- as.big.matrix(mallet.topic.words(topic.model, smoothed=T, normalized=T), backingfile=paste0(MALLET_HOME, "/", dataset_name, "K", K, "_topic_words"))
+	topic.words <- as.big.matrix(mallet.topic.words(topic.model, smoothed=T, normalized=T), 
+	                             backingfile=file.path(malletloc, paste0(dataset_name, "K", K, "_topic_words")))
 	# topic.words.raw <- as.big.matrix(mallet.topic.words(topic.model, smoothed=F, normalized=F))
 
 	# 2b.9  Label topics with most frequent words
@@ -240,7 +241,7 @@ ben.mallet.tm <- function(K=10, 						# how many topics?
 	topic.labels.tfitf <- top.words.tfitf(topic.model, topic.words, num.top.words)
 
 	# Now pass back the topic model itself, the labels for them, and the top words we removed:
-	save(topic.model, file=paste0(MALLET_HOME, "/", dataset_name, "K", K, ".gz"), compress=TRUE)			
+	save(topic.model, file=file.path(malletloc, paste0(dataset_name, "K", K, ".gz"), compress=TRUE))			
 	
 	return <- list("doc.topics" = doc.topics, 					# doc/topic big.matrix, filebacked
 				   "topic.words" = topic.words,					# topic/word big.matrix, filebacked
@@ -251,20 +252,30 @@ ben.mallet.tm <- function(K=10, 						# how many topics?
 }
 
 ## **Helper function: top.words.tfitf**
-# I'd like to get the top words in each topic ranked not by term frequency alone but by uniqueness to the topic -- i.e. term frequency * inverse topic frequency (as modeled on TF*IDF).
-# These will then be used to determine topic subject matter.
+# I'd like to get the top words in each topic ranked not by term frequency alone
+# but by uniqueness to the topic -- i.e. term frequency * inverse topic
+# frequency (as modeled on TF*IDF). These will then be used to determine topic
+# subject matter.
 top.words.tfitf <- function (topic.model, topic.words, num.top.words = 10) 
 {
-	# 1. for each term-topic pair, calculate term frequency = weight of the term in the topic divided by the total number of terms assigned to the topic. For a normalized topic, the sum should always be 1, so this is just the weight value at each location in the topic.words matrix.
+	# 1. for each term-topic pair, calculate term frequency = weight of the term in
+	# the topic divided by the total number of terms assigned to the topic. For a
+	# normalized topic, the sum should always be 1, so this is just the weight
+	# value at each location in the topic.words matrix.
 	tf <- topic.words
 
-	# 2. for each term, calculate inverse topic frequency = log(#topics / #topics assigned to that term). Number of topics K implicit in topic.words (and presumably topic.model, but I don't know what to call).
+	# 2. for each term, calculate inverse topic frequency = log(#topics / #topics
+	# assigned to that term). Number of topics K implicit in topic.words (and
+	# presumably topic.model, but I don't know what to call).
 	K <- nrow(topic.words)
 	itf <- apply(topic.words, 2, sum)
 	itf <- log(K / itf)
 
 	# 3. multiply TF by ITF. 
-	# NB: R wants to line up the ITF vector vertically with the TF grid and snake it around columns, which is not what we want. Instead, transpose TF and then undo it afterwards. (For some reason in vector-logic, transposing ITF will generate an error.)
+	# NB: R wants to line up the ITF vector vertically with the TF grid and snake
+	# it around columns, which is not what we want. Instead, transpose TF and then
+	# undo it afterwards. (For some reason in vector-logic, transposing ITF will
+	# generate an error.)
 
 	tf.itf <- t(t(tf) * itf)
 	dim(tf.itf)
@@ -272,10 +283,16 @@ top.words.tfitf <- function (topic.model, topic.words, num.top.words = 10)
 	# d[2,] <- d[2, order(d[2,], decreasing=T)]
 	top.indices <- lapply(1:K, FUN=function(x) head(order(tf.itf[x,], decreasing=T), num.top.words))
 
-	# NB: the vocabulary indices are the same as the indices used in each row of the topic.words matrix (and, thus, the tf.itf matrix).
+	# NB: the vocabulary indices are the same as the indices used in each row of
+	# the topic.words matrix (and, thus, the tf.itf matrix).
 	lapply(1:K, FUN=function(x) noquote(paste0(vocabulary[top.indices[[x]]], collapse=", ")))
 }
 
 
 ## Step 4. Run MALLET with the parameters set up in Step 2, with the topics as chosen in 1 or 3.
-ben.mallet.import(dataset_name)
+if(autorun) {
+    Sys.time()
+    ben.mallet.import(dataset_name="realconsorts")
+    Sys.time()
+}
+

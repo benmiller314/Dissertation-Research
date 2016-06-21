@@ -1,7 +1,8 @@
 # Get titles for a subset of dissertations, save to a file for ease of recall later
 find_topic_titles <- function(dataset_name = "consorts", 
                               ntopics      = 55, 
-                              subset_name  = NULL) 
+                              subset_name  = NULL,
+                              iter_index   = "") 
 {
     # run the loop in parallel, because it's annoyingly slow and each run is independent
     require(doParallel)
@@ -19,7 +20,7 @@ find_topic_titles <- function(dataset_name = "consorts",
                                      "unixsourceloc"),
                            .combine="rbind"
                            ) %dopar% {
-        titles <- factor(top_topic_browser(for.bind=T, subset_name=subset_name, topic=i)$Title)
+        titles <- factor(top_topic_browser(for.bind=T, subset_name=subset_name, iter_index=iter_index, topic=i)$Title)
         one_topic_titles <- paste(titles, collapse=" || ")
         cbind(topic=i, top_titles=one_topic_titles)
     }
@@ -27,7 +28,7 @@ find_topic_titles <- function(dataset_name = "consorts",
     stopCluster(cl)
  
     if(remake_figs) {
-        filename <- paste0("top_titles_per_topic-", dataset_name, "k", ntopics, subset_name, ".csv")
+        filename <- paste0("top_titles_per_topic-", dataset_name, "k", ntopics, subset_name, iter_index, ".csv")
         write.csv(titles_all, paste0(imageloc, filename))
     } else {
         return(titles_all)
