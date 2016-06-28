@@ -73,12 +73,12 @@ r2mallet <- function(
 			import <- paste(mallet_cmd, "import-dir --input", importdir,
 						 "--output", output, 
 						 "--keep-sequence --remove-stopwords")
-			go <- readline(paste("About to import instance list.",
-								 "Options set: keep sequence; remove stopwords.",
-								 "Is that what you meant to do? (Y/N)\n"))
-			if(tolower(go) != "y") { 
-				stop("Never mind, then.") 
-			} 
+			# go <- readline(paste("About to import instance list.",
+			# 					 "Options set: keep sequence; remove stopwords.",
+			# 					 "Is that what you meant to do? (Y/N)\n"))
+			# if(tolower(go) != "y") { 
+			# 	stop("Never mind, then.") 
+			# } 
 			
 			print("Beginning import now...")
 			if(! system(import)) { 
@@ -92,24 +92,25 @@ r2mallet <- function(
 		# Train the model. Topic-number dependent.
 		# 3a. Start looping for each number of topics. 
 		# kseq is defined at the top of this file.
+		i <- 0
 		foreach(k = kseq) %do% {
-			
+			i <- i + 1
 			# 2a. File names for output of model (extensions must be as shown)
-			outputstate <- file.path(outputroot, paste0(dataset_name, "k", k, "_topic-state.gz"))
-			outputtopickeys <- file.path(outputroot, paste0(dataset_name, "k", k, "_keys.txt"))
-			outputdoctopics <- file.path(outputroot, paste0(dataset_name, "k", k, "_composition.txt"))
-			wordtopics <- file.path(outputroot, paste0(dataset_name, "k", k, "_wordtopics.txt"))
-			diagnostics <- file.path(outputroot, paste0(dataset_name, "k", k, "_diagnostics.xml"))
+			outputstate <- file.path(outputroot, paste0(dataset_name, "k", k, "_topic-state", "_", i,".gz"))
+			outputtopickeys <- file.path(outputroot, paste0(dataset_name, "k", k, "_keys", "_", i,".txt"))
+			outputdoctopics <- file.path(outputroot, paste0(dataset_name, "k", k, "_composition", "_", i,".txt"))
+			wordtopics <- file.path(outputroot, paste0(dataset_name, "k", k, "_wordtopics", "_", i,".txt"))
+			diagnostics <- file.path(outputroot, paste0(dataset_name, "k", k, "_diagnostics", "_", i,".xml"))
 			
 			# 2b. Check that the files above exist. If not, create blank ones.
 			if (system(paste0("[ -s ", outputstate, " ]"))) {
 				system(paste("touch -a", outputstate))
 			} else {
-			  	go <- readline(paste("Outputstate file already exists", 
-									 "and is not empty. Overwrite (Y/N)?"))
-				  if(tolower(go) != "y") { 
-					  stop("Never mind, then.") 
-				  } 			
+			#   	go <- readline(paste("Outputstate file already exists", 
+			# 						 "and is not empty. Overwrite (Y/N)?"))
+			# 	  if(tolower(go) != "y") { 
+			# 		  stop("Never mind, then.") 
+			# 	  } 			
 			} 
 
 			# 3b. String together command to send to MALLET via the shell  
@@ -123,8 +124,11 @@ r2mallet <- function(
 						 "--output-doc-topics", outputdoctopics, 
 						 "--word-topic-counts-file", wordtopics,
 						 "--num-threads", parallel::detectCores()-1,
-						 "--diagnostics-file", diagnostics,
-						 "--random-seed", seed)
+						 "--diagnostics-file", diagnostics)
+			if(!is.null(seed)) {
+			    train <- paste(train, "--random-seed", seed)
+			}
+						 
 			
 			# 3c. Run the command in the shell.
 			message(paste("Starting at", Sys.time(), "using this command: \n", train))
@@ -137,7 +141,9 @@ r2mallet <- function(
 } # close the wrapper function
 
 if(autorun) {
-	r2mallet(datasets=c("realconsorts"), kseq=c(55))
+	r2mallet(datasets=c("realconsorts"), kseq=c(55), numiterations=250)   # about 9 minutes
+    r2mallet(datasets=c("realconsorts"), kseq=rep(55, times=10), seed=NULL, numiterations=250)
+    # r2mallet(datasets=c("realconsorts"), kseq=c(55), num_iterations=1000)   # about 32 minutes
 #     r2mallet("consorts")
 #     r2mallet("real.consorts")
 } else {

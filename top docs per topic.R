@@ -358,20 +358,6 @@ top_topic_browser <- function(
     
 }   # end of wrapper function top_topic_browser()
 
-## Run the big browser function above
-if (autorun) {
-    dataset_name <- "consorts"
-    subset_name <- "realconsorts"
-    ntopics <- 55
-    if (remake_figs) { 
-        filename <- paste0(imageloc, "top topics - ", dataset_name, ", K", ntopics, subset_name, "topic 8.txt")
-        readline(paste("About to capture browser output as", filename,"- <enter> to continue or <esc> to abort."))
-        
-        
-    } else {
-        top_topic_browser(subset_name=subset_name)
-    }
-}
 
 # TO DO:
 # New function: Get list of filenames for top docs in a given topic, to find Keywords in Context (KWIC), etc.
@@ -443,7 +429,7 @@ shareable_topic <- function(  topic,
                               depth = 10,            
                               
                               # show current topic labels for indiv. docs?  
-                              showlabels = TRUE
+                              showlabels = TRUE,
                               
                               # if we've run this model multiple times, which iteration?
                               iter_index = ""
@@ -482,5 +468,21 @@ shareable_topic <- function(  topic,
         warning("This function usually saves to .csv, but remake_figs is off.")
         warning("Printing to screen only.")
         print(docs)
+    }
+}
+
+## Run the big browser function above
+if (autorun) {
+    dataset_name <- "consorts"
+    subset_name <- "realconsorts"
+    ntopics <- 55
+    if (remake_figs) { 
+        filename <- paste0(imageloc, "top topics - ", dataset_name, ", K", ntopics, subset_name, "topic 8.txt")
+        readline(paste("About to capture browser output as", filename,"- <enter> to continue or <esc> to abort."))
+        
+        
+    } else {
+        top_topic_browser(subset_name=subset_name)
+        top_topic_browser(subset_name="realconsorts")
     }
 }
