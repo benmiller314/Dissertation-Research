@@ -28,7 +28,7 @@
 	# 	    options(java.parameters=heap_param)
 	# # Never mind, this is set by MALLET in $malletloc/bin/mallet, 
 	# # on line 10: "MEMORY=" etc. Leaving it here in case both need to be set.
-	heap_param <- paste("-Xmx","7g",sep="")
+	heap_param <- paste("-Xmx","15g",sep="")
 	options(java.parameters=heap_param)
 	
 	# What's our dataset?
