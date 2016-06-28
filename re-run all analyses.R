@@ -12,11 +12,18 @@
     setwd("~/Dropbox/coursework, etc/dissertation/data, code, and figures/Dissertation Research")
 
 ## 
-#         Global variables called in many functions. remake_figs: If TRUE,
-#     save new files for figures; if FALSE, display on screen only.
-#     autorun: If TRUE, call the functions when files are sourced; if
-#     FALSE, load functions but do not call.
-            remake_figs <- FALSE; autorun <- FALSE;
+# Global variables called in many functions. 
+#       remake_figs: If TRUE, save new files for figures; 
+#                    if FALSE, display on screen only.
+        remake_figs <- FALSE
+        
+#       autorun: If TRUE, call the functions when files are sourced; 
+#                if FALSE, load functions but do not call.            
+        autorun <- FALSE
+        
+#       update_realconsorts: If TRUE, overwrite file list index of dissertations from
+#                real consortium program dissertations, for text mining purposes.
+        update_realconsorts <- FALSE
 
 ## 
 # `dataprep.R`: prepares working environment by loading helper
@@ -125,39 +132,15 @@ source(file="collocation heatmap.R")
 
 
 #####       Functions for Topic Modeling        #####
-#   generate a (series of) topic model(s)   
+#   generate a (series of) topic model(s); more documentation in each file   
 source(file="r2mallet with foreach.R")
-
-<<<<<<< HEAD
-#####  Topic Modeling functions  #####
-source(file="r2mallet with foreach.R")				# generate a (series of) topic model(s)
-source(file="cotopics.R")							# find topics that co-occur within documents
-source(file="get doctopic grid.R")					# get weights of every topic for all documents
-source(file="topic cluster reach.R")				# find dissertations with high levels of a cluster of topics
-source(file="get topics for author.R")				# retrieve topic information about a dissertation by author name
+source(file="topic modeling 3.R")
 
 
 # Tools for topic exploration
-## Provides four functions:
-#  get.doc.composition(dataset, ntopics): helper function. retrieves a
-#    pre-existing matrix, output by MALLET, with topic proportions for each 
-#    document in corpus
-#  get.topics4doc(pubnum, dataset_name, ntopics, howmany, showlabels): 
-#    helper function. Retrieves top `howmany` topics for a document 
-#    specified by `pubnum`.
-#  top_topic_browser(...): browse topics to generate labels. 
-#     For a specified topic or range of topics, shows the top `howmany`
-#     documents and their method tags, with optional detail view showing top
-#     topics for each document at a time. See below for parameters. By default,
-#     uses an interactive mode, but can also output basic info for a topic by
-#     using the for.bind option.
-#  shareable_topic(topic, ...): Given a topic of interest, compiles clean data
-#     to share with others about the top `depth` docs from that topic; outputs
-#     a .csv file when remake_figs is true.
-source(file="top docs per topic.R")	
-=======
+
 ## 
-#   `top docs per topic.R`: browse topics to generate labels. Provides three 
+#   `top docs per topic.R`: browse topics to generate labels. Provides four
 #   functions:
 #         * get.doc.composition(dataset, ntopics): retrieves a pre-existing 
 #           matrix, output by MALLET, with topic proportions for each 
@@ -170,6 +153,9 @@ source(file="top docs per topic.R")
 #           optional detail view showing top topics for each document at a 
 #           time. Parameters include start.rank, topic, dataset_name, ntopics,
 #			depth, showlabels, etc.
+#         * shareable_topic(topic, ...): Given a topic of interest, compiles 
+#           clean data to share with others about the top `depth` docs from 
+#           that topic; outputs a .csv file when remake_figs is true.
 #   Dependencies: get doctopic grid.R, get topickeys.R, get topic labels.R
 source(file="top docs per topic.R")
 
@@ -185,7 +171,6 @@ source(file="get doctopic grid.R")
 
 #   find dissertations with high levels of a cluster of topics
 source(file="topic cluster reach.R")
->>>>>>> add-titles-to-json-output-for-d3
 
 ##
 #   `frameToD3.R`: outputs JSON file of topic model data for
