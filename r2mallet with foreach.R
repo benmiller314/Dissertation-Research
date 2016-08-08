@@ -25,14 +25,6 @@ library(parallel)
 #   Never mind, this is set by MALLET in $malletloc/bin/mallet, 
 #   on line 10: "MEMORY=" etc. But see also $malletloc/bin/mallet.bat, line 14, "set MALLET_MEMORY="
 
-	# What is the command that runs MALLET?
-	mallet_cmd <- file.path(malletloc, "bin", "mallet")
-	
-	# What's the directory within which to find text files for the corpus?
-	importroot <- "~/Documents/fulltext_dissertations/"
-
-	# What's the directory within which to output mallet files?
-	outputroot <- tmloc
 	
 # start of wrapper function	
 r2mallet <- function(
@@ -50,8 +42,18 @@ r2mallet <- function(
 					numiterations = 250,
 				
 				# To make pseudo-random results exactly replicable, specify a seed value
-				    seed = 8675309) {		
+				    seed = 8675309,
 
+				
+				# What is the command that runs MALLET?
+				    mallet_cmd = file.path(malletloc, "bin", "mallet"),
+				
+				# What's the directory within which to find text files for the corpus?
+				    importroot = "~/Documents/fulltext_dissertations/",
+				
+				# What's the directory within which to output mallet files?
+				    outputroot = tmloc)
+{
 
 	# Loop through each dataset and (1) import instances 
 	# (2) make sure output files are available, then
@@ -62,7 +64,7 @@ r2mallet <- function(
 		
 		# 1b. Locate the instance list. This will be stable for a given dataset,
 		# regardless of the number of topics.
-		output <- file.path(tmloc, paste0(dataset_name, "_instances.mallet"))
+		output <- file.path(outputroot, paste0(dataset_name, "_instances.mallet"))
 		
 		# Check to see if the instance list has already been created. If so,
 		# then system(scope) will return 0; otherwise, run the import script now.
