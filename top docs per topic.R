@@ -215,7 +215,7 @@ top_topic_browser <- function(
                          decreasing=TRUE)[1:depth]
         diss.ind <- outputfile[row.ind, "Pub.number"]
 
-        print(topic_keys.dt[topic.num])
+        print(topic_keys.dt[as.integer(topic.num)])
 
         # list of top 1:depth documents for this topic
         topdocs <- noexcludes.dt[as.character(diss.ind), 
@@ -299,7 +299,7 @@ top_topic_browser <- function(
             message("\nTopic of rank ", i, ":\n") 
         }
         
-        print(topic_keys.dt[topic.num])
+        print(topic_keys.dt[as.integer(topic.num)])
         
         # list of top 1:depth documents for this topic
         topdocs <- noexcludes.dt[as.character(diss.ind), 
