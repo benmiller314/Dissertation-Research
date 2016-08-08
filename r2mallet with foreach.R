@@ -165,6 +165,13 @@ if(autorun) {
 	message(paste("If you wish to create new topic models,", 
 				  "check configuration, then set autorun to TRUE."))
 }	
+
+#####
+# test that mallet works on Bridges supercomputer:
+r2mallet(cmdonly=T, mallet_cmd="./mallet/bin/mallet", importroot="./clean_realconsorts", outputroot="/pylon2/hm4s81p/bmiller3/tm", kseq=c(10))
+
+
+
 # ## Step 5. Inspect results
 # library(bigmemory)
 # library(biganalytics)
