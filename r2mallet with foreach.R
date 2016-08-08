@@ -40,7 +40,8 @@ r2mallet <- function(
 					datasets = c("realconsorts"),
 				
 				# How many topics? Set kseq to a sequence to try several options.
-					kseq = c(10, 30, 50, 100, 150, 200, 500),
+					# kseq = c(10, 30, 50, 100, 150, 200, 500),
+				    kseq = c(55),
 					
 				# What optimisation intervals for MALLET to use?
 				# Default choices are from Mimno's library(mallet)
