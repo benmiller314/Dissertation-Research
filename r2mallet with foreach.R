@@ -62,7 +62,7 @@ r2mallet <- function(
 	# then (3) build models w/varying numbers of topics.
 	foreach(dataset_name = datasets) %do% {
 		# 1a. Locate the folder containing txt files for MALLET to work on.
-		importdir <- file.path(importroot, paste0(importroot, "clean_", dataset_name, "_only"))
+		importdir <- file.path(importroot, paste0("clean_", dataset_name, "_only"))
 		
 		# 1b. Locate the instance list. This will be stable for a given dataset,
 		# regardless of the number of topics.
