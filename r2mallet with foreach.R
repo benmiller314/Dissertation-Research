@@ -44,6 +44,8 @@ r2mallet <- function(
 				# To make pseudo-random results exactly replicable, specify a seed value
 				    seed = 8675309,
 
+                # To use with the command line, just output the command and exit
+				    cmdonly = F,
 				
 				# What is the command that runs MALLET?
 				    mallet_cmd = file.path(malletloc, "bin", "mallet"),
@@ -82,6 +84,10 @@ r2mallet <- function(
 			# if(tolower(go) != "y") { 
 			# 	stop("Never mind, then.") 
 			# } 
+			
+			if (cmdonly) {
+			    return(import)
+			}
 			
 			print("Beginning import now...")
 			if(! system(import)) { 
@@ -131,7 +137,10 @@ r2mallet <- function(
 			if(!is.null(seed)) {
 			    train <- paste(train, "--random-seed", seed)
 			}
-						 
+			
+			if(cmdonly) { 
+			    return(train)    
+			}			 
 			
 			# 3c. Run the command in the shell.
 			message(paste("Starting at", Sys.time(), "using this command: \n", train))
@@ -150,6 +159,8 @@ if(autorun) {
 #     r2mallet("consorts")
 #     r2mallet("real.consorts")
 } else {
+    train <- r2mallet(cmdonly=T)
+    message(paste("Current default command is", train))
 	message("Autorun is FALSE, so no action was taken.")
 	message(paste("If you wish to create new topic models,", 
 				  "check configuration, then set autorun to TRUE."))
