@@ -22,11 +22,8 @@ get.doctopic.grid <- function(dataset_name="consorts",
     # Locate the doc/topic grid, or create it if it doesn't yet exist.
     filename <- file.path(tmloc, paste0(dataset_name, "k", ntopics, 
                         "_doc-all-topics", iter_index, ".txt"))
-    scope <- paste("cd", tmloc, ";  ls", filename)
-
-    if (system(scope))  # runs only if file not found, 
-                        # which returns a non-zero error value
-    {   
+    
+    if (!file.exists(filename)) {   
         if (do_reshape) { cmd <- "reshapeMallet.py" } else { cmd <- "mallet_composition2r.py" }
         command <- paste("cd", unixsourceloc, 
                 "; cd 'Shell scripts and commands'; python", cmd)
