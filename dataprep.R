@@ -20,6 +20,7 @@ if(getwd() != sourceloc) {
 
 imageloc <- paste0(sourceloc, "../Dissertation Research - Figures/")
 dataloc <- paste0(sourceloc, "../")
+newdataloc <- file.path("~", "Box Sync", "research", "dissertations")
 malletloc <- "~/Applications/mallet"
 webloc <- "~/Documents/Webdev/datavis_testing"
 tmloc <- "~/Documents/tm"
@@ -28,7 +29,7 @@ tmloc <- "~/Documents/tm"
 # name the method tags most of these analyses are interested in
 tagnames <- c("Clin","Crit",
 			  # "Cult",
-			  "Disc","Ethn","Expt","Hist","Intv","Meta","Modl","Phil","Poet","Prac","Rhet","Surv","Othr")
+			  "Disc","Ethn","Expt","Hist","Intv","Meta","Modl","Phil","Poet","Prac","Rhet","Surv","Othr", "Ped")
 
 tagnames.long <- c( "Clinical / Case Study", 
 					"Critical / Hermeneutical",
@@ -45,7 +46,8 @@ tagnames.long <- c( "Clinical / Case Study",
 					"Practitioner / Teacher-Research",
 					"Rhetorical Analytical",
 					"Survey",
-					"Other"
+					"Other", 
+					"Pedagogical Projection"
 					)
 					
 # provide a function to convert tag column labels to real tag names					
