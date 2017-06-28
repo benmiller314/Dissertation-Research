@@ -9,7 +9,7 @@
 # This file is sourced during `dataprep 2 - load data.R`
 #####
 
-parse_tags <- function(data) {
+parse_tags <- function(data, tagstyle="long", tagcol="Method.Terms") {
 	# Check that the columns we're adding don't already exist
 	while(any(names(data) %in% tagnames)) {
 		c <- readline(paste("Looks like data has already been parsed.", 
@@ -23,6 +23,12 @@ parse_tags <- function(data) {
 			print(noquote("I do not understand your response. Try again?"))
 		}
 	}
+    
+    # Check that tagstyle is legal
+    if (!tagstyle %in% c("long", "short")) {
+        warning("Only 'long' and 'short' are implemented for tagstyle parameter.")
+        return()
+    }
 
 	# Create a data frame to hold the updated info; we'll merge later.
 	tags <- data.frame(
@@ -43,18 +49,25 @@ parse_tags <- function(data) {
 		"Rhet" = 0,
 		"Surv" = 0,
 		"Othr" = 0,
+		"Ped"  = 0,
 		"Method.Count" = 0,
 		"Exclude.Level" = 0
 	)
 	
 	# For each method tag, deduce from Method.Terms what tags are present.
-	mt <- data[, "Method.Terms"]
-	searchterms <- c("Clinical", "Hermeneutical",
-					# "Cultural",
-					"Discourse", "Ethnographic", "Experimental",
-					"Historical", "Interview", "Meta-Analy", "Model",
-					"Philosophical", "Poetic", "Practitioner", "Rhetorical",
-					"Survey", "Other")
+	mt <- data[, tagcol]
+	if (tagstyle == "long") {
+    	searchterms <- c("Clinical", "Hermeneutical",
+    					# "Cultural",
+    					"Discourse", "Ethnographic", "Experimental",
+    					"Historical", "Interview", "Meta-Analy", "Model",
+    					"Philosophical", "Poetic", "Practitioner", "Rhetorical",
+    					"Survey", "Other", "Pedagogical Projection")
+	} else if (tagstyle == "short") {
+	    searchterms <- c("Clin", "Crit", "Disc", "Ethn", "Expt", "Hist",
+	                     "Intv", "Meta", "Modl", "Phil", "Poet", "Prac", 
+	                     "Rhet", "Surv", "Othr", "Ped")
+	}
 	
 	searchresults <- lapply(searchterms, FUN=function(x) { 
 							grep(x, mt, ignore.case=F) } )
@@ -84,7 +97,7 @@ parse_tags <- function(data) {
 	# Populate Exclude.Level 
 	el <- grep("xclude", mt, fixed=T)
 	tags[el, "Exclude.Level"] <- tags[el, "Exclude.Level"] + 2
-	cbind(bigarray[el,"Method.Terms"], tags[el,"Exclude.Level"])
+	cbind(data[el,"Method.Terms"], tags[el,"Exclude.Level"])
 	
 	el2 <- grep("xclude ?", mt, fixed=T)
 	tags[el2, "Exclude.Level"] <- tags[el2, "Exclude.Level"] - 1
