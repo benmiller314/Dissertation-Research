@@ -9,7 +9,11 @@
 # This file is sourced during `dataprep 2 - load data.R`
 #####
 
-parse_tags <- function(data, tagstyle="long", tagcol="Method.Terms") {
+parse_tags <- function(data, 
+                       tagstyle="long", 
+                       tagcol="Method.Terms", 
+                       standalone=FALSE,
+                       excludecol=tagcol) {
 	# Check that the columns we're adding don't already exist
 	while(any(names(data) %in% tagnames)) {
 		c <- readline(paste("Looks like data has already been parsed.", 
@@ -35,7 +39,6 @@ parse_tags <- function(data, tagstyle="long", tagcol="Method.Terms") {
 		"Pub.number" = data["Pub.number"],
 		"Clin" = 0,
 		"Crit" = 0,
-		# "Cult" = 0,
 		"Disc" = 0,
 		"Ethn" = 0,
 		"Expt" = 0,
@@ -58,7 +61,6 @@ parse_tags <- function(data, tagstyle="long", tagcol="Method.Terms") {
 	mt <- data[, tagcol]
 	if (tagstyle == "long") {
     	searchterms <- c("Clinical", "Hermeneutical",
-    					# "Cultural",
     					"Discourse", "Ethnographic", "Experimental",
     					"Historical", "Interview", "Meta-Analy", "Model",
     					"Philosophical", "Poetic", "Practitioner", "Rhetorical",
@@ -70,7 +72,7 @@ parse_tags <- function(data, tagstyle="long", tagcol="Method.Terms") {
 	}
 	
 	searchresults <- lapply(searchterms, FUN=function(x) { 
-							grep(x, mt, ignore.case=F) } )
+							grep(x, mt, ignore.case=T) } )
 	
 	## bug-hunting
 	# grep("Clinical", a[,"Method.Terms"], ignore.case=F)
@@ -84,27 +86,35 @@ parse_tags <- function(data, tagstyle="long", tagcol="Method.Terms") {
 		tags[i,"Method.Count"] <- sum(tags[i,tagnames])
 	}	
 	
-	# Account for Method.Count==0, which means that the only tag was excluded
-	# above
-	print(noquote(paste("Converting", length(which(tags$Method.Count==0)),
-						"dissertations with solo tags now excluded",
-						"from the schema to solo 'Other'")))
+	# Account for Method.Count==0, which means either that the only tag was excluded
+	# above, or that the diss hasn't been tagged yet
 	zeroindex <- which(tags$Method.Count==0)
-	tags[zeroindex, "Othr"] <- 1
-	tags[zeroindex, "Method.Count"] <- 1
+	falsezeros <- which(mt[zeroindex] != "")
 	
+	message(paste("Converting", length(falsezeros),
+	              "dissertations with solo tags now excluded",
+	              "from the schema to solo 'Other'"))
+	for (tagcell in mt[falsezeros]) {
+	    tags[falsezeros, "Othr"] <- 1
+	    tags[falsezeros, "Method.Count"] <- 1
+	}
+	message(paste(" Also found", length(zeroindex) - length(falsezeros),
+	              "dissertations that have not yet been tagged. \n",
+	              "Consider removing these before proceeding."))
 	
+	   
 	# Populate Exclude.Level 
-	el <- grep("xclude", mt, fixed=T)
+	et <- data[, excludecol]
+	el <- grep("xclude", et, fixed=T)
 	tags[el, "Exclude.Level"] <- tags[el, "Exclude.Level"] + 2
 	cbind(data[el,"Method.Terms"], tags[el,"Exclude.Level"])
 	
-	el2 <- grep("xclude ?", mt, fixed=T)
+	el2 <- grep("xclude ?", et, fixed=T)
 	tags[el2, "Exclude.Level"] <- tags[el2, "Exclude.Level"] - 1
 	
 	# make sure it worked
 	head(data.frame(				
-		"Method.Terms" = data[which(tags$Exclude.Level > 0), "Method.Terms"], 
+		"Method.Terms" = data[which(tags$Exclude.Level > 0), tagcol], 
 		"Exclude.Level" = tags[which(tags$Exclude.Level> 0), "Exclude.Level"]
 	    ), 30)
 	
@@ -120,6 +130,10 @@ parse_tags <- function(data, tagstyle="long", tagcol="Method.Terms") {
 	# 		tags[a, "Method.Count"])
 	# head(tags)
 	# head(mt)
+	
+	if(standalone) {
+	    return(tags)
+	}
 	
 	## Satisfied that the foregoing worked, let's merge 
 	data[, names(tags)] <- tags
