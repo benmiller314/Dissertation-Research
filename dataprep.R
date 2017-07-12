@@ -12,18 +12,18 @@ ans <- function() {
 	}
 	
 # set the working directories, taking into account the GitHub setup
-sourceloc <- "~/Dropbox/coursework, etc/dissertation/data, code, and figures/Dissertation Research/"
+sourceloc <- file.path("~","Dropbox", "coursework, etc", "dissertation", "data, code, and figures", "Dissertation Research")
 unixsourceloc <- "~/'Dropbox/coursework, etc/dissertation/data, code, and figures/Dissertation Research/'"
 if(getwd() != sourceloc) {
 	setwd(sourceloc)
 }
 
-imageloc <- paste0(sourceloc, "../Dissertation Research - Figures/")
-dataloc <- paste0(sourceloc, "../")
+imageloc <- file.path(sourceloc, "../Dissertation Research - Figures")
+dataloc <- file.path(sourceloc, "..")
 newdataloc <- file.path("~", "Box Sync", "research", "dissertations")
-malletloc <- "~/Applications/mallet"
-webloc <- "~/Documents/Webdev/datavis_testing"
-tmloc <- "~/Documents/tm"
+malletloc <- file.path("~", "Applications", "mallet")
+webloc <- file.path("~", "Documents", "Webdev", "datavis_testing")
+tmloc <- file.path("~", "Documents", "tm")
 
 
 # name the method tags most of these analyses are interested in
