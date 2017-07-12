@@ -16,12 +16,15 @@ if (!exists("tagnames")) {
 ## now get the data 
 # The most recent file of dissertation metadata
 invisible(readline("Select the most recent file of dissertation metadata. (Press <Enter> to continue.)"))
-bigarray <- read.csv(file=file.choose())
+oldarray <- read.csv(file=file.choose())
+newarray <- read.csv(file=file.choose())
 
 # parse the method tags... including for the collapsed schema
-bigarray <- parse_tags(bigarray)
-bigarray <- short_schema(bigarray)
+oldarray <- parse_tags(oldarray)
+oldarray <- short_schema(oldarray)
+newarray <- parse_tags(newarray, tagstyle="short", excludecol="Flags")
 
+bigarray <- merge(oldarray, newarray, all=TRUE)
 
 # filter out false positives
 noexcludes <- bigarray[bigarray$Exclude.Level==0,] 
