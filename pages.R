@@ -6,7 +6,7 @@ dataset_name <- "noexcludes"
 
 # Get the data
 dataset <- get(dataset_name)
-pages <- dataset$pages
+pages <- dataset$Pages
 
 # Make sure we have all numbers in our dataset
 if(any(is.na(pages))) {

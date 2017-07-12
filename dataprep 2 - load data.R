@@ -34,7 +34,7 @@ false.positives <- nrow(justexcludes)
 message(paste("In this data set, there are",diss.count,"dissertations, not counting",false.positives,"false positives."))
 
 # refactor levels for noexcludes alone
-refactor.index <- which(names(noexcludes) %in% c("Subject","KEYWORDS","School","Advisor.type","Advisor.Name","Degree","Method.Terms","pages","Flag.notes"))
+refactor.index <- which(names(noexcludes) %in% c("Subject","KEYWORDS","School","Advisor.type","Advisor.Name","Degree","Method.Terms","Pages","Flag.notes"))
 for (i in refactor.index) {
 	noexcludes[,i] <- factor(noexcludes[,i])
 }

@@ -2,5 +2,5 @@
 
 require(doBy)
 
-summaryBy(pages~Case+Crit+Cult+Disc+Ethn+Expt+Hist+Intv+Meta+Modl+Phil+Poet+Pract+Rhet+Surv,data=monomethodics) -> monotag.pages
-summary(monotag.pages$pages.mean)
+summaryBy(Pages~Case+Crit+Cult+Disc+Ethn+Expt+Hist+Intv+Meta+Modl+Phil+Poet+Pract+Rhet+Surv,data=monomethodics) -> monotag.pages
+summary(monotag.pages$Pages.mean)
