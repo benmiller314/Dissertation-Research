@@ -33,6 +33,16 @@ parse_tags <- function(data,
         warning("Only 'long' and 'short' are implemented for tagstyle parameter.")
         return()
     }
+    
+    # Remove blank rows. (I can't think of an occasion when you'd want to leave these in.)
+    blankindex <- which(data[, tagcol] == "")
+    if (length(blankindex) > 0) {
+        data <- data[-blankindex,]
+        warning(paste("Removed", length(blankindex),
+                      "dissertations that have not yet been tagged,\n",
+                      "leaving", nrow(data), "tagged dissertations."))
+    }
+    
 
 	# Create a data frame to hold the updated info; we'll merge later.
 	tags <- data.frame(
@@ -89,18 +99,13 @@ parse_tags <- function(data,
 	# Account for Method.Count==0, which means either that the only tag was excluded
 	# above, or that the diss hasn't been tagged yet
 	zeroindex <- which(tags$Method.Count==0)
-	falsezeros <- which(mt[zeroindex] != "")
-	
-	message(paste("Converting", length(falsezeros),
-	              "dissertations with solo tags now excluded",
-	              "from the schema to solo 'Other'"))
-	for (tagcell in mt[falsezeros]) {
-	    tags[falsezeros, "Othr"] <- 1
-	    tags[falsezeros, "Method.Count"] <- 1
+	if (length(zeroindex) > 0) {
+	    warning(paste("Converted", length(zeroindex),
+    	              "dissertations with solo tags now excluded",
+    	              "from the schema to solo 'Other'"))
+    	tags[zeroindex, "Othr"] <- 1
+    	tags[zeroindex, "Method.Count"] <- 1
 	}
-	message(paste(" Also found", length(zeroindex) - length(falsezeros),
-	              "dissertations that have not yet been tagged. \n",
-	              "Consider removing these before proceeding."))
 	
 	   
 	# Populate Exclude.Level 
