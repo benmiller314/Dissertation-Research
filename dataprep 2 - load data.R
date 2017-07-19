@@ -10,21 +10,34 @@
 ########
 
 if (!exists("tagnames")) {
-	source(file=file.path("~","Dropbox", "coursework, etc", "dissertation", "data, code, and figures", "Dissertation Research", "dataprep.R"))
+	source(file="~/Dropbox/coursework, etc/dissertation/data, code, and figures/Dissertation Research/dataprep.R")
 }
 
 ## now get the data 
-# The most recent file of dissertation metadata
+# The original file of dissertation metadata
 oldarray <- read.csv(file=file.path(dataloc, "Rhetoric-or-Composition-12-adding-depts.csv"))
+
+# The new file of dissertation metadata
 invisible(readline("Select the most recent file of dissertation metadata. (Press <Enter> to continue.)"))
 newarray <- read.csv(file=file.choose())
+
+
 
 # parse the method tags... including for the collapsed schema
 oldarray <- parse_tags(oldarray)
 oldarray <- short_schema(oldarray)
-newarray <- parse_tags(newarray, tagstyle="short", excludecol="Flags")
+# names(oldarray)
+# oldarray[tagnames]
 
-bigarray <- merge(oldarray, newarray, all=TRUE)
+newarray <- parse_tags(newarray, tagstyle="short", excludecol="Flags")
+newarray <- short_schema(newarray)
+
+
+# Let's merge them, why not
+bigarray <- merge(oldarray, newarray, all=T)
+names(bigarray)
+
+
 
 # filter out false positives
 noexcludes <- bigarray[bigarray$Exclude.Level==0,] 
@@ -37,16 +50,23 @@ false.positives <- nrow(justexcludes)
 message(paste("In this data set, there are",diss.count,"dissertations, not counting",false.positives,"false positives."))
 
 # refactor levels for noexcludes alone
-refactor.index <- which(names(noexcludes) %in% c("Subject","KEYWORDS","School","Advisor.type","Advisor.Name","Degree","Method.Terms","Pages","Flag.notes"))
+refactor.index <- which(names(noexcludes) %in% c("Subject","KEYWORDS","School","Advisor.type","Advisor.Name","Degree","Method.Terms","pages","Flag.notes"))
 for (i in refactor.index) {
 	noexcludes[,i] <- factor(noexcludes[,i])
 }
 
 
-## redefine methods that are all "check" or "check?" as "Other," and recalculate "Method.Count"
-# TO DO: incorporate this into `method tag array.R`, so we can account for the different flag columns
-# source(file=paste0(sourceloc, "check count.R"))
+# redefine methods that are all "check" or "check?" as "Other," and recalculate "Method.Count"
+source(file=file.path(sourceloc, "check count.R"))
 
+# get tag index columns on their own, for simplicity down the road
+# TO DO: See whether we still need this
+# tagarray <- noexcludes[,tagnames]
+# row.names(tagarray) <- noexcludes[,"Author"]
+# data.matrix(tagarray) -> tagarray.m
+
+# tag.totals <- tagtotals(tagarray, skip=0)
+# barplot(tag.totals)
 
 ## Store reference variables for schools
 
