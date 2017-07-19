@@ -30,8 +30,7 @@ parse_tags <- function(data,
     
     # Check that tagstyle is legal
     if (!tagstyle %in% c("long", "short")) {
-        warning("Only 'long' and 'short' are implemented for tagstyle parameter.")
-        return()
+        stop("Only 'long' and 'short' are implemented for tagstyle parameter.")
     }
     
     # Remove blank rows. (I can't think of an occasion when you'd want to leave these in.)
