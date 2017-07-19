@@ -114,7 +114,8 @@ parse_tags <- function(data,
 	tags[el, "Exclude.Level"] <- tags[el, "Exclude.Level"] + 2
 	cbind(data[el,"Method.Terms"], tags[el,"Exclude.Level"])
 	
-	el2 <- grep("xclude ?", et, fixed=T)
+	# Find excludes with question mark (with optional space beforehand)
+	el2 <- grep("xclude ?\\?", et, fixed=T)
 	tags[el2, "Exclude.Level"] <- tags[el2, "Exclude.Level"] - 1
 	
 	# make sure it worked
