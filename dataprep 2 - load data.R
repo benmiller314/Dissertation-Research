@@ -70,7 +70,7 @@ source(file=file.path(sourceloc, "check count.R"))
 
 ## Store reference variables for schools
 
-consortium <- read.csv(file=paste0(dataloc,"doctoral-consortium-schools-programs, reconciled to carnegie.csv"))
+consortium <- read.csv(file=file.path(dataloc, "doctoral-consortium-schools-programs, reconciled to carnegie.csv"))
 conschools <- factor(consortium$University)
 
 source(file="update realconsorts.R")
@@ -113,10 +113,10 @@ setkey(noexcludes.dt, Pub.number)
 
 ## Export file lists for subsets of data
 if(remake_figs || update_realconsorts) {
-    write(levels(factor(noexcludes$Pub.number)), file=paste0(sourceloc, "Shell scripts and commands/file list noexcludes.txt"), sep="\n")
-    write(levels(factor(consorts$Pub.number)), file=paste0(sourceloc, "Shell scripts and commands/file list consorts.txt"), sep="\n")
-    write(levels(factor(nonconsorts$Pub.number)), file=paste0(sourceloc, "Shell scripts and commands/file list nonconsorts.txt"), sep="\n")
-    write(levels(factor(realconsorts$Pub.number)), file=paste0(sourceloc, "Shell scripts and commands/file list realconsorts.txt"), sep="\n")
+    write(levels(factor(noexcludes$Pub.number)), file=file.path(sourceloc, "Shell scripts and commands/file list noexcludes.txt"), sep="\n")
+    write(levels(factor(consorts$Pub.number)), file=file.path(sourceloc, "Shell scripts and commands/file list consorts.txt"), sep="\n")
+    write(levels(factor(nonconsorts$Pub.number)), file=file.path(sourceloc, "Shell scripts and commands/file list nonconsorts.txt"), sep="\n")
+    write(levels(factor(realconsorts$Pub.number)), file=file.path(sourceloc, "Shell scripts and commands/file list realconsorts.txt"), sep="\n")
 }
 # TO DO (maybe): split out multiple advisors
 
