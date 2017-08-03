@@ -52,7 +52,7 @@ tag <- colSums(tagarray2[tagnames])
 simple1 <- colSums(tagarray1[tagnames.simple])
 simple2 <- colSums(tagarray2[tagnames.simple])
 
-rbind(simple1, simple2)
+simplegrid <- rbind(simple1, simple2)
 
 # Compare excludes
 exclude_table <- table(cbind(tagarray1["Exclude.Level"], tagarray2["Exclude.Level"]))
