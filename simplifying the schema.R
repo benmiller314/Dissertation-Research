@@ -12,13 +12,12 @@
 
 
 # define shortcut for new tag names
-tagnames.simple <- c("Aggreg", "Phenom", "Dialec", "Crafty", "Pract")
+tagnames.simple <- c("Aggreg", "Phenom", "Dialec", "Techne")
 tagnames.simple.long <- c(
                            "Aggregable", 
                            "Phenomenological", 
                            "Dialectical", 
-                           "Craft-based", 
-                           "Practitioner / Teacher Research")
+                           "Performance")
 
 # wrapper function to add these tags to existing tag array  
 short_schema <- function (data) {   
@@ -27,8 +26,7 @@ short_schema <- function (data) {
         c <- readline(paste("Looks like data has already been parsed.",
                         "Overwrite (O) or Abort (A)? \n short_schema > "))
         if(c == "A") {
-            warning("Short_schema not applied; data already parsed.")
-            return()
+            stop("Short_schema not applied; data already parsed.")
         } else if (c == "O") {
             break
         } else {
@@ -42,8 +40,8 @@ short_schema <- function (data) {
             Aggreg = -1,        # Aggregable
             Phenom = -1,        # Phenomenological
             Dialec = -1,        # Dialectical
-            Crafty = -1,        # Craft-Based
-            Pract  = -1,        # Practitioner 
+            Techne = -1,        # Craft-Based
+            # Pract  = -1,        # Practitioner 
                                 # (That last one is a little redundant, but
                                 # it makes `simple` simpler.)
             Counts.simple = -1
@@ -75,21 +73,23 @@ short_schema <- function (data) {
         a <- max(a1, a2, a3, a4, a5)
         di <- simple[i,"Dialec"] <- a
         
-        # Craft-Based
+        # Performance-Based
         a1 <- as.integer(data[i,"Poet"])
-#       a2 <- as.integer(data[i,"Prac"])
+        a2 <- as.integer(data[i,"Prac"])
         a3 <- as.integer(grep("tool-building", data[i,"Method.Terms"], 
                             ignore.case=TRUE))
         a <- max(a1, 
                # a2, 
                  a3)
-        cr <- simple[i,"Crafty"] <- a
+        cr <- simple[i,"Techne"] <- a
         
-        # Practitioner
-        pr <- simple[i, "Pract"] <- as.integer(data[i,"Prac"])
+        # # Practitioner
+        # pr <- simple[i, "Pract"] <- as.integer(data[i,"Prac"])
         
         # Now look for multi-modality across these broad categories
-        simple[i, "Counts.simple"] <- sum(ag, ph, di, cr, pr)
+        simple[i, "Counts.simple"] <- sum(ag, ph, di, cr
+                                          # , pr
+                                          )
     }
     # # Clean up the workspace (not needed after testing)
     # rm(a, a1, a2, a3, a4, a5, ag, c, ph, di, cr, pr)
