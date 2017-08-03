@@ -1,8 +1,8 @@
 #############################################################################
 # thresh.R
 #
-# Provides a function to subset data by threshold number of dissertations 
-# in a given timespan
+# Provides a function to subset schoolwise data by threshold number of dissertations 
+# at that school in a given timespan
 #####
 
 thresh <- function(dataset_name = "noexcludes", 
