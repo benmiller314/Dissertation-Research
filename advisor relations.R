@@ -8,12 +8,42 @@ titleCase <- function(x) {
           sep = "", collapse = " ")
 }
 
+
 unreverseName <- function(x) {
     x <- as.character(x)
     s <- strsplit(x, ", ")[[1]]
-    r <- paste(s[2], s[1], collapse=" ")
-    r <- titleCase(r)
+    # To do: account for more than one comma, e.g. the case of suffixes
+    if (length(s) < 2) {
+        return(titleCase(s))
+    } else {
+        r <- paste(s[2], s[1], collapse=" ")
+        return(titleCase(r))
+    }
 }
+
+reverseName <- function(x) {
+    x <- as.character(x)
+    # To do: account for a comma, e.g. the case of suffixes
+    s <- strsplit(x, " ")[[1]]
+    last <- tail(s, 1)
+    first <- paste(head(s, -1), collapse=" ")
+    paste0(last, ", ", first)
+}
+
+namepart <- function(name, part=c("first", "last")) {
+    name <- unreverseName(reverseName(unreverseName(name)))
+    namelist <- strsplit(name, " ")[[1]]
+    if (part == "first") {
+        return(head(namelist, 1))
+    } else if (part == "last") {
+        return(tail(namelist, 1))
+    } else {
+        warning("Only 'first' and 'last' parts are implemented for namepart();",
+                " name returned unchanged.")
+        return(name)
+    }
+}
+
 
 save_relations <- function(dataset_name) {
     dataset <- get(dataset_name)
