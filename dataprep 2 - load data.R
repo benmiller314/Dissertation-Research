@@ -78,13 +78,19 @@ consortium <- read.csv(file=file.path(dataloc, "doctoral-consortium-schools-prog
 conschools <- factor(consortium$University)
 
 source(file="update realconsorts.R")
+noexcludes <- realconsorts_by_list("noexcludes")
+
+consorts.index <- which(noexcludes$School %in% conschools)
+consorts <- noexcludes[consorts.index,]
+conschoolsfound <- factor(consorts$School)
+consort.count <- nrow(consorts)
 
 realconsorts.index <- which(noexcludes$realconsort == 1)
 realconsorts <- noexcludes[realconsorts.index,]
-consorts.index <- which(noexcludes$School %in% conschools)
-consorts <- noexcludes[consorts.index,]
-conschoolsfound <- factor(realconsorts$School)
-consort.count <- nrow(realconsorts)
+realconsort.count <- nrow(realconsorts)
+
+message("Of ", consort.count, " dissertations at Consortium schools, ",
+        realconsort.count, " are confirmed from Consortium programs.")
 
 # print("Consortium Schools Found:")
 # print(levels(conschoolsfound))
