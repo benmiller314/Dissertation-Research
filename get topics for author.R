@@ -94,6 +94,9 @@ get.topics4school <- function(schoolname,
     }
     
     # 2b. Get doc-topic grid for this dataset
+    if(!exists("get.doctopic.grid", mode="function")) {
+        source(file="get doctopic grid.R")
+    }
     grid <- get.doctopic.grid(dataset_name, ntopics, subset_name)$outputfile
     
     # 2c. Filter grid by pubnums

@@ -9,6 +9,7 @@
 
 # Step 0. Make sure we're all set up.
 if(!exists("thresh", mode="function")) {source(file="start here.R")}
+source(file="compare method ranks.R")
 
 # Step 1. Sum the tag columns
 if(!exists("get_tags", mode="function")) { source(file="get tags.R") }
