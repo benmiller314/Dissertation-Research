@@ -46,9 +46,13 @@ justexcludes <- bigarray[bigarray$Exclude.Level>0,]
 diss.count <- nrow(noexcludes) 
 false.positives <- nrow(justexcludes)
 
-
 message(paste("In this data set, there are",diss.count,"dissertations, not counting",false.positives,"false positives."))
 
+# mark noexcludes that will remain in for abstracts, but that 
+# we'll leave out of full-text analysis (non-English, bad scans);
+# these will now have Exclude.Level=3
+noexcludes <- remove_unreadables("noexcludes")
+    
 # refactor levels for noexcludes alone
 refactor.index <- which(names(noexcludes) %in% c("Subject","KEYWORDS","School","Advisor.type","Advisor.Name","Degree","Method.Terms","pages","Flag.notes"))
 for (i in refactor.index) {
