@@ -92,6 +92,12 @@ realconsort.count <- nrow(realconsorts)
 message("Of ", consort.count, " dissertations at Consortium schools, ",
         realconsort.count, " are confirmed from Consortium programs.")
 
+# index of disses that need to be checked for realconsort status
+# (no_alumni_list is created as a side effect of `update realconsorts.R`)
+maybeconsorts.index <- which(consorts$School %in% no_alumni_list)
+maybeconsorts.index <- which(!consorts[maybeconsorts.index, "realconsort"] %in% c(0,1))
+maybeconsorts <- consorts[maybeconsorts.index, ]
+
 # print("Consortium Schools Found:")
 # print(levels(conschoolsfound))
 # print("Did you remember to reconcile schools?")
@@ -118,6 +124,7 @@ nonconsorts <- refactor.all("nonconsorts")
 top.nonconsorts <- refactor.all("top.nonconsorts")
 consorts.plus <- refactor.all("consorts.plus")
 noexcludes2001_2015 <- refactor.all("noexcludes2001_2015")
+maybeconsorts <- refactor.all("maybeconsorts")
 
 # make noexcludes easy to index and search
 library(data.table)
@@ -131,6 +138,7 @@ if(remake_figs || update_realconsorts) {
     write(levels(factor(consorts$Pub.number)), file=file.path(sourceloc, "Shell scripts and commands/file list consorts.txt"), sep="\n")
     write(levels(factor(nonconsorts$Pub.number)), file=file.path(sourceloc, "Shell scripts and commands/file list nonconsorts.txt"), sep="\n")
     write(levels(factor(realconsorts$Pub.number)), file=file.path(sourceloc, "Shell scripts and commands/file list realconsorts.txt"), sep="\n")
+    write(levels(factor(maybeconsorts$Pub.number)), file=file.path(sourceloc, "Shell scripts and commands/file list maybeconsorts.txt"), sep="\n")
 }
 # TO DO (maybe): split out multiple advisors
 

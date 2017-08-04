@@ -71,6 +71,14 @@ realconsorts_by_list <- function(dataset_name = "consorts",
         alumni_list <- alumni_list[, c("Consortium_School", "Name", "Department", "Lastname", "Firstname", "Alumni_List")]
         # View(alumni_list)
         
+        # report on the number of schools indexed
+        message("Found alumni lists for ", 
+                length(levels(alumni_list$Consortium_School)), 
+                " of ", length(conschools), " schools in the Consortium.")
+        
+        # which schools don't we have lists for? (maybe contact them...)
+        no_alumni_list <<- conschools[which(!conschools %in% alumni_list$Consortium_School)]
+        
         
         # Narrow to just Consortium schools, then 
         unknown_dept <- dataset[which(dataset$School %in% conschools),]
@@ -141,6 +149,7 @@ realconsorts_by_list <- function(dataset_name = "consorts",
                 matchlist <- matchlist[which(!is.na(matchlist$Pub.number)),]    
             }
         }
+        
         
         # merge newly matched data into the dataset
         ## NB: Straight merge doesn't work because dataset$Department is a factor
