@@ -108,22 +108,26 @@ nonconsorts <- noexcludes[(which(noexcludes$School %in% non_conschools)),]
 top.nonconsorts <- thresh("nonconsorts")$thresh.data
 consorts.plus <- rbind(consorts, top.nonconsorts)
 
+# limit to 2001-2015
+noexcludes2001_2015 <- noexcludes[which(noexcludes$Year %in% seq(2001, 2015, 1)),]
+
 # re-factor all factor columns in all data subsets
 realconsorts <- refactor.all("realconsorts")
 consorts <- refactor.all("consorts")
 nonconsorts <- refactor.all("nonconsorts")
 top.nonconsorts <- refactor.all("top.nonconsorts")
 consorts.plus <- refactor.all("consorts.plus")
+noexcludes2001_2015 <- refactor.all("noexcludes2001_2015")
 
 # make noexcludes easy to index and search
 library(data.table)
 noexcludes.dt <- as.data.table(noexcludes)
 setkey(noexcludes.dt, Pub.number)
 
-
 ## Export file lists for subsets of data
 if(remake_figs || update_realconsorts) {
     write(levels(factor(noexcludes$Pub.number)), file=file.path(sourceloc, "Shell scripts and commands/file list noexcludes.txt"), sep="\n")
+    write(levels(factor(noexcludes2001_2015$Pub.number)), file=file.path(sourceloc, "Shell scripts and commands/file list noexcludes.txt"), sep="\n")
     write(levels(factor(consorts$Pub.number)), file=file.path(sourceloc, "Shell scripts and commands/file list consorts.txt"), sep="\n")
     write(levels(factor(nonconsorts$Pub.number)), file=file.path(sourceloc, "Shell scripts and commands/file list nonconsorts.txt"), sep="\n")
     write(levels(factor(realconsorts$Pub.number)), file=file.path(sourceloc, "Shell scripts and commands/file list realconsorts.txt"), sep="\n")
