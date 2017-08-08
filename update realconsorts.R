@@ -23,7 +23,8 @@
 realconsorts_by_list <- function(dataset_name = "consorts",
                                  manual_file = NULL,      # a file.path to a csv department-gathering
                                  alumni_file = NULL,      # a file.path to a list of alumni
-                                 matchlist_file = NULL)    # a file.path to save/load matched rows
+                                 matchlist_file = NULL,   # a file.path to save/load matched rows
+                                 schools = NULL)          # a list of new schools to match and add
 {
     dataset <- get(dataset_name)
     
@@ -71,14 +72,20 @@ realconsorts_by_list <- function(dataset_name = "consorts",
         alumni_list <- alumni_list[, c("Consortium_School", "Name", "Department", "Lastname", "Firstname", "Alumni_List")]
         # View(alumni_list)
         
-        # report on the number of schools indexed
-        message("Found alumni lists for ", 
-                length(levels(alumni_list$Consortium_School)), 
-                " of ", length(conschools), " schools in the Consortium.")
-        
-        # which schools don't we have lists for? (maybe contact them...)
-        no_alumni_list <<- conschools[which(!conschools %in% alumni_list$Consortium_School)]
-        
+        if(!is.null(schools)) {
+            myschool.index <- which(alumni_list$Consortium_School %in% schools)
+            alumni_list <- alumni_list[myschool.index,]
+            message("Searching for realconsort program matches only at these schools:\n")
+            print(schools)
+        } else {
+            # report on the number of schools indexed
+            message("Found alumni lists for ", 
+                    length(levels(alumni_list$Consortium_School)), 
+                    " of ", length(conschools), " schools in the Consortium.")
+            
+            # which schools don't we have lists for? (maybe contact them...)
+            no_alumni_list <<- conschools[which(!conschools %in% alumni_list$Consortium_School)]
+        }
         
         # Narrow to just Consortium schools, then 
         unknown_dept <- dataset[which(dataset$School %in% conschools),]
@@ -97,6 +104,7 @@ realconsorts_by_list <- function(dataset_name = "consorts",
         
         # Helper function: Update exact matches, or prompt to confirm
         update_from_list <- function(merged_list=matching) {
+            # start empty
             matchlist <- data.frame("Pub.number"="", "Department"="", stringsAsFactors = FALSE)
             response <- ""
             for (i in 1:nrow(merged_list)) {
@@ -125,31 +133,41 @@ realconsorts_by_list <- function(dataset_name = "consorts",
                     }      # end of while loop (y/n/a prompt)
                 }
             }       # end of for loop
+            
+            matchlist <- matchlist[which(!is.na(matchlist$Pub.number)),]    
             return(matchlist)
             
         }       # end of function update_from_list()
         # debug(update_from_list)
         
-        if (remake_figs) {
-            # Run helper function
+        
+        if (update_realconsorts && is.null(schools)) {
+            # Remake the match list from scratch
             matchlist <- update_from_list()
-            matchlist <- matchlist[which(!is.na(matchlist$Pub.number)),]    
-            
-            # save that list!
-            write.csv(matchlist, file=matchlist_file)
         } else {
             # load from previously saved list
             if (file.exists(matchlist_file)) {
-                matchlist <- read.csv(matchlist_file, stringsAsFactors=FALSE)   
-                matchlist <- matchlist[which(!is.na(matchlist$Pub.number)),]    
+                matchlist <- read.csv(matchlist_file, stringsAsFactors=FALSE)
+                
+                # add new schools to that list, if that's what we're doing
+                if(!is.null(schools)) {
+                    addendum <- update_from_list()
+                    matchlist <- rbind(matchlist, addendum)
+                }
             } else {
                 warning("Could not locate previously saved matched list ",
                         "of realconsorts; defaulting to manual entry.")
                 matchlist <- update_from_list()
-                matchlist <- matchlist[which(!is.na(matchlist$Pub.number)),]    
             }
+        
         }
         
+        if (remake_figs) {
+            # optionally overwrite the file
+            message("Saving consortium program matches to file: ", matchlist_file, "... ")
+            write.csv(matchlist, file=matchlist_file, row.names=FALSE)
+            message("Done.")
+        }
         
         # merge newly matched data into the dataset
         ## NB: Straight merge doesn't work because dataset$Department is a factor
@@ -185,3 +203,37 @@ realconsorts_by_list <- function(dataset_name = "consorts",
 # debug(realconsorts_by_list)
 # noexcludes <- realconsorts_by_list("noexcludes")
 
+realconsorts_ratios <- function(dataset_name = "consorts",
+                                 alumni_file = NULL      # a file.path to a list of alumni
+) {
+    dataset <- get(dataset_name)
+    
+    if (is.null(alumni_file)) {
+        # NB: this file assembled by Alyssa Rodriguez from public alumni lists on departmental websites
+        alumni_file <- file.path(newdataloc, "known consortium graduates 2017-07-30.csv")
+    }
+    
+    if (file.exists(alumni_file)) {
+        # Get spreadsheet of alumni, from public departmental lists
+        alumni_list <- read.csv(alumni_file)
+        names(alumni_list)
+        schools_known_alums <- levels(alumni_list$Consortium_School)
+        
+        known_subset <- dataset[which(dataset$School %in% schools_known_alums), c("School", "realconsort")]
+        consort_count <- aggregate(known_subset$realconsort, by=list(known_subset$School), FUN=function(s) {
+            sum(s, na.rm=T)
+        })
+        
+        total <- aggregate(known_subset$realconsort, by=list(known_subset$School), FUN=function(s) {
+            length(s)
+        })
+        
+        mytab <- merge(consort_count, total, by = "Group.1")
+        names(mytab) <- c("School", "Consortium", "Total")
+        mytab$Ratio <- mytab$Consortium / mytab$Total     
+        mytab <- mytab[order(mytab$Ratio, decreasing=T), ]
+        
+        return(mytab)
+    }
+}    
+# summary(realconsorts_ratios()$Ratio)
