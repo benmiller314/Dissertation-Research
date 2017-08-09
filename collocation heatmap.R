@@ -88,7 +88,7 @@ sumbytags <- function(dataset_name = "noexcludes",
 		
 		} else { 
 		
-			sum.by.tags <- rbind(sum.by.tags, tagsum[which(tagsum[1,] == 1), 	
+			sum.by.tags <- rbind(sum.by.tags, tagsum[which(tagsum[,1] == 1), 	
 								 2:ncol(tagsum)]) 
 		
 		}
