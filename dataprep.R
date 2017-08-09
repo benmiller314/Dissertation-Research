@@ -5,6 +5,13 @@
 # Follow up by running 'dataprep2 - load data.R'; see 'run all analyses.R' for further steps.
 ########
 
+# Global variables called in many functions. See `re-run all analyses.R` for descriptions.
+if (!exists("remake_figs")) {
+    remake_figs <- FALSE
+    autorun <- FALSE
+    update_realconsorts <- FALSE
+}
+
 # define some broad parameters, since this file will always be run first
 # make a shortcut for retrieving the last entered value
 ans <- function() {
