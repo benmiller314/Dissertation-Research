@@ -220,11 +220,18 @@ if (autorun) {
     # schoolwise("nonconsorts", "tagnames", agfixedcols=a$ag$colInd,
     #        difixedcols=a$di$colInd)
     schoolwise("consorts.plus", agn=T, hcl=F, dia=F)
+    schoolwise("noexcludes2001_2015", "tagnames")
+    schoolwise("consorts2001_2015", "tagnames")
+    schoolwise("realconsorts2001_2015", "tagnames")
+    
     
     # next up: re-run with the simplified schema
     schoolwise("consorts", "tagnames.simple")
     schoolwise("nonconsorts", "tagnames.simple")
     schoolwise("noexcludes", "tagnames.simple")
+    schoolwise("noexcludes2001_2015", "tagnames.simple")
+    schoolwise("consorts2001_2015", "tagnames.simple")
+    schoolwise("realconsorts2001_2015", "tagnames.simple")
     # schoolwise("consorts", "tagnames.simple", agfixedcols=c$ag$colInd,
     #        difixedcols=c$di$colInd)
     # schoolwise("nonconsorts", "tagnames.simple", agfixedcols=c$ag$colInd,
