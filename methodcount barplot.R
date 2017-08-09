@@ -59,7 +59,9 @@ methods.barplot <- function(dataset_name="noexcludes",
 if (autorun) {
     remake_figs
     methods.barplot("noexcludes")
+    methods.barplot("noexcludes2001_2015")
     methods.barplot("consorts")
+    methods.barplot("realconsorts")
     methods.barplot("nonconsorts")
 #   methods.barplot("top.nonconsorts", "blah")
     methods.barplot("consorts.plus")
