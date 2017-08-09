@@ -85,6 +85,7 @@ realconsorts_by_list <- function(dataset_name = "consorts",
             
             # which schools don't we have lists for? (maybe contact them...)
             no_alumni_list <<- conschools[which(!conschools %in% alumni_list$Consortium_School)]
+            message("Schools without known alumni lists can be accessed with the variable `no_alumni_list`.")
         }
         
         # Narrow to just Consortium schools, then 
