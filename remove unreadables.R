@@ -28,7 +28,7 @@ remove_unreadables <- function(dataset_name="noexcludes",
             dataset[which(dataset$Pub.number %in% more), "Exclude.Level"] <- 3
         }
         
-        message("Marked ", length(unreadables), " documents as unusuable for full-text analyses,",
+        message("Marked ", length(unreadables), " documents as unusable for full-text analyses,",
                 " leaving ", length(dataset) - length(unreadables), ".")
         
     } else {
