@@ -92,7 +92,7 @@ get.doc.composition <- function(dataset_name="consorts", ntopics=55, iter_index=
 # TO DO: Make this happen within get.doc.composition() -- i.e. give the
 # function the side effect of creating this object -- so it's responsive to
 # dataset_name and ntopics.
-doc_topics_consorts_55.dt <- get.doc.composition("consorts", 55, iter_index=iter_index)
+doc_topics_consorts_55.dt <- get.doc.composition("consorts", 55, iter_index="")
 
     
 ### Helper function: retrieve top five topics for a given Pub.number
@@ -455,7 +455,7 @@ shareable_topic <- function(  topic,
     docs$rank_in_doc <- a$rank_in_doc
     
     new.col.order <- c("Pub.number", "Author", "Title", "topic_weight","rank_in_doc",
-                       "School", "Advisor.Name", "Degree", "Department", "Year", "pages",
+                       "School", "Advisor.Name", "Degree", "Department", "Year", "Pages",
                        "Subject", "KEYWORDS", "ABSTRACT")
     docs <- docs[, new.col.order, with=F]
     head(docs, 1)
