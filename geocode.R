@@ -6,6 +6,8 @@
 
 library("RJSONIO") #Load Library
 
+
+## Code to get lat/lng for one location
 getGeoCode <- function(gcStr, 	# what location should we find lat/lng for?
 			throttle = 2)		# how many seconds to wait between requests?
 {
@@ -54,17 +56,28 @@ getGeoCode <- function(gcStr, 	# what location should we find lat/lng for?
   return (gcodes)
 } 	# end of getGeoCode()
 
+
 # Now apply the function above across a set of data
 geoCodeAll <- function(dataset_name  = "noexcludes", 
-					   schoolColName = c("School", "NAME")) 
+					   schoolColName = c("School", "NAME", "Institution"),
+					   throttle_size = 50) 
 {
-
+    
+    # Get the column with location names
 	dataset <- get(dataset_name)
 	if (schoolColName == "NAME") {
 		all_schools <- levels(factor(dataset$NAME))
+	} else if (schoolColName == "Worked.At") {
+	    all_schools <- subset(dataset, Confirmed.by.a.second.reader. != "exclude")
+	    all_schools <- levels(factor(dataset$Worked.At))
 	} else {
 		all_schools <- levels(factor(dataset$School))
 	}
+	
+	# Split the column into chunks of no more than throttle_size, to avoid throttling issues
+    div <- seq_along(all_schools)
+    chunks <- split(all_schools, ceiling(div/throttle_size))
+    chunks[1]
 	
 	# For each school found, use the function above to create new Lat
 	# and Long columns.	
@@ -125,3 +138,10 @@ geoCodeAll <- function(dataset_name  = "noexcludes",
 	return(all_schools.geo)
 	
 } 	# end of wrapper function geoCodeAll
+
+## Code to load a new CSV of locations and geocode them all
+whatToGeoCode <- function() {
+    # get csv file
+    data <- read.csv(file=file.choose())
+    return( geoCodeAll(dataset_name="data", schoolColName="Institution") )
+}
