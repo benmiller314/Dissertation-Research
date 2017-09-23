@@ -13,29 +13,21 @@
 # Where are the index files (from R)?
 INDEX_DIR=~/'Dropbox/coursework, etc/dissertation/data, code, and figures/Dissertation Research/Shell scripts and commands'
 
+
 # Function to convert Pub.numbers from the file into proper filenames, then copy the file
 function subset_copy
 {
 	DATASET=$1
 	FILETYPE=$2
-
+	
 	# Where are the files to move? 
-	if [ "$FILETYPE" == "txt" ] ; then
-		# use clean text output by ben_clean_and_consolidate.sh
-		SRC=~/'Documents/fulltext_dissertations/clean'
-	elif [ "$FILETYPE" == "pdf" ] ; then
-		# use original documents from ProQuest
-		SRC=~/'Documents/fulltext_dissertations' 
-	fi
+	SRC=~/'Documents/fulltext_dissertations/as text files' 
+# 	SRC='/Volumes/Seagate\ Backup\ Plus\ Drive/full-text\ dissertations/2016' 
 
+	
 	# Make sure we have a place to copy the files to.
-	if [ "$FILETYPE" == "txt" ] ; then
-		DST="$SRC/../""$DATASET""_""$FILETYPE"
-	elif [ "$FILETYPE" == "pdf" ] ; then
-		DST="$SRC/../""$FILETYPE""_""$DATASET""_only" 
-	fi
-# 	ls "$DST"
-
+	DST="$SRC/../""$FILETYPE""_""$DATASET""_only" 
+	
 	if ! [ -d "$DST" ] ; then
 		printf "Creating destination folder $DST ..."
 		mkdir "$DST"
@@ -50,14 +42,8 @@ function subset_copy
 	# (each line of the file is one input, i)
 	cat "$INDEX_DIR/file list ""$DATASET"".txt"	| \
 	while read i; do							# start the loop
-		if [ "$FILETYPE" == "txt" ] ; then
-			# use clean text output by ben_clean_and_consolidate.sh
-			FILE="cleaned_$i.txt"
-		elif [ "$FILETYPE" == "pdf" ] ; then
-			# use original documents from ProQuest
-			FILE="$i.PDF"
-		fi
-
+		FILE="$i.PDF"
+	
 		printf "Copying $FILE to folder for ""$DATASET"" files only... "
 		cp "$SRC/$FILE" "$DST/$FILE"
 		if [ $? == 0 ] ; then 					# did it work? if so,
@@ -65,8 +51,9 @@ function subset_copy
 			j=$((j+1))							# increment the counter.
 		fi
 		k=$((k+1))
-	done | \						# pass loop to xargs to run in parallel,
-	xargs --max-procs=3 			# per http://bit.ly/1S6iIND
+	done | xargs -P 3				# pass loop to xargs to run in parallel,
+	 								# per http://bit.ly/1S6iIND. 
+									# Number after -P is max processes.
 												
 	
 	echo "Copied $j of $k files."				# final status report.

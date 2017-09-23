@@ -48,11 +48,7 @@ function subset_copy
 	while read i; do							# start the loop
 		FILE="$i.""$FILETYPE"
 		printf "Copying $FILE to folder for ""$DATASET"" files only... "
-		
-		# TO DO: USE SYMLINK INSTEAD, TO SAVE ON MEMORY AND STORAGE; 
-		# need to see if it works with 
-		ln -s "$SRC/$FILE" "$DST/$FILE"
-		# cp "$SRC/$FILE" "$DST/$FILE"
+		cp "$SRC/$FILE" "$DST/$FILE"
 		if [ $? == 0 ] ; then 					# did it work? if so,
 			echo "Done." 						# report back, and
 			j=$((j+1))							# increment the counter.
@@ -67,5 +63,5 @@ function subset_copy
 # subset_copy consorts
 # subset_copy nonconsorts
 # subset_copy noexcludes
-subset_copy realconsorts txt
+subset_copy realconsorts pdf
 
