@@ -26,9 +26,12 @@ DATASET=$1
 # PDF="/Users/benmiller314/Documents/fulltext_dissertations/morepdfs"
 # SRC="/Users/benmiller314/Documents/fulltext_dissertations/morepdfs/as text files"
 # DST="/Users/benmiller314/Documents/fulltext_dissertations/clean_""$DATASET""_only"
-PDF="/Users/benmiller314/Documents/topic_inference_test"
-SRC="/Users/benmiller314/Documents/topic_inference_test/txt"
-DST="/Users/benmiller314/Documents/topic_inference_test/clean"
+# PDF="/Users/benmiller314/Documents/topic_inference_test"
+# SRC="/Users/benmiller314/Documents/topic_inference_test/txt"
+# DST="/Users/benmiller314/Documents/topic_inference_test/clean"
+PDF="/Volumes/Seagate_Backup_Plus_Drive/full-text_dissertations/all_noexcludes_only"
+SRC=$PDF
+DST=$SRC
 
 # Store cumulative data in its own directory
 CUMUL=~/"Documents/fulltext_dissertations/cumulative"
@@ -39,7 +42,8 @@ CUMUL=~/"Documents/fulltext_dissertations/cumulative"
 
 
 ## Zeroth function: extract text from pdf. Run in the $PDF folder.
-#  NB: pdftotext is available for free from http://www.bluem.net/en/mac/packages/
+#  NB: pdftotext is standard on linux distributions; a mac port 
+#  is available for free from http://www.bluem.net/en/mac/packages/
 function extract()
 {
     # Make sure we have a place to output to.
@@ -49,6 +53,9 @@ function extract()
 
     # Start the loop.
     while read line1; do
+		# strip filename extension: awk creates a table divided at 
+		# the field separator (FS); we want the first "cell," 
+		# i.e. whatever comes before the period.
         PUB=`printf $line1 | awk 'BEGIN { FS="." } { print $1; }'`
         
         # progress report
@@ -75,7 +82,6 @@ function extract()
 ## First function: Get text that R can read. Run in the $SRC folder.
 function clean ()
 {   
-<<<<<<< HEAD
 	# Make sure we have a place to output to.
 	if ! [ -d "$DST" ] ; then
 		mkdir "$DST"
@@ -88,9 +94,9 @@ function clean ()
 	echo "Cleaning from SRC $line1 to DST $DST/$line1"		# progress report
 	
 	# 1a. Convert text encoding from ISO 8859-1 (Latin-1) to UTF-8 (unicode standard)
-	# 1b. Using tr, delete all characters except for line breaks and Western characters
+	# 1b. Using tr, delete all non-line-break non-Western characters
 	# 1c. Using sed, delete the first page added by UMI (which starts in line 1, and 
-	#	  usually ends with the zip code)
+	#	  usually ends with the zip code) TO DO: BE SMARTER ABOUT THIS REGEX
 	# 1d. Save to a file in the destination directory.
 
 	iconv -f ISO_8859-1 -t UTF-8 "$SRC/$line1" | \
@@ -175,12 +181,12 @@ function combine ()
 function spellcount ()
 {       
 # (step 0 or 4a) Outside the loop, create a placeholder output file
-if ! [ -d "$DST/spellstats" ] ; then
-    mkdir "$DST/spellstats"
+if ! [ -d "$DST/_spellstats" ] ; then
+    mkdir "$DST/_spellstats"
 fi
 
-if ! [ -e "$DST/spellstats/spellstats.csv" ] ; then
-    echo 'Pub.Number, WordCount, ErrorCount' > "$DST/spellstats/spellstats.csv"
+if ! [ -e "$DST/_spellstats/spellstats.csv" ] ; then
+    echo 'Pub.Number, WordCount, ErrorCount' > "$DST/_spellstats/spellstats.csv"
 else 
     echo "spellstats.csv already exists; aborting script to avoid duplication."
     echo "To append, use new DST folder and concatenate later."
@@ -196,6 +202,9 @@ while read line1; do
 
 ## (step 2) Find misspelled words, save to file in case we want to analyze
 ## later.
+# UPDATE: Ignore the NB below. Easiest way to install on a Mac is with a package manager 
+# like Homebrew. First, go to http://brew.sh and use the simple installation script. 
+# Then simply type this at a Terminal prompt (without quotes): "brew install aspell"
 # NB: apparently this isn't included in OS X 10.7 (Lion). Boo. To download
 # the aspell command, you'll need something like Fink
 # http://www.finkproject.org/download/srcdist.php and Apple Developer Command
@@ -204,11 +213,11 @@ while read line1; do
 # dictionaries. Once those are installed (no small feat), uncomment and run
 # the commands in file "install aspell dictionary.txt" 
 
-    aspell list < "$DST/$line1" > "$DST/spellstats/wordswrong_$line1"
+    aspell list < "$DST/$line1" > "$DST/_spellstats/wordswrong_$line1"
 
 ## (step 3) count the lines in the wordswrong file; save the numbers in a
 ## variable.
-    ERRS=`wc -l "$DST/spellstats/wordswrong_$line1" | awk '{ print $1; }' - `
+    ERRS=`wc -l "$DST/_spellstats/wordswrong_$line1" | awk '{ print $1; }' - `
 
 ## (step 4) combine files into a cumulative table. Here's how:
     # Step 4a. Outside the loop, create a placeholder output file. (See
@@ -216,19 +225,19 @@ while read line1; do
     
     # Step 4b. Strip '.txt' and 'cleaned_' off the filename; this will help
     # us join tables later.     
-    PUB=`printf $line1 | awk 'BEGIN { FS="." } { print $1; }' | awk 'BEGIN { FS="_" } { print $2; }'`
+    PUB=`printf $line1 | awk 'BEGIN { FS="." } { print $1; }'` #| awk 'BEGIN { FS="_" } { print $2; }'`
     # Step 4c. String together the Pub.number, the wordcount, and the
     # errorcount; append to the output file.
     echo "-- checking $line1"
-    echo "$PUB, $WC, $ERRS" >> "$DST/spellstats/spellstats.csv"
+    echo "$PUB, $WC, $ERRS" >> "$DST/_spellstats/spellstats.csv"
 
 ## Close the loop
 done
     
     # Final report: Tell us what we've got!
-    echo "Spelling counts saved to $DST/spellstats/spellstats.csv."
+    echo "Spelling counts saved to $DST/_spellstats/spellstats.csv."
     
-    FILECOUNT=`wc -l "$DST/spellstats/spellstats.csv" | awk '{ print $1; }' - `
+    FILECOUNT=`wc -l "$DST/_spellstats/spellstats.csv" | awk '{ print $1; }' - `
     let FILECOUNT=$FILECOUNT-1          # account for headers in 1st line
     echo "$FILECOUNT files processed."
     echo ''
@@ -244,10 +253,11 @@ done
 ## IMPORTANT: Comment out those you don't need right now.
 CURRENT_DIR=$PWD
 # cd "$PDF"                                         # Go to pdf directory
-# ls *.pdf | extract                                # Call 0th function
-cd "$SRC"                                         # Go to source directory
-ls *.txt | clean                                  # Call 1st function
+# \ls *.pdf | extract                                # Call 0th function
+# cd "$SRC"                                         # Go to source directory
+# \ls *.txt | clean                                  # Call 1st function
 cd "$DST"                                           # Go to output directory
-# ls cleaned* | combine                               # Call 2nd function
-ls cleaned* | spellcount                          # Call 3rd function
+# \ls cleaned* | combine                               # Call 2nd function
+# \ls cleaned* | spellcount                          # Call 3rd function
+\ls *.txt | spellcount
 cd "$CURRENT_DIR"                                   # Go back where we were
