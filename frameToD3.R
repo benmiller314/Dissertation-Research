@@ -22,7 +22,7 @@
 
 frameToJSON <- function(dataset_name="consorts",
                         ntopics=55,
-                        subset_name="realconsorts",  # set NULL if not using.
+                        subset_name="realconsorts",  # Ben: set NULL if not using.
                         iter_index="",  # Ben: suffix to differentiate repeat runs of same MALLET params.
                         do.plot=TRUE,   # Ben: Use this the first time to 
                                         # find good cuts in the dendrogram.
