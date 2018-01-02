@@ -6,10 +6,11 @@
 
 library("RJSONIO") #Load Library
 
+gcapi <- Sys.getenv("GEOCODEAPI")
 
 ## Code to get lat/lng for one location
 getGeoCode <- function(gcStr, 	# what location should we find lat/lng for?
-			throttle = 2)		# how many seconds to wait between requests?
+			throttle = 0.02)		# how many seconds to wait between requests?
 {
   
   # correct for locations that GoogleMaps API can't find the names of
@@ -31,8 +32,8 @@ getGeoCode <- function(gcStr, 	# what location should we find lat/lng for?
 
  #Open Connection
  connectStr <-  
- paste('http://maps.google.com/maps/api/geocode/json?sensor=false&address=',
- 		gcStr2, sep="") 
+ paste0('https://maps.googleapis.com/maps/api/geocode/json?address=',
+ 		gcStr2, "&key=", gcapi) 
   con <- url(connectStr)
   data.json <- fromJSON(paste(readLines(con), collapse=""))
   close(con)
