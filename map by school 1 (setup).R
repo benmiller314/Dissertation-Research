@@ -51,7 +51,7 @@ maptags1 <- function (dataset_name="noexcludes", tagset_name="tagnames") {
 			invisible(readline("Select the geocoding csv file from geocode.R. 
 								(Filename is like 'geocoding by school, 
 								noexcludes, N2711.csv'; press <Enter> when 
-								ready."))
+								ready.)"))
 			all_schools.geo <<- read.csv(file=file.choose())
 			
 			# trim the first column, which is just the row number added on

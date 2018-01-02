@@ -15,6 +15,7 @@ require(mapdata)
 require(mapplots)
 require(maptools)
 require(scales)
+require(doBy)
 
 # Retrieve variables from other map-related scripts
 source(file="carnegie 1 (setup).R")
@@ -114,17 +115,20 @@ par(mfrow = c(1,1))
 		   title = "Dissertations \n per school, \n2001-2010", 
 		   legend = c("1", "2-4", "5-9", "10-49", "50-100", "100+"),
 		   fill = grays, 
-		   bty = "n")
+		   bty = "n"
+		   )
 	legend(x = "bottomleft", 
 		   legend = c("Doctoral programs", "R/C dissertations", 
 		   				"Consortium of R/C"), 
 		   pch = c(24, 21, 6), 
 		   bg = alpha("white", 0.3),
-		   box.lty = "blank")
+		   box.lty = "blank"
+		   )
 	title(main = paste("Most doctoral progams in the US",
 						"\n now have some rhet/comp dissertations"),
 		  sub = paste("List of doctoral programs from Carnegie",
 		  				"classification, IPGRAD2010 > 11")
+	      )
 
 if(remake_figs) {
 	dev.off()
