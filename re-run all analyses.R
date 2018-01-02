@@ -9,7 +9,7 @@
 #####   Programs for Preparing the Working Environment  #####
 
 # Set working directory to the location of R script files.
-    setwd("~/Dropbox/coursework, etc/dissertation/data, code, and figures/Dissertation Research")
+    setwd("~/Box Sync/research/dissertations/data, code, and figures/Dissertation-Research")
 
 ## 
 # Global variables called in many functions. 
