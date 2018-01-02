@@ -210,7 +210,7 @@ realconsorts_ratios <- function(dataset_name = "consorts",
     dataset <- get(dataset_name)
     
     if (is.null(alumni_file)) {
-        # NB: this file assembled by Alyssa Rodriguez from public alumni lists on departmental websites
+        # NB: this file assembled by Alyssa Hernandez from public alumni lists on departmental websites
         alumni_file <- file.path(newdataloc, "known consortium graduates 2017-07-30.csv")
     }
     
