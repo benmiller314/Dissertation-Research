@@ -10,7 +10,7 @@
 ########
 
 if (!exists("tagnames")) {
-	source(file="~/Dropbox/coursework, etc/dissertation/data, code, and figures/Dissertation Research/dataprep.R")
+	source(file=file.path("~","Box Sync", "research", "dissertations", "data, code, and figures", "Dissertation-Research", "dataprep.R"))
 }
 
 ## now get the data 

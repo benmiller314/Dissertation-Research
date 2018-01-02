@@ -19,19 +19,20 @@ ans <- function() {
 	}
 	
 # set the working directories, taking into account the GitHub setup
-sourceloc <- file.path("~","Dropbox", "coursework, etc", "dissertation", "data, code, and figures", "Dissertation Research")
-unixsourceloc <- "~/'Dropbox/coursework, etc/dissertation/data, code, and figures/Dissertation Research/'"
+sourceloc <- path.expand(file.path("~","Box Sync", "research", "dissertations", "data, code, and figures", "Dissertation-Research"))
+unixsourceloc <- sourceloc
 if(getwd() != sourceloc) {
 	setwd(sourceloc)
 }
 
-imageloc <- file.path(sourceloc, "../Dissertation Research - Figures")
-dataloc <- file.path(sourceloc, "..")
-newdataloc <- file.path("~", "Box Sync", "research", "dissertations")
+imageloc <- path.expand(file.path(sourceloc, "../Dissertation Research - Figures"))
+dataloc <- path.expand(file.path(sourceloc, ".."))
+newdataloc <- path.expand(file.path("~", "Box Sync", "research", "dissertations"))
 fulltextloc <- file.path("/Volumes/Seagate_Backup_Plus_Drive/full-text_dissertations")
-malletloc <- file.path("~", "Applications", "mallet")
-webloc <- file.path("~", "Documents", "Webdev", "datavis_testing")
-tmloc <- file.path("~", "Documents", "tm")
+malletloc <- path.expand(file.path("~", "Applications", "mallet"))
+webloc <- path.expand(file.path("~", "Documents", "Webdev", "datavis_testing"))
+# tmloc <- path.expand(file.path("~", "Documents", "tm"))
+tmloc <- path.expand(file.path(fulltextloc, "..", "topic_modeling"))
 
 
 # name the method tags most of these analyses are interested in
@@ -67,20 +68,11 @@ realtags <- function(tag, tagset_name="tagnames") {
 	return(tagset.long[index])
 }
 
-
 sumnames <- sapply(tagnames, FUN=function(x) paste0(x,".sum"))
 meannames <- sapply(tagnames, FUN=function(x) paste0(x,".mean"))
 topnames <- sapply(tagnames, FUN=function(x) as.list(tolower(paste0("top.",x))))
 topnames <- lapply(topnames, FUN=function(x) substr(x,1,8))
 
-# If remake_figs is true (e.g. if set by 'rerun all analyses.R'), new pdf files will be created; 
-# otherwise, they'll display on screen only.
-if(!exists("remake_figs")) {
-	remake_figs <- FALSE
-}
-if(!exists("autorun")) {
-	autorun <- FALSE
-}
 
 ## prep some useful functions
 # source(file="function scratchpad.R")
