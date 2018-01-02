@@ -153,8 +153,19 @@ frameToJSON <- function(dataset_name="consorts",
           if(remake_figs) { dev.off() } 
       }     
       
-     
       # TO DO: Find splits for model with 150 topics
+      
+      else if(dataset_name=="noexcludes2001_2015" && is.null(subset_name) && ntopics==150) {
+          if(remake_figs) { pdf(file=paste0(imageloc, main, iter_index, ".pdf")) }
+          plot(hc, main=main)
+              # abline(1.55, 0, col="#99FF99")
+              # rect.hclust(hc, k=38, border="#99FF99")
+              # abline(1.49, 0, col="#009900")
+              # rect.hclust(hc, k=53, border="#009900")
+              rect.hclust(hc, k=60, border="#009999")
+          if(remake_figs) { dev.off() } 
+      }
+      
       else {
           if(remake_figs) { pdf(file=paste0(imageloc, main, iter_index, ".pdf")) }
               plot(hc, main=main)
@@ -231,6 +242,8 @@ if(dataset_name=="consorts" && is.null(subset_name) && ntopics==55 && length(bad
 
     # TO DO: Add splits for model with 150 topics
 
+  
+  
   # Make note of group names for later; 
   # same operation for all numbers of bad.topics
   membVars <- paste0("memb", splits)
@@ -504,6 +517,7 @@ if(autorun) {
     frameToJSON(do.plot=T)
     frameToJSON(subset_name="realconsorts")
     frameToJSON(ntopics=150, bad.topics=NULL)
+    frameToJSON(do.plot=T, dataset_name="noexcludes2001_2015", subset_name=NULL, ntopics=150, iter_index=6, bad.topics = NULL)
 
 
     # 12% determined by `variation of topic proportions.R` to include nearly

@@ -16,7 +16,7 @@
 
 ## 0. Establish the working environment.
 	if (!exists(sourceloc)) { 
-		source(file="~/Dropbox/coursework, etc/dissertation/R experiments/Dissertation Research/dataprep.R") 
+		source(file="~/Box Sync/research/dissertations/data, code, and figures/Dissertation-Research/dataprep.R") 
 	}
 	
 	# # Assume we're typically going to need more Java heap space, set maximum allocation
@@ -32,13 +32,16 @@
 	options(java.parameters=heap_param)
 	
 	# What's our dataset?
-	dataset_name <- "realconsorts"
+	# dataset_name <- "realconsorts"
+	dataset_name <- "noexcludes2001_2015"
 	
 	
 ## Step 1. Compress the files, if they haven't been compressed already
 ## NB: double-check which commands are commented out before running; this could take a while.
 ## If the output file already exists, this call will just exit with an error.
-system(paste0("'", sourceloc, 'Shell scripts and commands/ben_clean_and_consolidate.sh',"' ", dataset_name))
+file <- path.expand(file.path(sourceloc, 'Shell scripts and commands/ben_clean_and_consolidate.sh'))
+file.exists(file)
+system(paste0('"', file,'" ', dataset_name))
 
 
 
@@ -60,8 +63,8 @@ ben.mallet.import <- function(dataset_name="noexcludes",
 	
 	# TO DO: Replace this file with a directory
 	# 2a.2. Where is the import file? (determined by the shell script in Step 1)
-	importroot <- "~/Documents/fulltext_dissertations"
-	importdir <- file.path(importroot, paste0("clean_", dataset_name, "_only"))
+	# importroot <- "~/Documents/fulltext_dissertations"  ## Now replaced with fulltextloc, set by dataprep.R 
+	importdir <- file.path(fulltextloc, paste0("clean_", dataset_name, "_only"))
 	
 	# import_file <- paste0("~/Documents/fulltext_dissertations/cumulative/",
 	#                       dataset_name, "_cumulative.txt")
@@ -121,7 +124,7 @@ ben.mallet.import <- function(dataset_name="noexcludes",
 	    
 	    # # 2a.7. Trigger the import.
 	    go <- readline(paste("About to import instance list with the following command: \n",
-	                         mallet_cmd, "\n",
+	                         import_cmd, "\n",
 	                         "Is that what you meant to do? (Y/N)\n"))
 	    if(tolower(go) != "y") { 
 	        stop("Never mind, then.") 
@@ -139,14 +142,29 @@ ben.mallet.import <- function(dataset_name="noexcludes",
 # close the mallet import function
 }
 
+if(autorun) {
+    require(dfrtopics)
+    
+    m <- train_model(instances = file.path(tmloc, paste0(dataset_name, "_instances.mallet")),		# the file created by ben.mallet.import)
+                     n_topics = 60,
+                     threads = 10L)
+    
+    summary(m)
+                     
+    write_mallet_model(m, file.path(tmloc, paste0(dataset_name, "modeling_results")))
+
+
+}
+
 # Step 2b. Use Mimno's library(mallet) to actually train the model on those instances.
-ben.mallet.tm <- function(K=10, 						# how many topics?
-						  dataset_name="noexcludes",	# which subset of data to include?
-						  imported_file=paste0("~/Documents/tm/", dataset_name, "_instances.mallet"),		# the file created by ben.mallet.import
+ben.mallet.tm <- function(K=50, 						# how many topics?
+						  dataset_name="noexcludes2001_2015",	# which subset of data to include?
+						  imported_file=file.path(tmloc, paste0(dataset_name, "_instances.mallet")),		# the file created by ben.mallet.import
 						  curate_vocab=FALSE,			# create new stoplist from top/bottom words?
 						  top.cutoff.pct=10, 			# remove words in this % of documents or more (only used if curate_vocab=TRUE)		
 						  num.top.words=7, 				# how to label topics
-						  runlong=FALSE 				# do extra iterations?
+						  runlong=FALSE, 				# do extra iterations?
+						  diagnostics=TRUE              # generate a diagnostics file as per http://mallet.cs.umass.edu/diagnostics.php?
 						  # abstracts=FALSE				# use full text (default) or abstracts only?
 						  ) 
 {
@@ -201,7 +219,7 @@ ben.mallet.tm <- function(K=10, 						# how many topics?
 	# end of stoplist vocabulary curation; we can pick it up again in another call to ben.mallet.import
 	}
 		
-
+r
 	## Now let's resume where Mimno left off... This is the actual model-training portion.
 	# 2b.5. Set to optimize hyperparameters every 20 iterations, after 50 burn-in iterations.
 	topic.model$setAlphaOptimization(20, 50)
@@ -292,7 +310,8 @@ top.words.tfitf <- function (topic.model, topic.words, num.top.words = 10)
 ## Step 4. Run MALLET with the parameters set up in Step 2, with the topics as chosen in 1 or 3.
 if(autorun) {
     Sys.time()
-    ben.mallet.import(dataset_name="realconsorts")
+    # ben.mallet.import(dataset_name="realconsorts")
+    ben.mallet.tm(dataset_name="noexcludes2001_2015")
     Sys.time()
 }
 

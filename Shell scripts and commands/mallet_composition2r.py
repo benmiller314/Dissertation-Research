@@ -3,12 +3,13 @@
 
 # Strategy: Read one line at a time: avoids loading everything into memory
 
-tmloc="/Users/millerb/Documents/tm/"
-dataset_name="realconsorts"
-ntopics=100
-destination=tmloc+dataset_name+"k"+`ntopics`+"_doc-all-topics.txt"
-indexfile=tmloc+dataset_name+"k"+`ntopics`+"_composition.txt"
-
+tmloc="/Volumes/Seagate_Backup_Plus_Drive/full-text_dissertations/../topic_modeling/"
+dataset_name="noexcludes2001_2015"
+ntopics=150
+iter_index=6
+destination=tmloc+dataset_name+"k"+`ntopics`+"_doc-all-topics_"+`iter_index`+".txt"
+indexfile=tmloc+dataset_name+"k"+`ntopics`+"_composition_"+`iter_index`+".txt"
+# indexfile=tmloc+"noexcludes2001_2015k60_composition_4.txt"
 
 writer=open(destination, "w+")
 with open(indexfile) as f:
