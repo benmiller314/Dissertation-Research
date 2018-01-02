@@ -130,8 +130,16 @@ ben.mallet.import <- function(dataset_name="noexcludes",
 	        stop("Never mind, then.") 
 	    } 
 	    
-	    print("Beginning import now...")
+	    message("Beginning import now...")
 	    if(! system(import_cmd)) { 
+	        print("Done.")      # If successful, report back.
+	    }
+	    
+	    message("Saving index of filenames used for this instance list...")
+	    id_cmd <- "ls *.txt | awk -F _ '{ print $2 }' | awk -F . '{ print $1 }'"
+	    outputfile <- file.path(tmloc, paste0(dataset_name, "_doc_ids.txt"))
+	    id_cmd <- paste("cd", importdir, ";", id_cmd, ">", outputfile)
+	    if(! system(id_cmd)) {
 	        print("Done.")      # If successful, report back.
 	    }
 	    
