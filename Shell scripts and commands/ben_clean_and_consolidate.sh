@@ -29,9 +29,9 @@ DATASET=$1
 # PDF="/Users/benmiller314/Documents/topic_inference_test"
 # SRC="/Users/benmiller314/Documents/topic_inference_test/txt"
 # DST="/Users/benmiller314/Documents/topic_inference_test/clean"
-PDF="/Volumes/Seagate_Backup_Plus_Drive/full-text_dissertations/all_noexcludes_only"
-SRC=$PDF
-DST=$SRC
+PDF="/Volumes/Seagate_Backup_Plus_Drive/full-text_dissertations/all_rescan_only"
+SRC="/Volumes/Seagate_Backup_Plus_Drive/full-text_dissertations/all_noexcludes_only"
+DST="/Volumes/Seagate_Backup_Plus_Drive/full-text_dissertations/noexcludes_2001-2015_clean"
 
 # Store cumulative data in its own directory
 CUMUL=~/"Documents/fulltext_dissertations/cumulative"
@@ -94,14 +94,21 @@ function clean ()
 	echo "Cleaning from SRC $line1 to DST $DST/$line1"		# progress report
 	
 	# 1a. Convert text encoding from ISO 8859-1 (Latin-1) to UTF-8 (unicode standard)
-	# 1b. Using tr, delete all non-line-break non-Western characters
+	# 1b. Using tr, delete all non-line-break non-Western characters 
+	#     OR IS THIS SOLVED BY CONVERTING TO UTF-8?
 	# 1c. Using sed, delete the first page added by UMI (which starts in line 1, and 
-	#	  usually ends with the zip code) TO DO: BE SMARTER ABOUT THIS REGEX
-	# 1d. Save to a file in the destination directory.
+	#	  usually ends with the zip code) TO DO: BE SMARTER ABOUT THIS REGEX. 
+	#	  Try removing everything from INFORMATION to the line in 1d?
+	# 1d. Using sed, remove all instances of the line below:
+	#	  "Reproduced with permission of the copyright owner. Further reproduction
+	#	   prohibited without permission."
+	# 13. Save to a file in the destination directory.
 
 	iconv -f ISO_8859-1 -t UTF-8 "$SRC/$line1" | \
-	tr -cd '\11\12\40-\176' | \
-	sed "1,/-1346/d" \
+# 	tr -cd '\11\12\40-\176' | \
+	sed "1,/48106-1346/d" | \
+    sed "1,/Further reproduction prohibited without permission./d" | \
+    sed "/Reproduced with permission of the copyright owner. Further reproduction prohibited without permission./d"
 	> "$DST/cleaned_$line1"
 	
 	# catch the case where we've stripped too much (ie. the file has 0 bytes)
@@ -254,10 +261,10 @@ done
 CURRENT_DIR=$PWD
 # cd "$PDF"                                         # Go to pdf directory
 # \ls *.pdf | extract                                # Call 0th function
-# cd "$SRC"                                         # Go to source directory
-# \ls *.txt | clean                                  # Call 1st function
+cd "$SRC"                                         # Go to source directory
+\ls *.txt | clean                                  # Call 1st function
 cd "$DST"                                           # Go to output directory
 # \ls cleaned* | combine                               # Call 2nd function
 # \ls cleaned* | spellcount                          # Call 3rd function
-\ls *.txt | spellcount
+# \ls *.txt | spellcount
 cd "$CURRENT_DIR"                                   # Go back where we were
