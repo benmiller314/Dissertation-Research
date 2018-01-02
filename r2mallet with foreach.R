@@ -32,8 +32,8 @@ r2mallet <- function(
 					datasets = c("realconsorts"),
 				
 				# How many topics? Set kseq to a sequence to try several options.
-					# kseq = c(10, 30, 50, 100, 150, 200, 500),
-				    kseq = c(55),
+					kseq = c(10, 30, 50, 60, 100, 150),
+				    # kseq = c(55),
 					
 				# What optimisation intervals for MALLET to use?
 				# Default choices are from Mimno's library(mallet)
@@ -51,7 +51,8 @@ r2mallet <- function(
 				    mallet_cmd = file.path(malletloc, "bin", "mallet"),
 				
 				# What's the directory within which to find text files for the corpus?
-				    importroot = "~/Documents/fulltext_dissertations/",
+				    # importroot = "~/Documents/fulltext_dissertations/",
+				    importroot = fulltextloc,
 				
 				# What's the directory within which to output mallet files?
 				    outputroot = tmloc)
@@ -154,13 +155,14 @@ r2mallet <- function(
 
 if(autorun) {
 	r2mallet(datasets=c("realconsorts"), kseq=c(55), numiterations=250)   # about 9 minutes
+    r2mallet(datasets=c("noexcludes2001_2015"))
     r2mallet(datasets=c("realconsorts"), kseq=rep(55, times=10), seed=NULL, numiterations=250)
     # r2mallet(datasets=c("realconsorts"), kseq=c(55), num_iterations=1000)   # about 32 minutes
 #     r2mallet("consorts")
 #     r2mallet("real.consorts")
 } else {
     train <- r2mallet(cmdonly=T)
-    message(paste("Current default command is", train))
+    message(paste("Current default instance-training command is", train))
 	message("Autorun is FALSE, so no action was taken.")
 	message(paste("If you wish to create new topic models,", 
 				  "check configuration, then set autorun to TRUE."))
@@ -168,7 +170,7 @@ if(autorun) {
 
 #####
 # test that mallet works on Bridges supercomputer:
-r2mallet(cmdonly=T, mallet_cmd="./mallet/bin/mallet", importroot="./clean_realconsorts", outputroot="/pylon2/hm4s81p/bmiller3/tm", kseq=c(10))
+# r2mallet(cmdonly=T, mallet_cmd="./mallet/bin/mallet", importroot="./clean_realconsorts", outputroot="/pylon2/hm4s81p/bmiller3/tm", kseq=c(10))
 
 
 
