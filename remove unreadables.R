@@ -29,7 +29,7 @@ remove_unreadables <- function(dataset_name="noexcludes",
         }
         
         message("Marked ", length(unreadables), " documents as unusable for full-text analyses,",
-                " leaving ", length(dataset) - length(unreadables), ".")
+                " leaving ", nrow(dataset) - length(unreadables), ".")
         
     } else {
         warning("Could not find spelling statistics file; some full-text files may be unreadable.")
