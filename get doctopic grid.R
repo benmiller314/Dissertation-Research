@@ -21,12 +21,12 @@ get.doctopic.grid <- function(dataset_name="consorts",
     
     # Locate the doc/topic grid, or create it if it doesn't yet exist.
     filename <- file.path(tmloc, paste0(dataset_name, "k", ntopics, 
-                        "_doc-all-topics", iter_index, ".txt"))
+                        "_doc-all-topics_", iter_index, ".txt"))
     
     if (!file.exists(filename)) {   
         if (do_reshape) { cmd <- "reshapeMallet.py" } else { cmd <- "mallet_composition2r.py" }
-        command <- paste("cd", unixsourceloc, 
-                "; cd 'Shell scripts and commands'; python", cmd)
+        command <- paste0("cd '", unixsourceloc, 
+                "'; cd 'Shell scripts and commands'; python", cmd)
         
         go <- readline(paste("Have you updated", cmd,
                         "to reflect your current dataset/ntopics? (Y/N)\n"))
@@ -49,9 +49,22 @@ get.doctopic.grid <- function(dataset_name="consorts",
     # switch from 0-indexed to 1-indexed, so the topic numbers in
     # topic_keys.dt are the same as row numbers
     # NB: this seems to be necessary to avoid searching for column "0"
-    head(outputfile)
+    head(outputfile,3)
     names(outputfile) <- c("Pub.number", (1:(ncol(outputfile)-1)))
     head(outputfile)
+ 
+    # If we accidentally included .DS_Store in the mallet input, remove it now
+    if(any(outputfile["Pub.number"] == "Store")) {
+        # nrow(outputfile)
+        replacement <- outputfile[-which(outputfile["Pub.number"] == "Store"),]
+        # head(replacement, 3)
+        # nrow(replacement)
+        outputfile <- replacement
+        str(outputfile)
+        rm(replacement)
+    }
+    
+    
     
     # If we specified a subset, filter the data tables before moving on
     if (! is.null(subset_name)) {
@@ -61,11 +74,13 @@ get.doctopic.grid <- function(dataset_name="consorts",
     
     
     ## Find overall top topics
-    # Each cell gives the percentage which the topic in that column
     # contributes to the dissertation in that row. Summing these percentages
+    # Each cell gives the percentage which the topic in that column
     # and sorting gives us a rank based on percentage points.
     
-    colsums <- colSums(outputfile)
+    colsums <- colSums(outputfile[,which(names(outputfile) != "Pub.number")])
+    str(colsums)
+    colsums <- c(999999, colsums)
     names(colsums) <- names(outputfile)
     head(colsums)
     colsums.sort <- colsums[order(colsums, decreasing=TRUE)]
@@ -80,14 +95,14 @@ get.doctopic.grid <- function(dataset_name="consorts",
     # Optionally save to file
     if(remake_figs) { 
         if(! is.null(subset_name)) {
-            filename <- paste0(imageloc, dataset_name, "k", ntopics, "--", subset_name, 
-                               "_topic-ranks", iter_index, ".csv")    
+            filename <- file.path(imageloc, paste0(dataset_name, "k", ntopics, "--", subset_name, 
+                               "_topic-ranks", iter_index, ".csv"))    
         } else {
-            filename <- paste0(imageloc, dataset_name, "k", ntopics,
-                             "_topic-ranks", iter_index, ".csv")
+            filename <- file.path(imageloc, paste0(dataset_name, "k", ntopics,
+                             "_topic-ranks", iter_index, ".csv"))
         }
         out <- colsums.sort.pct[2:length(colsums.sort.pct)]
-        
+        head(out)
         write.csv(out, filename)
     }
     
@@ -122,3 +137,7 @@ get.doctopic.grid <- function(dataset_name="consorts",
          )
 
 }   # end of get.doctopic.grid()
+
+if(FALSE) {         # this will never run on its own
+    get.doctopic.grid("noexcludes2001_2015", 60, NULL, 4, doplot=T)
+}
