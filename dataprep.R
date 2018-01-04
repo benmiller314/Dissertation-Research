@@ -10,6 +10,8 @@ if (!exists("remake_figs")) {
     remake_figs <- FALSE
     autorun <- FALSE
     update_realconsorts <- FALSE
+    # which_computer <- "work"
+    which_computer <- "laptop"
 }
 
 # define some broad parameters, since this file will always be run first
@@ -28,12 +30,15 @@ if(getwd() != sourceloc) {
 imageloc <- path.expand(file.path(sourceloc, "../Dissertation Research - Figures"))
 dataloc <- path.expand(file.path(sourceloc, ".."))
 newdataloc <- path.expand(file.path("~", "Box Sync", "research", "dissertations"))
-fulltextloc <- file.path("/Volumes/Seagate_Backup_Plus_Drive/full-text_dissertations")
 malletloc <- path.expand(file.path("~", "Applications", "mallet"))
 webloc <- path.expand(file.path("~", "Documents", "Webdev", "datavis_testing"))
-# tmloc <- path.expand(file.path("~", "Documents", "tm"))
-tmloc <- path.expand(file.path(fulltextloc, "..", "topic_modeling"))
-
+fulltextloc <- file.path("/Volumes/Seagate_Backup_Plus_Drive/full-text_dissertations")
+if (which_computer == "work") {
+    tmloc <- path.expand(file.path(fulltextloc, "..", "topic_modeling"))
+} else if (which_computer == "laptop") {
+    # tmloc <- path.expand(file.path("~", "Documents", "tm"))
+    tmloc <- path.expand(file.path(newdataloc, "tm"))
+}
 
 # name the method tags most of these analyses are interested in
 tagnames <- c("Clin","Crit",
