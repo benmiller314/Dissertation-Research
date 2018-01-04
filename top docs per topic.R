@@ -174,22 +174,34 @@ top_topic_browser <- function(
     # get packages in case we've just restarted R
     require(data.table)
     
-    # load the data from the functions defined or imported above
-    doc_composition <- paste0("doc_topics_", dataset_name, "_", 
-                             ntopics, iter_index, ".dt");
-    if(!exists(doc_composition)) { 
-        doc_topics.dt <- get.doc.composition(dataset_name, ntopics, iter_index=iter_index) 
-    } else { 
-        doc_topics.dt <- get(doc_composition) 
+    # # load the data from the functions defined or imported above
+    # doc_composition <- paste0("doc_topics_", dataset_name, "_", 
+    #                          ntopics, iter_index, ".dt");
+    # if(!exists(doc_composition)) { 
+    #     doc_topics.dt <- get.doc.composition(dataset_name, ntopics, iter_index=iter_index) 
+    # } else { 
+    #     doc_topics.dt <- get(doc_composition) 
+    # }
+    # 
+    
+    # load the topic model data
+    if(! exists("get.doctopic.grid", mode = "function")) {
+        source(file=file.path(sourceloc, "get doctopic grid.R"))
     }
-        
-    topic_keys.dt <- get.topickeys(dataset_name, ntopics, iter_index=iter_index)
     
     grids <- get.doctopic.grid(dataset_name=dataset_name, ntopics=ntopics, subset_name=subset_name, iter_index=iter_index)
         colsums <- grids$colsums
         colsums.sort <- grids$colsums.sort
         outputfile <- grids$outputfile
+        doc_topics.dt <- data.table(outputfile, key = "Pub.number")
     rm(grids)
+    
+    
+    if(! exists("get.topickeys", mode = "function")) {
+        source(file=file.path(sourceloc, "get topickeys.R"))
+    }
+    
+    topic_keys.dt <- get.topickeys(dataset_name, ntopics, iter_index=iter_index)
     
     # List the keys for the top N topics, where N = cutoff
     len <- min(length(colsums)-1, cutoff)
@@ -222,14 +234,17 @@ top_topic_browser <- function(
                                 c("Pub.number", "Title", tagnames), with=F]         
 
             # add a column with the weights this topic has in these docs
-            doc_tops <- get.doc.composition(dataset_name, ntopics, iter_index=iter_index)
+            # doc_tops <- get.doc.composition(dataset_name, ntopics, iter_index=iter_index)
             weights <- ranks <- c()
             for(j in 1:length(diss.ind)) {
-                topic.col <- match(topic.num, 
-                                   doc_tops[as.character(diss.ind)][j])
-                weights[j] <- doc_tops[as.character(diss.ind)][j, 
-                                         (topic.col+1), with=F]
-                ranks[j] <- topic.col/2
+                myrow <- doc_topics.dt[diss.ind[j]]          # returns a list of named topic weights
+                topic.col <- match(topic.num, names(myrow))  # index of topic within the list
+                weights[j] <- myrow[[topic.col]]             # value at that index is the weight
+                
+                justnumbers <- doc_topics.dt[diss.ind[j],as.character(1:ntopics), with=F]
+                decr <- order(as.numeric(justnumbers), decreasing=TRUE)
+                ranked_row <- doc_topics.dt[diss.ind[j], as.character(decr), with=F]
+                ranks[j] <- match(topic.num, names(ranked_row))
             }
             topdocs[, topic_weight:=unlist(weights)]
             topdocs[, rank_in_doc:=unlist(ranks)]
@@ -306,14 +321,17 @@ top_topic_browser <- function(
                         c("Pub.number", "Title", tagnames), with=F]
 
             # add a column with the weights this topic has in these docs
-            doc_tops <- get.doc.composition(dataset_name, ntopics, iter_index=iter_index)
+            # doc_tops <- get.doc.composition(dataset_name, ntopics, iter_index=iter_index)
             weights <- ranks <- c()
             for(j in 1:length(diss.ind)) {
-                topic.col <- match(topic.num, 
-                                    doc_tops[as.character(diss.ind)][j])
-                weights[j] <- doc_tops[as.character(diss.ind)][j, 
-                                    (topic.col+1), with=F]
-                ranks[j] <- topic.col/2
+                myrow <- doc_topics.dt[diss.ind[j]]          # returns a list of named topic weights
+                topic.col <- match(topic.num, names(myrow))  # index of topic within the list
+                weights[j] <- myrow[[topic.col]]             # value at that index is the weight
+                
+                justnumbers <- doc_topics.dt[diss.ind[j],as.character(1:ntopics), with=F]
+                decr <- order(as.numeric(justnumbers), decreasing=TRUE)
+                ranked_row <- doc_topics.dt[diss.ind[j], as.character(decr), with=F]
+                ranks[j] <- match(topic.num, names(ranked_row))
             }
             
             topdocs[, topic_weight:=unlist(weights)]
