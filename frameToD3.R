@@ -170,21 +170,21 @@ frameToJSON <- function(dataset_name="consorts",
           if(remake_figs) { pdf(file=paste0(imageloc, main, iter_index, ".pdf")) }
           plot(hc, main=main)
           abline(3.09, 0, col="#99FF99")
-          rect.hclust(hc, k=2, border="#99FF99")
+          rect.hclust(hc, k=2, border="#99FF99")    # seafoam
           abline(2.165, 0, col="#009900")
-          rect.hclust(hc, k=5, border="#009900")
+          rect.hclust(hc, k=5, border="#009900")    # green
           abline(1.885, 0, col="#990099")
-          rect.hclust(hc, k=7, border="#990099")
+          rect.hclust(hc, k=7, border="#990099")    # purple
           abline(1.735, 0, col="#009999")
-          rect.hclust(hc, k=12, border="#009999")
-          abline(1.65, 0, col="#999900")
-          rect.hclust(hc, k=15, border="#999900")
+          rect.hclust(hc, k=12, border="#009999")   # teal
+          abline(1.65, 0, col="#000099")
+          rect.hclust(hc, k=15, border="#000099")   # dark blue
           abline(1.53, 0, col="#FF0099")
-          rect.hclust(hc, k=22, border="#FF0099")
-          abline(1.48, 0, col="#00FF99")
-          rect.hclust(hc, k=24, border="#00FF99")
-          abline(1.33, 0, col="#000099")
-          rect.hclust(hc, k=40, border="#000099")
+          rect.hclust(hc, k=22, border="#FF0099")   # pink 
+          abline(1.48, 0, col="#999900")
+          rect.hclust(hc, k=24, border="#999900")   # yellow
+          abline(1.33, 0, col="#00FF99")
+          rect.hclust(hc, k=40, border="#00FF99")   # sky blue
           if(remake_figs) { dev.off() } 
       }
       
@@ -290,7 +290,7 @@ if(dataset_name=="noexcludes2001_2015" && is.null(subset_name) && ntopics==60 &&
   
   # Also add top dissertation titles
   filename <- paste0("top_titles_per_topic-", dataset_name, "k", ntopics, subset_name, iter_index, ".csv")
-  filename <- paste0(imageloc, filename)
+  filename <- file.path(imageloc, filename)
   
   if (!file.exists(filename))  {
       # if there isn't yet a file with top titles for each topic, create it now
@@ -550,6 +550,8 @@ if(autorun) {
     frameToJSON(ntopics=150, bad.topics=NULL)
     frameToJSON(do.plot=T, dataset_name="noexcludes2001_2015", subset_name=NULL, ntopics=150, iter_index=6, bad.topics = NULL)
     frameToJSON(do.plot=T, dataset_name="noexcludes2001_2015", subset_name=NULL, ntopics=60, iter_index=4, bad.topics = NULL)
+    frameToJSON(do.plot=T, dataset_name="noexcludes2001_2015", subset_name="consorts2001_2015", ntopics=60, iter_index=4, bad.topics = NULL)
+    frameToJSON(do.plot=T, dataset_name="noexcludes2001_2015", subset_name="realconsorts2001_2015", ntopics=60, iter_index=4, bad.topics = NULL)
 
     # 12% determined by `variation of topic proportions.R` to include nearly
     # all primary topics and 3/4 of secondary topics for *consorts*; 
