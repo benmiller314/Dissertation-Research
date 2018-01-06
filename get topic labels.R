@@ -20,7 +20,7 @@ get_topic_labels <- function(dataset_name="consorts", ntopics=55, subset_name=NU
 		data.table(read.csv(filename), key="Topic"), 
 		error = function(e) {
 	  		message("File not found; using top words instead.")
-	  		keys <- get.topickeys(dataset_name, ntopics)
+	  		keys <- get.topickeys(dataset_name, ntopics, iter_index)
 	  		outfile <- paste0(webloc, "/", dataset_name, "k", ntopics,
 	  						 "_clusters_topwords", iter_index, ".json")	
 	  		return(data.table(Topic = 1:ntopics, 
