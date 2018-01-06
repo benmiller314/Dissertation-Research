@@ -129,6 +129,14 @@ realconsorts2001_2015 <- realconsorts[which(realconsorts$Year %in% seq(2001, 201
 nonconsorts2001_2015 <- noexcludes[which(noexcludes$Year %in% seq(2001, 2015, 1)) &&
                                    which(!noexcludes$realconsort != 1),]
 
+# or just the new stuff
+noexcludes2011_2015 <- noexcludes[which(noexcludes$Year %in% seq(2011, 2015, 1)),]
+consorts2011_2015 <- consorts[which(consorts$Year %in% seq(2011, 2015, 1)),]
+realconsorts2011_2015 <- realconsorts[which(realconsorts$Year %in% seq(2011, 2015, 1)),]
+nonconsorts2011_2015 <- noexcludes[which(noexcludes$Year %in% seq(2011, 2015, 1)) &&
+                                       which(!noexcludes$realconsort != 1),]
+
+
 # re-factor all factor columns in all data subsets
 realconsorts <- refactor.all("realconsorts")
 consorts <- refactor.all("consorts")
