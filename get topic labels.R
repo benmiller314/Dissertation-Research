@@ -6,6 +6,10 @@
 # topic.R'
 #####
 
+if(!exists("get.topickeys", mode="function")) { 
+    source(file="get topickeys.R") 
+}
+
 get_topic_labels <- function(dataset_name="consorts", ntopics=55, subset_name=NULL, iter_index="") 
 {
 	filename <- file.path(imageloc, paste0("topic labeling - ", dataset_name, ", K",
