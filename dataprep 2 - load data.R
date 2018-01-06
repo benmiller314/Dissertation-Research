@@ -10,7 +10,7 @@
 ########
 
 if (!exists("tagnames")) {
-	source(file=file.path("~","Box Sync", "research", "dissertations", "data, code, and figures", "Dissertation-Research", "dataprep.R"))
+    source(file=file.path("~","Box Sync", "research", "dissertations", "data, code, and figures", "Dissertation-Research", "dataprep.R"))
 }
 
 ## now get the data 
@@ -91,6 +91,14 @@ realconsort.count <- nrow(realconsorts)
 
 message("Of ", consort.count, " dissertations at Consortium schools, ",
         realconsort.count, " are confirmed from Consortium programs.")
+
+rhetmaplist <- read.csv(file=file.path(dataloc, "rhetmap-doctoral-programs-list.csv"))
+rhetmapschools <- factor(rhetmaplist$Carnegie2010_name)
+rhetmapschools[-which(rhetmapschools %in% consortium$University)]
+consortium$University[-which(consortium$University %in% rhetmapschools)]
+rhetmap.index <- which(noexcludes$School %in% rhetmapschools)
+rhetmaps <- noexcludes[rhetmap.index,]
+
 
 # index of disses that need to be checked for realconsort status
 # (no_alumni_list is created as a side effect of `update realconsorts.R`)
