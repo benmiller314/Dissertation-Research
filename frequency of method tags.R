@@ -35,8 +35,8 @@ methodfreq_combined <- function(bigset="noexcludes",
 	d <- get_tags(diffset)
 	
 	if (remake_figs) { 
-		filename <- paste0(imageloc, main, ", ", smallset," within ", bigset,
-							 ".pdf");
+		filename <- file.path(imageloc, paste0(main, ", ", smallset," within ", bigset,
+							 ".pdf"))
 		pdf(file=filename) 
 	}
 		

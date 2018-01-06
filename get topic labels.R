@@ -8,8 +8,8 @@
 
 get_topic_labels <- function(dataset_name="consorts", ntopics=55, subset_name=NULL, iter_index="") 
 {
-	filename <- paste0(imageloc, "topic labeling - ", dataset_name, ", K",
-						 ntopics, iter_index, ".csv")
+	filename <- file.path(imageloc, paste0("topic labeling - ", dataset_name, ", K",
+						 ntopics, iter_index, ".csv"))
 	
 	# get the labels derived from the larger (or only) set
 	topic.labels.dt <- tryCatch(
