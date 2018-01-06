@@ -20,7 +20,7 @@ find_topic_titles <- function(dataset_name = "consorts",
                                      "unixsourceloc"),
                            .combine="rbind"
                            ) %dopar% {
-        titles <- factor(top_topic_browser(for.bind=T, subset_name=subset_name, iter_index=iter_index, topic=i)$Title)
+        titles <- factor(top_topic_browser(for.bind=T, dataset_name=dataset_name, ntopics=ntopics, subset_name=subset_name, iter_index=iter_index, topic=i)$Title)
         one_topic_titles <- paste(titles, collapse=" || ")
         cbind(topic=i, top_titles=one_topic_titles)
     }
@@ -29,7 +29,7 @@ find_topic_titles <- function(dataset_name = "consorts",
  
     if(remake_figs) {
         filename <- paste0("top_titles_per_topic-", dataset_name, "k", ntopics, subset_name, iter_index, ".csv")
-        write.csv(titles_all, paste0(imageloc, filename))
+        write.csv(titles_all, file.path(imageloc, filename))
     } else {
         return(titles_all)
     }
