@@ -62,8 +62,8 @@ frameToJSON <- function(dataset_name="consorts",
   }
   if(is.null(outfile)) {                
   # the desired location of the JSON file produced by the function
-        outfile <- paste0(webloc, "/", dataset_name, "k", ntopics, subset_name, 
-                         "_clusters_", ntopics-length(bad.topics), iter_index, ".json")
+        outfile <- file.path(webloc, paste0(dataset_name, "k", ntopics, subset_name, 
+                         "_clusters_", ntopics-length(bad.topics), iter_index, ".json"))
   }
 
  
@@ -98,7 +98,7 @@ frameToJSON <- function(dataset_name="consorts",
       # with 5 bad.topics removed   
       if(dataset_name=="consorts" && ntopics==55 && length(bad.topics) == 5) 
       {
-          if(remake_figs) { pdf(file=paste0(imageloc, main, iter_index, ".pdf")) }
+          if(remake_figs) { pdf(file=file.path(imageloc, paste0(main, iter_index, ".pdf"))) }
             plot(hc, main=main)
             abline(1.35, 0, col="#99FF99")          
             rect.hclust(hc, k=32, border="#99FF99") 
@@ -121,7 +121,7 @@ frameToJSON <- function(dataset_name="consorts",
       else if(dataset_name=="consorts" && subset_name=="realconsorts" && ntopics==55 &&            
               length(bad.topics)==7) 
       {
-          if(remake_figs) { pdf(file=paste0(imageloc, main, iter_index, ".pdf")) }
+          if(remake_figs) { pdf(file=file.path(imageloc, paste0(main, iter_index, ".pdf"))) }
               plot(hc, main=main)
               rect.hclust(hc, k=2, border="#99FF99")
               rect.hclust(hc, k=4, border="#999900")
@@ -140,7 +140,7 @@ frameToJSON <- function(dataset_name="consorts",
       else if(dataset_name=="consorts" && ntopics==55 &&            
               length(bad.topics)==7) 
       {
-          if(remake_figs) { pdf(file=paste0(imageloc, main, iter_index, ".pdf")) }
+          if(remake_figs) { pdf(file=file.path(imageloc, paste0(main, iter_index, ".pdf"))) }
               plot(hc, main=main)
               abline(1.45, 0, col="#99FF99")        
               rect.hclust(hc, k=21, border="#99FF99")   
@@ -156,7 +156,7 @@ frameToJSON <- function(dataset_name="consorts",
       # TO DO: Find splits for model with 150 topics
       
       else if(dataset_name=="noexcludes2001_2015" && is.null(subset_name) && ntopics==150) {
-          if(remake_figs) { pdf(file=paste0(imageloc, main, iter_index, ".pdf")) }
+          if(remake_figs) { pdf(file=file.path(imageloc, paste0(main, iter_index, ".pdf"))) }
           plot(hc, main=main)
               # abline(1.55, 0, col="#99FF99")
               # rect.hclust(hc, k=38, border="#99FF99")
@@ -167,7 +167,7 @@ frameToJSON <- function(dataset_name="consorts",
       }
       
       else if(dataset_name=="noexcludes2001_2015" && is.null(subset_name) && ntopics==60) {
-          if(remake_figs) { pdf(file=paste0(imageloc, main, iter_index, ".pdf")) }
+          if(remake_figs) { pdf(file=file.path(imageloc, paste0(main, iter_index, ".pdf"))) }
           plot(hc, main=main)
           abline(3.09, 0, col="#99FF99")
           rect.hclust(hc, k=2, border="#99FF99")    # seafoam
@@ -189,7 +189,7 @@ frameToJSON <- function(dataset_name="consorts",
       }
       
       else {
-          if(remake_figs) { pdf(file=paste0(imageloc, main, iter_index, ".pdf")) }
+          if(remake_figs) { pdf(file=file.path(imageloc, paste0(main, iter_index, ".pdf"))) }
               plot(hc, main=main)
           if(remake_figs) { dev.off() } 
           
@@ -289,8 +289,7 @@ if(dataset_name=="noexcludes2001_2015" && is.null(subset_name) && ntopics==60 &&
       
   
   # Also add top dissertation titles
-  filename <- paste0("top_titles_per_topic-", dataset_name, "k", ntopics, subset_name, iter_index, ".csv")
-  filename <- file.path(imageloc, filename)
+  filename <- file.path(imageloc, paste0("top_titles_per_topic-", dataset_name, "k", ntopics, subset_name, iter_index, ".csv"))
   
   if (!file.exists(filename))  {
       # if there isn't yet a file with top titles for each topic, create it now
@@ -344,11 +343,11 @@ if(dataset_name=="noexcludes2001_2015" && is.null(subset_name) && ntopics==60 &&
   # also be returned by the function.
   if(remake_figs) {
     if(! is.null(subset_name)) {
-        filename <- paste0(imageloc, "topic clusters - ", dataset_name, "k",
-                           ntopics, "--", subset_name, ", bad topics removed", iter_index, ".csv")
+        filename <- file.path(imageloc, paste0("topic clusters - ", dataset_name, "k",
+                           ntopics, "--", subset_name, ", bad topics removed", iter_index, ".csv"))
     } else {
-        filename <- paste0(imageloc, "topic clusters - ", dataset_name, "k",
-                        ntopics, "bad topics removed", iter_index, ".csv")
+        filename <- file.path(imageloc, paste0("topic clusters - ", dataset_name, "k",
+                        ntopics, "bad topics removed", iter_index, ".csv"))
     }
     write.csv(b, filename)
   } else {
@@ -439,14 +438,14 @@ cotopic_edges <- function(dataset_name="consorts",
 
     # the desired location of the JSON file produced by the function
     if(is.null(outfile)) {
-        outfile <- paste0(webloc, "/", "edges_", dataset_name, "k", ntopics,
+        outfile <- file.path(webloc, paste0("edges_", dataset_name, "k", ntopics,
                  subset_name, 
                  "_", ntopics-length(bad.topics), "_", level*100,
-                 "pct_min", min, "_nobads", iter_index, ".json")
+                 "pct_min", min, "_nobads", iter_index, ".json"))
     }
 
     # get co-occurring topics, for hierarchical edge bundling
-    if(!exists("get.cotopics")) { source(paste0(sourceloc, "cotopics.R")) }
+    if(!exists("get.cotopics")) { source(file.path(sourceloc, "cotopics.R")) }
     cotopics <- get.cotopics(dataset_name, ntopics, subset_name, level, min)
       
     # that gives one-directional links; to ensure symmetry, flip source and
