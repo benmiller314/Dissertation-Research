@@ -104,13 +104,13 @@ heatmap.ben <- function (
 	if(legend) {
 		if(remake_figs) { 
 			if(rowscale) {
-				filename <- paste0(imageloc, "color legend for ", 
+				filename <- file.path(imageloc, paste0("color legend for ", 
 									sum.by.tags$dataset, 
-									" method correlations, normed.pdf")
+									" method correlations, normed.pdf"))
 			} else {
-				filename <- paste0(imageloc, "color legend for ", 
+				filename <- file.path(imageloc, paste0("color legend for ", 
 									sum.by.tags$dataset, 
-									" method correlations, raw.pdf")
+									" method correlations, raw.pdf"))
 			}
 			pdf(filename)
 		}
@@ -206,13 +206,13 @@ heatmap.ben <- function (
 	if(dendro) {
 		if(remake_figs) { 
 			if(rowscale) {
-				filename <- paste0(imageloc, "dendrogram for ", 
+				filename <- file.path(imageloc, paste0("dendrogram for ", 
 									sum.by.tags$dataset, 
-									" method column correlations.pdf")
+									" method column correlations.pdf"))
 			} else {
-				filename <- paste0(imageloc, "dendrogram for ", 
+				filename <- file.path(imageloc, paste0("dendrogram for ", 
 									sum.by.tags$dataset, 
-									" method correlations, raw.pdf")
+									" method correlations, raw.pdf"))
 			}
 			pdf(filename)
 		}
@@ -221,9 +221,9 @@ heatmap.ben <- function (
 		
 		if(rowscale) { 
 			if(remake_figs) {
-				filename <- paste0(imageloc, "dendrogram for ", 
+				filename <- file.path(imageloc, paste0("dendrogram for ", 
 									sum.by.tags$dataset, 
-									" method row correlations.pdf")
+									" method row correlations.pdf"))
 				pdf(filename)
 			} 
 		plot(ddr)
