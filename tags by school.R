@@ -92,8 +92,8 @@ schoolwise <- function(dataset_name="noexcludes", tagset_name="tagnames",
 
     # 4b. divisive clustering (diana):
     if(dia) {
-    filename <- paste0(imageloc, "tags by schools, ", dataset_name, 
-                    ", N", nrow(dataset), ", ", tagset_name, ", diana.pdf")
+    filename <- file.path(imageloc, paste0("tags by schools, ", dataset_name, 
+                    ", N", nrow(dataset), ", ", tagset_name, ", diana.pdf"))
     maintitle <- paste0("Method Tag Averages by school, ", dataset_name, 
                     ", ", tagset_name, ", diana")
     
@@ -129,8 +129,8 @@ schoolwise <- function(dataset_name="noexcludes", tagset_name="tagnames",
         
     # 4a. agglomerative clustering (agnes):
     if(agn) {
-        filename <- paste0(imageloc, "tags by schools, ", dataset_name, 
-                ", N", nrow(dataset), ", ", tagset_name, ", agnes.pdf")
+        filename <- file.path(imageloc, paste0("tags by schools, ", dataset_name, 
+                ", N", nrow(dataset), ", ", tagset_name, ", agnes.pdf"))
         maintitle <- paste0("Method Tag Averages by school, ", dataset_name,
                 ", ", tagset_name, ", agnes")
     
@@ -167,8 +167,8 @@ schoolwise <- function(dataset_name="noexcludes", tagset_name="tagnames",
 
         # 4c. agglomerative clustering via hclust:
     if(hcl) {
-        filename <- paste0(imageloc, "tags by schools, ", dataset_name, 
-                    ", N", nrow(dataset), ", ", tagset_name, ", hclust.pdf")
+        filename <- file.path(imageloc, paste0("tags by schools, ", dataset_name, 
+                    ", N", nrow(dataset), ", ", tagset_name, ", hclust.pdf"))
         maintitle <- paste0("Method Tag Averages by school, ", dataset_name,
                     ", ", tagset_name, ", hclust")
     
