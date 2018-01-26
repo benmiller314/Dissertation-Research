@@ -20,6 +20,10 @@
 #       3b. set unknown or 0 realconsorts to 1
 #       4. for nonmatches, if realconsorts == 1, prompt to keep or reset to 0
 
+if(!exists("namepart", mode="function")) {
+    source(file=file.path(sourceloc, "advisor relations.R"))
+}
+
 realconsorts_by_list <- function(dataset_name = "consorts",
                                  manual_file = NULL,      # a file.path to a csv department-gathering
                                  alumni_file = NULL,      # a file.path to a list of alumni
