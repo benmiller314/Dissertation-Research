@@ -24,21 +24,27 @@ if(!exists("namepart", mode="function")) {
     source(file=file.path(sourceloc, "advisor relations.R"))
 }
 
-realconsorts_by_list <- function(dataset_name = "consorts",
-                                 manual_file = NULL,      # a file.path to a csv department-gathering
-                                 alumni_file = NULL,      # a file.path to a list of alumni
+realconsorts_by_list <- function(dataset_name = "noexcludes",
+                                 manual_file = NULL,     # a set of file.paths to department-gathering csvs 
+                                 alumni_file = NULL,      # a file.path to a list of known alumni
                                  matchlist_file = NULL,   # a file.path to save/load matched rows
                                  schools = NULL)          # a list of new schools to match and add
 {
     dataset <- get(dataset_name)
     
     if (is.null(manual_file)) {
-        manual_file <- file.path(dataloc, "department-gathering2.csv")
+        # NB: this file assembled by me and Moriah Purdy in spring of 2016, based on dissertations
+        # and some limited searching for public CVs; 
+        # updated by Janetta Brundage and Michelle Hillock in spring 2018
+        # manual_file <- file.path(dataloc, "department-gathering2.csv")        # previous file
+        manual_file <- file.path(dataloc, "department-gathering-5.csv")
     }
     
     if (is.null(alumni_file)) {
-        # NB: this file assembled by Alyssa Rodriguez from public alumni lists on departmental websites
-        alumni_file <- file.path(newdataloc, "known consortium graduates 2017-07-30.csv")
+        # NB: this file assembled by Alyssa Rodriguez in summer 2017 
+        # from public alumni lists on departmental websites, and 
+        # updated by Janetta Brundage and Michelle Hillock in spring 2018
+        alumni_file <- file.path(newdataloc, "known consortium graduates 2018-02-02.csv")
     }
     if (is.null(matchlist_file)) {
         matchlist_file <- file.path(newdataloc, "realconsorts from alumni lists.csv")
@@ -48,20 +54,27 @@ realconsorts_by_list <- function(dataset_name = "consorts",
         # get the department-matching data
         a <- read.csv(manual_file)
         
-        # read out just the Pub.numbers from confirmed dissertations in Consortium programs
-        confirmed_yes.index <- a[which(a$Consortium == "yes"), "Pub.number"]
-        confirmed_no.index <- a[which(a$Consortium == "no"), "Pub.number"]
+        # read out just the Pub.numbers from confirmed dissertations in Consortium/rhetmap programs
+        confirmed_consort.index <- a[which(a$Consortium_program == 1), "Pub.number"]
+        confirmed_nonconsort.index <- a[which(a$Consortium_program == 0), "Pub.number"]
+        confirmed_rhetmap.index <- a[which(a$rhetmap_program == 1), "Pub.number"]
+        confirmed_nonrhetmap.index <- a[which(a$rhetmap_program == 0), "Pub.number"]
         
-        # use those numbers to update our index
-        dataset[dataset$Pub.number %in% confirmed_yes.index, "realconsort"] <- 1 
-        dataset[dataset$Pub.number %in% confirmed_no.index, "realconsort"] <- 0
+        # use those numbers to update our set of realconsorts / realrhetmaps
+        
+        dataset[dataset$Pub.number %in% confirmed_consort.index, "realconsort"] <- 1 
+        dataset[dataset$Pub.number %in% confirmed_nonconsort.index, "realconsort"] <- 0
+        dataset[dataset$Pub.number %in% confirmed_rhetmap.index, "realrhetmap"] <- 1 
+        dataset[dataset$Pub.number %in% confirmed_nonrhetmap.index, "realrhetmap"] <- 0
         
         # sanity check: confirm that we're only getting dissertations at Consortium schools
-        if (all(dataset[dataset$Pub.number %in% confirmed_yes.index, "School"] %in% conschools)) {
-            message(paste("Found", length(confirmed_yes.index), "dissertations manually confirmed from Consortium programs."))
+        if (all(dataset[which(dataset$Pub.number %in% union(confirmed_consort.index, confirmed_rhetmap.index)), "School"] %in% union(conschools, rhetmapschools))) {
+            message(paste("Found", length(confirmed_consort.index), "dissertations manually confirmed from Consortium programs",
+                          "and", length(confirmed_rhetmap.index), "from programs listed on rhetmap.org." ))
         } else {
             warning("`update realconsorts.R` indexes non-Consortium schools. Time to debug!")
         }
+        
     } else {
         warning("`update realconsorts.R`: couldn't find csv of manually confirmed Consortium dissertations:\n", manual_file)
     }
