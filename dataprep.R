@@ -10,6 +10,9 @@ if (!exists("remake_figs")) {
     remake_figs <- FALSE
     autorun <- FALSE
     update_realconsorts <- FALSE
+}
+
+if (!exists("which_computer")) {
     # which_computer <- "work"
     which_computer <- "laptop"
 }
