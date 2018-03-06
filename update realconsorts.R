@@ -103,6 +103,25 @@ realconsorts_by_list <- function(dataset_name = "noexcludes",
             # which schools don't we have lists for? (maybe contact them...)
             no_alumni_list <<- conschools[which(!conschools %in% alumni_list$Consortium_School)]
             message("Schools without known alumni lists can be accessed with the variable `no_alumni_list`.")
+            
+            no_alumni_disses <<- dataset[which(dataset$School %in% no_alumni_list), ]
+            if(exists("confirmed_yes.index")) {
+                no_alumni_disses <<- no_alumni_disses[-which(no_alumni_disses$Pub.number %in% confirmed_yes.index),]
+                no_alumni_disses <<- no_alumni_disses[-which(no_alumni_disses$Pub.number %in% confirmed_no.index),]
+            }
+            
+            
+            if(remake_figs) {
+                filename <- file.path(dataloc, paste0("unconfirmed_consorts_",Sys.Date(),".csv"))
+                message(paste("Saving consortium-school dissertations without known department status to",
+                              filename))
+                write.csv(no_alumni_disses, file=filename)
+            } else {
+                View(no_alumni_disses)
+                message(paste("Dissertations from Consortium schools but unconfirmed departments can be accessed",
+                              "from the variable `no_alumni_disses`; to export, set remake_figs to TRUE."))
+            }
+            
         }
         
         # Narrow to just Consortium schools, then 
