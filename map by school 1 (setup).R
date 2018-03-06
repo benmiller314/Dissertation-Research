@@ -25,8 +25,8 @@ maptags1 <- function (dataset_name="noexcludes", tagset_name="tagnames") {
 	
 	# save the output
 	if(remake_figs) {
-		filename <- paste0(dataloc, tagset_name, " tagsums by school, ", 
-						   dataset_name, ", N", nrow(dataset), ".csv")
+		filename <- file.path(dataloc, paste0(tagset_name, " tagsums by school, ", 
+						   dataset_name, ", N", nrow(dataset), ".csv"))
 		write.csv(a1, file=filename)
 	}
 	
@@ -36,8 +36,8 @@ maptags1 <- function (dataset_name="noexcludes", tagset_name="tagnames") {
 	head(a2)
 	
 	if(remake_figs) {
-		filename <- paste0(dataloc, "disses by school, ", dataset_name, 
-							", N", nrow(dataset), ".csv")
+		filename <- file.path(dataloc, paste0("disses by school, ", dataset_name, 
+							", N", nrow(dataset), ".csv"))
 		write.csv(a2, file=filename)
 	}
 
@@ -69,8 +69,8 @@ maptags1 <- function (dataset_name="noexcludes", tagset_name="tagnames") {
 		} else {
 			warning("Selection for geocoding action not understood; 
 					trying default for this dataset.")		
-			filename <- paste0(dataloc, "geocoding by school, ",
-							 dataset_name, ", N", diss.count,".csv")
+			filename <- file.path(dataloc, paste0("geocoding by school, ",
+							 dataset_name, ", N", diss.count,".csv"))
 			all_schools.geo <<- read.csv(filename)
 
 			# trim the first column, which is just the row number, added on

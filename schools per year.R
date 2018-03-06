@@ -23,7 +23,7 @@ peryear <- function(dataset_name	= "noexcludes",
 		sub <- paste0(dataset_name, ", N", nrow(dataset))
 	
 		if(remake_figs) {
-			filename <- paste0(imageloc, main,", ", dataset_name, ", N",diss.count,".pdf") 
+			filename <- file.path(imageloc, paste0(main,", ", dataset_name, ", N",diss.count,".pdf")) 
 			pdf(filename)
 		}
 		
