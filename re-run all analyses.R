@@ -25,6 +25,10 @@
 #                real consortium program dissertations, for text mining purposes.
         update_realconsorts <- FALSE
 
+#       Are we working at home or at the office? 
+#       Some file locations will be slightly different.
+        # which_computer <- "work"
+        which_computer <- "laptop"
 ## 
 # `dataprep.R`: prepares working environment by loading helper
 #         functions and setting key variables (such as tagset).
