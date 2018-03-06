@@ -20,6 +20,10 @@ ans <- function() {
 	.Last.value
 	}
 	
+debugs <- function() {
+    names(which(sapply(unlist(lapply(search(), function(x) lsf.str(pos=x))), isdebugged)))
+}
+
 # set the working directories, taking into account the GitHub setup
 sourceloc <- path.expand(file.path("~","Box Sync", "research", "dissertations", "data, code, and figures", "Dissertation-Research"))
 unixsourceloc <- sourceloc
