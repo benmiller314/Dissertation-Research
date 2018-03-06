@@ -124,9 +124,10 @@ realconsorts_by_list <- function(dataset_name = "noexcludes",
             
         }
         
-        # Narrow to just Consortium schools, then 
+        
+        # Narrow to just Consortium schools, then... 
         unknown_dept <- dataset[which(dataset$School %in% conschools),]
-        # get list of those alumni with unknown departments
+        # ... get list of those alumni with unknown departments
         unknown_dept <- dataset[which(dataset$Department %in% c("?", "")), c("Author", "School", "Department", "realconsort", "Pub.number", "Title")]
         unknown_dept$Lastname <- sapply(unknown_dept$Author, function(x) namepart(x, "last"))
         unknown_dept$Firstname <- sapply(unknown_dept$Author, function(x) namepart(x, "first"))
@@ -205,6 +206,7 @@ realconsorts_by_list <- function(dataset_name = "noexcludes",
             write.csv(matchlist, file=matchlist_file, row.names=FALSE)
             message("Done.")
         }
+        
         
         # merge newly matched data into the dataset
         ## NB: Straight merge doesn't work because dataset$Department is a factor
