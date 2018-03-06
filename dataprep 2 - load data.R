@@ -60,9 +60,12 @@ for (i in refactor.index) {
 	noexcludes[,i] <- factor(noexcludes[,i])
 }
 
-
 # redefine methods that are all "check" or "check?" as "Other," and recalculate "Method.Count"
 source(file=file.path(sourceloc, "check count.R"))
+
+# verify departmental information, so we know what's really produced by a consortium or rhetmap school
+source(file="update realconsorts.R")
+noexcludes <- realconsorts_by_list("noexcludes")
 
 # get tag index columns on their own, for simplicity down the road
 # TO DO: See whether we still need this
@@ -74,31 +77,47 @@ source(file=file.path(sourceloc, "check count.R"))
 # barplot(tag.totals)
 
 ## Store reference variables for schools
-
 consortium <- read.csv(file=file.path(dataloc, "doctoral-consortium-schools-programs, reconciled to carnegie.csv"))
 conschools <- factor(consortium$University)
 
-source(file="update realconsorts.R")
-noexcludes <- realconsorts_by_list("noexcludes")
+rhetmaplist <- read.csv(file=file.path(dataloc, "rhetmap-doctoral-programs-list.csv"))
+rhetmapschools <- factor(rhetmaplist$Carnegie2010_name)
+rhetmapschools <- rhetmapschools[order(rhetmapschools)]
 
+# schools in rhetmap but not consortium (19)
+rhetmaponly <- rhetmapschools[-which(rhetmapschools %in% conschools)]
+
+# schools in consortium but not rhetmap  (1)
+consortsonly <- conschools[-which(conschools %in% rhetmapschools)]     
+
+
+#### update subsets
+# naive filter, by school only (without department)
 consorts.index <- which(noexcludes$School %in% conschools)
 consorts <- noexcludes[consorts.index,]
-conschoolsfound <- factor(consorts$School)
 consort.count <- nrow(consorts)
 
+rhetmap.index <- which(noexcludes$School %in% rhetmapschools)
+rhetmaps <- noexcludes[rhetmap.index,]
+rhetmap.count <- nrow(rhetmaps)
+
+# so much for schools. what about actual programs? 
 realconsorts.index <- which(noexcludes$realconsort == 1)
 realconsorts <- noexcludes[realconsorts.index,]
 realconsort.count <- nrow(realconsorts)
 
+realrhetmaps.index <- which(noexcludes$realrhetmap == 1)
+realrhetmaps <- noexcludes[realrhetmaps.index,]
+realrhetmap.count <- nrow(realrhetmaps)
+
+
+# report back what we've found
+
 message("Of ", consort.count, " dissertations at Consortium schools, ",
         realconsort.count, " are confirmed from Consortium programs.")
+message("Of ", rhetmap.count, " dissertations at Rhetmap schools, ",
+        realrhetmap.count, " are confirmed from Rhetmap programs.")
 
-rhetmaplist <- read.csv(file=file.path(dataloc, "rhetmap-doctoral-programs-list.csv"))
-rhetmapschools <- factor(rhetmaplist$Carnegie2010_name)
-rhetmapschools[-which(rhetmapschools %in% consortium$University)]
-consortium$University[-which(consortium$University %in% rhetmapschools)]
-rhetmap.index <- which(noexcludes$School %in% rhetmapschools)
-rhetmaps <- noexcludes[rhetmap.index,]
 
 
 # index of disses that need to be checked for realconsort status
@@ -107,11 +126,14 @@ maybeconsorts.index <- which(consorts$School %in% no_alumni_list)
 maybeconsorts.index <- which(!consorts[maybeconsorts.index, "realconsort"] %in% c(0,1))
 maybeconsorts <- consorts[maybeconsorts.index, ]
 
+
+## figure out which consortium schools are not showing up
+conschoolsfound <- factor(consorts$School)
 # print("Consortium Schools Found:")
 # print(levels(conschoolsfound))
 # print("Did you remember to reconcile schools?")
 
-## figure out which consortium schools are not showing up
+
 missing_conschools <- setdiff(levels(conschools),levels(conschoolsfound))
 non_conschools <- setdiff(levels(noexcludes$School),levels(conschools))
 nonconsorts <- noexcludes[(which(noexcludes$School %in% non_conschools)),]
@@ -129,6 +151,8 @@ consorts2001_2015 <- consorts[which(consorts$Year %in% seq(2001, 2015, 1)),]
 realconsorts2001_2015 <- realconsorts[which(realconsorts$Year %in% seq(2001, 2015, 1)),]
 nonconsorts2001_2015 <- noexcludes[which(noexcludes$Year %in% seq(2001, 2015, 1)) &&
                                    which(!noexcludes$realconsort != 1),]
+rhetmaps2001_2015 <- rhetmaps[which(rhetmaps$Year %in% seq(2001, 2015, 1)),]
+realrhetmaps2001_2015 <- realrhetmaps[which(realrhetmaps$Year %in% seq(2001, 2015, 1)),]
 
 # or just the new stuff
 noexcludes2011_2015 <- noexcludes[which(noexcludes$Year %in% seq(2011, 2015, 1)),]
@@ -136,7 +160,8 @@ consorts2011_2015 <- consorts[which(consorts$Year %in% seq(2011, 2015, 1)),]
 realconsorts2011_2015 <- realconsorts[which(realconsorts$Year %in% seq(2011, 2015, 1)),]
 nonconsorts2011_2015 <- noexcludes[which(noexcludes$Year %in% seq(2011, 2015, 1)) &&
                                        which(!noexcludes$realconsort != 1),]
-
+rhetmaps2011_2015 <- rhetmaps[which(rhetmaps$Year %in% seq(2011, 2015, 1)),]
+realrhetmaps2011_2015 <- realrhetmaps[which(realrhetmaps$Year %in% seq(2011, 2015, 1)),]
 
 # re-factor all factor columns in all data subsets
 realconsorts <- refactor.all("realconsorts")
