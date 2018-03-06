@@ -142,8 +142,11 @@ nonconsorts <- noexcludes[(which(noexcludes$School %in% non_conschools)),]
 # setequal(nonconsorts, (noexcludes[-consorts.index,]))
 
 # find top nonconsorts
-top.nonconsorts <- thresh("nonconsorts")$thresh.data
+until <- max(nonconsorts$Year)
+since <- until - 5
+top.nonconsorts <- thresh(dataset="nonconsorts", until=until, since=since)$thresh.data
 consorts.plus <- rbind(consorts, top.nonconsorts)
+rm("until", "since")
 
 # limit to 2001-2015
 noexcludes2001_2015 <- noexcludes[which(noexcludes$Year %in% seq(2001, 2015, 1)),]
