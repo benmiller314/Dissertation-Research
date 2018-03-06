@@ -14,8 +14,9 @@ if (!exists("tagnames")) {
 }
 
 ## now get the data 
-# The original file of dissertation metadata
-oldarray <- read.csv(file=file.path(dataloc, "Rhetoric-or-Composition-12-adding-depts.csv"))
+# The original file of dissertation metadata (built from 2012-2015, covering years 2001-2010)
+# oldarray <- read.csv(file=file.path(dataloc, "Rhetoric-or-Composition-12-adding-depts.csv"))
+oldarray <- read.csv(file=file.path(dataloc, "Diss-data-collected-pre-Pitt_short-tags.csv"))
 
 # The new file of dissertation metadata
 invisible(readline("Select the most recent file of dissertation metadata. (Press <Enter> to continue.)"))
@@ -24,7 +25,7 @@ newarray <- read.csv(file=file.choose())
 
 
 # parse the method tags... including for the collapsed schema
-oldarray <- parse_tags(oldarray)
+oldarray <- parse_tags(oldarray, tagstyle="short", excludecol="Flags")
 oldarray <- short_schema(oldarray)
 # names(oldarray)
 # oldarray[tagnames]
