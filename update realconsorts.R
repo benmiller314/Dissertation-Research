@@ -202,8 +202,8 @@ realconsorts_by_list <- function(dataset_name = "noexcludes",
         
         if (remake_figs) {
             # optionally overwrite the file
-            message("Saving consortium program matches to file: ", matchlist_file, "... ")
-            write.csv(matchlist, file=matchlist_file, row.names=FALSE)
+            message("Saving consortium program matches to file: ", paste0(matchlist_file, Sys.Date()), "... ")
+            write.csv(matchlist, file=paste0(matchlist_file, Sys.Date()), row.names=FALSE)
             message("Done.")
         }
         

@@ -13,7 +13,7 @@ m5 <- noexcludes[which(checkmaybes < checkcount),]
 nrow(m5)
 
 # save the file that still needs checking
-filename <- paste0(dataloc, "noexcludes in need of checking.csv")
+filename <- file.path(dataloc, paste0("noexcludes in need of checking ", Sys.Date(), ".csv"))
 write.csv(m5, file=filename)
 
 
