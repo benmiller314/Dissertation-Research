@@ -48,9 +48,10 @@ source(file="dataprep 2 - load data.R")
 
 #####   Functions for Determining the Scope of the Data    #####          
 
-#   `schools per year.R`: for each year, finds the number of
-#         institutions and number of dissertations. Optionally plots these
-#         numbers as a line graph
+#   `schools per year.R`: for each year, find the number of
+#         institutions and number of dissertations; optionally plot these
+#         numbers as a line graph (defaults to true). Provides one function:
+#         peryear(dataset_name, do.plot)
 source(file="schools per year.R")
 
 ## 
