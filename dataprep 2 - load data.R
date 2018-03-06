@@ -167,20 +167,14 @@ rhetmaps2011_2015 <- rhetmaps[which(rhetmaps$Year %in% seq(2011, 2015, 1)),]
 realrhetmaps2011_2015 <- realrhetmaps[which(realrhetmaps$Year %in% seq(2011, 2015, 1)),]
 
 # re-factor all factor columns in all data subsets
-realconsorts <- refactor.all("realconsorts")
-consorts <- refactor.all("consorts")
-nonconsorts <- refactor.all("nonconsorts")
-top.nonconsorts <- refactor.all("top.nonconsorts")
-consorts.plus <- refactor.all("consorts.plus")
-noexcludes2001_2015 <- refactor.all("noexcludes2001_2015")
-consorts2001_2015 <- refactor.all("consorts2001_2015")
-realconsorts2001_2015 <- refactor.all("realconsorts2001_2015")
-nonconsorts2001_2015 <- refactor.all("nonconsorts2001_2015")
-noexcludes2011_2015 <- refactor.all("noexcludes2011_2015")
-consorts2011_2015 <- refactor.all("consorts2011_2015")
-realconsorts2011_2015 <- refactor.all("realconsorts2011_2015")
-nonconsorts2011_2015 <- refactor.all("nonconsorts2011_2015")
-maybeconsorts <- refactor.all("maybeconsorts")
+subset_list <- c("consorts", "nonconsorts", "realconsorts", "top.nonconsorts", "consorts.plus", "maybeconsorts",
+                 "noexcludes2001_2015", "consorts2001_2015", "realconsorts2001_2015", "nonconsorts2001_2015",
+                 "noexcludes2011_2015", "consorts2011_2015", "realconsorts2011_2015", "nonconsorts2011_2015",
+                 "rhetmaps", "realrhetmaps", "rhetmaps2001_2015", "rhetmaps2011_2015")
+
+for (subset in subset_list) {
+    assign(subset, refactor.all(subset))
+}
 
 # make noexcludes easy to index and search
 library(data.table)
