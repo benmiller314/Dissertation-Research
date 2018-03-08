@@ -75,19 +75,25 @@ parse_tags <- function(data,
     					"Philosophical", "Poetic", "Practitioner", "Rhetorical",
     					"Survey", "Other", "Pedagogical Projection")
 	} else if (tagstyle == "short") {
-	    searchterms <- c("Clin", "Crit", "Disc", "Ethn", "Expt", "Hist",
-	                     "Intv", "Meta", "Modl", "Phil", "Poet", "Prac", 
-	                     "Rhet", "Surv", "Othr", "Ped")
+	    searchterms <- tagnames
 	}
 	
 	searchresults <- lapply(searchterms, FUN=function(x) { 
 							grep(x, mt, ignore.case=T) } )
+	names(searchresults) <- tagnames
 	
 	## bug-hunting
 	# grep("Clinical", a[,"Method.Terms"], ignore.case=F)
+######## megabug, caught 2018-03-07 ########	
+#	for (i in 1:length(searchresults)) {
+#		tags[searchresults[[i]], i] <- 1    # ohmygod, this was i+1 and it worked, 
+#		                                    # when did it change from 0-indexed to 1-indexed??
+#	}
+#########################
 	
-	for (i in 1:length(searchresults)) {
-		tags[searchresults[[i]], i+1] <- 1
+	# use names rather than numbers to index the array
+	for (tag in names(searchresults)) {
+	    tags[searchresults[[tag]], tag] <- 1
 	}
 	
 	# Populate Method.Count by summing across each row
