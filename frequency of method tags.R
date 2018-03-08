@@ -23,16 +23,20 @@ if(FALSE) {
 	e[order(e)]
 }
 
+
 # Step 2. Graph 'em
 methodfreq_combined <- function(bigset="noexcludes", 
 								smallset="consorts", 
+								label_diffs=T,
 								diffset="nonconsorts") 
 {
 
 	main <- "Frequency of Assigned Method Tags"
 	a <- get_tags(bigset)
 	b <- get_tags(smallset)
-	d <- get_tags(diffset)
+	if(label_diffs) {
+	    d <- get_tags(diffset)
+	}
 	
 	if (remake_figs) { 
 		filename <- file.path(imageloc, paste0(main, ", ", smallset," within ", bigset,
@@ -63,11 +67,16 @@ methodfreq_combined <- function(bigset="noexcludes",
 			col="white", 
 			add=TRUE
 	)
-	text(x=30, 
-		 y=seq(from=0.7, to=18.7, length.out=16), 
-		 labels=b[order(a)]
-	)
-		
+	
+	# only add subset labels if there really is a subset
+	if (bigset != smallset) {
+    	text(x=30, 
+    		 y=seq(from=0.7, to=18.7, length.out=16), 
+    		 labels=b[order(a)]
+    	)
+	}
+	
+	if(label_diffs) {	
 		# no need to actively plot the diffset: that's the gap where the
 		# baseline shows through. just add labels.
 
@@ -75,17 +84,25 @@ methodfreq_combined <- function(bigset="noexcludes",
 			 y=seq(from=0.7, to=18.7, length.out=16), 
 			 labels=d[order(a)]
 		)
-		
-		mtext(paste("Tags are non-exclusive, so sum will be greater than
-					the", nrow(get(bigset)), "included dissertations.", 
+	    
+	    legend(x="bottomright", 
+	           c(smallset, diffset), 
+	           fill=c("white","gray80"), 
+	           bty="n"
+	    )
+	} else {
+	    legend(x="bottomright", 
+	           smallset, 
+	           fill="white", 
+	           bty="n"
+	    )
+	}
+	
+		mtext(paste("Tags are non-exclusive, so sum will be greater than",
+					"the", nrow(get(bigset)), "included dissertations.", 
 			  side=1)
 		)
-		
-		legend(x="bottomright", 
-			   c(smallset, diffset), 
-			   fill=c("white","gray80"), 
-			   bty="n"
-		)
+	
 		
 	if (remake_figs) { dev.off() }
 }
@@ -96,4 +113,20 @@ if(autorun) {
 	methodfreq_combined(bigset="consorts.plus", 
 						smallset="consorts", 
 						diffset="top.nonconsorts") 
+	if(exists("new_noexcludes")) {
+	    depts_determined <- new_noexcludes[-which(new_excludes$Department==""),]
+	    rhetmap_programs <- realrhetmaps[which(realrhetmaps$Pub.number %in% depts_determined$Pub.number),]
+	    nrow(rhetmap_programs)
+	    nrow(realrhetmaps)
+	    methodfreq_combined(bigset="depts_determined", smallset="rhetmap_programs", label_diffs=F)
+	    methodfreq_combined("new_noexcludes", "new_noexcludes", label_diffs = F)
+	}
+
+	methodfreq_combined("noexcludes2001_2005", "noexcludes2001_2005", label_diffs = F)
+	methodfreq_combined("noexcludes2006_2010", "noexcludes2006_2010", label_diffs = F)
+	methodfreq_combined("noexcludes2011_2015", "noexcludes2011_2015", label_diffs = F)
+	
+} else {
+    message("The following function has been loaded:")
+    message("    methodfreq_combined(bigset, smallset, label_diffs, diffset)    ")
 }
