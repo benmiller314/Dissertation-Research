@@ -14,12 +14,12 @@ source(file="compare method ranks.R")
 # Step 1. Sum the tag columns
 if(!exists("get_tags", mode="function")) { source(file="get tags.R") }
 
-if(autorun) {
+if(FALSE) {
 	a <- get_tags("noexcludes")
 	b <- get_tags("consorts")
 	d <- get_tags("nonconsorts")
 	e <- thresh("nonconsorts")$thresh.data
-	e <- get_tags("e")
+	e <- get_tags(dataset_name = "e")
 	e[order(e)]
 }
 
