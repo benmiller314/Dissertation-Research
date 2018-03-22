@@ -28,14 +28,15 @@ if(FALSE) {
 methodfreq_combined <- function(bigset="noexcludes", 
 								smallset="consorts", 
 								label_diffs=T,
-								diffset="nonconsorts") 
+								diffset="nonconsorts",
+								tagset="tagnames") 
 {
 
 	main <- "Frequency of Assigned Method Tags"
-	a <- get_tags(bigset)
-	b <- get_tags(smallset)
+	a <- get_tags(bigset, tagset)
+	b <- get_tags(smallset, tagset)
 	if(label_diffs) {
-	    d <- get_tags(diffset)
+	    d <- get_tags(diffset, tagset)
 	}
 	
 	if (remake_figs) { 
@@ -128,5 +129,5 @@ if(autorun) {
 	
 } else {
     message("The following function has been loaded:")
-    message("    methodfreq_combined(bigset, smallset, label_diffs, diffset)    ")
+    message("    methodfreq_combined(bigset, smallset, label_diffs, diffset, tagset)    ")
 }
