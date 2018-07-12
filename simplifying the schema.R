@@ -25,9 +25,9 @@ short_schema <- function (data) {
     while(any(names(data) %in% tagnames.simple)) {
         c <- readline(paste("Looks like data has already been parsed.",
                         "Overwrite (O) or Abort (A)? \n short_schema > "))
-        if(c == "A") {
+        if(tolower(c) == "a") {
             stop("Short_schema not applied; data already parsed.")
-        } else if (c == "O") {
+        } else if (tolower(c) == "o") {
             break
         } else {
             print(noquote("I do not understand your response. Try again?"))
