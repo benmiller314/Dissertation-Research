@@ -17,7 +17,7 @@ tagnames.simple.long <- c(
                            "Aggregable", 
                            "Phenomenological", 
                            "Dialectical", 
-                           "Performance")
+                           "Craft-Based")
 
 # wrapper function to add these tags to existing tag array  
 short_schema <- function (data) {   
@@ -55,7 +55,8 @@ short_schema <- function (data) {
         a2 <- as.integer(data[i,"Expt"])
         a3 <- as.integer(data[i,"Surv"])
         a4 <- as.integer(data[i,"Meta"])
-        a <- max(a1, a2, a3, a4)
+        a5 <- as.integer(data[i,"Intv"])
+        a <- max(a1, a2, a3, a4, a5)
         ag <- simple[i,"Aggreg"] <- a
         
         # Phenomenological
@@ -70,16 +71,17 @@ short_schema <- function (data) {
         a3 <- as.integer(data[i,"Modl"])
         a4 <- as.integer(data[i,"Phil"])
         a5 <- as.integer(data[i,"Rhet"])
-        a <- max(a1, a2, a3, a4, a5)
+        a6 <- as.integer(data[i,"Ped"])
+        a <- max(a1, a2, a3, a4, a5, a6)
         di <- simple[i,"Dialec"] <- a
         
-        # Performance-Based
+        # Craft/Performance-Based
         a1 <- as.integer(data[i,"Poet"])
         a2 <- as.integer(data[i,"Prac"])
         a3 <- as.integer(grep("tool-building", data[i,"Method.Terms"], 
                             ignore.case=TRUE))
         a <- max(a1, 
-               # a2, 
+                 a2,
                  a3)
         cr <- simple[i,"Techne"] <- a
         
