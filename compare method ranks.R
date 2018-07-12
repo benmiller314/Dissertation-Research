@@ -201,4 +201,7 @@ if(autorun) {
 						betterlabels=c("Consortium", "All Non-Consortium"))
 	compare_method_ranks("consorts", "top.nonconsorts", 
 						betterlabels=c("Consortium", "Top Non-Consortium"))
+} else {
+    message("The following function has been loaded:")
+    message("    compare_method_ranks(set1, set2, pcts, colorful, betterlabels, tagset_name)")
 }

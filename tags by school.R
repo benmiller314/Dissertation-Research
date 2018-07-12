@@ -236,6 +236,10 @@ if (autorun) {
     #        difixedcols=c$di$colInd)
     # schoolwise("nonconsorts", "tagnames.simple", agfixedcols=c$ag$colInd,
     #        difixedcols=c$di$colInd)
+} else {
+    message("Loaded the following functions:")
+    message("    schoolwise.data()    # helper function to load data")
+    message("    schoolwise()         # function to graph data")
 }
 
 

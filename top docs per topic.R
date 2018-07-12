@@ -504,3 +504,9 @@ if (autorun) {
         top_topic_browser(subset_name="realconsorts")
     }
 }
+
+if(FALSE) {
+    top_topic_browser(topic=35, 
+                      dataset_name="noexcludes2001_2015", ntopics=60, iter_index=4,
+                      depth=10)
+}
