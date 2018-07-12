@@ -17,15 +17,7 @@ if (!exists("which_computer")) {
     which_computer <- "laptop"
 }
 
-# define some broad parameters, since this file will always be run first
-# make a shortcut for retrieving the last entered value
-ans <- function() {
-	.Last.value
-	}
-	
-debugs <- function() {
-    names(which(sapply(unlist(lapply(search(), function(x) lsf.str(pos=x))), isdebugged)))
-}
+### define some broad parameters, since this file will always be run first
 
 # set the working directories, taking into account the GitHub setup
 sourceloc <- path.expand(file.path("~","Box Sync", "research", "dissertations", "data, code, and figures", "Dissertation-Research"))
@@ -34,23 +26,25 @@ if(getwd() != sourceloc) {
 	setwd(sourceloc)
 }
 
-imageloc <- path.expand(file.path(sourceloc, "../Dissertation Research - Figures"))
-dataloc <- path.expand(file.path(sourceloc, ".."))
-newdataloc <- path.expand(file.path("~", "Box Sync", "research", "dissertations"))
-malletloc <- path.expand(file.path("~", "Applications", "mallet"))
-webloc <- path.expand(file.path("~", "Documents", "Webdev", "datavis_testing"))
+imageloc <- normalizePath(file.path(sourceloc, "../Dissertation Research - Figures"))
+dataloc <- normalizePath(file.path(sourceloc, ".."))
+newdataloc <- normalizePath(file.path("~", "Box Sync", "research", "dissertations"))
+malletloc <- normalizePath(file.path("~", "Applications", "mallet"))
+webloc <- normalizePath(file.path("~", "Documents", "Webdev", "datavis_testing"))
 fulltextloc <- file.path("/Volumes/Seagate_Backup_Plus_Drive/full-text_dissertations")
 if (which_computer == "work") {
-    tmloc <- path.expand(file.path(fulltextloc, "..", "topic_modeling"))
+    tmloc <- normalizePath(file.path(fulltextloc, "..", "topic_modeling"))
 } else if (which_computer == "laptop") {
     # tmloc <- path.expand(file.path("~", "Documents", "tm"))
-    tmloc <- path.expand(file.path(newdataloc, "tm"))
+    tmloc <- normalizePath(file.path(newdataloc, "tm"))
 }
 
 # name the method tags most of these analyses are interested in
 tagnames <- c("Clin","Crit",
 			  # "Cult",
 			  "Disc","Ethn","Expt","Hist","Intv","Meta","Modl","Phil","Poet","Prac","Rhet","Surv","Othr", "Ped")
+
+no_ped_tagnames <- tagnames[-length(tagnames)]
 
 tagnames.long <- c( "Clinical / Case Study", 
 					"Critical / Hermeneutical",
