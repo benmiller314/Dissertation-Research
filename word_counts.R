@@ -36,20 +36,21 @@ wc_column <- function(dataset, column, do.plot=T, print.summary=T) {
 
 # Does it change over time?
 wc_timeplot <- function(dataset, column, rawavg=F, smoothavg=T) {
-    my_title <- paste("Average word count of", column, "in", deparse(substitute(dataset)))
+    my_title <- paste("Length of", tolower(column), "in", deparse(substitute(dataset)))
     
     if (remake_figs) {
         filename <- file.path(imageloc, paste0(my_title, ".pdf"))
-        pdf(filename)
+        pdf(file=filename)
     }
     
-    plot.new()
-    plot(dataset[["Year"]], wc_column(dataset, column))
+    # plot.new()
+    plot(dataset[["Year"]], wc_column(dataset, column, do.plot=F, print.summary=F),
+         xlab="Year", ylab="Word count", bty="l")
     years <- sort(unique(dataset[["Year"]]))
     yearlyavgs <- c()
     
     for (my_year in years) {
-        yearlyavg <- mean(wc_column(dataset[which(knownprograms$Year == my_year),], column, do.plot=F, print.summary=F))
+        yearlyavg <- mean(wc_column(dataset[which(dataset[["Year"]] == my_year),], column, do.plot=F, print.summary=F))
         yearlyavgs <- c(yearlyavgs, yearlyavg)
     }
     
@@ -68,7 +69,7 @@ wc_timeplot <- function(dataset, column, rawavg=F, smoothavg=T) {
     }
     
     if (rawavg | smoothavg) {
-        legend("topleft", fill=legend_fill, legend=legend_text)
+        outside_legend("bottomleft", col=legend_fill, lty=1, legend=legend_text, cex=0.8, bty="n")
     }
     
     title(my_title)
@@ -81,8 +82,11 @@ wc_timeplot <- function(dataset, column, rawavg=F, smoothavg=T) {
 }
 
 if(autorun) {
+    remake_figs
     wc_column(knownprograms, "ABSTRACT")
     wc_timeplot(knownprograms, "ABSTRACT")
+    wc_timeplot(justexcludes, "ABSTRACT")
     wc_column(knownprograms, "Title")
     wc_timeplot(knownprograms, "Title")
+    wc_timeplot(justexcludes, "Title")
 }

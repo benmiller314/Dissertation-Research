@@ -83,6 +83,8 @@ source(file="tags by school.R")
 ## 
 #   `methodcount barplot.R`: produces a bar plot of method-tag
 #         counts per dissertation, for a given method tagset. 
+#         Provides one function: 
+#       * methods.barplot(dataset_name, tagset_name)
 source(file="methodcount barplot.R")
 
 ##
@@ -142,7 +144,7 @@ source(file="r2mallet with foreach.R")
 source(file="topic modeling 3.R")
 
 
-# Tools for topic exploration
+## Tools for topic exploration ##
 
 ## 
 #   `top docs per topic.R`: browse topics to generate labels. Provides four
@@ -235,3 +237,16 @@ source(file="variation of topic proportions.R")
 #         get doctopic grid.R, get topic labels.R
 source(file="single topic strength vs rank.R")
 
+        
+#####       Other Functions       #####
+
+##
+# `word_counts.R`: how long is the average abstract? has it changed over time?
+# Provides three functions:
+#       * wc(f): counts words in f by split()ing at spaces.
+#       * wc_column(dataset, column, do.plot, print.summary): makes a boxplot 
+#         of word counts in one column of dataset. Not recommended for non-text columns.
+#       * wc_timeplot(dataset, column, rawavg, smoothavg): assuming that dataset has 
+#         a column "Year", produces a scatterplot of wc_column data divided out by year.
+#         optionally overlays a trendline, using raw means or smoothed medians (the default).
+source(file="word_counts.R")
