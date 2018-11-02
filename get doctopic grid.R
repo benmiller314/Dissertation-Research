@@ -155,11 +155,16 @@ get.doctopic.grid <- function(dataset_name="consorts",
         
     }   # end of if(doplot)
     
+    doc_topics.dt <- as.data.table(doc_topics)
+    setkey(doc_topics.dt, Pub.number)
+    
+    
     # Return with the goods
     list("colsums" = colsums,
          "colsums.sort" = colsums.sort,
          "colsums.sort.pct" = colsums.sort.pct,
-         "outputfile" = doc_topics
+         "outputfile" = doc_topics,
+         "outputfile.dt" = doc_topics.dt
          )
 
 }   # end of get.doctopic.grid()
