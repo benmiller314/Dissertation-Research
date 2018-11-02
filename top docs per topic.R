@@ -4,10 +4,7 @@
 # Tools for topic exploration
 #
 
-# Provides four functions:
-#         * get.doc.composition(dataset, ntopics): retrieves a pre-existing 
-#           matrix, output by MALLET, with topic proportions for each 
-#           document in corpus
+# Provides three functions:
 #         * get.topics4doc(pubnum, dataset_name, ntopics, howmany, 
 #           showlabels): retrieves top `howmany` topics for a document 
 #           specified by `pubnum`. 
@@ -19,6 +16,9 @@
 #         * shareable_topic(topic, ...): Given a topic of interest, 
 #           get clean data to share with others about the top "depth" docs
 #           time. See below for parameters.
+#   Legacy support:
+#         * This used to define a function get.doc.composition, but it ended up being a 
+#           fairly simple wrapper on get.doctopic.grid, so I've now factored it out.
 ##### 
 
     
@@ -39,60 +39,6 @@ if(!exists("get.topickeys", mode="function")) {
     # really popular topic isn't actually the main component of the docs that
     # come up. 
     
-    # We start with the doc-topic matrix from MALLET:
-get.doc.composition <- function(dataset_name="consorts", ntopics=55, iter_index="") 
-{
-    # get packages in case we've just restarted R
-    require(data.table)
-    
-    filename <- file.path(tmloc, paste0(dataset_name, "k", ntopics,
-                      "_composition", iter_index, ".txt"))
-    doc_topics <- read.delim(filename, header=F, skip=1)
-    head(doc_topics)
-    
-    # column 1 is an unneeded index; column 2 contains names of identical
-    # length, ending with a 7-digit Pub.number followed by ".txt"; final
-    # column is empty. Let's simplify.
-    doc_topics[, "V1"] <- NULL 
-    len <- nchar(as.character(doc_topics[1, "V2"]))
-    doc_topics[, "V2"] <- substr(as.character(doc_topics[, "V2"]), 
-                                 (len-10), (len-4))
-    if (is.na(all(doc_topics[, ncol(doc_topics)]))) { 
-        doc_topics[, ncol(doc_topics)] <- NULL
-    }
-
-    # Get findable column names
-    colnames(doc_topics)[1] <- "Pub.number"
-    colnames(doc_topics)[seq(2, ncol(doc_topics), 2)] <- paste0("top", 
-            seq(1, (ncol(doc_topics)-1)/2, 1))
-    colnames(doc_topics)[seq(3, ncol(doc_topics), 2)] <- paste0("wgt", 
-            seq(1, (ncol(doc_topics)-1)/2, 1))
-    head(colnames(doc_topics))
-    
-    # convert to 1-indexed from MALLET's 0-indexed, so everything matches
-    doc_topics[, seq(2, ncol(doc_topics), 2)] <- 
-                        (doc_topics[, seq(2, ncol(doc_topics), 2)]+1)
-    
-    # for some reason, it thinks the topic weights are characters. They're
-    # numbers.
-    doc_topics[, seq(3, ncol(doc_topics), 2)] <- 
-            apply(doc_topics[, seq(3, ncol(doc_topics), 2)], 2,
-                  FUN=function(x) { x <- as.numeric(x) })
-
-    doc_topics.dt <- as.data.table(doc_topics)
-    setkey(doc_topics.dt, Pub.number)
-    head(doc_topics.dt)
-    
-    return(doc_topics.dt)
-}
-
-# Run `get.doc.composition()` when file is sourced, so we don't have to
-# recreate this multiple times for the same dataset if we're running
-# `top_topic_browser()` using the `for.bind` option.
-# TO DO: Make this happen within get.doc.composition() -- i.e. give the
-# function the side effect of creating this object -- so it's responsive to
-# dataset_name and ntopics.
-doc_topics_consorts_55.dt <- get.doc.composition("consorts", 55, iter_index="")
 
     
 ### Helper function: retrieve top five topics for a given Pub.number
@@ -112,7 +58,7 @@ get.topics4doc <- function(pubnum,
         pubnum <- as.character(pubnum) 
     }
     
-    doc_tops <- get.doc.composition(dataset_name, ntopics, iter_index=iter_index)
+    doc_tops <- get.doctopic.grid(dataset_name, ntopics, iter_index=iter_index)$outputfile.dt
     topic_keys <- data.table(get.topickeys(dataset_name, ntopics, iter_index=iter_index))
     topic_keys <- topic_keys[as.numeric(doc_tops[pubnum, paste0("top",
                                                  1:howmany), with=F])]
@@ -174,15 +120,7 @@ top_topic_browser <- function(
     # get packages in case we've just restarted R
     require(data.table)
     
-    # # load the data from the functions defined or imported above
-    # doc_composition <- paste0("doc_topics_", dataset_name, "_", 
-    #                          ntopics, iter_index, ".dt");
-    # if(!exists(doc_composition)) { 
-    #     doc_topics.dt <- get.doc.composition(dataset_name, ntopics, iter_index=iter_index) 
-    # } else { 
-    #     doc_topics.dt <- get(doc_composition) 
-    # }
-    # 
+    
     
     # load the topic model data
     if(! exists("get.doctopic.grid", mode = "function")) {
@@ -234,7 +172,7 @@ top_topic_browser <- function(
                                 c("Pub.number", "Title", tagnames), with=F]         
 
             # add a column with the weights this topic has in these docs
-            # doc_tops <- get.doc.composition(dataset_name, ntopics, iter_index=iter_index)
+            
             weights <- ranks <- c()
             for(j in 1:length(diss.ind)) {
                 myrow <- doc_topics.dt[diss.ind[j]]          # returns a list of named topic weights
@@ -321,7 +259,7 @@ top_topic_browser <- function(
                         c("Pub.number", "Title", tagnames), with=F]
 
             # add a column with the weights this topic has in these docs
-            # doc_tops <- get.doc.composition(dataset_name, ntopics, iter_index=iter_index)
+            
             weights <- ranks <- c()
             for(j in 1:length(diss.ind)) {
                 myrow <- doc_topics.dt[diss.ind[j]]          # returns a list of named topic weights
@@ -390,7 +328,6 @@ top_topic_browser <- function(
     # ){
 
     # # load the data from the functions defined or imported above
-    # doc_topics.dt <- get.doc.composition(dataset_name, ntopics)
     # topic_keys.dt <- get.topickeys(dataset_name, ntopics)
     # grids <- get.doctopic.grid(dataset_name, ntopics)
         # colsums <- grids$colsums
