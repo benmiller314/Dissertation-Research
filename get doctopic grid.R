@@ -56,49 +56,41 @@ get.doctopic.grid <- function(dataset_name="consorts",
     # }
     
     # Read in the doc/topic grid. 
+    # for colClasses:   Column 1 is an unneeded row index, so convert to NULL.
+    #                   Column 2 is filenames; we'll clean below.
+    #                   The remaining columns are the topics.
     filename <- file.path(tmloc, paste0(dataset_name, "k", ntopics, "_composition_", iter_index, ".txt"))
-    doc_topics <- read.delim(filename, 
-                             header=FALSE, 
-                             colClasses=c("NULL",                   # first col is rownumber; skip
-                                          "character",              # second col is filename
-                                          rep("numeric", ntopics)   # all other cols are topic weights
-                                          )
-                             )
+    if(file.exists(filename)) {
+        doc_topics <- read.delim(filename, header=F, colClasses=c("NULL", "character", rep("numeric", ntopics)))        
+    } else {
+        stop("doc/topic grid does not exist: ", filename)
+    }
     
     
-    # column 1 is an unneeded index; column 2 contains filenames starting with "clean_", 
-    # ending with a 7-digit Pub.number followed by ".txt". Let's simplify.
+    # The first row may contain a .DS_Store row, which we can toss out. 
+    if (grepl("DS_Store", doc_topics[, "V2"][1])) {
+        doc_topics <- doc_topics[-1,]
+    }
     
+    
+    # Column V2 contains filenames ending with "cleaned_" plus a (usually 7-digit) Pub.number, 
+    # followed by ".txt". Let's simplify. 
     get_pub <- function(cell) {
-        cell <- as.character(cell)
         last_underscore <- tail(gregexpr("_", cell)[[1]], 1)    
         val <- substr(cell, last_underscore + 1, nchar(cell)-4)
         return(val)
     }
     doc_topics[, "V2"] <- sapply(doc_topics[, "V2"], get_pub)
+    head(doc_topics[, "V2"])
     
     
-    # first remaining column is now the text id; call it Pub.number to match main data structure.
+    # first remaining column is the text id; use Pub.number to match main data structure.
     # remaining columns are topics in order. To avoid searching for column "0" later,
     # switch from 0-indexed to 1-indexed, so the topic numbers in topic_keys.dt are the same as row numbers
 
-    colnames(doc_topics) <- c("Pub.number", (1:(ncol(doc_topics)-1)))
+    colnames(doc_topics) <- c("Pub.number", (1:ntopics))
     head(doc_topics,3)
      
-                                 
-    # If we accidentally included .DS_Store in the mallet input, remove it now
-    if(any(doc_topics["Pub.number"] == "S")) {
-        # nrow(outputfile)
-        replacement <- doc_topics[-which(doc_topics["Pub.number"] == "S"),]
-        # head(replacement, 3)
-        # nrow(replacement)
-        doc_topics <- replacement
-        str(doc_topics)
-        rm(replacement)
-    }
-    
-    head(doc_topics,3)
-    
     
     # If we specified a subset, filter the data tables before moving on
     if (! is.null(subset_name)) {
@@ -173,5 +165,5 @@ get.doctopic.grid <- function(dataset_name="consorts",
 }   # end of get.doctopic.grid()
 
 if(FALSE) {         # this will never run on its own
-    get.doctopic.grid("noexcludes2001_2015", 60, NULL, 4, doplot=T)
+    mygrid <- get.doctopic.grid("noexcludes2001_2015", 60, NULL, 4, doplot=F)
 }
