@@ -24,7 +24,7 @@ newarray <- read.csv(file=file.choose())
 
 
 
-# parse the method tags... including for the collapsed schema
+# parse the method tags... including for the collapsed schema. parse_tags() is from `method tag array.R`.
 oldarray <- parse_tags(oldarray, tagstyle="short", excludecol="Flags")
 oldarray <- short_schema(oldarray)
 # names(oldarray)
@@ -34,10 +34,10 @@ newarray <- parse_tags(newarray, tagstyle="short", excludecol="Flags")
 newarray <- short_schema(newarray)
 
 
+
 # Let's merge them, why not
 bigarray <- merge(oldarray, newarray, all=T)
 names(bigarray)
-
 
 
 # filter out false positives
@@ -60,21 +60,11 @@ for (i in refactor.index) {
 	noexcludes[,i] <- factor(noexcludes[,i])
 }
 
-# redefine methods that are all "check" or "check?" as "Other," and recalculate "Method.Count"
-source(file=file.path(sourceloc, "check count.R"))
+# TO DO: Make this into a function without weird side effects; 
+# 'check count.R' seems to be misaligning Method.Terms, so the tagarray doesn't line up afterwards
+# # redefine methods that are all "check" or "check?" as "Other," and recalculate "Method.Count"
+# source(file=file.path(sourceloc, "check count.R"))
 
-# verify departmental information, so we know what's really produced by a consortium or rhetmap school
-source(file="update realconsorts.R")
-noexcludes <- realconsorts_by_list("noexcludes")
-
-# get tag index columns on their own, for simplicity down the road
-# TO DO: See whether we still need this
-# tagarray <- noexcludes[,tagnames]
-# row.names(tagarray) <- noexcludes[,"Author"]
-# data.matrix(tagarray) -> tagarray.m
-
-# tag.totals <- tagtotals(tagarray, skip=0)
-# barplot(tag.totals)
 
 ## Store reference variables for schools
 consortium <- read.csv(file=file.path(dataloc, "doctoral-consortium-schools-programs, reconciled to carnegie.csv"))
@@ -90,6 +80,20 @@ rhetmaponly <- rhetmapschools[-which(rhetmapschools %in% conschools)]
 # schools in consortium but not rhetmap  (1)
 consortsonly <- conschools[-which(conschools %in% rhetmapschools)]     
 
+# verify departmental information, so we can know what's really produced by a consortium or rhetmap school
+source(file="update realconsorts.R")
+noexcludes <- realconsorts_by_list("noexcludes") # use default = department-gathering-6.csv
+noexcludes <- realconsorts_by_list("noexcludes", manual_file = file.path(dataloc, "unconfirmed_consorts_2018-07-05.csv"))
+
+# get tag index columns on their own, for simplicity down the road
+# TO DO: See whether we still need this
+# tagarray <- noexcludes[,tagnames]
+# row.names(tagarray) <- noexcludes[,"Author"]
+# data.matrix(tagarray) -> tagarray.m
+
+# tag.totals <- tagtotals(tagarray, skip=0)
+# barplot(tag.totals)
+
 
 #### update subsets
 # naive filter, by school only (without department)
@@ -97,27 +101,34 @@ consorts.index <- which(noexcludes$School %in% conschools)
 consorts <- noexcludes[consorts.index,]
 consort.count <- nrow(consorts)
 
-rhetmap.index <- which(noexcludes$School %in% rhetmapschools)
-rhetmaps <- noexcludes[rhetmap.index,]
+rhetmaps.index <- which(noexcludes$School %in% rhetmapschools)
+rhetmaps <- noexcludes[rhetmaps.index,]
 rhetmap.count <- nrow(rhetmaps)
 
 # so much for schools. what about actual programs? 
 realconsorts.index <- which(noexcludes$realconsort == 1)
 realconsorts <- noexcludes[realconsorts.index,]
 realconsort.count <- nrow(realconsorts)
+fakeconsorts <- consorts[-which(consorts$Pub.number %in% realconsorts$Pub.number),]
 
 realrhetmaps.index <- which(noexcludes$realrhetmap == 1)
 realrhetmaps <- noexcludes[realrhetmaps.index,]
 realrhetmap.count <- nrow(realrhetmaps)
 
+knownprograms.index <- union(realconsorts.index, realrhetmaps.index)
+knownprograms <- noexcludes[knownprograms.index,]
+unknownprograms.count <- length(union(consorts.index, rhetmaps.index)) - length(knownprograms.index)
 
 # report back what we've found
 
 message("Of ", consort.count, " dissertations at Consortium schools, ",
-        realconsort.count, " are confirmed from Consortium programs.")
+        realconsort.count, " are confirmed from Consortium programs, ",
+        "and ", length(which(noexcludes$realconsort == 0)), " confirmed to be otherwise.")
 message("Of ", rhetmap.count, " dissertations at Rhetmap schools, ",
-        realrhetmap.count, " are confirmed from Rhetmap programs.")
-
+        realrhetmap.count, " are confirmed from Rhetmap programs, ",
+        "and ", length(which(noexcludes$realrhetmap == 0)), " confirmed to be otherwise.")
+message("This brings the total count confirmed from known programs to ", nrow(knownprograms), ", ",
+        "with ", unknownprograms.count, " programs at these schools remaining to be tracked down.")
 
 
 # index of disses that need to be checked for realconsort status
@@ -156,6 +167,8 @@ nonconsorts2001_2015 <- noexcludes[which(noexcludes$Year %in% seq(2001, 2015, 1)
                                    which(!noexcludes$realconsort != 1),]
 rhetmaps2001_2015 <- rhetmaps[which(rhetmaps$Year %in% seq(2001, 2015, 1)),]
 realrhetmaps2001_2015 <- realrhetmaps[which(realrhetmaps$Year %in% seq(2001, 2015, 1)),]
+knownprograms2001_2015 <- knownprograms[which(knownprograms$Year %in% seq(2001, 2015, 1)),]
+
 
 # or just the new stuff
 noexcludes2011_2015 <- noexcludes[which(noexcludes$Year %in% seq(2011, 2015, 1)),]
@@ -165,12 +178,33 @@ nonconsorts2011_2015 <- noexcludes[which(noexcludes$Year %in% seq(2011, 2015, 1)
                                        which(!noexcludes$realconsort != 1),]
 rhetmaps2011_2015 <- rhetmaps[which(rhetmaps$Year %in% seq(2011, 2015, 1)),]
 realrhetmaps2011_2015 <- realrhetmaps[which(realrhetmaps$Year %in% seq(2011, 2015, 1)),]
+knownprograms2011_2015 <- knownprograms[which(knownprograms$Year %in% seq(2011, 2015, 1)),]
+
+# better: make a subset for figuring out what you did for cccc grant in 2017ff
+new_noexcludes <- noexcludes[-which(is.na(noexcludes$Link)), ]
+
+# five-year bins
+noexcludes2001_2005 <- noexcludes[which(noexcludes$Year %in% seq(2001, 2005, 1)),]
+noexcludes2006_2010 <- noexcludes[which(noexcludes$Year %in% seq(2006, 2010, 1)),]
+realconsorts2001_2005 <- realconsorts[which(realconsorts$Year %in% seq(2001, 2005, 1)),]
+realconsorts2006_2010 <- realconsorts[which(realconsorts$Year %in% seq(2006, 2010, 1)),]
+realrhetmaps2001_2005 <- realrhetmaps[which(realrhetmaps$Year %in% seq(2001, 2005, 1)),]
+realrhetmaps2006_2010 <- realrhetmaps[which(realrhetmaps$Year %in% seq(2006, 2010, 1)),]
+rhetmaps2001_2005 <- rhetmaps[which(rhetmaps$Year %in% seq(2001, 2005, 1)),]
+rhetmaps2006_2010 <- rhetmaps[which(rhetmaps$Year %in% seq(2006, 2010, 1)),]
+
 
 # re-factor all factor columns in all data subsets
+## TO DO: use loops and assign() to *build* these subsets with less redundancy
+
 subset_list <- c("consorts", "nonconsorts", "realconsorts", "top.nonconsorts", "consorts.plus", "maybeconsorts",
                  "noexcludes2001_2015", "consorts2001_2015", "realconsorts2001_2015", "nonconsorts2001_2015",
+                 "noexcludes2001_2005", "realconsorts2001_2005", "realrhetmaps2001_2005",
+                 "noexcludes2006_2010", "realconsorts2006_2010", "realrhetmaps2006_2010",
                  "noexcludes2011_2015", "consorts2011_2015", "realconsorts2011_2015", "nonconsorts2011_2015",
-                 "rhetmaps", "realrhetmaps", "rhetmaps2001_2015", "rhetmaps2011_2015")
+                 "new_noexcludes", "rhetmaps", "rhetmaps2001_2015", "rhetmaps2011_2015",
+                 "realrhetmaps", "realrhetmaps2001_2015", "realrhetmaps2011_2015",
+                 "knownprograms", "knownprograms2001_2015", "knownprograms2011_2015")
 
 for (subset in subset_list) {
     assign(subset, refactor.all(subset))
@@ -182,19 +216,38 @@ noexcludes.dt <- as.data.table(noexcludes)
 setkey(noexcludes.dt, Pub.number)
 
 ## Export file lists for subsets of data
-if(remake_figs || update_realconsorts) {
-    write(levels(factor(noexcludes$Pub.number)), file=file.path(sourceloc, "Shell scripts and commands/file list noexcludes.txt"), sep="\n")
-    write(levels(factor(noexcludes2001_2015$Pub.number)), file=file.path(sourceloc, "Shell scripts and commands/file list noexcludes_2001_2015.txt"), sep="\n")
-    write(levels(factor(consorts2001_2015$Pub.number)), file=file.path(sourceloc, "Shell scripts and commands/file list consorts_2001_2015.txt"), sep="\n")
-    write(levels(factor(realconsorts2001_2015$Pub.number)), file=file.path(sourceloc, "Shell scripts and commands/file list realconsorts_2001_2015.txt"), sep="\n")
-    write(levels(factor(noexcludes2011_2015$Pub.number)), file=file.path(sourceloc, "Shell scripts and commands/file list noexcludes_2011_2015.txt"), sep="\n")
-    write(levels(factor(consorts2011_2015$Pub.number)), file=file.path(sourceloc, "Shell scripts and commands/file list consorts_2011_2015.txt"), sep="\n")
-    write(levels(factor(realconsorts2011_2015$Pub.number)), file=file.path(sourceloc, "Shell scripts and commands/file list realconsorts_2011_2015.txt"), sep="\n")
-    write(levels(factor(consorts$Pub.number)), file=file.path(sourceloc, "Shell scripts and commands/file list consorts.txt"), sep="\n")
-    write(levels(factor(nonconsorts$Pub.number)), file=file.path(sourceloc, "Shell scripts and commands/file list nonconsorts.txt"), sep="\n")
-    write(levels(factor(realconsorts$Pub.number)), file=file.path(sourceloc, "Shell scripts and commands/file list realconsorts.txt"), sep="\n")
-    write(levels(factor(maybeconsorts$Pub.number)), file=file.path(sourceloc, "Shell scripts and commands/file list maybeconsorts.txt"), sep="\n")
+
+# TO DO: use filename convention from dfrtopics, namely paste(dataset_name, "_doc_ids.txt")
+
+export_file_list <- function(dataset_names) {
+    for (dataset_name in dataset_names) {
+        dataset <- get(dataset_name)
+        pubs <- dataset$Pub.number
+        write(levels(factor(pubs)), file=file.path(sourceloc, "subsets", paste0(dataset_name, "_doc_ids.txt")))
+    }
 }
+
+if(remake_figs || update_realconsorts) {
+    export_file_list(c("noexcludes",
+                   "noexcludes2001_2015",
+                   "knownprograms2001_2015"))
+}
+
+#### The next 10 lines or so now replaced by export_file_list, above ####
+#     write(levels(factor(noexcludes$Pub.number)), file=file.path(sourceloc, "Shell scripts and commands/file list noexcludes.txt"), sep="\n")
+#     write(levels(factor(noexcludes2001_2015$Pub.number)), file=file.path(sourceloc, "Shell scripts and commands/file list noexcludes_2001_2015.txt"), sep="\n")
+#     write(levels(factor(consorts2001_2015$Pub.number)), file=file.path(sourceloc, "Shell scripts and commands/file list consorts_2001_2015.txt"), sep="\n")
+#     write(levels(factor(realconsorts2001_2015$Pub.number)), file=file.path(sourceloc, "Shell scripts and commands/file list realconsorts_2001_2015.txt"), sep="\n")
+#     write(levels(factor(noexcludes2011_2015$Pub.number)), file=file.path(sourceloc, "Shell scripts and commands/file list noexcludes_2011_2015.txt"), sep="\n")
+#     write(levels(factor(consorts2011_2015$Pub.number)), file=file.path(sourceloc, "Shell scripts and commands/file list consorts_2011_2015.txt"), sep="\n")
+#     write(levels(factor(realconsorts2011_2015$Pub.number)), file=file.path(sourceloc, "Shell scripts and commands/file list realconsorts_2011_2015.txt"), sep="\n")
+#     write(levels(factor(consorts$Pub.number)), file=file.path(sourceloc, "Shell scripts and commands/file list consorts.txt"), sep="\n")
+#     write(levels(factor(nonconsorts$Pub.number)), file=file.path(sourceloc, "Shell scripts and commands/file list nonconsorts.txt"), sep="\n")
+#     write(levels(factor(realconsorts$Pub.number)), file=file.path(sourceloc, "Shell scripts and commands/file list realconsorts.txt"), sep="\n")
+#     write(levels(factor(maybeconsorts$Pub.number)), file=file.path(sourceloc, "Shell scripts and commands/file list maybeconsorts.txt"), sep="\n")
+# }
+
+
 # TO DO (maybe): split out multiple advisors
 
 # if "function scratchpad.R" is being used, clean up unneeded variables
