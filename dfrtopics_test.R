@@ -97,12 +97,57 @@ dfrt_from_outside_model <- function(dataset_name = "noexcludes2001_2015",
         
         metadata(m) <- md
         
+        # export browser data so we don't have to take 40 minutes every time!
         
-        # save in dfr's preferred format for faster loading next time
-        mydir <- paste0("dfrtest_", dataset_name, "k", ntopics, "_", iter_index)
+        # from ?export_browser_data: 
+        # If you are working with non-JSTOR documents, the one file that will reflect
+        # this is the exported metadata. dfr-browser expects seven metadata columns: 
+        # id,title,author,journaltitle,volume,issue,pubdate,pagerange.
+        # Note that you can adjust the metadata held on the model object by assigning to
+        # metadata(m) before exporting the browser data. In particular, if you have many
+        # documents, you may wish to conserve space by eliminating metadata columns that
+        # are not used by the visualization: for example, metadata(m)$publisher <- NULL.
+        
+        # Locations
+        model_name <- paste0(dataset_name, "k", ntopics, "_", i)
+        browser_dir <- file.path("~", "Box Sync", "research", "dissertations", "dfr-browser", model_name)
+        mdfile <- file.path(browser_dir, "meta.csv")
+        
+        # Check for supporting_files
+        if(file.exists(file.path(browser_dir, "..", "src", "VIS.js"))) {
+            sf <- F
+        } else {
+            sf <- T
+        }
+        
+        # Export
+        if(remake_figs) {
+            overwrite <- T
+        } else {
+            overwrite <- F
+        }
         
         system.time(
-            write_mallet_model(m, file.path(tmloc, mydir))
+            export_browser_data(m, out_dir=browser_dir, supporting_files=sf, overwrite=T)
+        )    
+        
+        write.csv(md, path.expand(mdfile), row.names=F, col.names=F)
+        zip(paste0(mdfile, ".zip"), c(path.expand(mdfile))) 
+        # to do: delete the non-zipped file, move all this functionality into a function
+        
+        # Finish up
+        message(paste("Browser data exported to", browser_dir, "at", Sys.time()))
+        
+        
+        
+        
+        # save in dfr's preferred format for faster loading next time
+        mydir <- paste0("dfrtest_", dataset_name, "k", ntopics, "_", i)
+        
+        system.time(
+            write_mallet_model(m, file.path(tmloc, mydir), 
+                               simplify_state = F)      # we already saved the simple state via load_from_mallet_state
+                                                        # (though we'll need to change the default location to get it later)
         )
         
         if(test_mode) {
