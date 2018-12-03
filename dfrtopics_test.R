@@ -47,7 +47,7 @@ dfrt_from_outside_model <- function(dataset_name = "noexcludes2001_2015",
 {
     # figure out which files/Pub.numbers are in this model
     dataset <- get(dataset_name)
-    filename <- file=file.path(sourceloc, "subsets", paste0(dataset_name, "_doc_ids.txt"))
+    filename <- file.path(sourceloc, "subsets", paste0(dataset_name, "_doc_ids.txt"))
     
     if(file.exists(filename)) {
         dataset_ids <- read.table(filename)$V1    
