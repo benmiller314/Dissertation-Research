@@ -194,7 +194,7 @@ m <- load_mallet_model(doc_topics_file = file.path(tmloc, "dfrtest", "doc_topics
                         params_file = file.path(tmloc, "dfrtest", "params.txt"),
                         topic_words_file = file.path(tmloc, "dfrtest", "topic_words.csv"),
                         vocab_file = file.path(tmloc, "dfrtest", "vocabulary.txt"),
-                        doc_ids_file = file.path(tmloc, paste0(dataset_name, "_doc_ids.txt"))
+                        doc_ids_file = file.path(sourceloc, "subsets", paste0(dataset_name, "_doc_ids.txt"))
                         # doc_ids_file = file.path(".", "Shell scripts and commands", "file list realconsorts.txt")
 )
 
