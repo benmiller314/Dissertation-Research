@@ -58,12 +58,19 @@ get.topics4doc <- function(pubnum,
         pubnum <- as.character(pubnum) 
     }
     
+    # start with the doc/topic grid
     doc_tops <- get.doctopic.grid(dataset_name, ntopics, iter_index=iter_index)$outputfile.dt
+    
+    # narrow to the doc named by the pubnum; skip the pubnum for sorting by descending weight
+    this_doc_tops <- doc_tops[pubnum,2:ntopics+1, with=F]
+    this_doc_tops <- this_doc_tops[, order(this_doc_tops, decreasing = T), with=F][,1:howmany, with=F]
+    
+    # merge weights with keys: from all keys, narrow to just the top howmany in this doc
     topic_keys <- data.table(get.topickeys(dataset_name, ntopics, iter_index=iter_index))
-    topic_keys <- topic_keys[as.numeric(doc_tops[pubnum, paste0("top",
-                                                 1:howmany), with=F])]
-    topic_keys[,weight:=as.numeric(doc_tops[pubnum, paste0("wgt", 1:howmany),
-                                                             with=F])]
+    topic_keys <- topic_keys[as.numeric(names(this_doc_tops))] 
+    topic_keys[,weight:=as.numeric(this_doc_tops)]
+    
+    # reorder columns for ease of presentation
     topic_keys <- topic_keys[, list(topic, weight, alpha, top_words)]
 
     if(showlabels) { 
@@ -428,18 +435,25 @@ shareable_topic <- function(  topic,
 
 ## Run the big browser function above
 if (autorun) {
-    dataset_name <- "consorts"
-    subset_name <- "realconsorts"
-    ntopics <- 55
-    if (remake_figs) { 
+    # dataset_name <- "consorts"
+    # subset_name <- "realconsorts"
+    # ntopics <- 55
+    if (remake_figs) {
         filename <- paste0(imageloc, "top topics - ", dataset_name, ", K", ntopics, subset_name, "topic 8.txt")
         readline(paste("About to capture browser output as", filename,"- <enter> to continue or <esc> to abort."))
-        
-        
     } else {
         top_topic_browser(subset_name=subset_name)
         top_topic_browser(subset_name="realconsorts")
     }
+} else {
+    message(paste("top docs per topic.R loaded the following functions: \n",
+                  " * get.doc.composition(dataset, ntopics): retrieves a pre-existing matrix, \n",
+                  "   output by MALLET, with topic proportions for each document in corpus \n",
+                  " * get.topics4doc(pubnum, dataset_name, ntopics, howmany, showlabels): \n",
+                  "   retrieves top `howmany` topics for a document specified by `pubnum`. \n",
+                  " * top_topic_browser(...): for a specified topic or range of topics,   \n",
+                  "   shows the top `howmany` documents and their method tags, with   \n",
+                  "   optional detail view showing top topics for each document at a time."))
 }
 
 if(FALSE) {
