@@ -95,21 +95,21 @@ get.topics4doc <- function(pubnum,
 
 ### Browse through the top topics and their top-proportioned dissertations
 top_topic_browser <- function(
-                              # assuming we're looping, start where?
-                              start.rank = 1,
-
-                              # alternately, browse one specified topic
-                              topic = NULL,
-                              
                               # where will our topic assignments come from?          
                               dataset_name = "consorts",
                               ntopics = 55, 
                               
+                              # if we've run the params above many times, which one now?
+                              iter_index = "",
+                              
                               # do we want to show the full dataset, or a subset?
                               subset_name = NULL,
                               
-                              # if we've run the params above many times, which one now?
-                              iter_index = "",
+                              # assuming we're looping, start where?
+                              start.rank = 1,
+                              
+                              # alternately, browse one specified topic
+                              topic = NULL,
                               
                               # if lots of topics, where to stop?
                               cutoff = get("ntopics"),  
@@ -134,6 +134,7 @@ top_topic_browser <- function(
         source(file=file.path(sourceloc, "get doctopic grid.R"))
     }
     
+    # TO DO: Check to be sure, but didn't I put this functionality straight into get.doctopic.grid?
     grids <- get.doctopic.grid(dataset_name=dataset_name, ntopics=ntopics, subset_name=subset_name, iter_index=iter_index)
         colsums <- grids$colsums
         colsums.sort <- grids$colsums.sort
@@ -262,7 +263,7 @@ top_topic_browser <- function(
         print(topic_keys.dt[as.integer(topic.num)])
         
         # list of top 1:depth documents for this topic
-        topdocs <- noexcludes.dt[as.character(diss.ind), 
+        topdocs <- noexcludes.dt[as.character(diss.ind),                ## UH OH: We shouldn't just use noexcludes.dt
                         c("Pub.number", "Title", tagnames), with=F]
 
             # add a column with the weights this topic has in these docs
@@ -378,28 +379,31 @@ top_topic_browser <- function(
 
 ########
 ## Given a topic of interest, get clean data to share with others about the top N docs
-shareable_topic <- function(  topic,
-                              
-                              # where will our topic assignments come from?          
+shareable_topic <- function(  # where will our topic assignments come from?          
                               dataset_name = "consorts",
                               ntopics = 55, 
                               
+                              # if we've run this model multiple times, which iteration?
+                              iter_index = "",
+                              
                               # do we want to show the full dataset, or a subset?
                               subset_name = "realconsorts",
+                              
+                              # must specify one topic
+                              topic,
                               
                               # how many docs to show for each topic?
                               depth = 10,            
                               
                               # show current topic labels for indiv. docs?  
-                              showlabels = TRUE,
+                              showlabels = TRUE
                               
-                              # if we've run this model multiple times, which iteration?
-                              iter_index = ""
+                              
 ) {
     a <- top_topic_browser(topic=topic, 
                            dataset_name=dataset_name, 
                            ntopics=ntopics, 
-                           subset_name=NULL, 
+                           subset_name=subset_name, 
                            depth=depth,
                            showlabels=showlabels,
                            iter_index=iter_index,
