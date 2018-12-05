@@ -44,7 +44,7 @@ frameToJSON <- function(dataset_name="consorts",
   if(!exists("get.doctopic.grid", mode="function")) { 
         source(file="get doctopic grid.R") 
   }
-  dt <- as.data.table(get.doctopic.grid(dataset_name, ntopics, subset_name, iter_index)$outputfile)
+  dt <- get.doctopic.grid(dataset_name, ntopics, subset_name, iter_index)$outputfile.dt
 
   # Ben: Exclude any NA rows included accidentally by the index file
   dt <- na.omit(dt)
@@ -53,14 +53,14 @@ frameToJSON <- function(dataset_name="consorts",
   if(!is.null(bad.topics)) { dt <- dt[, !names(dt) %in% bad.topics, with=F] }
 
   # Set parameter defaults if needed
-  if(is.null(groupVars)) {              
+  if(!exists("groupVars") || is.null(groupVars)) {              
         groupVars <- c("Pub.number")    # Group by ID column
   }
-  if(is.null(dataVars)) {   
+  if(!exists("dataVars") || is.null(dataVars)) {   
         dataVars <- colnames(dt)[!colnames(dt) %in% groupVars]  
         # any column that's not an ID is a datapoint
   }
-  if(is.null(outfile)) {                
+  if(!exists("outfile") || is.null(outfile)) {                
   # the desired location of the JSON file produced by the function
         outfile <- file.path(webloc, paste0(dataset_name, "k", ntopics, subset_name, 
                          "_clusters_", ntopics-length(bad.topics), iter_index, ".json"))
@@ -72,6 +72,7 @@ frameToJSON <- function(dataset_name="consorts",
 
 
   #Rolf: calculate the correlation matrix
+  # BEN TO DO: use Jenson-Shannon distance instead of Pearson cor()?
   t <- cor(dt[, dataVars, with=F])
 
   #Rolf: calculate the hierarchical cluster structure 
@@ -83,22 +84,31 @@ frameToJSON <- function(dataset_name="consorts",
   if(do.plot) {  
       #Rolf: take a look at your strucutre:
       # Ben: optionally save clustering figure
-      if(! is.null(subset_name)) {
-          main <- paste0("Cluster Dendrogram, ", dataset_name, "--", subset_name, ", ",
-                    ntopics - length(bad.topics), " topics")
-      } else {
-          main <- paste0("Cluster Dendrogram, ", dataset_name, ", ",
-                         ntopics - length(bad.topics), " topics") 
-      }
+     
+      # build a filename
+      if(! is.null(subset_name)) { subset_part <- paste0("--", subset_name) 
+      } else { subset_part <- "" }
       
-    
+      if(length(bad.topics > 0)) { bad_topics_part <- paste0("--", length(bad.topics), " bad topics hidden")
+      } else { bad_topics_part <- "" }
+  
+      if(iter_index > 0) { iter_part <- paste0("_iter", iter_index) 
+      } else { iter_part <- "" }
+      
+      main <- paste0("Cluster Dendrogram, ",                               # type of plot
+                     dataset_name, "k", ntopics, iter_part,                # which topic model
+                     subset_part, bad_topics_part)                         # parts of that model
+      
+      main
+      rm(subset_part, bad_topics_part, iter_part)
+      
       # Ben: Try various cut levels until you find a set that seems 
       # interesting; Then adjust the memb_ variables below, accordingly.
     
       # with 5 bad.topics removed   
       if(dataset_name=="consorts" && ntopics==55 && length(bad.topics) == 5) 
       {
-          if(remake_figs) { pdf(file=file.path(imageloc, paste0(main, iter_index, ".pdf"))) }
+          if(remake_figs) { pdf(file=file.path(imageloc, paste0(main, ".pdf"))) }
             plot(hc, main=main)
             abline(1.35, 0, col="#99FF99")          
             rect.hclust(hc, k=32, border="#99FF99") 
@@ -121,7 +131,7 @@ frameToJSON <- function(dataset_name="consorts",
       else if(dataset_name=="consorts" && subset_name=="realconsorts" && ntopics==55 &&            
               length(bad.topics)==7) 
       {
-          if(remake_figs) { pdf(file=file.path(imageloc, paste0(main, iter_index, ".pdf"))) }
+          if(remake_figs) { pdf(file=file.path(imageloc, paste0(main, ".pdf"))) }
               plot(hc, main=main)
               rect.hclust(hc, k=2, border="#99FF99")
               rect.hclust(hc, k=4, border="#999900")
@@ -140,7 +150,7 @@ frameToJSON <- function(dataset_name="consorts",
       else if(dataset_name=="consorts" && ntopics==55 &&            
               length(bad.topics)==7) 
       {
-          if(remake_figs) { pdf(file=file.path(imageloc, paste0(main, iter_index, ".pdf"))) }
+          if(remake_figs) { pdf(file=file.path(imageloc, paste0(main, ".pdf"))) }
               plot(hc, main=main)
               abline(1.45, 0, col="#99FF99")        
               rect.hclust(hc, k=21, border="#99FF99")   
@@ -156,18 +166,32 @@ frameToJSON <- function(dataset_name="consorts",
       # TO DO: Find splits for model with 150 topics
       
       else if(dataset_name=="noexcludes2001_2015" && is.null(subset_name) && ntopics==150) {
-          if(remake_figs) { pdf(file=file.path(imageloc, paste0(main, iter_index, ".pdf"))) }
-          plot(hc, main=main)
-              # abline(1.55, 0, col="#99FF99")
-              # rect.hclust(hc, k=38, border="#99FF99")
-              # abline(1.49, 0, col="#009900")
-              # rect.hclust(hc, k=53, border="#009900")
-              rect.hclust(hc, k=60, border="#009999")
+          if(remake_figs) { pdf(file=file.path(imageloc, paste0(main, ".pdf"))) }
+          plot(hc, main=main, cex=0.3)
+              abline(2, 0, col="#99FF99")            # seafoam
+              rect.hclust(hc, k=15, border="#99FF99")
+              abline(1.81, 0, col="#009900")          # green
+              rect.hclust(hc, k=23, border="#009900")
+              abline(1.5, 0, col="#009999")             # teal
+              rect.hclust(hc, k=50, border="#009999")
           if(remake_figs) { dev.off() } 
       }
       
+      else if(dataset_name=="noexcludes2001_2015" && is.null(subset_name) && ntopics==23) {
+          if(remake_figs) { pdf(file=file.path(imageloc, paste0(main, ".pdf"))) }
+          plot(hc, main=main, cex=0.3)
+          abline(2, 0, col="#99FF99")            # seafoam
+          rect.hclust(hc, k=15, border="#99FF99")
+          abline(1.81, 0, col="#009900")          # green
+          rect.hclust(hc, k=23, border="#009900")
+          abline(1.5, 0, col="#009999")             # teal
+          rect.hclust(hc, k=50, border="#009999")
+          if(remake_figs) { dev.off() } 
+      }
+      
+      
       else if(dataset_name=="noexcludes2001_2015" && is.null(subset_name) && ntopics==60) {
-          if(remake_figs) { pdf(file=file.path(imageloc, paste0(main, iter_index, ".pdf"))) }
+          if(remake_figs) { pdf(file=file.path(imageloc, paste0(main, ".pdf"))) }
           plot(hc, main=main)
           abline(3.09, 0, col="#99FF99")
           rect.hclust(hc, k=2, border="#99FF99")    # seafoam
@@ -189,7 +213,7 @@ frameToJSON <- function(dataset_name="consorts",
       }
       
       else {
-          if(remake_figs) { pdf(file=file.path(imageloc, paste0(main, iter_index, ".pdf"))) }
+          if(remake_figs) { pdf(file=file.path(imageloc, paste0(main, ".pdf"))) }
               plot(hc, main=main)
           if(remake_figs) { dev.off() } 
           
@@ -263,6 +287,10 @@ if(dataset_name=="consorts" && is.null(subset_name) && ntopics==55 && length(bad
 }   
 
     # TO DO: Add splits for model with 150 topics
+if(dataset_name=="noexcludes2001_2015" && is.null(subset_name) && ntopics==150 && is.null(bad.topics)) {  
+    
+}
+  
 if(dataset_name=="noexcludes2001_2015" && is.null(subset_name) && ntopics==60 && is.null(bad.topics)) {
   splits <- c(2, 5, 7, 12, 15, 22, 24, 40)
   memb2 <- as.character(cutree(hc, k = 2))
@@ -548,6 +576,7 @@ if(autorun) {
     frameToJSON(subset_name="realconsorts")
     frameToJSON(ntopics=150, bad.topics=NULL)
     frameToJSON(do.plot=T, dataset_name="noexcludes2001_2015", subset_name=NULL, ntopics=150, iter_index=6, bad.topics = NULL)
+    frameToJSON(do.plot=T, dataset_name="noexcludes2001_2015", subset_name=NULL, ntopics=150, iter_index=1, bad.topics = NULL)
     frameToJSON(do.plot=T, dataset_name="noexcludes2001_2015", subset_name=NULL, ntopics=60, iter_index=4, bad.topics = NULL)
     frameToJSON(do.plot=T, dataset_name="noexcludes2001_2015", subset_name="consorts2001_2015", ntopics=60, iter_index=4, bad.topics = NULL)
     frameToJSON(do.plot=T, dataset_name="noexcludes2001_2015", subset_name="realconsorts2001_2015", ntopics=60, iter_index=4, bad.topics = NULL)
