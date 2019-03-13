@@ -11,6 +11,10 @@ find_topic_titles <- function(dataset_name = "consorts",
     cl <- makeCluster(detectCores()-1)
     registerDoParallel(cl)
     
+    if(!exists("get.topics4doc")) {
+        source("top docs per topic.R")
+    }
+    
     titles_all <- foreach (i=1:ntopics, 
                            .verbose=T,
                            .export=c("dataset_name", "ntopics", "subset_name", "realconsorts", 
@@ -30,6 +34,7 @@ find_topic_titles <- function(dataset_name = "consorts",
     if(remake_figs) {
         filename <- paste0("top_titles_per_topic-", dataset_name, "k", ntopics, subset_name, iter_index, ".csv")
         write.csv(titles_all, file.path(imageloc, filename))
+        return(titles_all)
     } else {
         return(titles_all)
     }
