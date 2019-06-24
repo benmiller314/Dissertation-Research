@@ -21,7 +21,7 @@ oldarray <- read.csv(file=file.path(dataloc, "Diss-data-collected-pre-Pitt_short
 # The new file of dissertation metadata
 invisible(readline("Select the most recent file of dissertation metadata. (Press <Enter> to continue.)"))
 newdatafile <- file.choose()
-newarray <- read.csv(file=newdatafile())
+newarray <- read.csv(file=newdatafile)
 
 
 
