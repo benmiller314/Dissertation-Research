@@ -39,7 +39,7 @@ filter_realconsorts <- function(updata,                # data in file to update 
                                 school_col = "School") # relevant column name
                                 {
     if (!is.null(schools)) {
-        message("`update realconsorts.R`: I see the following list of schools:\n")
+        message("filter_realconsorts: I see the following list of schools:\n")
         print(schools)
         filter_option <- readline("Update realconsorts only for these schools (S), all schools (A), or none (N)?  > ")
         
@@ -59,10 +59,10 @@ filter_realconsorts <- function(updata,                # data in file to update 
                 filter_option <- readline("Update realconsorts only for these schools (S), all schools (A), or none (N)?  > ")
             }
         } 
-        # message("The value of 'filter_option' is: ", filter_option)
-        # message("Exiting while loop")
+        # message("The value of 'filter_option' is: ", filter_option)       # debugging
+        # message("Exiting while loop")                                     # debugging
     } else {
-        message("`update realconsorts.R`: No schools entered to filter by, so continuing with all schools in the dataset.")
+        message("filter_realconsorts: No schools entered to filter by, so continuing with all schools in the dataset.")
     }
     
     message("Preparing to work with ", nrow(updata), " rows of updated data...")
@@ -71,7 +71,7 @@ filter_realconsorts <- function(updata,                # data in file to update 
 
 
 realconsorts_by_list <- function(dataset_name = "noexcludes",
-                                 manual_file = NULL,     # a set of file.paths to department-gathering csvs 
+                                 manual_file = NULL,      # a set of file.paths to department-gathering csvs 
                                  alumni_file = NULL,      # a file.path to a list of known alumni
                                  matchlist_file = NULL,   # a file.path to save/load matched rows from alumni_file
                                  output_file = NULL,      # a file.path to export the full dataset after matching
@@ -107,21 +107,21 @@ realconsorts_by_list <- function(dataset_name = "noexcludes",
     
     if (is.null(schools)) {
         # prompt for schools to filter on if they're not already specified
-        message("`update realconsorts.R`: No schools entered to filter by; are you sure you want to update all of them? \n")
+        message("realconsorts_by_list: No schools entered to filter by; are you sure you want to update all of them? \n")
         add <- readline("To add a school to the filter, type it now (must be exact Carnegie name), or press Enter to skip: \n")
         
         while (nchar(add) > 0) {
             # TO DO: handle removal of items from the list
             if (grepl("[[:digit:]]+", add)) {
                 if (as.numeric(add) < 0 || as.numeric(add) > length(schools)) {
-                    message("`update realconsorts.R`: ERROR: To remove a school from the filter, enter a positive integer number from the array.")
+                    message("realconsorts_by_list: ERROR: To remove a school from the filter, enter a positive integer number from the array.")
                 } else {
                     schools <- schools[-as.numeric(add)]
                 }
             } else {
                 schools <- c(schools, add)
             }
-            message("`update realconsorts.R`: I see the following list of schools: ")
+            message("realconsorts_by_list: I see the following list of schools: ")
             print(schools)
             add <- readline(paste("To add a school to the filter, enter it now (must be exact Carnegie name); \n",
                                   "to remove a school, enter its number in the array; \n",
@@ -131,7 +131,7 @@ realconsorts_by_list <- function(dataset_name = "noexcludes",
     
     
     ### Individually located departments: no need to match again, just read out 
-    message("`update realconsorts.R`: File with *individually located* dissertations is currently: ", manual_file)
+    message("realconsorts_by_list: File with *individually located* dissertations is currently: ", manual_file)
     do_manual <- readline("Update realconsorts from this file? (y/n)  ")
     if (tolower(substr(do_manual, 1, 1)) != "n" & file.exists(manual_file)) {
         # get the department-matching data
@@ -158,11 +158,11 @@ realconsorts_by_list <- function(dataset_name = "noexcludes",
             message(paste("Found", length(confirmed_consort.index), "dissertations manually confirmed from Consortium programs",
                           "and", length(confirmed_rhetmap.index), "from programs listed on rhetmap.org." ))
         } else {
-            warning("`update realconsorts.R` indexes non-Consortium schools. Time to debug!")
+            warning("realconsorts_by_list indexes non-Consortium schools. Time to debug!")
         }
         
     } else if (!file.exists(manual_file)) {
-        warning("`update realconsorts.R`: couldn't find csv of manually confirmed Consortium dissertations:\n", manual_file)
+        warning("realconsorts_by_list: couldn't find csv of manually confirmed Consortium dissertations:\n", manual_file)
     }
     
     ### Alumni lists: these will need to be screened and confirmed.
@@ -206,7 +206,7 @@ realconsorts_by_list <- function(dataset_name = "noexcludes",
         #                   "before running `update realconsorts` (called in `dataprep2`)."))
         # }
         
-        message("`update realconsorts.R`: File with *alumni lists* is currently: \n", alumni_file)
+        message("realconsorts_by_list: File with *alumni lists* is currently: \n", alumni_file)
         do_alumni <- readline("Match realconsorts from this file? (y/n)  ")
         if (tolower(substr(do_alumni, 1, 1)) == 'y') {
             
@@ -290,7 +290,7 @@ realconsorts_by_list <- function(dataset_name = "noexcludes",
                         matchlist <- merge(matchlist, addendum) # was rbind, but I worry about column order
                     }
                 } else {
-                    warning("Could not locate previously saved matched list ",
+                    warning("realconsorts_by_list: Could not locate previously saved matched list ",
                             "of realconsorts at ", matchlist_file,"; defaulting to manual confirmation of matches.")
                     matchlist <- update_from_list()
                 }
@@ -331,12 +331,12 @@ realconsorts_by_list <- function(dataset_name = "noexcludes",
             if (all(dataset[which(dataset$realconsort == 1), "School"] %in% conschools)) {
                 message(paste("Found", nrow(matchlist), "dissertations confirmed from Consortium program alumni lists."))
             } else {
-                warning("`update realconsorts.R` indexes non-Consortium schools. Time to debug!")
+                warning("realconsorts_by_list` indexes non-Consortium schools. Time to debug!")
             }
         } # end of if (do_alumni=y)
         
     } else if (!file.exists(alumni_file)) {
-        warning("`update realconsorts.R`: Could not load Consortium program alumni file: \n", alumni_file)
+        warning("realconsorts_by_list: Could not load Consortium program alumni file: \n", alumni_file)
     }
     
     # optionally (but encouragedly) save an updated file of the full dataset
