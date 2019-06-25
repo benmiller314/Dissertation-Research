@@ -298,7 +298,7 @@ realconsorts_by_list <- function(dataset_name = "noexcludes",
                 return(matchlist)
                 
             }       # end of function update_from_list()
-            debug(update_from_list)
+            # debug(update_from_list)
         
             
             if (update_realconsorts & is.null(schools)) {
