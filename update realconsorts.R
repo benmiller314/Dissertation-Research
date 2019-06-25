@@ -75,7 +75,8 @@ realconsorts_by_list <- function(dataset_name = "noexcludes",
                                  alumni_file = NULL,      # a file.path to a list of known alumni
                                  matchlist_file = NULL,   # a file.path to save/load matched rows from alumni_file
                                  output_file = NULL,      # a file.path to export the full dataset after matching
-                                 schools = NULL)          # a list of new schools to filter for matching/adding
+                                 schools = NULL,          # a list of new schools to filter for matching/adding
+                                 school_col = "School")    # which column has the reconciled school names?
 {
     dataset <- get(dataset_name)
     
@@ -86,15 +87,17 @@ realconsorts_by_list <- function(dataset_name = "noexcludes",
         # and some limited searching for public CVs; 
         # updated by Janetta Brundage and Michelle Hillock in spring 2018
         # manual_file <- file.path(dataloc, "department-gathering2.csv")        # previous file
-        manual_file <- file.path(dataloc, "department-gathering-6.csv")
+        manual_file <- file.path(dataloc, "department-gathering-7.csv")
     }
     
     if (is.null(alumni_file)) {
         # NB: this file assembled by Alyssa Rodriguez in summer 2017 
         # from public alumni lists on departmental websites, and 
         # updated by Janetta Brundage and Michelle Hillock in spring 2018
+        # new info pulled from Consortium member reports by Michael ____ (Eng dept work/study) spring 2019.
         # alumni_file <- file.path(newdataloc, "known consortium graduates 2017-07-30.csv")  # older file
-        alumni_file <- file.path(newdataloc, "known consortium graduates 2018-07-02.csv")
+        # alumni_file <- file.path(newdataloc, "known consortium graduates 2018-07-02.csv")  # older file
+        alumni_file <- file.path(newdataloc, "consortium-graduates-2019-06-Updated-6_14-reconciled-lastfirst.csv")
     }
     
     if (is.null(matchlist_file)) {
@@ -170,18 +173,18 @@ realconsorts_by_list <- function(dataset_name = "noexcludes",
     if (file.exists(alumni_file)) {
         # Get spreadsheet of alumni, from public departmental lists
         alumni_list <- read.csv(alumni_file)
-        
+        message("realconsorts_by_list: loading alumni lists from file", alumni_file)
         # report on the number of schools indexed
         message("Found alumni lists for ", 
-                length(levels(alumni_list$Consortium_School)), 
+                length(levels(alumni_list[, school_col])), 
                 " of ", length(conschools), " schools in the Consortium.")
         
         # which schools don't we have lists for? (maybe contact them...)
-        no_alumni_list <<- levels(factor(conschools[which(!conschools %in% alumni_list$Consortium_School)]))
+        no_alumni_list <<- levels(factor(conschools[which(!conschools %in% alumni_list[, school_col])]))
         message("Schools without known alumni lists can be accessed with the variable `no_alumni_list`")
         if(remake_figs) {
             filename <- file.path(dataloc, paste0("desired_alumni_lists_",Sys.Date(),".csv"))
-            write.csv(no_alumni_list, file=filename)
+            write.csv(no_alumni_list, file=filename, na="")
             message("and in the file ", filename, ".")
         }
         
@@ -198,7 +201,7 @@ realconsorts_by_list <- function(dataset_name = "noexcludes",
         #     filename <- file.path(dataloc, paste0("unconfirmed_consorts_",Sys.Date(),".csv"))
         #     message(paste("Saving consortium-school dissertations without known department status to",
         #                   filename))
-        #     write.csv(no_alumni_disses, file=filename)
+        #     write.csv(no_alumni_disses, file=filename, na="na")
         # } else {
         #     # View(no_alumni_disses)
         #     message(paste("Dissertations from Consortium schools but unconfirmed departments can be accessed",
@@ -211,20 +214,21 @@ realconsorts_by_list <- function(dataset_name = "noexcludes",
         if (tolower(substr(do_alumni, 1, 1)) == 'y') {
             
             # Optionally filter by schools
-            alumni_list <- filter_realconsorts(alumni_list, schools, school_col = "Consortium_School")
+            alumni_list <- filter_realconsorts(alumni_list, schools, school_col = school_col)
             
             
             # View(alumni_list)
             alumni_list$Lastname <- sapply(alumni_list$Name, function(x) namepart(x, "last"))
             alumni_list$Firstname <- sapply(alumni_list$Name, function(x) namepart(x, "first"))
-            alumni_list <- alumni_list[order(alumni_list$Consortium_School, alumni_list$Lastname, alumni_list$Firstname),]
-            alumni_list <- alumni_list[, c("Consortium_School", "Name", "Department", "Lastname", "Firstname", "Alumni_List")]
+            alumni_list <- alumni_list[order(alumni_list[, school_col], alumni_list$Lastname, alumni_list$Firstname),]
+            alumni_list <- alumni_list[, c(school_col, "Name", "Department", "Lastname", "Firstname", "Source", "Year")]
+            
             # View(alumni_list)
             
                     # Narrow to just Consortium schools, then... 
             unknown_dept <- dataset[which(dataset$School %in% union(conschools, rhetmapschools)),]
             # ... get list of those alumni with unknown departments
-            unknown_dept <- dataset[which(dataset$Department %in% c("?", "")), c("Author", "School", "Department", "realconsort", "Pub.number", "Title")]
+            unknown_dept <- unknown_dept[which(dataset$Department %in% c("?", "")), c("Author", "School", "Department", "realconsort", "Pub.number", "Title", "Year")]
             unknown_dept$Lastname <- sapply(unknown_dept$Author, function(x) namepart(x, "last"))
             unknown_dept$Firstname <- sapply(unknown_dept$Author, function(x) namepart(x, "first"))
             unknown_dept <- unknown_dept[order(unknown_dept$School, unknown_dept$Author),]
@@ -232,48 +236,69 @@ realconsorts_by_list <- function(dataset_name = "noexcludes",
             
             
             # Use merge to find matches
-            matching <- merge(unknown_dept, alumni_list, by.x=c("School", "Lastname"), by.y=c("Consortium_School", "Lastname"))
-            matching <- matching[, c("School", "Lastname", "Firstname.x", "Firstname.y", "Author", "Name", "Department.y", "realconsort", "Department.x", "Alumni_List", "Pub.number", "Title")]
+            matching <- merge(unknown_dept, alumni_list, by.x=c("School", "Lastname"), by.y=c(school_col, "Lastname"))
+            matching <- matching[, c("School", "Lastname", "Firstname.x", "Firstname.y", "Year.x", "Year.y", "Author", "Name", "Department.x", "Department.y", "realconsort", "Source", "Pub.number", "Title")]
+            
             # View(matching)
+            
             
             # Helper function: Update exact matches, or prompt to confirm
             update_from_list <- function(merged_list=matching) {
                 # start empty
                 matchlist <- data.frame("Pub.number"="", "Department"="", stringsAsFactors = FALSE)
+                merged_list["Checked"] <- ""
                 response <- ""
                 if (nrow(merged_list > 0)) {             # avoid errors caused by over-filtering
-                    for (i in 1:nrow(merged_list)) {
-                        if (merged_list[i, "Firstname.x"] == merged_list[i, "Firstname.y"]) {
+                    i <- 1L                               # use while loop to allow backward movement
+                    while (i <= nrow(merged_list)) {
+                        if (!is.null(merged_list[i, "Checked"]) & merged_list[i, "Checked"] == "y") {
+                            i <- i + 1L
+                        } else if (merged_list[i, "Firstname.x"] == merged_list[i, "Firstname.y"]) {
                             matchlist[i, "Pub.number"] <- as.character(merged_list[i, "Pub.number"])
                             matchlist[i, "Department"] <- as.character(merged_list[i, "Department.y"])
+                            merged_list[i, "Checked"] <- "y"
+                            i <- i + 1L
                         } else {
-                            while (! tolower(response) %in% c("y", "n", "a")) {
-                                print(merged_list[i, c("Author", "Name", "School", "Title", "Pub.number")])
-                                response <- readline("Is this a match? ([Y]es / [N]o / [A]bort) > ")
-                            
-                                if (tolower(response) == "y") {
+                            while (! response %in% c("y", "n", "a", "b")) {
+                                print(merged_list[i, c("Author", "Year.x", "Name", "Year.y", "School", "Title", "Pub.number")])
+                                response <- tolower(substr(readline("Is this a match? ([Y]es / [N]o / [A]bort) > "), 1,1))
+                                    
+                                if (response == "y") {
                                     matchlist[i, "Pub.number"] <- as.character(merged_list[i, "Pub.number"])
                                     matchlist[i, "Department"] <- as.character(merged_list[i, "Department.y"])
+                                    merged_list[i, "Checked"] <- "y"
                                     response <- ""
+                                    i <- i + 1L
                                     break()
-                                } else if (tolower(response) == "n") {
+                                } else if (response == "n") {
+                                    merged_list[i, "Checked"] <- "y"
                                     response <- ""
+                                    i <- i + 1L
                                     break()
-                                } else if (tolower(response) == "a") {
+                                } else if (response == "a") {
                                     warning("Process aborted; matchlist incomplete.")
                                     return(matchlist)
+                                } else if (response == "b") { 
+                                    # to go back, we need not the previous row,
+                                    # but the previous row prompting about mismatched first names 
+                                    findthis <- matchlist[i-1, "Pub.number"]
+                                    i <- min(which(merged_list["Pub.number"] == findthis))
+                                    message("going back to previous match-prompt...")
+                                    merged_list[i, "Checked"] <- ""
+                                    response <- ""
+                                    break()
                                 } else {
                                     message("I didn't get that.")    
                                 }
-                            }      # end of while loop (y/n/a prompt)
+                            }      # end of inner while loop (y/n/a/b prompt)
                         }
-                    }       # end of for loop
+                    }       # end of oute while loop (fake for-loop)
                 }       # end of if statement            
                 matchlist <- matchlist[which(!is.na(matchlist$Pub.number)),]    
                 return(matchlist)
                 
             }       # end of function update_from_list()
-            # debug(update_from_list)
+            debug(update_from_list)
         
             
             if (update_realconsorts & is.null(schools)) {
@@ -302,13 +327,14 @@ realconsorts_by_list <- function(dataset_name = "noexcludes",
                 fix_fig <- readline(paste("remake_figs is currently set to FALSE. Save file anyway \n",
                         "to avoid verifying all these matches again? (y to save)"  ))
                 if(tolower(substr(fix_fig, 1, 1)) == "y") {
-                    message("Saving consortium program matches to file: ", paste0(matchlist_file, Sys.Date()), "... ")
-                    write.csv(matchlist, file=paste0(matchlist_file, Sys.Date()), row.names=FALSE)
+                    filename <- file.path(newdataloc, paste(Sys.Date(), matchlist_file))
+                    message("Saving consortium program matches to file: ", filename, "... ")
+                    write.csv(matchlist, file=filename, row.names=FALSE, na="")
                     message("Done.")
                 }
             } else {
                 message("Saving consortium program matches to file: ", paste0(matchlist_file, Sys.Date()), "... ")
-                write.csv(matchlist, file=paste0(matchlist_file, Sys.Date()), row.names=FALSE)
+                write.csv(matchlist, file=paste0(matchlist_file, Sys.Date()), row.names=FALSE, na="")
                 message("Done.")
             }
         
@@ -345,14 +371,14 @@ realconsorts_by_list <- function(dataset_name = "noexcludes",
                                   "\n file anyway to avoid verifying all these matches again? (y to save)"  ))
         if(tolower(substr(fix_fig, 1, 1)) == "y") {
             message("Saving ", dataset_name, " with updated realconsorts to file: ", output_file, "...")
-            write.csv(dataset, file=output_file, row.names=FALSE)
+            write.csv(dataset, file=output_file, row.names=FALSE, na="")
             message("Done.")
         } else {
             message("Okay, not writing to file then.")
         }
     } else {
         message("Saving ", dataset_name, " with updated realconsorts to file: ", output_file, "...")
-        write.csv(dataset, file=output_file, row.names=FALSE)
+        write.csv(dataset, file=output_file, row.names=FALSE, na="")
         message("Done.")
     }
     
@@ -379,7 +405,7 @@ realconsorts_ratios <- function(dataset_name = "consorts",
         # Get spreadsheet of alumni, from public departmental lists
         alumni_list <- read.csv(alumni_file)
         names(alumni_list)
-        schools_known_alums <- levels(alumni_list$Consortium_School)
+        schools_known_alums <- levels(alumni_list[, school_col])
         
         known_subset <- dataset[which(dataset$School %in% schools_known_alums), c("School", "realconsort")]
         consort_count <- aggregate(known_subset$realconsort, by=list(known_subset$School), FUN=function(s) {
@@ -399,3 +425,7 @@ realconsorts_ratios <- function(dataset_name = "consorts",
     }
 }    
 # summary(realconsorts_ratios()$Ratio)
+
+if(FALSE) {     # for testing; will never run on its own
+    realconsorts_by_list()
+}
