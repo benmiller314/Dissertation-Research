@@ -188,10 +188,6 @@ realconsorts_by_list <- function(dataset_name = "noexcludes",
             message("and in the file ", filename, ".")
         }
         
-        ## re-do the following report only at the end of the update; 
-        ## otherwise we'll accidentally report back manually confirmed disses as still missing
-        # 
-        # no_alumni_disses <<- dataset[which(dataset$School %in% no_alumni_list), ]
         # if(exists("confirmed_yes.index")) {
         #     no_alumni_disses <<- no_alumni_disses[-which(no_alumni_disses$Pub.number %in% confirmed_yes.index),]
         #     no_alumni_disses <<- no_alumni_disses[-which(no_alumni_disses$Pub.number %in% confirmed_no.index),]
@@ -327,14 +323,23 @@ realconsorts_by_list <- function(dataset_name = "noexcludes",
                 fix_fig <- readline(paste("remake_figs is currently set to FALSE. Save file anyway \n",
                         "to avoid verifying all these matches again? (y to save)"  ))
                 if(tolower(substr(fix_fig, 1, 1)) == "y") {
-                    filename <- file.path(newdataloc, paste(Sys.Date(), matchlist_file))
-                    message("Saving consortium program matches to file: ", filename, "... ")
-                    write.csv(matchlist, file=filename, row.names=FALSE, na="")
-                    message("Done.")
+                    tryCatch(
+                        expr = function() {
+                            filename <- paste(matchlist_file, Sys.Date())
+                            message("Saving consortium program matches to file: ", filename, "... ")
+                            write.csv(matchlist, file=filename, row.names=FALSE, na="")
+                        },
+                        error = function(e) {
+                            message("Can't save file, so exporting it instead")
+                            matchlist_err <<- matchlist
+                            stop("update_realconsorts.R: something went wrong in file save, line 330")
+                        },
+                        finally = message("Done.")
+                    )
                 }
             } else {
                 message("Saving consortium program matches to file: ", paste0(matchlist_file, Sys.Date()), "... ")
-                write.csv(matchlist, file=paste0(matchlist_file, Sys.Date()), row.names=FALSE, na="")
+                write.csv(matchlist, file=paste(matchlist_file, Sys.Date()), row.names=FALSE, na="")
                 message("Done.")
             }
         
@@ -380,6 +385,14 @@ realconsorts_by_list <- function(dataset_name = "noexcludes",
         message("Saving ", dataset_name, " with updated realconsorts to file: ", output_file, "...")
         write.csv(dataset, file=output_file, row.names=FALSE, na="")
         message("Done.")
+    }
+    
+    maybeconsort_index <- intersect(which(dataset$School %in% conschools), which(dataset$realconsort %in% c(0,1)))
+    mayberhetmap_index <- intersect(which(dataset$School %in% rhetmapschools), which(dataset$realrhetmap %in% c(0,1)))
+    maybeconsorts <<- dataset[union(maybeconsort_index, mayberhetmap_index), ]
+    message("Disses at consortium/rhetmap schools but with unconfirmed program status can be accessed as maybeconsorts.")
+    if(remake_figs) {
+        write.csv(maybeconsorts, file=file.path(newdataloc, paste0("maybeconsorts_", Sys.Date(), ".csv")))
     }
     
     return(dataset)
