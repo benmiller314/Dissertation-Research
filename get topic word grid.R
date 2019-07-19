@@ -10,13 +10,18 @@ get.wordtopic.grid <- function(dataset_name="noexcludes2001_2015",
 {
     require(data.table)
     filename <- paste0(dataset_name, "k", ntopics, "_wordtopics_", iter_index, ".txt")
+    filename <- file.path(tmloc, filename)
     
-    # oneline <- readLines(file.path(tmloc, filename), n=1)
-    dt <- read.table(file.path(tmloc, filename), header=FALSE, fill=TRUE,
-                col.names=c("index", "token", paste0("TopicRanked", 1:ntopics))
-    )
-    dt <- data.table(dt)
-    
+    if(file.exists(filename)) {
+        # oneline <- readLines(file.path(tmloc, filename), n=1)
+        dt <- read.table(filename, header=FALSE, fill=TRUE,
+                    col.names=c("index", "token", paste0("TopicRanked", 1:ntopics))
+        )
+        dt <- data.table(dt)
+    } else {
+        stop("'get topic word grid.R': could not load word-topic pairs from file ",
+             filename)
+    }
     
     return(dt)
 }
@@ -35,7 +40,7 @@ get.wordtopic.grid <- function(dataset_name="noexcludes2001_2015",
 trim.wordtopic.grid <- function(dt,            # wordtopic grid, as above
                                 threshold=5)   # minimum word-weight in top-ranked topic
 {
-    topword_values <- sapply(dt[[column]], just.value)
+    tormpword_values <- sapply(dt[["TopicRanked1"]], just.value)
     cutindex <- which(topword_values < threshold)
     return(dt[-cutindex])
 }
@@ -84,7 +89,7 @@ find.topic.in.all.cols <- function(topic,
     return(topic_word_vec)
 }
 
-build.topicword.grid <- function(dt=NULL,    # if it exists, pass it for speed boost
+build.topicword.table <- function(dt=NULL,    # if it exists, pass it for speed boost
                                  per.topic.threshold=300,
                                  top.topic.threshold=5,
                                  dataset_name="noexcludes2001_2015",
@@ -122,7 +127,71 @@ build.topicword.grid <- function(dt=NULL,    # if it exists, pass it for speed b
     return(tw)
 }
 
+topicword.probability.grid <- function(tw)         # topicword.table as built above
+{
+    ntopics <- max(tw$topic)
+    
+    # start empty, with a row for each included token
+    tw.grid <- data.table(token_ind=as.numeric(levels(factor(tw$token_ind))))
+    
+    # and add one column for each topic
+    for (i in seq_len(ntopics)) {
+        tw.grid <- merge(tw.grid, 
+                         tw[topic==i, .(token_ind, i=probability)], 
+                         by="token_ind",
+                         all=TRUE)                 # merge all=T introduces NA's; 
+                                                   # we'll deal with them later
+        setnames(tw.grid, "i", paste0("T", i))
+    }
+    
+    # replace NA's with vanishingly small (but non-zero) value
+    for (column in names(tw.grid)) {
+        set(tw.grid, which(is.na(tw.grid[[column]])), column, 1e-20)
+        
+        # # and normalize so it still adds up to 1
+        # col_sum <- sum(tw.grid[[column]])
+        # set(tw.grid, i=NULL, j=column, value=(tw.grid[[column]]/col_sum) 
+        # confirm that we're still adding up essentially to 1
+        if (sum(tw.grid[[column]]) != 1 & column != "token_ind") {
+            warning("Sum of probabilities for ", column, " is ", sum(tw.grid[[column]]))
+        }
+    }
+    
+    # drop token_ind, so the matrix is just a set of probability vectors
+    # (so we can calculate distances). Weirdly, we don't have to re-assign tw.grid.
+    tw.grid[, token_ind:=NULL]
+    
+    return(tw.grid)
+}                                       
 
+one.tw.probability.vector <- function(mytopic,     # just a number in 1:ntopics
+                                      dataset_name="noexcludes2001_2015", 
+                                      ntopics=50,
+                                      iter_index=1,
+                                      tw=NULL)     # if we have a topic-word matrix,
+                                                   # don't waste time rebuilding it
+{
+    # if we don't have a topic-word matrix, let's get one
+    if(is.null(tw)) {
+        # Get the topic-word info
+        if(!exists("build.topicword.grid", mode="function")) { 
+            source(file="get topic word grid.R") 
+        }
+        
+        tw <- build.topicword.grid(dataset_name=dataset_name, 
+                                   ntopics=ntopics, 
+                                   iter_index=iter_index)
+    }
+    
+    # pull out just the topics we need    
+    tw_a <- tw[topic==mytopic][order(-probability)]     # make sure it looks okay
+    setkey(tw_a, token_ind)
+    vector_a <- tw_a$probability
+    names(vector_a) <- tw_a$token_ind                   # prep for bind by name
+
+    return(vector_a)
+}    
+    
 if(FALSE) { #test
     dt <- get.wordtopic.grid()      # 1,616,842 tokens
     dt <- trim.wordtopic.grid(dt)   #   254,092 tokens
