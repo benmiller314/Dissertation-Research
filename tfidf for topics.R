@@ -1,8 +1,10 @@
-# given a topic-word data.table as per "get topic word grid.R",
+# Given a topic-word data.table as per "get topic word grid.R",
 # calculate the most differentially interesting words for each topic
 # by using a TF-IDF approach. Let TF, here, be the weight of that word in that topic,
 # and IDF = ln(ntopics/topics-with-term). Multiply TF times IDF to get the new weight.
 
+# Returns both an updated topic-word data.table (as $tw) 
+# and a two-column data.table of topic numbers and top words (as $topN)
 
 tfidf.for.topics <- function(nwords=20,
                   tw=NULL,        # if it exists, pass in for a speed boost
@@ -44,6 +46,7 @@ tfidf.for.topics <- function(nwords=20,
     
     # inspect results
     topN <- tw[order(-TFIDF), .SD[1:nwords], by=topic]
+    topN <- topN[, .(by_tfidf=paste(token, collapse=", ")), by=topic][order(topic)]
     if(remake_figs) {
         tryCatch(
             {
@@ -61,5 +64,10 @@ tfidf.for.topics <- function(nwords=20,
         View(topN)
     }
     
-    return(topN)
+    return(list("tw" = tw,
+                "topN" = topN))
+}
+
+if(FALSE) {
+    
 }
