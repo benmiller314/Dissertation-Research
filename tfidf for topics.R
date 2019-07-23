@@ -4,7 +4,7 @@
 # and IDF = ln(ntopics/topics-with-term). Multiply TF times IDF to get the new weight.
 
 # Returns both an updated topic-word data.table (as $tw) 
-# and a two-column data.table of topic numbers and top words (as $topN)
+# and a three-column data.table of topic numbers and top words (as $topN)
 
 tfidf.for.topics <- function(nwords=20,
                   tw=NULL,        # if it exists, pass in for a speed boost
@@ -44,9 +44,18 @@ tfidf.for.topics <- function(nwords=20,
     #     
     # }
     
-    # inspect results
+    # Make simple version for data labeling, synonym-finding, etc
+    # first by tfidf 
     topN <- tw[order(-TFIDF), .SD[1:nwords], by=topic]
-    topN <- topN[, .(by_tfidf=paste(token, collapse=", ")), by=topic][order(topic)]
+    topN <- topN[, .(by_tfidf=paste(token, collapse=" ")), by=topic][order(topic)]
+    
+    # but also save the old (probability) toplist, for comparison
+    topM <- tw[order(-probability), .SD[1:nwords], by=topic]
+    topM <- topM[, .(by_prob=paste(token, collapse=" ")), by=topic][order(topic)]
+    
+    # and export them together
+    topN <- merge(topN, topM, by="topic")
+    
     if(remake_figs) {
         tryCatch(
             {
@@ -61,8 +70,9 @@ tfidf.for.topics <- function(nwords=20,
             finally = message("done.")
         )
     } else {
-        View(topN)
+        # View(topN)
     }
+    
     
     return(list("tw" = tw,
                 "topN" = topN))
