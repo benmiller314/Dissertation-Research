@@ -19,42 +19,76 @@
 # needed.
 ##### 
 
+# Ben: helper function to build a filename / main title for topic-modeling figures
+build_plot_title <- function(dataset_name, ntopics, iter_index, subset_name, 
+                             bad.topics, use.labels=NULL,
+                             whatitis="Cluster Dendrogram") {
+    if(! is.null(subset_name)) { subset_part <- paste0("--", subset_name) 
+    } else { subset_part <- "" }
+    
+    if(length(bad.topics > 0)) { bad_topics_part <- paste0(", ", length(bad.topics), " bad topics hidden")
+    } else { bad_topics_part <- "" }
+    
+    if(iter_index > 0) { iter_part <- paste0("_iter", iter_index) 
+    } else { iter_part <- "" }
+  
+    if(use.labels) { label_part <- ", topics labeled" 
+    } else { label_part <- "" }
+    
+    main <- paste0(whatitis, ", ",                                       # type of plot/file
+                   dataset_name, "k", ntopics, iter_part,                # which topic model
+                   subset_part, bad_topics_part,                         # parts of that model
+                   label_part)                                           # topics named or numbered
+    return(main)
+}
 
-frameToJSON <- function(dataset_name="consorts",
-                        ntopics=55,
-                        subset_name="realconsorts",  # Ben: set NULL if not using.
-                        iter_index="",  # Ben: suffix to differentiate repeat runs of same MALLET params.
+frameToJSON <- function(dataset_name="noexcludes2001_2015",
+                        ntopics=50,
+                        subset_name="realconsorts2001_2015",  # Ben: set NULL if not using.
+                        iter_index=1,  # Ben: suffix to differentiate repeat runs of same MALLET params.
                         do.plot=TRUE,   # Ben: Use this the first time to 
                                         # find good cuts in the dendrogram.
                         groupVars=NULL, # Ben: If not provided by the calling 
                         dataVars=NULL,  # environment, these 3 parameters 
                         outfile=NULL,   # will be set to defaults.
-                        bad.topics= c("2", "4", "22", "24", "47",   
+                        use.labels=FALSE, # replace topic numbers with labels
+                                        # chosen using top_topic_browser()?
+                        bad.topics= NULL,
                                         # exclude non-content-bearing topics
-                                        "50", "13")                 
-                                        # (incl. Spanish & Italian languages)
-                        ) 
+                        auto.lines=FALSE, # should we draw all the boxes on autorun?
+                        tw = NULL)      # a topic-word matrix, if it exists 
 {           
 
   #packages we will need:
   require(data.table)   
-  require(jsonlite)     
+  require(jsonlite)  
+  require(cluster)
   
   # Ben: Get topic weights for every document we have 
   if(!exists("get.doctopic.grid", mode="function")) { 
         source(file="get doctopic grid.R") 
   }
-  dt <- get.doctopic.grid(dataset_name, ntopics, subset_name, iter_index)$outputfile.dt
+  dt <- get.doctopic.grid(dataset_name=dataset_name, ntopics=ntopics, 
+                          subset_name=subset_name, iter_index=iter_index)$outputfile.dt
 
   # Ben: Exclude any NA rows included accidentally by the index file
   dt <- na.omit(dt)
   
-  # Ben: Exclude non-content-bearing topics
+  
+  # Ben: Optionally exclude non-content-bearing topics
+  if (is.null(bad.topics)) {
+      if (dataset_name=="consorts" && ntopics==55 && iter_index=="") {
+          bad.topics <- c("2", "4", "22", "24", "47", "50", "13") 
+      } else if (dataset_name=="noexcludes2001_2015" && ntopics==50 && iter_index==1) {
+          bad.topics <- c("3", "8", "12", "15", "30", "34", "36", "47", "50")
+      }
+  }
+  
   if(!is.null(bad.topics)) { dt <- dt[, !names(dt) %in% bad.topics, with=F] }
 
   # Set parameter defaults if needed
   if(!exists("groupVars") || is.null(groupVars)) {              
-        groupVars <- c("Pub.number")    # Group by ID column
+        groupVars <- c("Pub.number")    # Don't treat ID column as data
   }
   if(!exists("dataVars") || is.null(dataVars)) {   
         dataVars <- colnames(dt)[!colnames(dt) %in% groupVars]  
@@ -62,157 +96,252 @@ frameToJSON <- function(dataset_name="consorts",
   }
   if(!exists("outfile") || is.null(outfile)) {                
   # the desired location of the JSON file produced by the function
-        outfile <- file.path(webloc, paste0(dataset_name, "k", ntopics, subset_name, 
-                         "_clusters_", ntopics-length(bad.topics), iter_index, ".json"))
+        outfile <- file.path(webloc, paste0(build_plot_title(dataset_name=dataset_name, ntopics=ntopics, 
+                                                      iter_index=iter_index, subset_name=subset_name,
+                                                      bad.topics=bad.topics, 
+                                                      whatitis="radial_clusters_data_tw_jsd"), ".json"))
   }
-
- 
-  #Rolf: Here you may want to sort by colSums() 
-  #to keep only the most relevant variables.
-
-
+  
   #Rolf: calculate the correlation matrix
-  # BEN TO DO: use Jenson-Shannon distance instead of Pearson cor()?
-  t <- cor(dt[, dataVars, with=F])
-
+  
+  # Ben: We'll use topic-word vectors, instead of topic-document
+  if(!exists("topic_distance_matrix", mode="function")) { 
+    source(file="topic_term_synonyms.R") 
+  }
+  
+  t <- topic_distance_matrix(dataset_name = dataset_name, 
+                             ntopics = ntopics, 
+                             iter_index = iter_index,
+                             dist_method = "jensen-shannon",
+                             tw = tw,
+                             bad.topics = bad.topics)
+ 
   #Rolf: calculate the hierarchical cluster structure 
   #from the correlation scores
-  hc <- hclust(dist(t), "ward.D2")
+  # Ben: topic_clusters() is also from topic_term_synonyms.R
+  # Ben: optionally use descriptive topic labels, if we have them
+  ag <- topic_clusters(t, do.plot=F, use.labels=use.labels)
+  # hc <- hclust(dist(t), "ward.D2")
 
+  # Ben: convert to hclust so we can interact with the plot more easily
+  hc <- (as.hclust(ag))
+  
   # Ben: I'm making this section optional, 
   # because it makes the most sense early on and has diminishing returns.
   if(do.plot) {  
       #Rolf: take a look at your strucutre:
       # Ben: optionally save clustering figure
-     
-      # build a filename
-      if(! is.null(subset_name)) { subset_part <- paste0("--", subset_name) 
-      } else { subset_part <- "" }
-      
-      if(length(bad.topics > 0)) { bad_topics_part <- paste0("--", length(bad.topics), " bad topics hidden")
-      } else { bad_topics_part <- "" }
-  
-      if(iter_index > 0) { iter_part <- paste0("_iter", iter_index) 
-      } else { iter_part <- "" }
-      
-      main <- paste0("Cluster Dendrogram, ",                               # type of plot
-                     dataset_name, "k", ntopics, iter_part,                # which topic model
-                     subset_part, bad_topics_part)                         # parts of that model
-      
-      main
-      rm(subset_part, bad_topics_part, iter_part)
       
       # Ben: Try various cut levels until you find a set that seems 
       # interesting; Then adjust the memb_ variables below, accordingly.
-    
+      
+      main <- build_plot_title(dataset_name=dataset_name, ntopics=ntopics, iter_index=iter_index, 
+                               subset_name=subset_name, bad.topics=bad.topics, use.labels=use.labels)
+      
+      # restarting with topic-word-based clusters; see topic_term_synonyms.R
+      if(any(class(ag) %in% "agnes") && dataset_name=="noexcludes2001_2015" &&
+        ntopics==50 && length(bad.topics==9)) {
+          if(remake_figs) { pdf(file=file.path(imageloc, paste0(main, ", jsd.pdf"))) } 
+          plot(hc, main=main)
+          if(auto.lines) {
+              rect.hclust(hc, k=2, border="#999900")
+              abline(0.91, 0, col="#999900")
+              rect.hclust(hc, k=4, border="#FF9999")
+              abline(0.7, 0, col="#FF9999")
+              rect.hclust(hc, k=7, border="#009900")
+              abline(0.63, 0, col="#9999FF")
+              rect.hclust(hc, k=12, border="#9999FF")
+              abline(0.55, 0, col="#9999FF")
+          }
+          if(remake_figs) { dev.off() }
+          
+          splits <- c(2, 4, 7, 12)
+      }
+      
+      
       # with 5 bad.topics removed   
       if(dataset_name=="consorts" && ntopics==55 && length(bad.topics) == 5) 
       {
           if(remake_figs) { pdf(file=file.path(imageloc, paste0(main, ".pdf"))) }
             plot(hc, main=main)
-            abline(1.35, 0, col="#99FF99")          
-            rect.hclust(hc, k=32, border="#99FF99") 
-            abline(1.55, 0, col="#009900")          
-            rect.hclust(hc, k=16, border="#009900") 
-            abline(1.7, 0, col="#FF9999")
-            rect.hclust(hc, k=12, border="#FF9999")
-            abline(1.85, 0, col="#9999FF")
-            rect.hclust(hc, k=7, border="#9999FF")
-            abline(1.95, 0, col="#990099")
-            rect.hclust(hc, k=6, border="#990099")
-            abline(2.33, 0, col="#009999")
-            rect.hclust(hc, k=4, border="#009999")
-            abline(3.37, 0, col="#999900")
-            rect.hclust(hc, k=2, border="#999900")
+            if(auto.lines) {
+                abline(1.35, 0, col="#99FF99")          
+                rect.hclust(hc, k=32, border="#99FF99") 
+                abline(1.55, 0, col="#009900")          
+                rect.hclust(hc, k=16, border="#009900") 
+                abline(1.7, 0, col="#FF9999")
+                rect.hclust(hc, k=12, border="#FF9999")
+                abline(1.85, 0, col="#9999FF")
+                rect.hclust(hc, k=7, border="#9999FF")
+                abline(1.95, 0, col="#990099")
+                rect.hclust(hc, k=6, border="#990099")
+                abline(2.33, 0, col="#009999")
+                rect.hclust(hc, k=4, border="#009999")
+                abline(3.37, 0, col="#999900")
+                rect.hclust(hc, k=2, border="#999900")
+            }
           if(remake_figs) { dev.off() } 
-        }
+        
 
       # with 7 bad.topics removed and the real consortium-program subset         
-      else if(dataset_name=="consorts" && subset_name=="realconsorts" && ntopics==55 &&            
+      } else if(dataset_name=="consorts" && subset_name=="realconsorts" && ntopics==55 &&            
               length(bad.topics)==7) 
       {
           if(remake_figs) { pdf(file=file.path(imageloc, paste0(main, ".pdf"))) }
               plot(hc, main=main)
-              rect.hclust(hc, k=2, border="#99FF99")
-              rect.hclust(hc, k=4, border="#999900")
-              rect.hclust(hc, k=6, border="#FF9999")
-              abline(1.931, 0, col="#FF9999")
-              rect.hclust(hc, k=9, border="#009999")
-              abline(1.79, 0, col="#009999")            
-              rect.hclust(hc, k=11, border="#990099")
-              abline(1.7, 0, col="#990099")
-              rect.hclust(hc, k=19, border="#009900")
-              abline(1.54, 0, col="#009900")        
+              if(auto.lines) {
+                  rect.hclust(hc, k=2, border="#99FF99")
+                  rect.hclust(hc, k=4, border="#999900")
+                  rect.hclust(hc, k=6, border="#FF9999")
+                  abline(1.931, 0, col="#FF9999")
+                  rect.hclust(hc, k=9, border="#009999")
+                  abline(1.79, 0, col="#009999")            
+                  rect.hclust(hc, k=11, border="#990099")
+                  abline(1.7, 0, col="#990099")
+                  rect.hclust(hc, k=19, border="#009900")
+                  abline(1.54, 0, col="#009900")    
+              }
           if(remake_figs) { dev.off() } 
-      }     
+          
       
       # with 7 bad.topics removed but the full consorts set 
-      else if(dataset_name=="consorts" && ntopics==55 &&            
+      } else if(dataset_name=="consorts" && ntopics==55 &&            
               length(bad.topics)==7) 
       {
           if(remake_figs) { pdf(file=file.path(imageloc, paste0(main, ".pdf"))) }
               plot(hc, main=main)
-              abline(1.45, 0, col="#99FF99")        
-              rect.hclust(hc, k=21, border="#99FF99")   
-              abline(1.73, 0, col="#009900")            
-              rect.hclust(hc, k=11, border="#009900")
-              abline(1.955, 0, col="#FF9999")
-              rect.hclust(hc, k=6, border="#FF9999")
-              rect.hclust(hc, k=4, border="#009999")
-              rect.hclust(hc, k=2, border="#999900")      
+              if(auto.lines) {
+                  abline(1.45, 0, col="#99FF99")        
+                  rect.hclust(hc, k=21, border="#99FF99")   
+                  abline(1.73, 0, col="#009900")            
+                  rect.hclust(hc, k=11, border="#009900")
+                  abline(1.955, 0, col="#FF9999")
+                  rect.hclust(hc, k=6, border="#FF9999")
+                  rect.hclust(hc, k=4, border="#009999")
+                  rect.hclust(hc, k=2, border="#999900")   
+              }
           if(remake_figs) { dev.off() } 
-      }     
+         
       
       # TO DO: Find splits for model with 150 topics
       
-      else if(dataset_name=="noexcludes2001_2015" && is.null(subset_name) && ntopics==150) {
-          if(remake_figs) { pdf(file=file.path(imageloc, paste0(main, ".pdf"))) }
+     } else if(dataset_name=="noexcludes2001_2015" && is.null(subset_name) && ntopics==150) {
+         if(remake_figs) { pdf(file=file.path(imageloc, paste0(main, ".pdf"))) }
+            
+            if(FALSE) {       # for screenshots. 
+                subplot = 23  # for subplot, use a number of topics from below. 
+                              # start the pdf device, using a filename indicating lines or boxes
+                pdf(file=file.path(imageloc, paste0(main, "--", subplot, " subtopics--line.pdf")))
+                # pdf(file=file.path(imageloc, paste0(main, "--", subplot, " subtopics--boxes.pdf")))    
+                plot(hc, main=main, sub=paste(subplot, "topic clusters"), cex=0.3, xlab="")
+                              # **insert/run the relevant lines from below here**
+                              # then come back up to turn the pdf device off
+                dev.off()
+            }
+            
           plot(hc, main=main, cex=0.3)
+          if(auto.lines) { 
+                abline(4.1, 0, col="#99FF99")    # seafoam
+                rect.hclust(hc, k=2, border="#99FF99")
+                abline(3.14, 0, col="#009900")    # green
+                rect.hclust(hc, k=3, border="#009900")
+                abline(2.34, 0, col="#990099")  # purple
+                rect.hclust(hc, k=8, border="#990099")    
+                abline(2, 0, col="#009999")   # teal
+                rect.hclust(hc, k=15, border="#009999")   
+                abline(1.81, 0, col="#FF0099")   # pink 
+                rect.hclust(hc, k=23, border="#FF0099")   
+                abline(1.5, 0, col="#000099")   # dark blue
+                rect.hclust(hc, k=50, border="#000099")
+          }
+          if(remake_figs) { dev.off() } 
+      
+      
+      } else if(dataset_name=="noexcludes2001_2015" && is.null(subset_name) && ntopics==23) {
+          if(remake_figs) { pdf(file=file.path(imageloc, paste0(main, ".pdf"))) }
+          plot(hc, main=main, cex=0.6)
+          if(auto.lines) {
               abline(2, 0, col="#99FF99")            # seafoam
               rect.hclust(hc, k=15, border="#99FF99")
               abline(1.81, 0, col="#009900")          # green
               rect.hclust(hc, k=23, border="#009900")
               abline(1.5, 0, col="#009999")             # teal
               rect.hclust(hc, k=50, border="#009999")
+          }
           if(remake_figs) { dev.off() } 
-      }
-      
-      else if(dataset_name=="noexcludes2001_2015" && is.null(subset_name) && ntopics==23) {
-          if(remake_figs) { pdf(file=file.path(imageloc, paste0(main, ".pdf"))) }
-          plot(hc, main=main, cex=0.3)
-          abline(2, 0, col="#99FF99")            # seafoam
-          rect.hclust(hc, k=15, border="#99FF99")
-          abline(1.81, 0, col="#009900")          # green
-          rect.hclust(hc, k=23, border="#009900")
-          abline(1.5, 0, col="#009999")             # teal
-          rect.hclust(hc, k=50, border="#009999")
-          if(remake_figs) { dev.off() } 
-      }
       
       
-      else if(dataset_name=="noexcludes2001_2015" && is.null(subset_name) && ntopics==60) {
+      # use the following for CCCC 2019
+      } else if(dataset_name=="noexcludes2001_2015" && is.null(subset_name) && ntopics==50 && iter_index==1) {
           if(remake_figs) { pdf(file=file.path(imageloc, paste0(main, ".pdf"))) }
           plot(hc, main=main)
-          abline(3.09, 0, col="#99FF99")
-          rect.hclust(hc, k=2, border="#99FF99")    # seafoam
-          abline(2.165, 0, col="#009900")
-          rect.hclust(hc, k=5, border="#009900")    # green
-          abline(1.885, 0, col="#990099")
-          rect.hclust(hc, k=7, border="#990099")    # purple
-          abline(1.735, 0, col="#009999")
-          rect.hclust(hc, k=12, border="#009999")   # teal
-          abline(1.65, 0, col="#000099")
-          rect.hclust(hc, k=15, border="#000099")   # dark blue
-          abline(1.53, 0, col="#FF0099")
-          rect.hclust(hc, k=22, border="#FF0099")   # pink 
-          abline(1.48, 0, col="#999900")
-          rect.hclust(hc, k=24, border="#999900")   # yellow
-          abline(1.33, 0, col="#00FF99")
-          rect.hclust(hc, k=40, border="#00FF99")   # sky blue
+          if(auto.lines) {
+              rect.hclust(hc, k=2, border="#99FF99")    # seafoam
+              abline(2.95, 0, col="#99FF99")
+              rect.hclust(hc, k=4, border="#009900")    # green
+              abline(2.17, 0, col="#009900")
+              rect.hclust(hc, k=6, border="#990099")    # purple
+              abline(1.92, 0, col="#990099")
+              rect.hclust(hc, k=8, border="#009999")   # teal
+              abline(1.65, 0, col="#009999")
+              rect.hclust(hc, k=12, border="#000099")   # dark blue
+              abline(1.51, 0, col="#000099")
+              rect.hclust(hc, k=16, border="#FF0099")   # pink 
+              abline(1.46, 0, col="#FF0099")
+              rect.hclust(hc, k=20, border="#999900")   # yellow
+              abline(1.42, 0, col="#999900")
+          }
           if(remake_figs) { dev.off() } 
-      }
+          
+          splits <- c(2, 4, 6, 8, 12, 16, 20)
       
-      else {
+      } else if(dataset_name=="noexcludes2001_2015" && subset_name=="realconsorts2001_2015" 
+                && ntopics==50 && iter_index==1) {
+          if(remake_figs) { pdf(file=file.path(imageloc, paste0(main, ".pdf"))) }
+          plot(hc, main=main)
+          if(auto.lines) {
+              rect.hclust(hc, k=2, border="#99FF99")    # seafoam
+              abline(2.88, 0, col="#99FF99")
+              rect.hclust(hc, k=3, border="#009900")    # green
+              abline(2.31, 0, col="#009900")
+              rect.hclust(hc, k=7, border="#990099")    # purple
+              abline(1.91, 0, col="#990099")
+              rect.hclust(hc, k=9, border="#009999")   # teal
+              abline(1.69, 0, col="#009999")
+              rect.hclust(hc, k=14, border="#000099")   # dark blue
+              abline(1.52, 0, col="#000099")
+              rect.hclust(hc, k=20, border="#FF0099")   # pink 
+              abline(1.43, 0, col="#FF0099")
+              rect.hclust(hc, k=24, border="#999900")   # yellow
+              abline(1.37, 0, col="#999900")
+          }
+          if(remake_figs) { dev.off() } 
+      
+          splits=c(2, 3, 7, 9, 14, 20, 24)
+              
+      } else if(dataset_name=="noexcludes2001_2015" && is.null(subset_name) && ntopics==60) {
+          if(remake_figs) { pdf(file=file.path(imageloc, paste0(main, ".pdf"))) }
+          plot(hc, main=main)
+          if(auto.lines) {
+              abline(2.95, 0, col="#99FF99")
+              rect.hclust(hc, k=2, border="#99FF99")    # seafoam
+              abline(2.165, 0, col="#009900")
+              rect.hclust(hc, k=5, border="#009900")    # green
+              abline(1.885, 0, col="#990099")
+              rect.hclust(hc, k=7, border="#990099")    # purple
+              abline(1.735, 0, col="#009999")
+              rect.hclust(hc, k=12, border="#009999")   # teal
+              abline(1.65, 0, col="#000099")
+              rect.hclust(hc, k=15, border="#000099")   # dark blue
+              abline(1.53, 0, col="#FF0099")
+              rect.hclust(hc, k=22, border="#FF0099")   # pink 
+              abline(1.48, 0, col="#999900")
+              rect.hclust(hc, k=24, border="#999900")   # yellow
+              abline(1.33, 0, col="#00FF99")
+              rect.hclust(hc, k=40, border="#00FF99")   # sky blue
+          }
+        if(remake_figs) { dev.off() } 
+      } else {
           if(remake_figs) { pdf(file=file.path(imageloc, paste0(main, ".pdf"))) }
               plot(hc, main=main)
           if(remake_figs) { dev.off() } 
@@ -222,7 +351,8 @@ frameToJSON <- function(dataset_name="consorts",
           message("Exiting function.")
           message("Using abline() and rect.hclust(), try various cut levels
                     until you find a set that seems promising.")
-          return()
+          return() ## TO DO: instead of exiting, can we pause somehow but preserve the environment?
+                   ## We still need hc to do the cuts.    
       }  
   }   # end of if(do.plot)
   
@@ -236,72 +366,53 @@ frameToJSON <- function(dataset_name="consorts",
   ## at specific heights (on the y axis of that plot), if we don't want to
   ## count the groups.
 
+if(dataset_name=="noexcludes2001_2015" && ntopics==50 && length(bad.topics==9)) {
+  splits <- c(2, 4, 6, 8, 12, 16, 20)
+} 
+  
     # Ben: splits for consorts with 55 topics (i.e. including bad.topics)
 if(dataset_name=="consorts" && ntopics==55 && is.null(bad.topics)) {
   splits <- c(2, 5, 10, 22, 55)
-  
-  memb2 <- as.character(cutree(hc, k = 2))
-  memb5 <- as.character(cutree(hc, k = 5))
-  memb10 <- as.character(cutree(hc, k = 10))
-  memb22 <- as.character(cutree(hc, k = 22))
-  memb55 <- as.character(cutree(hc, k = 55))
 }
 
     # Ben: splits for consorts with 50 topics 
     # (i.e. 5 bad.topics removed for bad OCR or boilerplate)
 if(dataset_name=="consorts" && ntopics==55 && length(bad.topics) == 5) {
   splits <- c(2, 4, 6, 7, 12, 16, 32)
-
-  memb2 <- as.character(cutree(hc, k = 2))
-  memb4 <- as.character(cutree(hc, k = 4))
-  memb6 <- as.character(cutree(hc, k = 6))
-  memb7 <- as.character(cutree(hc, k = 7))
-  memb12 <- as.character(cutree(hc, k = 12))
-  memb16 <- as.character(cutree(hc, k = 16))
-  memb32 <- as.character(cutree(hc, k = 32))
 }  
   
     # Ben: splits for realconsorts subset with 48 topics 
     # (i.e. 7 bad.topics removed for bad OCR, boilerplate, or non-English lang)
 if(dataset_name=="consorts" && subset_name=="realconsorts" && ntopics==55 && length(bad.topics) == 7) {
   splits <- c(2, 4, 6, 9, 11, 19)
-
-  memb2 <- as.character(cutree(hc, k = 2))
-  memb4 <- as.character(cutree(hc, k = 4))
-  memb6 <- as.character(cutree(hc, k = 6))
-  memb9 <- as.character(cutree(hc, k = 9))
-  memb11 <- as.character(cutree(hc, k = 11))
-  memb19 <- as.character(cutree(hc, k = 19))
 }
   
     # Ben: splits for consorts with 48 topics (i.e. 7 bad.topics removed 
     # for bad OCR, boilerplate, or non-English lang)
 if(dataset_name=="consorts" && is.null(subset_name) && ntopics==55 && length(bad.topics) == 7) {
   splits <- c(2, 4, 6, 11, 21)
-
-  memb2 <- as.character(cutree(hc, k = 2))
-  memb4 <- as.character(cutree(hc, k = 4))
-  memb6 <- as.character(cutree(hc, k = 6))
-  memb11 <- as.character(cutree(hc, k = 11))
-  memb21 <- as.character(cutree(hc, k = 21))
 }   
 
-    # TO DO: Add splits for model with 150 topics
+    # Splits for model with 150 topics
 if(dataset_name=="noexcludes2001_2015" && is.null(subset_name) && ntopics==150 && is.null(bad.topics)) {  
-    
+    splits <- c(2, 3, 8, 15, 23, 50)
 }
   
 if(dataset_name=="noexcludes2001_2015" && is.null(subset_name) && ntopics==60 && is.null(bad.topics)) {
   splits <- c(2, 5, 7, 12, 15, 22, 24, 40)
-  memb2 <- as.character(cutree(hc, k = 2))
-  memb5 <- as.character(cutree(hc, k = 5))
-  memb7 <- as.character(cutree(hc, k = 7))
-  memb12 <- as.character(cutree(hc, k = 12))
-  memb15 <- as.character(cutree(hc, k = 15))
-  memb22 <- as.character(cutree(hc, k = 22))
-  memb24 <- as.character(cutree(hc, k = 24))
-  memb40 <- as.character(cutree(hc, k = 40))
 }
+ 
+ # use the following for CCCC 2019 
+ if(dataset_name=="noexcludes2001_2015" && is.null(subset_name) && ntopics==50 && iter_index==1) {
+      splits <- c(2, 4, 6, 8, 12, 16, 20) 
+  }
+  
+  # ***this version should work to assign group membership for any given set of splits***
+  # get_cluster_names is from topic_term_synonyms.R
+  for (i in splits) {
+      assign(paste0("memb", i), as.character(cutree(hc, k = i)))
+      assign(paste0("k", i), get_cluster_names(rect.hclust(hc, k=i)))
+  }
   
   # Make note of group names for later; 
   # same operation for all numbers of bad.topics
@@ -312,7 +423,8 @@ if(dataset_name=="noexcludes2001_2015" && is.null(subset_name) && ntopics==60 &&
   if(!exists("get_topic_labels", mode="function")) { 
         source(file="get topic labels.R") 
   }
-  topic.labels.dt <- get_topic_labels(dataset_name, ntopics, subset_name, iter_index)
+  topic.labels.dt <- get_topic_labels(dataset_name=dataset_name, ntopics=ntopics, 
+                                      subset_name=subset_name, iter_index=iter_index)
     # str(topic.labels.dt)
       
   
@@ -324,7 +436,8 @@ if(dataset_name=="noexcludes2001_2015" && is.null(subset_name) && ntopics==60 &&
       if(!exists("find_topic_titles", mode="function")) {
           source(file="find topic titles.R")
       }
-      titles_all <- find_topic_titles(dataset_name, ntopics, subset_name, iter_index)
+      titles_all <- find_topic_titles(dataset_name=dataset_name, ntopics=ntopics, 
+                                      subset_name=subset_name, iter_index=iter_index)
   } else {
       # if the file does exist, just load it now
       titles_all <- read.csv(filename)
@@ -333,7 +446,7 @@ if(dataset_name=="noexcludes2001_2015" && is.null(subset_name) && ntopics==60 &&
   # exclude non-content-bearing topics
   if(!is.null(bad.topics)) { 
       topic.labels.dt <- topic.labels.dt[!Topic %in% bad.topics]  
-      titles_all <- titles_all[!titles_all$i %in% bad.topics,]
+      titles_all <- titles_all[!titles_all$topic %in% bad.topics,]
   }
         
   #Rolf: Now put this information into a table, together with the labels and
@@ -349,7 +462,7 @@ if(dataset_name=="noexcludes2001_2015" && is.null(subset_name) && ntopics==60 &&
         topwords = topic.labels.dt[, Top.Words], 
         rank = topic.labels.dt[, Rank], 
         order = hc$order,
-        titles = titles_all[, "one_topic_titles"]
+        titles = titles_all[, "top_titles"]
         )
 
   #Rolf: We might want to know the size of each node. Let's add that.
@@ -371,11 +484,13 @@ if(dataset_name=="noexcludes2001_2015" && is.null(subset_name) && ntopics==60 &&
   # also be returned by the function.
   if(remake_figs) {
     if(! is.null(subset_name)) {
-        filename <- file.path(imageloc, paste0("topic clusters - ", dataset_name, "k",
-                           ntopics, "--", subset_name, ", bad topics removed", iter_index, ".csv"))
+        filename <- file.path(imageloc, paste0("topic clusters - ", dataset_name, 
+                           "k", ntopics, "_", iter_index, "--", subset_name, ", ", 
+                           length(bad.topics), " bad topics removed.csv"))
     } else {
-        filename <- file.path(imageloc, paste0("topic clusters - ", dataset_name, "k",
-                        ntopics, "bad topics removed", iter_index, ".csv"))
+        filename <- file.path(imageloc, paste0("topic clusters - ", dataset_name, 
+                        "k", ntopics, "_", iter_index, ", ", 
+                        length(bad.topics), " bad topics removed.csv"))
     }
     write.csv(b, filename)
   } else {
@@ -430,7 +545,9 @@ if(dataset_name=="noexcludes2001_2015" && is.null(subset_name) && ntopics==60 &&
   #add separators, or a prefix and suffix to make the formatting just right
     # Ben adds: to avoid overwriting, only save this file if remake_figs is
     # TRUE
-    if(remake_figs) {  cat(jsonOut,file=outfile)    }
+    if(remake_figs) {  
+        cat(jsonOut,file=outfile)    
+    }
 
   # Ben: Return the data.table for use in edge bundling, below
   return(b)
@@ -448,7 +565,7 @@ if(dataset_name=="noexcludes2001_2015" && is.null(subset_name) && ntopics==60 &&
 #     2) loop through the targets, and find the "name" corresponding to
 #         that target
 #     3) convert to JSON.   
-###
+########
 
 cotopic_edges <- function(dataset_name="consorts", 
               ntopics=55, 
@@ -466,15 +583,20 @@ cotopic_edges <- function(dataset_name="consorts",
 
     # the desired location of the JSON file produced by the function
     if(is.null(outfile)) {
-        outfile <- file.path(webloc, paste0("edges_", dataset_name, "k", ntopics,
-                 subset_name, 
-                 "_", ntopics-length(bad.topics), "_", level*100,
-                 "pct_min", min, "_nobads", iter_index, ".json"))
+        outfile <- file.path(webloc, 
+                paste0(build_plot_title(dataset_name=dataset_name, ntopics=ntopics, 
+                                    iter_index=iter_index, subset_name=subset_name,
+                                    bad.topics=bad.topics, whatitis="edge_data"), 
+                       "--min", min, "--level", level, ".json"))
     }
+    
+    
 
     # get co-occurring topics, for hierarchical edge bundling
     if(!exists("get.cotopics")) { source(file.path(sourceloc, "cotopics.R")) }
-    cotopics <- get.cotopics(dataset_name, ntopics, subset_name, level, min)
+    cotopics <- get.cotopics(dataset_name=dataset_name, ntopics=ntopics, 
+                             subset_name=subset_name, iter_index=iter_index,
+                             level=level, min=min)
       
     # that gives one-directional links; to ensure symmetry, flip source and
     # target and combine.
@@ -564,13 +686,15 @@ cotopic_edges <- function(dataset_name="consorts",
     edge_bund <- edge_bund[!(name %in% "NA")]
 
     jsonEdge <- toJSON(edge_bund, pretty=TRUE)
-    cat(jsonEdge, file=outfile)
+    if(remake_figs) {
+        cat(jsonEdge, file=outfile)
+    }
     return(jsonEdge)
 }
 
 
-if(autorun) { 
-    remake_figs
+if(FALSE) { 
+    remake_figs=T
     # debug(frameToJSON)
     frameToJSON(do.plot=T)
     frameToJSON(subset_name="realconsorts")
@@ -580,13 +704,18 @@ if(autorun) {
     frameToJSON(do.plot=T, dataset_name="noexcludes2001_2015", subset_name=NULL, ntopics=60, iter_index=4, bad.topics = NULL)
     frameToJSON(do.plot=T, dataset_name="noexcludes2001_2015", subset_name="consorts2001_2015", ntopics=60, iter_index=4, bad.topics = NULL)
     frameToJSON(do.plot=T, dataset_name="noexcludes2001_2015", subset_name="realconsorts2001_2015", ntopics=60, iter_index=4, bad.topics = NULL)
-
+    frameToJSON(do.plot=F, dataset_name="noexcludes2001_2015", subset_name=NULL, ntopics=50, iter_index=1, bad.topics = c(3, 12, 50, 47, 34, 36, 30, 8, 15))
+    frameToJSON(do.plot=T, dataset_name="noexcludes2001_2015", subset_name="realconsorts2001_2015", ntopics=50, iter_index=1, bad.topics = c(3, 12, 50, 47, 34, 36, 30, 8, 15), use.labels=T)
+    frameToJSON(do.plot=T, dataset_name="noexcludes2001_2015", subset_name="knownprograms2001_2015", ntopics=50, iter_index=1, bad.topics = c(3, 12, 50, 47, 34, 36, 30, 8, 15), use.labels=T)
+    
+    
+    
     # 12% determined by `variation of topic proportions.R` to include nearly
     # all primary topics and 3/4 of secondary topics for *consorts*; 
     # see `Variation of Topic Proportions, Top 10 Topics per Document.pdf`
-    cotopic_edges(level=0.12, min=1)        
+    cotopic_edges(level=0.12, min=1, dataset_name="noexcludes2001_2015", subset_name="realconsorts2001_2015", ntopics=50, iter_index=1, bad.topics = c(3, 12, 50, 47, 34, 36, 30, 8, 15))
     cotopic_edges(level=0.12, min=2)        
-    cotopic_edges(level=0.12, min=3)        
+    cotopic_edges(level=0.12, min=3, dataset_name="noexcludes2001_2015", ntopics=50, iter_index=1, bad.topics = c(3, 12, 50, 47, 34, 36, 30, 8, 15))        
     cotopic_edges(level=0.12, min=4)
     cotopic_edges(level=0.12, min=5)
     
