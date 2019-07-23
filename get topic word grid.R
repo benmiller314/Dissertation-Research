@@ -1,5 +1,6 @@
 # Get word/topic grid
 
+# helper function
 just.value <- function(key.value) {
     as.integer(strsplit(as.character(key.value), ":")[[1]][2])
 }
@@ -14,19 +15,19 @@ get.wordtopic.grid <- function(dataset_name="noexcludes2001_2015",
     
     if(file.exists(filename)) {
         # oneline <- readLines(file.path(tmloc, filename), n=1)
-        dt <- read.table(filename, header=FALSE, fill=TRUE,
+        wt <- read.table(filename, header=FALSE, fill=TRUE,
                     col.names=c("index", "token", paste0("TopicRanked", 1:ntopics))
         )
-        dt <- data.table(dt)
+        wt <- data.table(wt)
     } else {
         stop("'get topic word grid.R': could not load word-topic pairs from file ",
              filename)
     }
     
-    return(dt)
+    return(wt)
 }
 
-# The format of the wordtopic dt is given by col.names, above: each row is a token,
+# The format of the wordtopic wt is given by col.names, above: each row is a token,
 # and columns after the first two are key/value pairs, consisting of
 # a *zero-indexed* topic number, a colon, and a probability score / weight. 
 # Not sure how probability is represented; I think it's actually raw counts?
@@ -37,12 +38,12 @@ get.wordtopic.grid <- function(dataset_name="noexcludes2001_2015",
 # Make grid smaller by trimming rows 
 # for which the top-ranked topic is really low weight
 
-trim.wordtopic.grid <- function(dt,            # wordtopic grid, as above
+trim.wordtopic.grid <- function(wt,            # wordtopic grid, as above
                                 threshold=5)   # minimum word-weight in top-ranked topic
 {
-    tormpword_values <- sapply(dt[["TopicRanked1"]], just.value)
+    topword_values <- sapply(wt[["TopicRanked1"]], just.value)
     cutindex <- which(topword_values < threshold)
-    return(dt[-cutindex])
+    return(wt[-cutindex])
 }
 
 # To compare topics to one another, we want to reshape this so as to 
@@ -50,12 +51,12 @@ trim.wordtopic.grid <- function(dt,            # wordtopic grid, as above
 
 find.topic.in.one.col <- function(topic,     # search by topic number
                                   rank.col,  # name columns by topic.ranked.X
-                                  dt)        # a wordtopic grid, as above
+                                  wt)        # a wordtopic grid, as above
 {
     colname <- paste0("TopicRanked", rank.col)
     my_expr <- paste0("^", topic-1, ":")    # note the offset (convert 0-index to 1-index)
-    index <- grep(my_expr, dt[[colname]])
-    key.value.pairs <- dt[index, ..colname]
+    index <- grep(my_expr, wt[[colname]])
+    key.value.pairs <- wt[index, ..colname]
     
     values <- sapply(key.value.pairs[[1]], just.value)
     
@@ -65,13 +66,13 @@ find.topic.in.one.col <- function(topic,     # search by topic number
 
 find.topic.in.all.cols <- function(topic,
                                    ntopics=50,
-                                   dt,             # a wordtopic grid, as above
+                                   wt,             # a wordtopic grid, as above
                                    threshold=5)    # minimum weight per token
 {
     topic_word_vec <- data.table(token_ind=numeric(), weight=numeric())
     for (column in seq_len(ntopics)) {
         topic_word_vec <- rbindlist(list(topic_word_vec,
-                                         find.topic.in.one.col(topic, column, dt)
+                                         find.topic.in.one.col(topic, column, wt)
                                         )
                                    )
     }
@@ -83,22 +84,23 @@ find.topic.in.all.cols <- function(topic,
     setkey(topic_word_vec, token_ind)
     
     # add useful info
-    topic_word_vec[, token:=dt[topic_word_vec$token_ind, token]]
+    topic_word_vec[, token:=wt[topic_word_vec$token_ind, token]]
     topic_word_vec[, probability:=weight/sum(weight)]
     
     return(topic_word_vec)
 }
 
-build.topicword.table <- function(dt=NULL,    # if it exists, pass it for speed boost
+build.topicword.table <- function(wt=NULL,    # if it exists, pass it for speed boost
                                  per.topic.threshold=300,
                                  top.topic.threshold=5,
                                  dataset_name="noexcludes2001_2015",
                                  ntopics=50,
-                                 iter_index=1)
+                                 iter_index=1,
+                                 bad.topics=NULL)
 {
-    if(is.null(dt)) {
-        dt <- get.wordtopic.grid(dataset_name, ntopics, iter_index)
-        dt <- trim.wordtopic.grid(dt, top.topic.threshold)
+    if(is.null(wt)) {
+        wt <- get.wordtopic.grid(dataset_name, ntopics, iter_index)
+        wt <- trim.wordtopic.grid(wt, top.topic.threshold)
     }
     
     tw <- data.table(topic=numeric(),
@@ -107,16 +109,18 @@ build.topicword.table <- function(dt=NULL,    # if it exists, pass it for speed 
                      token=character(),
                      probability=numeric())
     
-    for (i in seq_len(ntopics)) {
+    
+    topic_list <- setdiff(seq_len(ntopics), bad.topics) # still works if bad.topics is NULL
+    
+    for (i in topic_list) {
        tryCatch(
            expr = {   
-               message("Building word vector for topic ", i, "...")
+               message("Building word vector for topic ", i, "...");
                tw_i <- find.topic.in.all.cols(topic=i,
                                           ntopics=ntopics,
-                                          dt=dt,
-                                          threshold=per.topic.threshold)
-    
-               tw_i[,topic:=i]
+                                          wt=wt,
+                                          threshold=per.topic.threshold);
+               tw_i[,topic:=i];
                tw <- rbindlist(list(tw, tw_i), use.names=TRUE)
            },
            error = function(e) { e },
@@ -129,19 +133,19 @@ build.topicword.table <- function(dt=NULL,    # if it exists, pass it for speed 
 
 topicword.probability.grid <- function(tw)         # topicword.table as built above
 {
-    ntopics <- max(tw$topic)
+    topic_list <- unique(tw$topic)
     
     # start empty, with a row for each included token
     tw.grid <- data.table(token_ind=as.numeric(levels(factor(tw$token_ind))))
     
     # and add one column for each topic
-    for (i in seq_len(ntopics)) {
+    for (i in topic_list) {
         tw.grid <- merge(tw.grid, 
                          tw[topic==i, .(token_ind, i=probability)], 
                          by="token_ind",
                          all=TRUE)                 # merge all=T introduces NA's; 
                                                    # we'll deal with them later
-        setnames(tw.grid, "i", paste0("T", i))
+        setnames(tw.grid, "i", as.character(i))
     }
     
     # replace NA's with vanishingly small (but non-zero) value
@@ -183,7 +187,7 @@ one.tw.probability.vector <- function(mytopic,     # just a number in 1:ntopics
                                    iter_index=iter_index)
     }
     
-    # pull out just the topics we need    
+    # pull out just the topic we need    
     tw_a <- tw[topic==mytopic][order(-probability)]     # make sure it looks okay
     setkey(tw_a, token_ind)
     vector_a <- tw_a$probability
@@ -193,16 +197,16 @@ one.tw.probability.vector <- function(mytopic,     # just a number in 1:ntopics
 }    
     
 if(FALSE) { #test
-    dt <- get.wordtopic.grid()      # 1,616,842 tokens
-    dt <- trim.wordtopic.grid(dt)   #   254,092 tokens
+    wt <- get.wordtopic.grid()      # 1,616,842 tokens
+    wt <- trim.wordtopic.grid(wt)   #   254,092 tokens
     topic=1    
     rank.col=1
-    t1_words <- find.topic.in.all.cols(topic=1, ntopics=50, dt)
+    t1_words <- find.topic.in.all.cols(topic=1, ntopics=50, wt)
     t1_words[order(-probability)]
-    t4_words <- find.topic.in.all.cols(topic=11, ntopics=50, dt=dt, threshold=300)
+    t4_words <- find.topic.in.all.cols(topic=11, ntopics=50, wt=wt, threshold=300)
     
     # put it all together
-    tw <- build.topicword.grid(dt, ntopics=50)
+    tw <- build.topicword.table(wt=wt)
     
     # to extract one topic/word vector (for inspection, comparison, distance, etc):
     tw[topic==1]
