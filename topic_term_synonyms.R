@@ -56,7 +56,7 @@ match_lists <- function(listA, listB) {
 
 two_topic_synonyms <- function(topic_a,
                                topic_b,
-                               term_source = c("by_tfidf", "by_prob"),
+                               term_source = c("by_tfitf", "by_prob"),
                                dataset_name = "noexcludes2001_2015", 
                                ntopics = 50,
                                iter_index = 1,
@@ -75,8 +75,8 @@ two_topic_synonyms <- function(topic_a,
     keys <- tfidf.for.topics(dataset_name=dataset_name, ntopics=ntopics,
                              iter_index=iter_index, tw=tw)$topN
     
-    if (term_source == "by_tfidf") {
-        keys <- keys$by_tfidf
+    if (term_source == "by_tfitf") {
+        keys <- keys$by_tfitf
     } else if(term_source == "by_prob") {
         keys <- keys$by_prob 
     } 
@@ -295,6 +295,7 @@ if(autorun) {
 
     twm <- topic_distance_matrix(tw=tw)
     ag <- topic_clusters(twm, use.labels=T)
+    k20
 }
 
 

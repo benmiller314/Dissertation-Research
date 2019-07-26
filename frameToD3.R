@@ -21,7 +21,7 @@
 
 # Ben: helper function to build a filename / main title for topic-modeling figures
 build_plot_title <- function(dataset_name, ntopics, iter_index, subset_name, 
-                             bad.topics, use.labels=NULL,
+                             bad.topics, use.labels=FALSE,
                              whatitis="Cluster Dendrogram") {
     if(! is.null(subset_name)) { subset_part <- paste0("--", subset_name) 
     } else { subset_part <- "" }
@@ -411,7 +411,7 @@ if(dataset_name=="noexcludes2001_2015" && is.null(subset_name) && ntopics==60 &&
   # get_cluster_names is from topic_term_synonyms.R
   for (i in splits) {
       assign(paste0("memb", i), as.character(cutree(hc, k = i)))
-      assign(paste0("k", i), get_cluster_names(rect.hclust(hc, k=i)))
+      # assign(paste0("k", i), get_cluster_names(rect.hclust(hc, k=i)))
   }
   
   # Make note of group names for later; 
@@ -427,8 +427,13 @@ if(dataset_name=="noexcludes2001_2015" && is.null(subset_name) && ntopics==60 &&
                                       subset_name=subset_name, iter_index=iter_index)
     # str(topic.labels.dt)
       
+  # Ben: Update the vocabulary for those top-lists
+  if(!exists("tfidf.for.topics", mode="function")) {
+        source(file="tfidf for topics.R")
+  }
+  topwords <- tfidf.for.topics(tw=tw)$topN
   
-  # Also add top dissertation titles
+  # Ben: Also add top dissertation titles
   filename <- file.path(imageloc, paste0("top_titles_per_topic-", dataset_name, "k", ntopics, subset_name, iter_index, ".csv"))
   
   if (!file.exists(filename))  {
@@ -447,6 +452,7 @@ if(dataset_name=="noexcludes2001_2015" && is.null(subset_name) && ntopics==60 &&
   if(!is.null(bad.topics)) { 
       topic.labels.dt <- topic.labels.dt[!Topic %in% bad.topics]  
       titles_all <- titles_all[!titles_all$topic %in% bad.topics,]
+      topwords <- topwords[!(topic %in% bad.topics),]
   }
         
   #Rolf: Now put this information into a table, together with the labels and
@@ -459,7 +465,8 @@ if(dataset_name=="noexcludes2001_2015" && is.null(subset_name) && ntopics==60 &&
                         ), 
         label = gsub(' ', '_', topic.labels.dt[, Label]), 
         topic = topic.labels.dt[, Topic], 
-        topwords = topic.labels.dt[, Top.Words], 
+        topwords = topwords$by_prob,
+        itfwords = topwords$by_tfitf,
         rank = topic.labels.dt[, Rank], 
         order = hc$order,
         titles = titles_all[, "top_titles"]
@@ -520,6 +527,7 @@ if(dataset_name=="noexcludes2001_2015" && is.null(subset_name) && ntopics==60 &&
              size=x[,"size"][y],
              scaledsize=x[,"scaledsize"][y],
              topwords=x[,"topwords"][y],
+             itfwords=x[,"itfwords"][y],
              topic=x[,"topic"][y],
              rank=x[,"rank"][y],
              titles=x[,"titles"][y])
@@ -574,8 +582,9 @@ cotopic_edges <- function(dataset_name="consorts",
               level=0.12,   # topic must constitute how much of each doc?
               min=3,        # how many times must a pair of topics co-occur?
               outfile=NULL,
-              bad.topics= c("2", "4", "22", "24", "47", "50", "13") 
+              bad.topics= c("2", "4", "22", "24", "47", "50", "13"), 
                             # exclude non-content-bearing topics
+              tw=NULL    # topic-word grid, if we have one, makes this much faster
               )
 {
 
@@ -587,7 +596,7 @@ cotopic_edges <- function(dataset_name="consorts",
                 paste0(build_plot_title(dataset_name=dataset_name, ntopics=ntopics, 
                                     iter_index=iter_index, subset_name=subset_name,
                                     bad.topics=bad.topics, whatitis="edge_data"), 
-                       "--min", min, "--level", level, ".json"))
+                       "--min", min, "--", level*100, "pct.json"))
     }
     
     
@@ -596,7 +605,7 @@ cotopic_edges <- function(dataset_name="consorts",
     if(!exists("get.cotopics")) { source(file.path(sourceloc, "cotopics.R")) }
     cotopics <- get.cotopics(dataset_name=dataset_name, ntopics=ntopics, 
                              subset_name=subset_name, iter_index=iter_index,
-                             level=level, min=min)
+                             level=level, min=min, bad.topics=bad.topics)
       
     # that gives one-directional links; to ensure symmetry, flip source and
     # target and combine.
@@ -614,7 +623,7 @@ cotopic_edges <- function(dataset_name="consorts",
     # head(edges)
     
     # Bring in the node table
-    b <- frameToJSON(dataset_name, ntopics, subset_name, iter_index, bad.topics=bad.topics, do.plot=F)
+    b <- frameToJSON(dataset_name, ntopics, subset_name, iter_index, bad.topics=bad.topics, do.plot=F, tw=tw)
     setkey(b, topic)
     # head(b)
     
@@ -655,6 +664,7 @@ cotopic_edges <- function(dataset_name="consorts",
         edge_bund[i, "size"] <- b[source %in% i, size]
         edge_bund[i, "scaledsize"] <- b[source %in% i, scaledsize] * 100
         edge_bund[i, "topwords"] <- b[source %in% i, topwords]
+        edge_bund[i, "itfwords"] <- b[source %in% i, itfwords]
         edge_bund[i, "titles"] <- b[source %in% i, titles]
         
         # extract targets' topic numbers
@@ -706,14 +716,14 @@ if(FALSE) {
     frameToJSON(do.plot=T, dataset_name="noexcludes2001_2015", subset_name="realconsorts2001_2015", ntopics=60, iter_index=4, bad.topics = NULL)
     frameToJSON(do.plot=F, dataset_name="noexcludes2001_2015", subset_name=NULL, ntopics=50, iter_index=1, bad.topics = c(3, 12, 50, 47, 34, 36, 30, 8, 15))
     frameToJSON(do.plot=T, dataset_name="noexcludes2001_2015", subset_name="realconsorts2001_2015", ntopics=50, iter_index=1, bad.topics = c(3, 12, 50, 47, 34, 36, 30, 8, 15), use.labels=T)
-    frameToJSON(do.plot=T, dataset_name="noexcludes2001_2015", subset_name="knownprograms2001_2015", ntopics=50, iter_index=1, bad.topics = c(3, 12, 50, 47, 34, 36, 30, 8, 15), use.labels=T)
+    frameToJSON(do.plot=F, dataset_name="noexcludes2001_2015", subset_name="knownprograms2001_2015", ntopics=50, iter_index=1, bad.topics = c(3, 12, 50, 47, 34, 36, 30, 8, 15), use.labels=T, tw=tw)
     
     
     
     # 12% determined by `variation of topic proportions.R` to include nearly
     # all primary topics and 3/4 of secondary topics for *consorts*; 
     # see `Variation of Topic Proportions, Top 10 Topics per Document.pdf`
-    cotopic_edges(level=0.12, min=1, dataset_name="noexcludes2001_2015", subset_name="realconsorts2001_2015", ntopics=50, iter_index=1, bad.topics = c(3, 12, 50, 47, 34, 36, 30, 8, 15))
+    cotopic_edges(level=0.12, min=1, dataset_name="noexcludes2001_2015", subset_name="knownprograms2001_2015", ntopics=50, iter_index=1, bad.topics = c(3, 12, 50, 47, 34, 36, 30, 8, 15))
     cotopic_edges(level=0.12, min=2)        
     cotopic_edges(level=0.12, min=3, dataset_name="noexcludes2001_2015", ntopics=50, iter_index=1, bad.topics = c(3, 12, 50, 47, 34, 36, 30, 8, 15))        
     cotopic_edges(level=0.12, min=4)
@@ -722,6 +732,7 @@ if(FALSE) {
     # 11% determined by `variation of topic proportions.R` to include nearly
     # all primary topics and 3/4 of secondary topics for *realconsorts*; 
     # see `Variation of Topic Proportions, Top 10 Topics per Document.pdf`
-    
+    cotopic_edges(level=0.11, min=1, tw=tw, dataset_name="noexcludes2001_2015", subset_name="knownprograms2001_2015", ntopics=50, iter_index=1, bad.topics = c(3, 12, 50, 47, 34, 36, 30, 8, 15))
+    cotopic_edges(level=0.12, min=3, tw=tw, dataset_name="noexcludes2001_2015", subset_name="knownprograms2001_2015", ntopics=50, iter_index=1, bad.topics = c(3, 12, 50, 47, 34, 36, 30, 8, 15))
 }
 

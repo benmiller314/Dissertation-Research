@@ -13,12 +13,13 @@
 get.cotopics <- function(dataset_name="consorts", 
 		 ntopics=55, 
 		 subset_name=NULL,
+		 iter_index="",
 		 level=.12, 			# what fraction of the doc (out of 1) must 
 		 						# each topic account for?
 		 json=F, 				# export to JSON?
 		 min=3,					# how many times must these topics co-occur 
 		 						# to be "co-topics"?
-		 bad.topics=c("2", "4", "22", "24", "47", "50", "13")	
+		 bad.topics=c("2", "4", "22", "24", "47", "50", "13")
 		 						# exclude non-content-bearing topics
 		) 
 {
@@ -28,7 +29,8 @@ get.cotopics <- function(dataset_name="consorts",
 	if (!exists("get.doctopic.grid", mode="function")) { 
 		source(file="get doctopic grid.R") 
 	}
-	grid <- get.doctopic.grid(dataset_name, ntopics, subset_name)$outputfile
+	grid <- get.doctopic.grid(dataset_name=dataset_name, ntopics=ntopics, 
+	                          subset_name=subset_name, iter_index=iter_index)$outputfile
 	head(grid)
 	grid <- grid[, !names(grid) %in% bad.topics]
 	head(grid)
