@@ -1,10 +1,14 @@
-# Get word/topic grid
+# GOAL: From MALLET's output of words and topics, 
+# assemble a matrix of topic-word probability vectors
 
-# helper function
-just.value <- function(key.value) {
-    as.integer(strsplit(as.character(key.value), ":")[[1]][2])
-}
+# Assumptions:
+# 1. tmloc = a character variable storing the location (file.path) of topic modeling files
+# 2. MALLET output files are named by dataset, number of topics, and a numeric indicator
+#    of the particular iteration of the model (iter_index) on that dataset and ntopics
 
+
+
+# Load the MALLET output file
 get.wordtopic.grid <- function(dataset_name="noexcludes2001_2015", 
                                ntopics=50, 
                                iter_index=1)
@@ -30,14 +34,18 @@ get.wordtopic.grid <- function(dataset_name="noexcludes2001_2015",
 # The format of the wordtopic wt is given by col.names, above: each row is a token,
 # and columns after the first two are key/value pairs, consisting of
 # a *zero-indexed* topic number, a colon, and a probability score / weight. 
-# Not sure how probability is represented; I think it's actually raw counts?
+# Not 100% sure how probability is represented; I think it's actually raw counts?
 # see https://stackoverflow.com/questions/33251703/how-to-get-a-probability-distribution-for-a-topic-in-mallet#comment69702638_33251703)
 
+
+# extract weight value from a topic:weight pair (MALLET's format)
+just.value <- function(key.value) {
+    as.integer(strsplit(as.character(key.value), ":")[[1]][2])
+}
 
 
 # Make grid smaller by trimming rows 
 # for which the top-ranked topic is really low weight
-
 trim.wordtopic.grid <- function(wt,            # wordtopic grid, as above
                                 threshold=5)   # minimum word-weight in top-ranked topic
 {
@@ -46,9 +54,9 @@ trim.wordtopic.grid <- function(wt,            # wordtopic grid, as above
     return(wt[-cutindex])
 }
 
-# To compare topics to one another, we want to reshape this so as to 
-# index by topic.                 
 
+# To compare topics to one another, we want to reshape this so as to 
+# index by topic. We'll start by assembling one topic vector, then compile.                
 find.topic.in.one.col <- function(topic,     # search by topic number
                                   rank.col,  # name columns by topic.ranked.X
                                   wt)        # a wordtopic grid, as above
@@ -56,7 +64,8 @@ find.topic.in.one.col <- function(topic,     # search by topic number
     colname <- paste0("TopicRanked", rank.col)
     my_expr <- paste0("^", topic-1, ":")    # note the offset (convert 0-index to 1-index)
     index <- grep(my_expr, wt[[colname]])
-    key.value.pairs <- wt[index, ..colname]
+    key.value.pairs <- wt[index, ..colname] # this syntax requires data.table 1.10.2 or higher;
+                                            # see https://github.com/Rdatatable/data.table/blob/master/NEWS.md#changes-in-v1102--31-jan-2017
     
     values <- sapply(key.value.pairs[[1]], just.value)
     
@@ -90,13 +99,19 @@ find.topic.in.all.cols <- function(topic,
     return(topic_word_vec)
 }
 
+# Main function of this file; it'll call the others as needed. Returns a data.table 
+# that you can filter on to view tokens and probabilities for each topic.
+# Other functions, including those for TF-ITF, will require its output.
+# NB you should be able to re-create the top N "keys" for each topic from here
+# (though I forgot to grab the alpha for each topic...).
 build.topicword.table <- function(wt=NULL,    # if it exists, pass it for speed boost
                                  per.topic.threshold=300,
                                  top.topic.threshold=5,
                                  dataset_name="noexcludes2001_2015",
                                  ntopics=50,
                                  iter_index=1,
-                                 bad.topics=NULL)
+                                 bad.topics=NULL) # optional sequence of (1-indexed) 
+                                                  # topic numbers to leave out (bad OCR, etc)
 {
     if(is.null(wt)) {
         wt <- get.wordtopic.grid(dataset_name, ntopics, iter_index)
@@ -131,6 +146,8 @@ build.topicword.table <- function(wt=NULL,    # if it exists, pass it for speed 
     return(tw)
 }
 
+# But sometimes you really just want the probabilities, 
+# not the tokens they correspond to. 
 topicword.probability.grid <- function(tw)         # topicword.table as built above
 {
     topic_list <- unique(tw$topic)
@@ -162,7 +179,8 @@ topicword.probability.grid <- function(tw)         # topicword.table as built ab
     }
     
     # drop token_ind, so the matrix is just a set of probability vectors
-    # (so we can calculate distances). Weirdly, we don't have to re-assign tw.grid.
+    # (so we can calculate distances). Weirdly, we don't have to re-assign tw.grid,
+    # because we're assigning by reference.
     tw.grid[, token_ind:=NULL]
     
     return(tw.grid)
@@ -196,7 +214,8 @@ one.tw.probability.vector <- function(mytopic,     # just a number in 1:ntopics
     return(vector_a)
 }    
     
-if(FALSE) { #test
+# Testing space / demo
+if(FALSE) { 
     wt <- get.wordtopic.grid()      # 1,616,842 tokens
     wt <- trim.wordtopic.grid(wt)   #   254,092 tokens
     topic=1    
