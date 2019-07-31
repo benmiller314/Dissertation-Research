@@ -2,22 +2,27 @@
 # calculate the most differentially interesting words for each topic
 # by using a TF-IDF approach. Let TF, here, be the weight of that word in that topic,
 # and ITF = ln(ntopics/topics-with-term). Multiply TF times ITF to get the new weight.
-
+#
 # Returns both an updated topic-word data.table (as $tw) 
 # and a three-column data.table of topic numbers and top words (as $topN)
+#
+# Some global variables I'm assuming:
+# 1. remake_figs (boolean): should we save to file?
+# 2. imageloc (character): a file.path to a directory where files should be saved
 
-tfidf.for.topics <- function(nwords=20,
-                  tw=NULL,        # if it exists, pass in for a speed boost
+tfidf.for.topics <- function(nwords=20,   # how many top words to display?
+                  tw=NULL,        # the topic-word data.table. 
+                                  # If it exists, pass in for a (big) speed boost
                   dataset_name="noexcludes2001_2015",
                   ntopics=50,
                   iter_index=1)
 {
-    if(!exists("topicword.probability.grid", mode="function")) { 
+    if(!exists("build.topicword.table", mode="function")) { 
         source(file="get topic word grid.R") 
     }
     
-    # if we don't have a topic-word matrix, let's get one here, 
-    # so we don't have to do it twice (once for each topic)
+    # if we don't have a topic-word matrix, let's get one here. 
+    # should be stable for each topic model, so I recommend saving it, but ymmv.
     
     if(is.null(tw)) {
         tw <- build.topicword.table(dataset_name=dataset_name, 
@@ -25,24 +30,13 @@ tfidf.for.topics <- function(nwords=20,
                                     iter_index=iter_index)
     }
         
-    tw[, ITF:=log(max(topic)/.N), by=token]     # data.table has a built-in function for counting
-                                    # frequencies across the whole table
+    tw[, ITF:=log(max(topic)/.N), by=token]     # data.table has a built-in function, .N, for 
+                                                # counting frequencies across the whole table
     tw[, TFITF:=weight*ITF]
-    
-    # # gather results
-    # topic.topwords <- data.frame(topic=seq_len(ntopics),
-    #                        by_tfitf="", 
-    #                        by_prob="",
-    #                        stringsAsFactors = FALSE)
-    # 
-    # for(i in seq_len(ntopics)) {
-    #     by_tfitf <- tw[topic==i][order(-TFITF)][1:20, token]
-    #     by_prob <- tw[topic==i][order(-probability)][1:20, token]
-    #     
-    #     topic.topwords[i, "by_tfitf"][[1]] <- I(list(as.character(by_tfitf)))
-    #     topic.topwords[i, "by_prob"][[1]]  <- I(list(as.character(by_prob))) 
-    #     
-    # }
+                                                # IMPORTANT NOTE: because of how := works (by reference),
+                                                # the data.table tw will change in the calling environment, too,
+                                                # if it exists there.
+
     
     # Make simple version for data labeling, synonym-finding, etc
     # first by tfitf 
@@ -78,12 +72,10 @@ tfidf.for.topics <- function(nwords=20,
                 "topN" = topN))
 }
 
-if(FALSE) {
-    tf <- tfidf.for.topics(tw=tw)    
-}
-
-compare_topic_vocablists <- function(mytopic, # just a number 
-                                     tf)      # result from above
+# side-by-side alphabetized lists of the two kinds of toplists, for a given topic
+compare_topic_vocablists <- function(tf,        # result from above
+                                     mytopic    # a topic number
+                                     )      
 {
     topwords <- tf$topN[mytopic, by_prob]
     topwords <- sort(strsplit(topwords, " ")[[1]])
@@ -94,14 +86,15 @@ compare_topic_vocablists <- function(mytopic, # just a number
     data.table(topwords, itfwords)
 }
 
-# testing area
-if(FALSE) {
-    # get cluster names (ksplits) from frameToD3.R
-    # e.g. lists of topic names (w/prefixed numbers) with 20 clusters = k20
-    i=20
-    mynames <- k20[[i]]
-    m <- gregexpr("^[0-9]", mynames)
-    regmatches(mynames, m)
 
-    
+# testing area / examples
+if(FALSE) {
+    tf <- tfidf.for.topics(tw=tw)    
+    compare_topic_vocablists(tf, 1)
+    lapply(1:ntopics, function(x) compare_topic_vocablists(tf, x))
 }
+
+
+message("(tfidf for topics.R) The following functions have been loaded:\n",
+        " * tfidf.for.topics(nwords, tw, dataset_name, ntopics, iter_index)\n",
+        " * compare_topic_vocablists(mytopic, tf)")

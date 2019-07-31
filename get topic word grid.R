@@ -1,10 +1,13 @@
 # GOAL: From MALLET's output of words and topics, 
 # assemble a matrix of topic-word probability vectors
 
-# Assumptions:
-# 1. tmloc = a character variable storing the location (file.path) of topic modeling files
-# 2. MALLET output files are named by dataset, number of topics, and a numeric indicator
-#    of the particular iteration of the model (iter_index) on that dataset and ntopics
+# The code below assumes the following:
+# 1. tmloc (character): a file.path to a directory of topic modeling files
+# 2. MALLET output files are in that directory, named by dataset, number of topics, 
+#    and a numeric indicator of the particular iteration of the model 
+#    for that dataset and ntopics. See lines 20-21 for what I mean.
+# 3. When running MALLET, you used the --word-topic-counts-file option
+#    My MALLET settings are in the file "r2mallet with foreach.R"
 
 
 
@@ -196,11 +199,11 @@ one.tw.probability.vector <- function(mytopic,     # just a number in 1:ntopics
     # if we don't have a topic-word matrix, let's get one
     if(is.null(tw)) {
         # Get the topic-word info
-        if(!exists("build.topicword.grid", mode="function")) { 
+        if(!exists("build.topicword.table", mode="function")) { 
             source(file="get topic word grid.R") 
         }
         
-        tw <- build.topicword.grid(dataset_name=dataset_name, 
+        tw <- build.topicword.table(dataset_name=dataset_name, 
                                    ntopics=ntopics, 
                                    iter_index=iter_index)
     }
