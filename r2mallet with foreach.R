@@ -29,7 +29,7 @@ library(parallel)
 # start of wrapper function	
 r2mallet <- function(
 				# Which datasets to examine?
-					datasets = c("realconsorts"),
+					datasets = c("knownprograms"),
 				
 				# How many topics? Set kseq to a sequence to try several options.
 					kseq = c(10, 30, 50, 60, 100, 150),
@@ -42,7 +42,8 @@ r2mallet <- function(
 					numiterations = 250,
 				
 				# To make pseudo-random results exactly replicable, specify a seed value
-				    seed = 8675309,
+				    # seed = 8675309,
+				    seed = NULL,
 
                 # To use with the command line, just output the command and exit
 				    cmdonly = F,
@@ -55,11 +56,21 @@ r2mallet <- function(
 				    importroot = fulltextloc,
 				
 				# What's the directory within which to output mallet files?
-				    outputroot = tmloc)
+				    outputroot = tmloc,
+				
+				# What counts as a word?
+	    			
+                    # token_regex = "'\\p{L}[\\p{L}\\p{P}]*\\p{L}|\\p{L}'" 	)
+				# (letters possibly including punctuation; from Mallet website 20181130).
+				
+    				token_regex = "'\\p{L}+[\\p{L}\\p{Po}]*[-]?\\p{L}+'"    )
+				# One or more letter, plus a string of zero or more letters, or punctuation characters that are not dashes,
+				# bracket, quote or connectors, plus zero or one hyphens, plus one or more letters. (This per
+				# http://www.regular-expressions.info/unicode.html.) Updated post-diss.
 {
 
 	# Loop through each dataset and (1) import instances 
-	# (2) make sure output files are available, then
+	# (2) make sure output files are available, 
 	# then (3) build models w/varying numbers of topics.
 	foreach(dataset_name = datasets) %do% {
 		# 1a. Locate the folder containing txt files for MALLET to work on.
@@ -72,13 +83,14 @@ r2mallet <- function(
 		# Check to see if the instance list has already been created. If so,
 		# then system(scope) will return 0; otherwise, run the import script now.
 		# NB: This assumes you've already moved the files into their own directory.
-		scope <- paste0("cd ", "~/'", substr(sourceloc, 3, nchar(sourceloc)), "'",
-						"; cd 'Shell scripts and commands' ; ls ", output)
+		scope <- paste0("cd ", "~/'", sub(path.expand("~/"), "", sourceloc), "'",
+						"; cd 'Shell scripts and commands' ; ls \"", output, "\"")
 						
 		if (system(scope)) {
-			import <- paste(mallet_cmd, "import-dir --input", importdir,
+		    import <- paste(mallet_cmd, "import-dir --input", importdir,
 						 "--output", output, 
-						 "--keep-sequence --remove-stopwords")
+						 "--keep-sequence --remove-stopwords",
+						 "--token-regex", token_regex)    
 			# go <- readline(paste("About to import instance list.",
 			# 					 "Options set: keep sequence; remove stopwords.",
 			# 					 "Is that what you meant to do? (Y/N)\n"))
@@ -102,15 +114,18 @@ r2mallet <- function(
 		# Train the model. Topic-number dependent.
 		# 3a. Start looping for each number of topics. 
 		# kseq is defined at the top of this file.
-		i <- 0
+		i <- 0       # TO DO: get smarter about iter_index: only advance if same k as previous
 		foreach(k = kseq) %do% {
 			i <- i + 1
 			# 2a. File names for output of model (extensions must be as shown)
-			outputstate <- file.path(outputroot, paste0(dataset_name, "k", k, "_topic-state", "_", i,".gz"))
-			outputtopickeys <- file.path(outputroot, paste0(dataset_name, "k", k, "_keys", "_", i,".txt"))
-			outputdoctopics <- file.path(outputroot, paste0(dataset_name, "k", k, "_composition", "_", i,".txt"))
-			wordtopics <- file.path(outputroot, paste0(dataset_name, "k", k, "_wordtopics", "_", i,".txt"))
-			diagnostics <- file.path(outputroot, paste0(dataset_name, "k", k, "_diagnostics", "_", i,".xml"))
+			# New naming convention: locate i within model name, e.g.
+			  model_name <- paste0(dataset_name, "k", k, "_", i)
+			  outputstate <- file.path(outputroot, paste0(model_name, "_topic-state.gz"))
+			  outputtopickeys <- file.path(outputroot, paste0(model_name, "_keys.txt"))
+			  outputdoctopics <- file.path(outputroot, paste0(model_name, "_composition.txt"))
+			  wordtopics <- file.path(outputroot, paste0(model_name, "_wordtopics.txt"))
+			  diagnostics <- file.path(outputroot, paste0(model_name, "_diagnostics.xml"))
+			
 			
 			# 2b. Check that the files above exist. If not, create blank ones.
 			if (system(paste0("[ -s ", outputstate, " ]"))) {
@@ -145,7 +160,7 @@ r2mallet <- function(
 			
 			# 3c. Run the command in the shell.
 			message(paste("Starting at", Sys.time(), "using this command: \n", train))
-			system(train)
+			system.time(	system(train)     )     # about 41 minutes for 3648 dissertations and 150 topics
 			message(paste("Finished at", Sys.time()))
 		}
 		
@@ -153,47 +168,21 @@ r2mallet <- function(
 
 } # close the wrapper function
 
-if(autorun) {
+# Testing area / examples
+if(FALSE) {
 	r2mallet(datasets=c("realconsorts"), kseq=c(55), numiterations=250)   # about 9 minutes
-    r2mallet(datasets=c("noexcludes2001_2015"))
+    r2mallet(datasets=c("noexcludes2001_2015"), kseq=c(150), cmdonly=F)
     r2mallet(datasets=c("realconsorts"), kseq=rep(55, times=10), seed=NULL, numiterations=250)
     # r2mallet(datasets=c("realconsorts"), kseq=c(55), num_iterations=1000)   # about 32 minutes
 #     r2mallet("consorts")
 #     r2mallet("real.consorts")
-} else {
+    r2mallet(datasets=c("noexcludes2001_2015"), kseq=c(50, 15, 23), cmdonly=F)
+    
+} else if (autorun) {
     train <- r2mallet(cmdonly=T)
-    message(paste("Current default instance-training command is", train))
-	message("Autorun is FALSE, so no action was taken.")
-	message(paste("If you wish to create new topic models,", 
-				  "check configuration, then set autorun to TRUE."))
+    message("\n(r2mallet with foreach.R) ",
+            "Current default instance-training command is: \n\n",
+            train, "\n")
+	message("Topic modeling is often a slow process, so no action was taken.")
 }	
-
-#####
-# test that mallet works on Bridges supercomputer:
-# r2mallet(cmdonly=T, mallet_cmd="./mallet/bin/mallet", importroot="./clean_realconsorts", outputroot="/pylon2/hm4s81p/bmiller3/tm", kseq=c(10))
-
-
-
-# ## Step 5. Inspect results
-# library(bigmemory)
-# library(biganalytics)
-
-# #  5a. The matrix that MALLET spits out is sorted by document, with pairs of columns for each topic number and (descending) topic weight. Call the reshapeMallet script in Python (by Rolf Fredheim) to re-sort the matrix by topic, so we can get a big picture.
-# setwd(paste0(sourceloc, "/Shell scripts and commands"))
-# system("ls -F")
-# system("python reshapeMallet.py")	
-# # TODO: make this script take arguments, so we can control the dataset... and put the dataset_name in the filename of the output
-
-# #  5b. Read in the output from reshapeMallet.py (currently all files will be called "reshapedMallet11.txt")
-# doc_topics_reshaped <- read.csv("reshapedMallet11.txt", header=F, sep="\t")
-# head(doc_topics_reshaped)
-
-# # write reshaped table to CSV file for closer inspection
-# write.big.matrix(doc.topics.reshaped, paste0(dataloc, "doc_topics_reshaped_consorts.csv"))
-
-# names(consorts)
-# consorts_doctopics <- merge(consorts[, c("Pub.number", "Title", "Subject", "KEYWORDS")], doc_topics_reshaped, by.y="V1", by.x="Pub.number", all.x=T, all.y=F)
-
-
-# lapply(2:ncol(doc_topics_reshaped), FUN=function(x) summary(doc_topics_reshaped[, x]))
 
