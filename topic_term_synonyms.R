@@ -277,14 +277,123 @@ get_cluster_names <- function(hcr,            # result of an hclust.rect()
     }
 }
 
+# assessing clusters
+tw_cluster_weight <- function(mytopics,  # a set of topic numbers (presumed to be members of a given cluster)
+                              tw)
+{
+    if(!is.numeric(mytopics)) {
+        stop("mytopics should be a set of numbers corresponding to topics")
+    }
+    tw[topic %in% mytopics, .(topicweight = sum(.SD$weight)/sum(tw$weight)), by=topic][, .(topic, topicweight, clusterweight=sum(topicweight))]    
+}
+
+tree_summary <- function(nclust,
+                         ag = NULL,
+                         twm = NULL, 
+                         tw = NULL,
+                         dataset_name = "noexcludes2001_2015",
+                         ntopics = 150,
+                         iter_index = 1,
+                         bad.topics = NULL,
+                         slow=F,                # optionally go one cluster at a time
+                         internal.distances=F)
+{
+    
+    if(is.null(ag)) {
+        ag <- topic_clusters(twm=twm, 
+                             tw=tw,
+                             dataset_name = dataset_name,
+                             ntopics = ntopics,
+                             iter_index = iter_index,
+                             bad.topics = bad.topics)
+    }
+    
+    pltree(ag)
+    
+    hc <- as.hclust(ag)
+    rhc <- rect.hclust(hc, k=nclust)
+    
+    for(i in seq_along(rhc)) {
+        twcw <- tw_cluster_weight(rhc[[i]], tw=tw)
+        message("Cluster: ", i, " (% of corpus: ", round(100*mean(twcw$clusterweight), 2), ")")
+        
+        tops <- tf$topN[rhc[[i]], by_tfitf]
+        print(cbind(twcw, tops))
+        
+        if(slow) {
+            rect.hclust(hc, k=nclust, which=i, border="blue")
+            rect.hclust(hc, k=nclust, which=i, border="blue")
+            rect.hclust(hc, k=nclust, which=i, border="blue")
+            adv <- readline("Press <enter> for next cluster")
+            pltree(ag)
+            rect.hclust(hc, k=nclust)
+        }
+        
+        if(internal.distances) {
+            message("Distances between topic-word vectors for this cluster:")
+            topic_distances_in_cluster(members=rhc[[i]],
+                                       twm=twm,
+                                       tw=tw,
+                                       dataset_name=dataset_name,
+                                       ntopics=ntopics,
+                                       iter_index=iter_index,
+                                       bad.topics=bad.topics)
+        }
+        
+    }
+    
+    
+}
+
 
 if(autorun) {
-    if(is.null(tw)) {
-        tw <- build.topicword.table(dataset_name=dataset_name, 
+    dataset_name <- "noexcludes2001_2015"
+    ntopics <- 150
+    iter_index <- 1
+    bad.topics <- NULL
+    
+    tw <- build.topicword.table(dataset_name=dataset_name, 
                                     ntopics=ntopics, 
                                     iter_index=iter_index,
                                     bad.topics=bad.topics)
-    }
+    
+    twm <- topic_distance_matrix(dataset_name = dataset_name,
+                                 ntopics = ntopics,
+                                 iter_index = iter_index,
+                                 bad.topics = bad.topics,
+                                 tw=tw)
+    
+    ag <- topic_clusters(twm=twm, 
+                         tw=tw,
+                         dataset_name = dataset_name,
+                         ntopics = ntopics,
+                         iter_index = iter_index,
+                         bad.topics = bad.topics)
+    
+    if(!exists("tfidf.for.topics")) { source(file="tfidf for topics.R") }
+    tf <- tfidf.for.topics(tw=tw)
+    
+    
+    tree_summary(ag=ag, tw=tw, nclust=10, slow=F)
+    
+    # top words by topic number
+    tf$topN$by_tfitf[c(1, 5, 119, 75, 8, 139)]     # digital media cluster
+    tf$topN$by_tfitf[c(2, 17, 61, 57, 14, 54, 105, 30)] # rhetoric & philosophy cluster
+    tf$topN$by_tfitf[c(2, 17, 61, 57, 14, 54, 105, 30)]
+    tf$topN$by_tfitf[c(27, 133, 118, 7)]  # bad ocr cluster
+    tw[topic %in% c(3, 6, 86, 22, 130, 65, 34, 146, 88, 101, 124, 141), sum(.SD$weight)/sum(tw$weight), by=topic]
+    
+    # new way to calculate cluster weight:
+    
+    tw_cluster_weight(tw=tw, mytopics=c(2, 17, 61, 57, 14, 54, 105, 30))
+    tw_cluster_weight(tw=tw, mytopics=c(3, 6, 86, 22, 130, 65, 34, 146, 88, 101, 124, 141))
+    tw_cluster_weight(tw=tw, mytopics=c(27, 133, 118, 7))
+    
+    
+    #*******************************************#
+    #.       noexcludes2001_2015k50_iter1      .#
+    #...........................................#
+    
     # 44: Online Circulation and Social Media;  45: Digital Media Affordances
     two_topic_synonyms(topic_a=44, topic_b=45, tw=tw)
     two_topic_distance(44, 45, tw=tw)      # 0.3655386
