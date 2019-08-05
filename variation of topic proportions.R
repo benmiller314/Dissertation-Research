@@ -215,9 +215,16 @@ topic.proportions <- function(dataset_name = "consorts",
 	return(stats)
 }
 
-if(autorun) {
+if(FALSE) {
 	remake_figs
 	topic.proportions(subset_name="realconsorts")
 	topic.proportions(explore.outliers=T)
 	# abline(0.11384, 0, col="#aa0000")
+}
+
+if(autorun) {
+    topic.proportions(dataset_name=dataset_name, subset_name=subset_name, 
+                      ntopics=ntopics, iter_index=iter_index,
+                      bad.topics=bad.topics,
+                      explore.outliers=T)
 }
