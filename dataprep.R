@@ -35,9 +35,9 @@ fulltextloc <- file.path("/Volumes/Seagate_Backup_Plus_Drive/full-text_dissertat
 if (which_computer == "work") {
     tmloc <- normalizePath(file.path(fulltextloc, "..", "topic_modeling"))
 } else if (which_computer == "laptop") {
-    # tmloc <- path.expand(file.path("~", "Documents", "tm"))
     tmloc <- normalizePath(file.path(newdataloc, "tm"))
 }
+WNHOME <- file.path("/usr", "local", "Cellar", "wordnet", "3.1")
 
 # name the method tags most of these analyses are interested in
 tagnames <- c("Clin","Crit",
