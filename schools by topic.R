@@ -8,26 +8,31 @@ schools_by_topic <- function(mytopic,
                                                # use -1 for all.
                              dataset_name="noexcludes2001_2015",
                              ntopics=50,
-                             subset_name="realconsorts2001_2015",  # set NULL if not using.
+                             subset_name="knownprograms2001_2015",  # set NULL if not using.
                              iter_index=1,     # suffix to differentiate repeat runs of same MALLET params.
                              outfile=NULL,     # if not provided, will be set to a default.
                              use.labels=FALSE, # replace topic numbers with labels
                                                # chosen using top_topic_browser()?
-                             bad.topics= NULL) # exclude non-content-bearing topics
+                             bad.topics= NULL, # exclude non-content-bearing topics
+                             dt=NULL,          # doctopic grid. pass in for a speed boost.
+                             quiet=FALSE)      # if TRUE, suppress messages
                              
 {
     require(data.table)
     
-    if(!exists("get.doctopic.grid", mode="function")) { 
-        source(file="get doctopic grid.R") 
-    }
-    dt <- get.doctopic.grid(dataset_name=dataset_name,
-                            ntopics=ntopics,
-                            subset_name=subset_name,
-                            iter_index=iter_index)$outputfile.dt
-    
-    # Exclude any NA rows included accidentally by the index file
-    dt <- na.omit(dt)
+    if(is.null(dt)) {
+        
+        if(!exists("get.doctopic.grid", mode="function")) { 
+            source(file="get doctopic grid.R") 
+        }
+        dt <- get.doctopic.grid(dataset_name=dataset_name,
+                                ntopics=ntopics,
+                                subset_name=subset_name,
+                                iter_index=iter_index)$outputfile.dt
+        
+        # Exclude any NA rows included accidentally by the index file
+        dt <- na.omit(dt)
+    }    
     
     # Check for non-content-bearing topics, but don't remove them
     if (is.null(bad.topics) && mytopic %in% bad.topics) {
@@ -54,15 +59,25 @@ schools_by_topic <- function(mytopic,
         dataset <- get(dataset_name)
     }
     
+    dataset <- as.data.table(dataset)
+    setkey(dataset, "Pub.number")
+    
+    
     index <- which(dataset$Pub.number %in% mypubs$Pub.number)
-    mydepts <- dataset[index, c("Pub.number", "School", "Department", "realconsort", "realrhetmap")]
-    mydepts <- as.data.table(mydepts)
+    mydepts <- dataset[index, .(Pub.number, School, Department, realconsort, realrhetmap)]
+    
+    # Join diss data to topic contrib data. NB: mydepts may be smaller than mypubs, 
+    # because some of mypubs may be outside of the subset.
+    mydepts <- merge(mydepts, mypubs, by="Pub.number")
     
     # because department names can be finicky, and because we update from alumni lists
     # but don't always update departments, use  knownprogam bits to cluster instead
     mydepts[, knownprogram:=(realconsort | realrhetmap)]
     mydepts[, `:=`(realconsort=NULL, realrhetmap=NULL)]
-    mydepts <- merge(mydepts, mypubs, by="Pub.number")
+    
+    # note that if the subset is a form of knownprograms, mydepts$knownprogram should 
+    # all be TRUE. It may be possible to find the topics that maximize the ratio of 
+    # TRUE to FALSE in this category, after returning this function with howmany=-1
     
     setkey(mydepts, School, knownprogram)
     
@@ -91,7 +106,10 @@ schools_by_topic <- function(mytopic,
         )
     }
     
-    message(title)
+    # TO DO: save this info using remake_figs
+    if(!quiet) { 
+        message(title) 
+    }
     if (howmany > 0) {
         toplist <- toplist[1:howmany]
     }
