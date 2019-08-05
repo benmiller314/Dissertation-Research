@@ -73,26 +73,35 @@ topic.proportions <- function(dataset_name = "consorts",
 
 	
 	## Time to make the plot
-	maintitle <- "Variation of Topic Proportions, Top 10 Topics per Document"
-	subtitle <- paste0(dataset_name, ", N=", nrow(grid))
-	if(! is.null(subset_name)) { subtitle <- paste0(subset_name, ", N=", nrow(grid))}
+	if(!exists("build_plot_title", mode="function")) {
+	    source(file="frameToD3.R")
+	}
+	
+	bigtitle <- build_plot_title(dataset_name=dataset_name, subset_name=subset_name,
+	                         ntopics=ntopics, iter_index=iter_index,
+	                         bad.topics=bad.topics,
+	                         whatitis="Variation of Topic Proportions")
+	maintitle <- paste0(strsplit(bigtitle, ",")[[1]][1], ", Top 10 Topics per Document")
+	subtitle <- strsplit(bigtitle, ",")[[1]][2]
+	subtitle <- paste0(subtitle, "   N=", nrow(grid))
 
 	if(remake_figs) { 
-		pdf(file=paste0(imageloc, "Variation of Topic Proportions, ", dataset_name, subset_name, ".pdf")) 
+	    filename <- file.path(imageloc, paste0(bigtitle, ".pdf"))
+	    pdf(filename)
 	}
 		boxplot(grid.sorted[, 1:10], 
 				cex.axis = 1, 
 				las = 1, 
 				main = maintitle, 
 				sub = subtitle, 
-				xlab = "Topic Rank", 
+				xlab = "Topic Rank Within Document", 
 				ylab = "Portion of Document (scaled to 1)", 
 				yaxp = c(0, 1, 10), 
 				notch = use.notch
 		)
 		## mark line covering top three quartiles for the 2nd-ranked topic,
 		## but only the top quartile for 3rd
-		# abline(h=0.12) 	
+		abline(h=0.11, col="#99FF99")
 
 	if(remake_figs) { 
 		dev.off() 
