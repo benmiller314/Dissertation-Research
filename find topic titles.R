@@ -17,7 +17,7 @@ find_topic_titles <- function(dataset_name = "consorts",
     
     titles_all <- foreach (i=1:ntopics, 
                            .verbose=T,
-                           .export=c("realconsorts2001_2015", "noexcludes2001_2015", # update to include current likely data
+                           .export=c("realconsorts2001_2015", "noexcludes2001_2015", "knownprograms2001_2015", # update to include current likely data
                                      "get.doctopic.grid", "get.topickeys", 
                                      "get.topics4doc", "imageloc", "noexcludes.dt", "remake_figs","tagnames", "tmloc", "top_topic_browser", 
                                      "unixsourceloc"),
