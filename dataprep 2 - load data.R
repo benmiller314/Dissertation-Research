@@ -14,9 +14,17 @@ if (!exists("tagnames")) {
 }
 
 ## now get the data 
-# The original file of dissertation metadata (built from 2012-2015, covering years 2001-2010)
-# oldarray <- read.csv(file=file.path(dataloc, "Rhetoric-or-Composition-12-adding-depts.csv"))
-oldarray <- read.csv(file=file.path(dataloc, "Diss-data-collected-pre-Pitt_short-tags.csv"))
+
+if(dual_source) {
+    # The original file of dissertation metadata (built from 2012-2015, covering years 2001-2010)
+    # oldarray <- read.csv(file=file.path(dataloc, "Rhetoric-or-Composition-12-adding-depts.csv"))
+    oldarray <- read.csv(file=file.path(dataloc, "Diss-data-collected-pre-Pitt_short-tags.csv"))
+    
+    # parse the method tags... including for the collapsed schema. parse_tags() is from `method tag array.R`.
+    oldarray <- parse_tags(oldarray, tagstyle="short", excludecol="Flags")
+    oldarray <- short_schema(oldarray)
+    
+}
 
 # The new file of dissertation metadata
 invisible(readline("Select the most recent file of dissertation metadata. (Press <Enter> to continue.)"))
@@ -26,20 +34,17 @@ newarray <- read.csv(file=newdatafile)
 
 
 # parse the method tags... including for the collapsed schema. parse_tags() is from `method tag array.R`.
-oldarray <- parse_tags(oldarray, tagstyle="short", excludecol="Flags")
-oldarray <- short_schema(oldarray)
-# names(oldarray)
-# oldarray[tagnames]
-
 newarray <- parse_tags(newarray, tagstyle="short", excludecol="Flags")
 newarray <- short_schema(newarray)
 
 
-
-# Let's merge them, why not
-bigarray <- merge(oldarray, newarray, all=T)
-names(bigarray)
-
+if(dual_source) {
+    # Let's merge them, why not
+    bigarray <- merge(oldarray, newarray, all=T)
+    names(bigarray)
+} else {
+    bigarray <- newarray
+}
 
 # filter out false positives
 noexcludes <- bigarray[bigarray$Exclude.Level==0,] 
