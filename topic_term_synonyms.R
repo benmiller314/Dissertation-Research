@@ -1,7 +1,8 @@
 
 # load the WordNet dictionary of synsets
 require(data.table)
-library(wordnet)
+require(wordnet)        # NB: if this crashes R, try updating Java: 
+                        # https://stackoverflow.com/questions/26252591/mac-os-x-and-multiple-java-versions#answer-47699905
 setDict(file.path(WNHOME, "dict"))
 
 
