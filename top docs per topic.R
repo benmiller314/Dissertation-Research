@@ -17,7 +17,7 @@
 #           get clean data to share with others about the top "depth" docs
 #           time. See below for parameters.
 #   Legacy support:
-#         * This used to define a function get.doc.composition, but it ended up being a 
+#         * This used to define the function get.doc.composition(), but it ended up being a 
 #           fairly simple wrapper on get.doctopic.grid, so I've now factored it out.
 ##### 
 
@@ -179,6 +179,7 @@ top_topic_browser <- function(
         topdocs <- noexcludes.dt[as.character(diss.ind), 
                                 c("Pub.number", "Title", tagnames), with=F]         
 
+
             # add a column with the weights this topic has in these docs
             
             weights <- ranks <- c()
@@ -196,19 +197,21 @@ top_topic_browser <- function(
             topdocs[, rank_in_doc:=unlist(ranks)]
             topdocs <- topdocs[, c("Pub.number", "Title", "topic_weight",
                                    "rank_in_doc", tagnames), with=F]
-        # print(topdocs)
+        
 
         # if we're just looking at one topic, maybe we want to save that list
         # of docs and their metadata, and exit.
         if(for.bind) {
             return(topdocs)
+        } else {
+            print(topdocs)
         }
 
         # if we're saving all output, automatically cycle through everything.
         # but by default, prompt the user.
         if (!remake_figs) { 
             a <- readline(paste("Press <enter> for more detail on", 
-                        "these docs, or S to skip to the next topic\n"))
+                        "these docs, or S to skip to the next topic: \n"))
         } else { 
             a <- ""
         }
@@ -221,7 +224,7 @@ top_topic_browser <- function(
                 if (!remake_figs) { 
                     a <- readline(paste("Press <enter> for next doc,", 
                         "D for more details, or", 
-                        "S to skip to the next topic\n"))
+                        "S to skip to the next topic: \n"))
                 } else { 
                     a <- ""
                 }
@@ -231,7 +234,7 @@ top_topic_browser <- function(
                 } else if (tolower(a) == "d") { 
                     print(noexcludes.dt[i]) 
                     a <- readline(paste("Press <enter> for next doc", 
-                                    "or S to skip to the next topic\n"))
+                                    "or S to skip to the next topic: \n"))
                 }
             }
             a <- "s"
@@ -289,18 +292,20 @@ top_topic_browser <- function(
         
         if (!remake_figs) { 
             a <- readline(paste("Press <enter> for more detail", 
-                        "on these docs, or S to skip to the next topic\n")) 
+                        "on these docs, or S to skip to the next topic: \n")) 
         } else { 
             a <- ""
         }
 
         while (tolower(a) != "s") {
             for(i in topdocs$Pub.number) {
-                print(get.topics4doc(i, showlabels=showlabels, iter_index=iter_index))
+                print(get.topics4doc(pubnum=i, dataset_name=dataset_name, 
+                                     ntopics=ntopics, howmany=depth, 
+                                     showlabels=showlabels, iter_index=iter_index))
                 if (!remake_figs) { 
                     a <- readline(paste("Press <enter> for next doc,",
                                         "D for more details, or",
-                                        "S to skip to the next topic\n"))
+                                        "S to skip to the next topic: \n"))
                 } else { 
                     a <- ""
                 }
@@ -311,7 +316,7 @@ top_topic_browser <- function(
                 } else if (tolower(a) == "d") { 
                     print(noexcludes.dt[i]) 
                     a <- readline(paste("Press <enter> for next doc or",
-                                        "S to skip to the next topic\n"))
+                                        "S to skip to the next topic: \n"))
                 }
             }
             
@@ -461,7 +466,7 @@ if (autorun) {
 }
 
 if(FALSE) {
-    top_topic_browser(topic=35, 
-                      dataset_name="noexcludes2001_2015", ntopics=60, iter_index=4,
+    remake_figs=F
+    top_topic_browser(dataset_name="noexcludes2001_2015", ntopics=50, iter_index=1,
                       depth=10)
 }
