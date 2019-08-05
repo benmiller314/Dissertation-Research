@@ -9,21 +9,17 @@
 
 ## Set up stable elements of the working environment
 # 	# Let's assume we're typically going to need more Java heap space;
-# 	# this sets the maximum allocation for a 4GB MacBook Pro
-# 	    heap_param <- paste("-Xmx","2g",sep="") 
-# 	    options(java.parameters=heap_param)
-# now attempting 15GB for just under half a 32GB-RAM MacPro
-# 	    heap_param <- paste("-Xmx","15g",sep="") 
-# 	    options(java.parameters=heap_param)
-#   Never mind, this is set by MALLET in $malletloc/bin/mallet, 
-#   on line 10: "MEMORY=" etc. But see also $malletloc/bin/mallet.bat, line 14, "set MALLET_MEMORY="
+#   NB: this is set within MALLET in $malletloc/bin/mallet, 
+#   on line 10: "MEMORY=" etc and in $malletloc/bin/mallet.bat, line 14, "set MALLET_MEMORY="
+#   But you do seem to need to set it with R, too.
 
-# 15GB for just under half a 32GB-RAM MacPro, 3GB for an 8GB-RAM MacBook Air
+# IMPORTANT: set heap limit before loading mallet, bc mallet loads java,
+# and once the VM is set, it's stuck.
 heap_param <- paste("-Xmx","15g",sep="")
 options(java.parameters=heap_param)
 
 library(dfrtopics)
-library(mallet)
+library(mallet) # did you raise the heap limit? 
 library(dplyr)
 library(XML)
 library(parallel)
@@ -42,25 +38,31 @@ dfrt_native <- function(dataset_name = "noexcludes2001_2015",
 dfrt_from_outside_model <- function(dataset_name = "noexcludes2001_2015",
                  ntopics      = 60,
                  iter_index   = 4,
-                 test_mode    = FALSE
+                 test_mode    = FALSE,
+                 naming_convention = c("old", "new")
                  )
 {
     # figure out which files/Pub.numbers are in this model
     dataset <- get(dataset_name)
     filename <- file.path(sourceloc, "subsets", paste0(dataset_name, "_doc_ids.txt"))
-    
     if(file.exists(filename)) {
         dataset_ids <- read.table(filename)$V1    
         length(dataset_ids)
     } else {
-        stop("dfrtopics_test.R: could not find file ", filename)
+        stop("dfrtopics_test.R: could not find doc_ids file ", filename)
     }
     
     # For each iteration, read in state file and convert to dfrtopics format
     foreach(i = iter_index) %do% {
         
+        model_name <- paste0(dataset_name, "k", ntopics, "_", i)
+        naming_convention <- match.arg(naming_convention)
+        
+        
         # locate state file from Mallet, which is required
-        mstate <- file.path(tmloc, paste0(dataset_name, "k", ntopics, "_topic-state_", i, ".gz"))
+        if(naming_convention == "new") { mstate <- file.path(tmloc, paste0(model_name, "_topic-state.gz"))
+        } else { mstate <- file.path(tmloc, paste0(dataset_name, "k", ntopics, "_topic-state_", i, ".gz")) }
+            
         if(!file.exists(mstate)) {
             stop(paste("dfrtopics_test.R: could not find file ", mstate))
         }
@@ -71,17 +73,52 @@ dfrt_from_outside_model <- function(dataset_name = "noexcludes2001_2015",
             stop(paste("dfrtopics_test.R: could not find file ", ilist))
         }
 
-        # where to place simplified state file, which dfrtopics creates for a later speed bonus?
-        simple_state <- path.expand(file.path(tmloc, paste0(dataset_name, "k", ntopics, "_simplestate_", i, ".csv")))
+        # locate simplified state file, which dfrtopics creates for a speed bonus
+        if(naming_convention == "new") { simple_state <- path.expand(file.path(tmloc, paste0(model_name, "_simplestate.csv")))
+        } else { simple_state <- path.expand(file.path(tmloc, paste0(dataset_name, "k", ntopics, "_simplestate_", i, ".csv"))) }
+        if(!file.exists(simple_state)) {
+            stop(paste("dfrtopics_test.R: could not find file ", simple_state))
+        }
+        
+        # locate doc-topic matrix
+        dfr_doc_topics <- get.doctopic.grid(dataset_name, ntopics, iter_index=iter_index)$outputfile
+        
+        # locate topic-words matrix 
+        if(naming_convention == "new") { topic_words <- path.expand(file.path(tmloc, paste0(model_name, "_wordtopics.txt")))
+        } else { topic_words <- path.expand(file.path(tmloc, paste0(dataset_name, "k", ntopics, "_wordtopics_", i, ".txt")))}
+        if(!file.exists(topic_words)) {
+            stop(paste("dfrtopics_test.R: could not find file ", topic_words))
+        }
+        
+        # locate file with top words per topic
+        if(naming_convention == "new") { keys <- path.expand(file.path(tmloc, paste0(model_name, "_keys.txt")))
+        } else { keys <- path.expand(file.path(tmloc, paste0(dataset_name, "k", ntopics, "_keys_", i, ".txt")))}
         
         
-        # Convert state file to dfrtopics-style mallet_model object, in prep for exporting to dfrbrowser
-        message(paste("Starting at", Sys.time(), "from state file:\n ", mstate))
-        system.time(
-            m <- load_from_mallet_state(mstate, simplified_state_file=simple_state, instances_file=ilist)
-        )
-        message(paste("Done at", Sys.time()))        # about 19 minutes for 60 topics and 2568 dissertations with 15GB RAM
+        # # if simple state file exists, load from that
+        # if(file.exists(simple_state)) {
+        #     message(paste("Starting at", Sys.time(), "from simplified state file:\n ", simple_state))
+        #         system.time(
+        #         m <- load_mallet_model(state_file = simple_state,
+        #                                doc_topics_file = doc_topics,
+        #                                vocab = ilist,
+        #                                doc_ids_file = dataset_ids,
+        #                                topic_words_file = topic_words,
+        #                                top_words_file = keys
+        #                                )
+        #         )
+        #     message(paste("Done at", Sys.time()))
+        # } else {
         
+            # If not, make it now: convert full (gzipped) state file to dfrtopics-style mallet_model object, 
+            # in prep for exporting to dfrbrowser
+            message(paste("Starting at", Sys.time(), "from state file:\n ", mstate))
+            system.time(
+                m <- load_from_mallet_state(mstate, simplified_state_file=simple_state, instances_file=ilist)
+            )
+            message(paste("Done at", Sys.time()))        # about 19 minutes for 60 topics and 2568 dissertations with 15GB RAM
+            
+        # }
         # check what we got
         summary(m)
         
@@ -92,7 +129,10 @@ dfrt_from_outside_model <- function(dataset_name = "noexcludes2001_2015",
                       title = Title, 
                       authors = Author, 
                       university = School, 
-                      date = as.Date(as.character(Year), "%Y")
+                      date = as.Date(as.character(Year), "%Y"),
+                      methods = Method.Terms,
+                      abstract = ABSTRACT,
+                      url = Link
             )
         
         metadata(m) <- md
@@ -109,7 +149,6 @@ dfrt_from_outside_model <- function(dataset_name = "noexcludes2001_2015",
         # are not used by the visualization: for example, metadata(m)$publisher <- NULL.
         
         # Locations
-        model_name <- paste0(dataset_name, "k", ntopics, "_", i)
         browser_dir <- file.path("~", "Box Sync", "research", "dissertations", "dfr-browser", model_name)
         mdfile <- file.path(browser_dir, "meta.csv")
         
@@ -132,8 +171,9 @@ dfrt_from_outside_model <- function(dataset_name = "noexcludes2001_2015",
         )    
         
         write.csv(md, path.expand(mdfile), row.names=F, col.names=F)
-        zip(paste0(mdfile, ".zip"), c(path.expand(mdfile))) 
+        # zip(paste0(mdfile, ".zip"), c(path.expand(mdfile))) 
         # to do: delete the non-zipped file, move all this functionality into a function
+        # NB: This zip fails, recreating the full folder path inside the .zip archive. For now, manually zip in Finder.
         
         # Finish up
         message(paste("Browser data exported to", browser_dir, "at", Sys.time()))
@@ -141,12 +181,11 @@ dfrt_from_outside_model <- function(dataset_name = "noexcludes2001_2015",
         
         
         
-        # save in dfr's preferred format for faster loading next time
-        mydir <- paste0("dfrtest_", dataset_name, "k", ntopics, "_", i)
+        # output source files in dfr's preferred format for faster loading next time
+        mydir <- file.path(tmloc, paste0("dfrtest_", model_name))
         
         system.time(
-            write_mallet_model(m, file.path(tmloc, mydir), 
-                               simplify_state = F)      # we already saved the simple state via load_from_mallet_state
+            write_mallet_model(m, mydir, simplify_state = F)      # we already saved the simple state via load_from_mallet_state
                                                         # (though we'll need to change the default location to get it later)
         )
         
@@ -261,5 +300,27 @@ top_docs(m2, 3) %>%
 diag_file <- file.path(tmloc, paste0(dataset_name, "k", ntopics, "_diagnostics_", iter_index, ".xml"))
 d <- read_diagnostics(diag_file)
 which.min(d$topics$corpus_dist)
+
+
+
+
+
+# where'd you write_mallet_model files in dfr's preferred format?
+mydir <- file.path(tmloc, paste0("dfrtest_", model_name))
+
+if(!file.exists(file.path(mydir, "doc_ids.txt"))) {
+    writeLines(levels(dataset_ids), file.path(mydir, "doc_ids.txt"))
+}
+
+# try loading them from there
+system.time(
+    m2 <- load_mallet_model_directory(mydir, load_topic_words = T)
+)
+
+
+
+
+
+
 
 }
