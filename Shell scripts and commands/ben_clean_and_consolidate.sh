@@ -25,13 +25,16 @@
 DATASET=$1
 # PDF="/Users/benmiller314/Documents/fulltext_dissertations/morepdfs"
 # SRC="/Users/benmiller314/Documents/fulltext_dissertations/morepdfs/as text files"
-# DST="/Users/benmiller314/Documents/fulltext_dissertations/clean_""$DATASET""_only"
+DST="/Users/benmiller314/Documents/fulltext_dissertations/clean_""$DATASET""_only"
 # PDF="/Users/benmiller314/Documents/topic_inference_test"
 # SRC="/Users/benmiller314/Documents/topic_inference_test/txt"
 # DST="/Users/benmiller314/Documents/topic_inference_test/clean"
-PDF="/Volumes/Seagate_Backup_Plus_Drive/full-text_dissertations/all_rescan_only"
-SRC="/Volumes/Seagate_Backup_Plus_Drive/full-text_dissertations/all_noexcludes_only"
-DST="/Volumes/Seagate_Backup_Plus_Drive/full-text_dissertations/noexcludes_2001-2015_clean"
+# PDF="/Volumes/Seagate_Backup_Plus_Drive/full-text_dissertations/all_rescan_only"
+# SRC="/Volumes/Seagate_Backup_Plus_Drive/full-text_dissertations/all_noexcludes_only"
+# DST="/Volumes/Seagate_Backup_Plus_Drive/full-text_dissertations/clean_noexcludes2001_2015_only"
+PDF="/Volumes/Seagate_Backup_Plus_Drive/full-text_dissertations/all_noexcludes_only"
+SRC="/Volumes/Seagate_Backup_Plus_Drive/full-text_dissertations/all_txt"
+# DST=$SRC
 
 # Store cumulative data in its own directory
 CUMUL=~/"Documents/fulltext_dissertations/cumulative"
@@ -48,7 +51,7 @@ function extract()
 {
     # Make sure we have a place to output to.
     if ! [ -d "$SRC" ] ; then
-        mkdir "$SRC"
+        mkdir -p "$SRC"
     fi
 
     # Start the loop.
@@ -84,7 +87,7 @@ function clean ()
 {   
 	# Make sure we have a place to output to.
 	if ! [ -d "$DST" ] ; then
-		mkdir "$DST"
+		mkdir -p "$DST"
 	fi
 
 	# Start the loop.
@@ -212,13 +215,13 @@ while read line1; do
 # UPDATE: Ignore the NB below. Easiest way to install on a Mac is with a package manager 
 # like Homebrew. First, go to http://brew.sh and use the simple installation script. 
 # Then simply type this at a Terminal prompt (without quotes): "brew install aspell"
-# NB: apparently this isn't included in OS X 10.7 (Lion). Boo. To download
-# the aspell command, you'll need something like Fink
-# http://www.finkproject.org/download/srcdist.php and Apple Developer Command
-# Line Tools https://developer.apple.com/downloads/index.action and
-# ftp://ftp.gnu.org/gnu/aspell/dict/en/aspell6-en-7.1-0.tar.bz2 for
-# dictionaries. Once those are installed (no small feat), uncomment and run
-# the commands in file "install aspell dictionary.txt" 
+# 	NB: apparently this isn't included in OS X 10.7 (Lion). Boo. To download
+# 		the aspell command, you'll need something like Fink
+# 		http://www.finkproject.org/download/srcdist.php and Apple Developer Command
+# 		Line Tools https://developer.apple.com/downloads/index.action and
+# 		ftp://ftp.gnu.org/gnu/aspell/dict/en/aspell6-en-7.1-0.tar.bz2 for
+# 		dictionaries. Once those are installed (no small feat), uncomment and run
+# 		the commands in file "install aspell dictionary.txt" 
 
     aspell list < "$DST/$line1" > "$DST/_spellstats/wordswrong_$line1"
 
