@@ -120,6 +120,74 @@ schools_by_topic <- function(mytopic,
 if(FALSE) {
     schools_by_topic(41)
     schools_by_topic(1, use.labels=T)
+    table(schools_by_topic(1, subset_name=NULL, howmany=-1)$knownprogram)
+}
+
+knownprogram_topical_ratio <- function(level = 0.12,     # percentage of a diss contributed by the topic
+                                       # for it to "count"
+                                       howmany = 10,      # how many top schools to show?
+                                       # use -1 for all.
+                                       dataset_name="noexcludes2001_2015",
+                                       ntopics=50,
+                                       iter_index=1,     # suffix to differentiate repeat runs of same MALLET params.
+                                       outfile=NULL,     # if not provided, will be set to a default.
+                                       use.labels=FALSE, # replace topic numbers with labels
+                                       # chosen using top_topic_browser()?
+                                       bad.topics= NULL, # exclude non-content-bearing topics
+                                       dt=NULL,          # doctopic grid. pass in for a speed boost.
+                                       quiet=TRUE)      # if TRUE, suppress messages
+{
+    topic_list <- seq_len(ntopics)
+    if(! is.null(bad.topics) ) {
+        topic_list <- setdiff(topic_list, bad.topics)
+    }
+    
+    ratios <- data.frame("topic.num"=numeric(),
+                         "unknown.dept"=logical(),
+                         "known.dept"=logical(),
+                         "pct.known"=numeric())
+    j <- 1
+    for(i in topic_list) {
+        result <- table(schools_by_topic(i,
+                                         level=level,
+                                         howmany=-1,
+                                         dataset_name=dataset_name,
+                                         ntopics=ntopics,
+                                         iter_index=iter_index,
+                                         subset_name=NULL,
+                                         bad.topics=bad.topics,
+                                         dt=dt, 
+                                         quiet=TRUE)$knownprogram)
+        ratios[j,] <- c(i, 
+                        result[["FALSE"]], 
+                        result[["TRUE"]], 
+                        result[["TRUE"]]/(result[["TRUE"]]+result[["FALSE"]]))
+        j <- j+1
+    }
+    
+    if(use.labels) {
+        if(!exists("get_topic_labels")) { source(file="get topic labels.R") }
+        tryCatch(expr={labels <- get_topic_labels(dataset_name=dataset_name, 
+                                                  ntopics=ntopics, 
+                                                  subset_name=NULL, 
+                                                  iter_index=iter_index)
+            ratios <- merge(ratios, labels[, .(Topic, Label)], by.x="topic.num", by.y="Topic")
+        },
+        error=function(e) e,
+        finally=""
+        )
+    }
+    
+    
+    myorder <- order(ratios$pct.known, decreasing = T)
+    ratios <- ratios[myorder,]
+    row.names(ratios) <- NULL
+    
+    return(ratios)
+}
+
+if(FALSE) {
+    ratios <- knownprogram_topical_ratio(bad.topics=bad.topics, dt=dt, use.labels=T)
 }
     
 # TO DO: finish this function, which should find differences among schools_by_topic 
