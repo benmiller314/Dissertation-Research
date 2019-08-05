@@ -151,8 +151,9 @@ topic_distance_matrix <- function(dataset_name="noexcludes2001_2015",
                                                # anything in philentropy::distance.
                                   tw=NULL,     # if we have a topic-word matrix,
                                                # don't waste time rebuilding it.
-                                  bad.topics=NULL)  # for use in visualizations,
+                                  bad.topics=NULL,  # for use in visualizations,
                                                     # eg in frameToD3.R
+                                  tw.grid=NULL) # pass explicitly to allow for combined grids from several iter_index runs
 {
     # load required functions
     require(philentropy)
@@ -161,23 +162,26 @@ topic_distance_matrix <- function(dataset_name="noexcludes2001_2015",
         source(file="get topic word grid.R") 
     }
     
-    # if we don't have a topic-word matrix, let's get one here, 
-    # so we don't have to do it twice (once for each topic)
-    
-    if(is.null(tw)) {
-        tw <- build.topicword.table(dataset_name=dataset_name, 
-                                    ntopics=ntopics, 
-                                    iter_index=iter_index,
-                                    bad.topics=bad.topics)
-    }
-    
-    # extract just equal-length probability vectors (sorted by token_ind)
-    tw.grid <- topicword.probability.grid(tw)
-    
-    if(!is.null(bad.topics)) {
-        tw.grid <- tw.grid[, !(..bad.topics)]
-    }
-    
+    # if we have tw.grid, skip ahead to getting distances. otherwise, build tw.grid.
+    if(is.null(tw.grid)) {
+        # if we don't have a topic-word matrix, let's get one here, 
+        # so we don't have to do it twice (once for each topic)
+        
+        if(is.null(tw)) {
+            tw <- build.topicword.table(dataset_name=dataset_name, 
+                                        ntopics=ntopics, 
+                                        iter_index=iter_index,
+                                        bad.topics=bad.topics)
+        }
+        
+        # extract just equal-length probability vectors (sorted by token_ind)
+        tw.grid <- topicword.probability.grid(tw)
+        
+        if(!is.null(bad.topics)) {
+            tw.grid <- tw.grid[, !(..bad.topics)]
+        }
+    } 
+            
     # convert to matrix and transpose, because philentropy expects vectors as rows
     tw.matrix <- t(as.matrix(tw.grid))
     
@@ -189,6 +193,7 @@ topic_distance_matrix <- function(dataset_name="noexcludes2001_2015",
 }
 
 topic_clusters <- function(twm = NULL,               # a topic-distance matrix, as above
+                           tw = NULL,                # a topic-word table. if it exists, gives a big speed boost.
                            agnes_method = "ward",   # from package(cluster)    
                            do.plot = TRUE,
                            use.labels = FALSE,
@@ -204,7 +209,8 @@ topic_clusters <- function(twm = NULL,               # a topic-distance matrix, 
         twm <- topic_distance_matrix(dataset_name = dataset_name,
                               ntopics = ntopics,
                               iter_index = iter_index,
-                              bad.topics = bad.topics)
+                              bad.topics = bad.topics,
+                              tw=tw)
     }
     
     ag <- agnes(twm, diss=TRUE, method=agnes_method)
@@ -236,15 +242,17 @@ topic_distances_in_cluster <- function(members,    # a vector of topic numbers,
                                          ntopics=50,
                                          iter_index=1,
                                          bad.topics=NULL,
-                                         twm=NULL)     # if we have a topic distance matrix,
-    # don't waste time rebuilding it
+                                         twm=NULL,
+                                         tw=NULL)     # don't waste time rebuilding if we have them
+    
 {
     
     if(is.null(twm)) {
         topic_distance_matrix(dataset_name=dataset_name,
                               ntopics=ntopics,
                               iter_index=iter_index,
-                              bad.topics=bad.topics)
+                              bad.topics=bad.topics,
+                              tw=tw)
     }
     
     clust_dist <- twm[members, members]
