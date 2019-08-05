@@ -101,7 +101,13 @@ realconsorts_by_list <- function(dataset_name = "noexcludes",
     }
     
     if (is.null(matchlist_file)) {
-        matchlist_file <- file.path(newdataloc, "realconsorts from alumni lists.csv")
+        matchlist_name <- "realconsorts from alumni lists"
+        # if you're working on this file, you probably have one from today
+        matchlist_file <- file.path(dataloc, paste0(matchlist_name, " ", Sys.Date(), ".csv"))
+        # but if not, just load the default
+        if(!file.exists(matchlist_file)) {
+            matchlist_file <- file.path(dataloc, (paste0(matchlist_name, ".csv")))
+        }
     }
     
     if (is.null(output_file)) {
@@ -164,6 +170,12 @@ realconsorts_by_list <- function(dataset_name = "noexcludes",
             warning("realconsorts_by_list indexes non-Consortium schools. Time to debug!")
         }
         
+        if(remake_figs) {
+            message("Saving ", dataset_name, " with updated realconsorts from *manual* (non-alumni list) matches to file: ", output_file, "...")
+            write.csv(dataset, file=output_file, row.names=FALSE, na="")
+            message("Done.")
+        }
+        
     } else if (!file.exists(manual_file)) {
         warning("realconsorts_by_list: couldn't find csv of manually confirmed Consortium dissertations:\n", manual_file)
     }
@@ -217,14 +229,18 @@ realconsorts_by_list <- function(dataset_name = "noexcludes",
             alumni_list$Lastname <- sapply(alumni_list$Name, function(x) namepart(x, "last"))
             alumni_list$Firstname <- sapply(alumni_list$Name, function(x) namepart(x, "first"))
             alumni_list <- alumni_list[order(alumni_list[, school_col], alumni_list$Lastname, alumni_list$Firstname),]
-            alumni_list <- alumni_list[, c(school_col, "Name", "Department", "Lastname", "Firstname", "Source", "Year")]
+            # alumni_list <- alumni_list[, c(school_col, "Name", "Department", "Lastname", "Firstname", "Source", "Year")]
+            
             
             # View(alumni_list)
             
-                    # Narrow to just Consortium schools, then... 
-            unknown_dept <- dataset[which(dataset$School %in% union(conschools, rhetmapschools)),]
-            # ... get list of those alumni with unknown departments
-            unknown_dept <- unknown_dept[which(dataset$Department %in% c("?", "")), c("Author", "School", "Department", "realconsort", "Pub.number", "Title", "Year")]
+            # Narrow dataset to just Consortium/Rhetmap schools with unknown program status
+            maybeconsort_index <- intersect(which(dataset$School %in% conschools), which(!dataset$realconsort %in% c(0,1)))
+            mayberhetmap_index <- intersect(which(dataset$School %in% rhetmapschools), which(!dataset$realrhetmap %in% c(0,1)))
+            
+            unknown_dept <- dataset[union(maybeconsort_index, mayberhetmap_index), ]
+                                    # c("Author", "School", "Department", "realconsort", "Pub.number", "Title", "Year")]
+            
             unknown_dept$Lastname <- sapply(unknown_dept$Author, function(x) namepart(x, "last"))
             unknown_dept$Firstname <- sapply(unknown_dept$Author, function(x) namepart(x, "first"))
             unknown_dept <- unknown_dept[order(unknown_dept$School, unknown_dept$Author),]
@@ -233,7 +249,7 @@ realconsorts_by_list <- function(dataset_name = "noexcludes",
             
             # Use merge to find matches
             matching <- merge(unknown_dept, alumni_list, by.x=c("School", "Lastname"), by.y=c(school_col, "Lastname"))
-            matching <- matching[, c("School", "Lastname", "Firstname.x", "Firstname.y", "Year.x", "Year.y", "Author", "Name", "Department.x", "Department.y", "realconsort", "Source", "Pub.number", "Title")]
+            matching <- matching[, c("School", "Lastname", "Firstname.x", "Firstname.y", "Year.x", "Year.y", "Author", "Name", "Department.x", "Department.y", "realconsort", "Source", "Pub.number", "Title", "Checked")]
             
             # View(matching)
             
@@ -242,7 +258,7 @@ realconsorts_by_list <- function(dataset_name = "noexcludes",
             update_from_list <- function(merged_list=matching) {
                 # start empty
                 matchlist <- data.frame("Pub.number"="", "Department"="", stringsAsFactors = FALSE)
-                merged_list["Checked"] <- ""
+                merged_list[which(is.na(merged_list$Checked)), "Checked"] <- ""
                 response <- ""
                 if (nrow(merged_list > 0)) {             # avoid errors caused by over-filtering
                     i <- 1L                               # use while loop to allow backward movement
@@ -288,7 +304,7 @@ realconsorts_by_list <- function(dataset_name = "noexcludes",
                                 }
                             }      # end of inner while loop (y/n/a/b prompt)
                         }
-                    }       # end of oute while loop (fake for-loop)
+                    }       # end of outer while loop (fake for-loop)
                 }       # end of if statement            
                 matchlist <- matchlist[which(!is.na(matchlist$Pub.number)),]    
                 return(matchlist)
@@ -318,31 +334,6 @@ realconsorts_by_list <- function(dataset_name = "noexcludes",
             
             }
             
-            # optionally (but encouragedly) overwrite the file
-            if (!remake_figs) {
-                fix_fig <- readline(paste("remake_figs is currently set to FALSE. Save file anyway \n",
-                        "to avoid verifying all these matches again? (y to save)"  ))
-                if(tolower(substr(fix_fig, 1, 1)) == "y") {
-                    tryCatch(
-                        expr = function() {
-                            filename <- paste(matchlist_file, Sys.Date())
-                            message("Saving consortium program matches to file: ", filename, "... ")
-                            write.csv(matchlist, file=filename, row.names=FALSE, na="")
-                        },
-                        error = function(e) {
-                            message("Can't save file, so exporting it instead")
-                            matchlist_err <<- matchlist
-                            stop("update_realconsorts.R: something went wrong in file save, line 330")
-                        },
-                        finally = message("Done.")
-                    )
-                }
-            } else {
-                message("Saving consortium program matches to file: ", paste0(matchlist_file, Sys.Date()), "... ")
-                write.csv(matchlist, file=paste(matchlist_file, Sys.Date()), row.names=FALSE, na="")
-                message("Done.")
-            }
-        
             # merge newly matched data into the dataset
             ## NB: Straight merge doesn't work because dataset$Department is a factor
             # dataset <- merge(dataset, matchlist, all.x=T)
@@ -355,6 +346,46 @@ realconsorts_by_list <- function(dataset_name = "noexcludes",
             }
             dataset$Department <- as.factor(dataset$Department)
             
+            # optionally (but encouragedly) overwrite the file
+            if (!remake_figs) {
+                fix_fig <- readline(paste("remake_figs is currently set to FALSE. Save ", dataset, " to file anyway \n",
+                        "to avoid verifying all these matches again? (y to save)"  ))
+                if(tolower(substr(fix_fig, 1, 1)) == "y") {
+                    tryCatch(
+                        expr = function() {
+                            message("Saving ", dataset_name, " with updated realconsorts from *alumni list* matches to file: ", output_file, "...")
+                            write.csv(dataset, file=output_file, row.names=FALSE, na="")
+                            message("Done.")
+                            
+                            filename <- file.path(dataloc, paste(matchlist_name, Sys.Date(), ".csv"))
+                            message("Saving *alumni* matchlist to file: ", filename, "... ")
+                            write.csv(matchlist, file=filename, row.names=FALSE, na="")
+                        },
+                        error = function(e) {
+                            message("Can't save file, so exporting it instead")
+                            matchlist_err <<- matchlist
+                            warning("update_realconsorts.R: something went wrong in file save, line 338ff")
+                        },
+                        finally = message("Done.")
+                    )
+                }
+            } else {
+                tryCatch(
+                    expr = function() {
+                        filename <- file.path(dataloc, paste(matchlist_name, Sys.Date(), ".csv"))
+                        message("Saving consortium program matches from *alumni lists* to file: ", filename, "... ")
+                        write.csv(matchlist, file=filename, row.names=FALSE, na="")
+                    },
+                    error = function(e) {
+                        message("Can't save file, so exporting it instead")
+                        matchlist_err <<- matchlist
+                        warning("update_realconsorts.R: something went wrong in file save, line 338ff")
+                    },
+                    finally = message("Done.")
+                )
+            }
+        
+           
             ## check results
             # dataset[which(dataset$realconsort == 1), c("School", "Department", "realconsort")]
             
@@ -387,12 +418,15 @@ realconsorts_by_list <- function(dataset_name = "noexcludes",
         message("Done.")
     }
     
-    maybeconsort_index <- intersect(which(dataset$School %in% conschools), which(dataset$realconsort %in% c(0,1)))
-    mayberhetmap_index <- intersect(which(dataset$School %in% rhetmapschools), which(dataset$realrhetmap %in% c(0,1)))
+    # Redo index of possible but unknown consortium/rhetmap disses
+    maybeconsort_index <- intersect(which(dataset$School %in% conschools), which(!dataset$realconsort %in% c(0,1)))
+    mayberhetmap_index <- intersect(which(dataset$School %in% rhetmapschools), which(!dataset$realrhetmap %in% c(0,1)))
+    
+    # Make this available outside the function
     maybeconsorts <<- dataset[union(maybeconsort_index, mayberhetmap_index), ]
     message("Disses at consortium/rhetmap schools but with unconfirmed program status can be accessed as maybeconsorts.")
     if(remake_figs) {
-        write.csv(maybeconsorts, file=file.path(newdataloc, paste0("maybeconsorts_", Sys.Date(), ".csv")))
+        write.csv(maybeconsorts, file=file.path(dataloc, paste0("maybeconsorts_", Sys.Date(), ".csv")), row.names=F, na="")
     }
     
     return(dataset)
@@ -441,4 +475,48 @@ realconsorts_ratios <- function(dataset_name = "consorts",
 
 if(FALSE) {     # for testing; will never run on its own
     realconsorts_by_list()
+}
+
+
+
+# I don't know how it happened, but somehow all the above somehow managed to miss 
+# a bunch of dissertations for which I knew the department, but hadn't labeled as
+# realconsort or realrhetmap. I processed them in OpenRefine. This function will 
+# copy the new realconsort/realrhetmap values from that spreadsheet into noexcludes
+# and re-export. (There were still 358 dissertations at rhetmap schools for which
+# I still don't have departments.) --Ben 2019-07-01
+
+refine_consorts <- function(dataset_name, 
+                            sourcefile=file.path(dataloc, "maybeconsorts_2019-07-01_refined-take-2.csv"),
+                            output_file = NULL      # a file.path to export the full dataset after matching
+                            ){
+    
+    if(file.exists(sourcefile)) {
+        
+        if (is.null(output_file)) {
+            output_file <- file.path(dataloc, paste0(dataset_name, " with realconsorts updated ", Sys.Date(), ".csv"))
+        }
+        
+        dataset <- get(dataset_name)
+    
+        sourceset <- read.csv(sourcefile)
+        for(i in 1:nrow(sourceset)) {
+            dataset[which(dataset$Pub.number == sourceset[i, "Pub.number"]), "realconsort"] <- sourceset[i, "realconsort"]
+            dataset[which(dataset$Pub.number == sourceset[i, "Pub.number"]), "realrhetmap"] <- sourceset[i, "realrhetmap"]
+        }
+        
+        message("Updated ", nrow(sourceset), " rows with realconsort/realrhetmap values from ", sourcefile)
+        
+        if(remake_figs) {
+            message("Saving ", dataset_name, " with updated realconsorts from openrefined matches to file: ", output_file, "...")
+            write.csv(dataset, file=output_file, row.names=FALSE, na="")
+            message("Done.")
+        }
+        
+        return(dataset)
+    }
+}
+
+if(FALSE) {    # This should be a one-time operation
+    noexcludes <- refine_consorts("noexcludes")
 }
