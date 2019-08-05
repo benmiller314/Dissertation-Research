@@ -130,12 +130,10 @@ sumbytags <- function(dataset_name = "noexcludes",
 	# print(total.counts)
 
 
-	to.return <- list("dataset" = dataset_name,
-
+	to.return <- list("dataset_name" = dataset_name,
+				 "tagset_name" = tagset_name,
 				 "correlations" = as.matrix(sum.by.tags),
-	
 				 "solo.counts"  = solo.counts,
-
 				 "total.counts" = total.counts)
 
 	
@@ -159,7 +157,7 @@ sumbytags <- function(dataset_name = "noexcludes",
 
 				}
 
-			heatmap.ben(to.return, diags=TRUE, dendro=dendro)
+			heatmap.ben(sum.by.tags=to.return, diags=TRUE, dendro=dendro)
 
 			title(main="Method Tag Co-Occurrence", sub=paste0(dataset_name, ", N", nrow(dataset)))
 				
@@ -179,7 +177,7 @@ sumbytags <- function(dataset_name = "noexcludes",
 			}
 
 	
-			heatmap.ben(to.return, rowscale=TRUE, diags=TRUE, dendro=dendro)
+			heatmap.ben(sum.by.tags=to.return, rowscale=TRUE, diags=TRUE, dendro=dendro)
 				
 			title(main="Method Tag Co-Occurrence \n (normed by row)", sub=paste0(dataset_name, ", N", nrow(dataset)))
 				
