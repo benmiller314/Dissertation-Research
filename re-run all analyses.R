@@ -20,6 +20,11 @@
 #       autorun: If TRUE, call the functions when files are sourced; 
 #                if FALSE, load functions but do not call.            
         autorun <- FALSE
+
+#       dual_source: Set TRUE if merging an old datafile with a new datafile;
+#                    set FALSE if loading an already-merged file
+#                    (e.g. an exported version of noexcludes with realconsorts updated)
+        dual_source <- FALSE
         
 #       update_realconsorts: If TRUE, overwrite file list index of dissertations from
 #                real consortium program dissertations, for text mining purposes.
