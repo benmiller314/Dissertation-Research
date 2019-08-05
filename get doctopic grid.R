@@ -16,45 +16,9 @@ get.doctopic.grid <- function(dataset_name="consorts",
                               doplot=F,
                               do_reshape=F
                               ) {
-    # get packages in case we've just restarted R
+
     require(data.table)
-    
-    
-    ################
-    ## OH GOOD LORD -- encountering mysterious bugs on 2018-01-02, I realize that MALLET's output has changed:
-    ## instead of spitting out alternating ranked columns of topic number, topic weight, topic number, topic weight 
-    ## as my original reshaping scheme below assumed), at some point it started giving only topic weights, with all topics 
-    ## in order. This change was not documented anywhere, as far as I can tell, except for this issue queue -- from way back
-    ## in 2015 -- https://github.com/mimno/Mallet/issues/41. GRRRRRAGHH.
-    ##
-    ## The upshot is, we no longer need mallet_composition2r.py, because the composition file is already in a grid. 
-    ################
-    
-    #
-    # Locate the doc/topic grid, or create it if it doesn't yet exist.
-    # filename <- file.path(tmloc, paste0(dataset_name, "k", ntopics, 
-    #                     "_doc-all-topics_", iter_index, ".txt"))
-    # 
-    # if (!file.exists(filename)) {   
-    #     if (do_reshape) { cmd <- "reshapeMallet.py" } else { cmd <- "mallet_composition2r.py" }
-    #     command <- paste0("cd '", unixsourceloc, 
-    #             "'; cd 'Shell scripts and commands'; python", cmd)
-    #     
-    #     go <- readline(paste("Have you updated", cmd,
-    #                     "to reflect your current dataset/ntopics? (Y/N)\n"))
-    #     if(tolower(go) != "y") { 
-    #         stop("Better fix that, then") 
-    #     } 
-    #     
-    #     print("Converting topic/weight pairs into doc/topic grid...")
-    #     if(! system(command)) {     # runs only if command exits successfully
-    #         print("Done.") 
-    #     }
-    #     
-    # } else {    # file already exists
-    #     print("Oh, good, the doc-all-topics file exists. Moving on...")
-    # }
-    
+
     # Read in the doc/topic grid. 
     # for colClasses:   Column 1 is an unneeded row index, so convert to NULL.
     #                   Column 2 is filenames; we'll clean below.
@@ -62,6 +26,7 @@ get.doctopic.grid <- function(dataset_name="consorts",
     filename <- file.path(tmloc, paste0(dataset_name, "k", ntopics, "_composition_", iter_index, ".txt"))
     if(file.exists(filename)) {
         doc_topics <- read.delim(filename, header=F, colClasses=c("NULL", "character", rep("numeric", ntopics)))        
+        
     } else {
         stop("doc/topic grid does not exist: ", filename)
     }
@@ -100,8 +65,8 @@ get.doctopic.grid <- function(dataset_name="consorts",
     
     
     ## Find overall top topics
-    # contributes to the dissertation in that row. Summing these percentages
     # Each cell gives the percentage which the topic in that column
+    # contributes to the dissertation in that row. Summing these percentages
     # and sorting gives us a rank based on percentage points.
     
     colsums <- colSums(doc_topics[,which(names(doc_topics) != "Pub.number")])
@@ -170,5 +135,10 @@ get.doctopic.grid <- function(dataset_name="consorts",
 }   # end of get.doctopic.grid()
 
 if(FALSE) {         # this will never run on its own
-    mygrid <- get.doctopic.grid("noexcludes2001_2015", 60, NULL, 4, doplot=F)
+    remake_figs
+    mygrid <- get.doctopic.grid("noexcludes2001_2015", ntopics=23, subset_name=NULL, 3, doplot=T)
+    
+    mygrid <- get.doctopic.grid("noexcludes2001_2015", ntopics=50, iter_index=1, 
+                                subset_name="knownprograms2001_2015", 
+                                doplot=T)
 }
