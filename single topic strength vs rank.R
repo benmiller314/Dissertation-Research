@@ -5,9 +5,11 @@
 
 
 strength_v_rank <- function(my.topic, 
-							dataset_name = "consorts", 
-							ntopics		 = 55,
-							bad.topics	 = NULL
+							dataset_name = "noexcludes2001_2015", 
+							ntopics		 = 50,
+							subset_name  = "realconsorts2001_2015",
+							iter_index   = "1",
+							bad.topics	 = c("3", "12", "50", "47", "34", "36", "30", "8", "15")
 							) 
 {
 	# Exclude non-content-bearing topics
@@ -23,7 +25,8 @@ strength_v_rank <- function(my.topic,
 	
 	# get all topics by document
 	if(!exists("get.doctopic.grid", mode="function")) { source("get doctopic grid.R") }
-	grid <- data.table(get.doctopic.grid(dataset_name, ntopics)$outputfile)
+	grid <- get.doctopic.grid(dataset_name=dataset_name, ntopics=ntopics, 
+	                          subset_name=subset_name, iter_index=iter_index)$outputfile.dt
 	# str(grid)
 	# head(grid)
 
@@ -49,20 +52,29 @@ strength_v_rank <- function(my.topic,
 		# head(my.contribs)
 		
 	# set up the plot
-	maintitle <- paste("Topic Contribution by Topic Rank")
-	subtitle <- paste(dataset_name, ntopics, "topics")
+	if(!exists("build_plot_title", mode="function")) {
+	    source(file="frameToD3.R")
+	}
+	bigtitle <- build_plot_title(dataset_name=dataset_name, ntopics=ntopics,
+	                             subset_name=subset_name, iter_index=iter_index,
+	                             bad.topics=bad.topics,
+	                             whatitis="Topic Contribution by Topic Rank")
+	
+	maintitle <- strsplit(bigtitle, ",")[[1]][1]
+	subtitle <- strsplit(bigtitle, ",")[[1]][2]
 	ymax <- max(grid)
 	
 		# Use get_topic_labels() to retrieve ranks
 		if(!exists("get_topic_labels", mode="function")) { source(file="get topic labels.R") }
-		topic.labels.dt <- get_topic_labels()
+		topic.labels.dt <- get_topic_labels(dataset_name=dataset_name, ntopics=ntopics,
+		                                    subset_name=subset_name, iter_index=iter_index)
 			# head(topic.labels.dt)
 		overall.rank <- topic.labels.dt[Topic == my.topic, Rank]
 		topic.label <- topic.labels.dt[Topic == my.topic, Label]
 	legendtext <- paste0("topic: ", my.topic, "\n'",topic.label, "'\noverall rank: ", overall.rank)
 	
 	# plot it
-	if(remake_figs) { filename <- paste0(imageloc, maintitle, " ", subtitle, ".pdf"); pdf(filename) }
+	if(remake_figs) { filename <- file.path(imageloc, paste0(maintitle, " ", subtitle, ".pdf")); pdf(filename) }
 	plot(my.ranks, 											# x values
 		 my.contribs, 										# y values
 		 main=maintitle, 									# title of figure
@@ -84,12 +96,13 @@ strength_v_rank <- function(my.topic,
 
 # Okay, now I want to run that function on multiple topics
 
-if(autorun) {
+if(FALSE) {
 	remake_figs
 	
 	# Use get_topic_labels() to retrieve ranks
 	if(!exists("get_topic_labels", mode="function")) { source(file="get topic labels.R") }
-	topic.labels.dt <- get_topic_labels()
+	topic.labels.dt <- get_topic_labels(dataset_name=dataset_name, ntopics=ntopics,
+	                                    subset_name=subset_name, iter_index=iter_index)
 	head(topic.labels.dt)
 	
 	# Exclude non-content-bearing topics
@@ -99,7 +112,9 @@ if(autorun) {
 	topics.by.rank <- head(topic.labels.dt[, Topic], 10)
 	
 	lapply(topics.by.rank, strength_v_rank)
-	strength_v_rank(my.topic=10)
+	strength_v_rank(dataset_name=dataset_name, ntopics=ntopics,
+	                subset_name=subset_name, iter_index=iter_index,
+	                my.topic=10)
 	
 	# lapply(topic.labels.dt[, Topic], strength_v_rank)
 	
