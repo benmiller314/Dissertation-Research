@@ -88,8 +88,11 @@ consortsonly <- conschools[-which(conschools %in% rhetmapschools)]
 
 # verify departmental information, so we can know what's really produced by a consortium or rhetmap school
 source(file="update realconsorts.R")
-noexcludes <- realconsorts_by_list("noexcludes") # use default = department-gathering-6.csv
-noexcludes <- realconsorts_by_list("noexcludes", manual_file = file.path(dataloc, "unconfirmed_consorts_2018-07-05.csv"))
+if(update_realconsorts) {
+    noexcludes <- realconsorts_by_list("noexcludes") # use default
+}
+    
+# noexcludes <- realconsorts_by_list("noexcludes", manual_file = file.path(dataloc, "unconfirmed_consorts_2018-07-05.csv"))
 
 # get tag index columns on their own, for simplicity down the road
 # TO DO: See whether we still need this
@@ -123,6 +126,9 @@ realrhetmap.count <- nrow(realrhetmaps)
 
 knownprograms.index <- union(realconsorts.index, realrhetmaps.index)
 knownprograms <- noexcludes[knownprograms.index,]
+unknownprograms.index <- setdiff(union(consorts.index, rhetmaps.index), knownprograms.index)
+unknownprograms <- noexcludes[unknownprograms.index, ]
+# write.csv(unknownprograms, file=file.path(dataloc, paste0("maybeconsorts_", Sys.Date(), ".csv")), row.names=F, na="")
 unknownprograms.count <- length(union(consorts.index, rhetmaps.index)) - length(knownprograms.index)
 
 # report back what we've found
@@ -139,9 +145,9 @@ message("This brings the total count confirmed from known programs to ", nrow(kn
 
 # index of disses that need to be checked for realconsort status
 # (no_alumni_list is created as a side effect of `update realconsorts.R`)
-maybeconsorts.index <- which(consorts$School %in% no_alumni_list)
-maybeconsorts.index <- which(!consorts[maybeconsorts.index, "realconsort"] %in% c(0,1))
-maybeconsorts <- consorts[maybeconsorts.index, ]
+# maybeconsorts.index <- which(consorts$School %in% no_alumni_list)
+# maybeconsorts.index <- which(!consorts[maybeconsorts.index, "realconsort"] %in% c(0,1))
+# maybeconsorts <- consorts[maybeconsorts.index, ]
 
 
 ## figure out which consortium schools are not showing up
@@ -203,17 +209,20 @@ rhetmaps2006_2010 <- rhetmaps[which(rhetmaps$Year %in% seq(2006, 2010, 1)),]
 # re-factor all factor columns in all data subsets
 ## TO DO: use loops and assign() to *build* these subsets with less redundancy
 
-subset_list <- c("consorts", "nonconsorts", "realconsorts", "top.nonconsorts", "consorts.plus", "maybeconsorts",
+subset_list <- c("consorts", "nonconsorts", "realconsorts", "top.nonconsorts", "consorts.plus", 
                  "noexcludes2001_2015", "consorts2001_2015", "realconsorts2001_2015", "nonconsorts2001_2015",
                  "noexcludes2001_2005", "realconsorts2001_2005", "realrhetmaps2001_2005",
                  "noexcludes2006_2010", "realconsorts2006_2010", "realrhetmaps2006_2010",
                  "noexcludes2011_2015", "consorts2011_2015", "realconsorts2011_2015", "nonconsorts2011_2015",
                  "new_noexcludes", "rhetmaps", "rhetmaps2001_2015", "rhetmaps2011_2015",
                  "realrhetmaps", "realrhetmaps2001_2015", "realrhetmaps2011_2015",
-                 "knownprograms", "knownprograms2001_2015", "knownprograms2011_2015")
+                 "knownprograms", "knownprograms2001_2015", "knownprograms2011_2015",
+                 "maybeconsorts", "unknownprograms")
 
 for (subset in subset_list) {
-    assign(subset, refactor.all(subset))
+    if(exists(subset)) {
+        assign(subset, refactor.all(subset))
+    }
 }
 
 # make noexcludes easy to index and search
@@ -258,3 +267,4 @@ if(remake_figs || update_realconsorts) {
 
 # if "function scratchpad.R" is being used, clean up unneeded variables
 # rm(datawrangle, best_sort, filter_data, get_tags, matcharray, reorder_ser, rowdiff, rowmatch, shuffle, tagdiff, tagmatch, refactor.index)
+
