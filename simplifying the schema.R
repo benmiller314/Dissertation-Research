@@ -23,11 +23,12 @@ tagnames.simple.long <- c(
 short_schema <- function (data) {   
     # Check that the columns we're adding don't already exist
     while(any(names(data) %in% tagnames.simple)) {
-        c <- readline(paste("Looks like data has already been parsed.",
+        val <- readline(paste("Looks like data has already been parsed.",
                         "Overwrite (O) or Abort (A)? \n short_schema > "))
-        if(tolower(c) == "a") {
-            stop("Short_schema not applied; data already parsed.")
-        } else if (tolower(c) == "o") {
+        if(tolower(val) == "a") {
+            warning("Short_schema not applied; data already parsed.")
+            return(data)
+        } else if (tolower(val) == "o") {
             break
         } else {
             print(noquote("I do not understand your response. Try again?"))
