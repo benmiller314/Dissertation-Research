@@ -20,15 +20,13 @@
 	}
 	
 	# # Assume we're typically going to need more Java heap space, set maximum allocation
-	# # for a 4GB MacBook Pro:
-	# 	    heap_param <- paste("-Xmx","2g",sep="") 
-	# 	    options(java.parameters=heap_param)
-	# # now attempting 15GB for just under half a 32GB-RAM MacPro
-	# 	    heap_param <- paste("-Xmx","15g",sep="") 
-	# 	    options(java.parameters=heap_param)
 	# # Never mind, this is set by MALLET in $malletloc/bin/mallet, 
 	# # on line 10: "MEMORY=" etc. Leaving it here in case both need to be set.
-	heap_param <- paste("-Xmx","15g",sep="")
+	if (which_computer == "laptop") {
+    	heap_param <- paste("-Xmx","3g",sep="")
+	} else if (which_computer == "work") {
+	    heap_param <- paste("-Xmx","15g",sep="")
+	}
 	options(java.parameters=heap_param)
 	
 	# What's our dataset?
