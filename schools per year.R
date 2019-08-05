@@ -36,7 +36,10 @@ peryear <- function(dataset_name	= "noexcludes",
 		lines(x=to.return$Year, y=to.return$Schools, col="red", type="b", pch=17)
 		
 		# add legend
-		legend("bottomright",legend=c("Dissertations","Schools"),pch=c(16,17),col=c("blue","red"),bty="n")
+		if (!exists ("outside_legend", mode="function")) {
+		    source(file="outside_legend.R")
+		}
+		outside_legend("bottomright",legend=c("Dissertations","Schools"),pch=c(16,17),col=c("blue","red"),bty="n")
 
 		if(remake_figs) {	dev.off()	}
 	}
@@ -48,4 +51,5 @@ if(autorun) {
 	remake_figs
 	peryear()
 	peryear("consorts.plus")
+	peryear("noexcludes2001_2015", do.plot=T)
 }
