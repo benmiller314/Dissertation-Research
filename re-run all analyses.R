@@ -27,8 +27,17 @@
 
 #       Are we working at home or at the office? 
 #       Some file locations will be slightly different.
-        # which_computer <- "work"
-        which_computer <- "laptop"
+        which_computer <- "work"
+        # which_computer <- "laptop"
+
+#       Try not to run out of memory, would you? Need to set this before loading the rJava VM.
+        if (which_computer == "work") {
+            heap_param <- paste("-Xmx","15g",sep="")    
+        } else if (which_computer == "laptop") {
+            heap_param <- paste("-Xmx","3g",sep="")
+        }
+        options(java.parameters=heap_param)        
+        
 ## 
 # `dataprep.R`: prepares working environment by loading helper
 #         functions and setting key variables (such as tagset).
