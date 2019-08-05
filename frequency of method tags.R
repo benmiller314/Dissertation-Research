@@ -127,6 +127,10 @@ if(autorun) {
 	methodfreq_combined("noexcludes2006_2010", "noexcludes2006_2010", label_diffs = F)
 	methodfreq_combined("noexcludes2011_2015", "noexcludes2011_2015", label_diffs = F)
 	
+	methodfreq_combined("rhetmaps2001_2005", "rhetmaps2001_2005", label_diffs = F, tagset = "tagnames.simple")
+	methodfreq_combined("rhetmaps2006_2010", "rhetmaps2006_2010", label_diffs = F, tagset = "tagnames.simple")
+	methodfreq_combined("rhetmaps2011_2015", "rhetmaps2011_2015", label_diffs = F, tagset = "tagnames.simple")
+	
 } else {
     message("The following function has been loaded:")
     message("    methodfreq_combined(bigset, smallset, label_diffs, diffset, tagset)    ")
