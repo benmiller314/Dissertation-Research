@@ -177,7 +177,7 @@ topicword.probability.grid <- function(tw)         # topicword.table as built ab
         # set(tw.grid, i=NULL, j=column, value=(tw.grid[[column]]/col_sum) 
         # confirm that we're still adding up essentially to 1
         if (sum(tw.grid[[column]]) != 1 & column != "token_ind") {
-            warning("Sum of probabilities for ", column, " is ", sum(tw.grid[[column]]))
+            warning("Sum of probabilities for column ", column, " is ", sum(tw.grid[[column]]))
         }
     }
     
@@ -216,7 +216,8 @@ one.tw.probability.vector <- function(mytopic,     # just a number in 1:ntopics
 
     return(vector_a)
 }    
-    
+
+
 # Testing space / demo
 if(FALSE) { 
     wt <- get.wordtopic.grid()      # 1,616,842 tokens
