@@ -4,13 +4,18 @@
 # Construct a map of squares, shaded according to value. Based heavily on R's
 # core heatmap function, modified to print the value for each square of the
 # grid.
+#
+# This file will be called by `collocation heatmap.R`. Or maybe it should go 
+# the other way. Apparently I used to just clutter my files with a lot of
+# junk code. So. Still working on that.
 #####
 
 
 heatmap.ben <- function (
-	sum.by.tags, 			# A list output by sumbytags() containing 
-							# a correlation matrix, solos, & totals
-	diags    = FALSE,		# Should we outline diagonals? 
+	dataset_name = "noexcludes2001_2015",
+	tagset_name = "tagnames",
+	sum.by.tags = NULL,    # Allow for passing in correlations from sumbytags; avoid infinite loop!
+    diags    = FALSE,		# Should we outline diagonals? 
 	highval  = "#818181",	# Darkest color
 	lowval   = "#FAFAFA",	# Lightest color
 	numCols  = 10,			# How many different shades?
@@ -22,7 +27,21 @@ heatmap.ben <- function (
 							# clustering?
 	) 
 {
-
+    # get the data
+     
+    if (!is.null(sum.by.tags)) {
+        dataset_name <- sum.by.tags$dataset_name
+        tagset_name <- sum.by.tags$tagset_name
+    } else {
+        if(!exists("sumbytags", mode="function")) {
+            source(file="sum by tags.R")
+        }
+        sum.by.tags <- sumbytags(dataset_name, tagset_name)
+    } 
+    
+    dataset <- get(dataset_name)
+    tagset <- get(tagset_name)
+    
 	# extract the matrix, if need be
 	if(!is.matrix(sum.by.tags)) {
 		sum.by.tags.s <- sum.by.tags$correlations
@@ -105,11 +124,11 @@ heatmap.ben <- function (
 		if(remake_figs) { 
 			if(rowscale) {
 				filename <- file.path(imageloc, paste0("color legend for ", 
-									sum.by.tags$dataset, 
+									dataset_name, 
 									" method correlations, normed.pdf"))
 			} else {
 				filename <- file.path(imageloc, paste0("color legend for ", 
-									sum.by.tags$dataset, 
+				                    dataset_name, 
 									" method correlations, raw.pdf"))
 			}
 			pdf(filename)
@@ -143,6 +162,22 @@ heatmap.ben <- function (
 		
 	} # end of if(legend)
 
+	# plot the heatmap itself
+	if(remake_figs) {
+	    if(rowscale) {
+	        raw_or_cooked <- "scaled"
+	    } else {
+	        raw_or_cooked <- "raw"
+	    }
+    	
+	    filename <- file.path(imageloc, paste0("Method correlation heatmap (",
+                                               raw_or_cooked, " values), ",
+	                                           dataset_name, ", ",
+	                                           tagset_name, ", N",
+	                                           nrow(dataset), ".pdf"))
+	    pdf(filename)
+	}
+	
 	# set up a blank canvas of the right size
 	plot(0, 0, xlim=c(0.5,0.5+n.col), ylim=c(0.5,0.5+n.row), type="n", xaxt="n", yaxt="n", xlab="", ylab="", bty="n")
 
@@ -196,22 +231,25 @@ heatmap.ben <- function (
 						"Diagonals represent tags occurring on one-method 
 						dissertations.")
 		} else {
-			h2 <- "Diagonals represent tags occurring on one-method
-				  dissertations."
+			h2 <- "Diagonals represent tags occurring on one-method dissertations."
 		}
 		
 		title(sub=h2)
+	}
+	
+	if(remake_figs) {
+	    dev.off()
 	}
 	
 	if(dendro) {
 		if(remake_figs) { 
 			if(rowscale) {
 				filename <- file.path(imageloc, paste0("dendrogram for ", 
-									sum.by.tags$dataset, 
+									dataset_name, 
 									" method column correlations.pdf"))
 			} else {
 				filename <- file.path(imageloc, paste0("dendrogram for ", 
-									sum.by.tags$dataset, 
+									dataset_name, 
 									" method correlations, raw.pdf"))
 			}
 			pdf(filename)
@@ -222,7 +260,7 @@ heatmap.ben <- function (
 		if(rowscale) { 
 			if(remake_figs) {
 				filename <- file.path(imageloc, paste0("dendrogram for ", 
-									sum.by.tags$dataset, 
+									dataset_name, 
 									" method row correlations.pdf"))
 				pdf(filename)
 			} 
@@ -233,3 +271,16 @@ heatmap.ben <- function (
 	} # end of if(dendro)
 	
 } # end of wrapper function heatmap.ben()
+
+if(autorun) {
+    heatmap.ben(dataset_name="noexcludes2001_2015", 
+                tagset_name="no_ped_tagnames",
+                diags=T,
+                rowscale=T)
+    
+    heatmap.ben(dataset_name="realconsorts2001_2015", 
+                tagset_name="no_ped_tagnames",
+                diags=T,
+                rowscale=T)
+    
+}
