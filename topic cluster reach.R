@@ -7,45 +7,57 @@
 #####
 
 
-## define clusters of topics
-    # The Teaching of Writing
-    Teaching.of.Writing <- c(1, 32, 30, 3, 9, 39, 41, 40, 45, 6, 25, 8)
+## helper function: define clusters of topics
+name_topic_clusters <- function(dataset_name="noexcludes2001_2015", 
+                                ntopics=50, 
+                                iter_index=1,
+                                subset_name=NULL) {
+    if(dataset_name=="consorts" && ntopics==55 && iter_index=="" && is.null(subset_name)) {
+        # The Teaching of Writing
+        Teaching.of.Writing <- c(1, 32, 30, 3, 9, 39, 41, 40, 45, 6, 25, 8)
+        
+        # Theories of Meaning-Making
+        Theories.of.Meaning.Making <- c(21, 18, 48, 14, 26, 53, 31, 29)         
+        
+        # Audience and Context for Composing
+        Audience.and.Context <- c(35, 49, 55, 27, 43, 46, 44)
+        
+        # Performative Identities, past and present
+        Performative.Identities <- c(23, 10, 16, 33, 15, 11, 7, 37)
+        
+        # Politics and Power
+        Politics.and.Power <- c(36, 20, 28, 54, 17, 52)
+        
+        # other
+        Other <- c(5, 12, 42, 38, 51, 34, 19)                                   
+        
+        all_clusters <- c("Teaching.of.Writing", "Theories.of.Meaning.Making",
+                          "Audience.and.Context", "Performative.Identities",
+                          "Politics.and.Power", "Other")
+        
+        # The Teaching of Writing subcluster that's especially classroom-y
+        Teaching.of.Writing.1 <- c(1, 32, 30, 3, 9, 39, 41, 40)     
+        
+        # The Teaching of Writing subcluster that's a little more administrative
+        WPA <- c(45, 6, 25, 8)
+    } 
     
-    # Theories of Meaning-Making
-    Theories.of.Meaning.Making <- c(21, 18, 48, 14, 26, 53, 31, 29)         
-    
-    # Audience and Context for Composing
-    Audience.and.Context <- c(35, 49, 55, 27, 43, 46, 44)
-    
-    # Performative Identities, past and present
-    Performative.Identities <- c(23, 10, 16, 33, 15, 11, 7, 37)
-    
-    # Politics and Power
-    Politics.and.Power <- c(36, 20, 28, 54, 17, 52)
-    
-    # other
-    Other <- c(5, 12, 42, 38, 51, 34, 19)                                   
-    
-    all_clusters <- c("Teaching.of.Writing", "Theories.of.Meaning.Making",
-                      "Audience.and.Context", "Performative.Identities",
-                      "Politics.and.Power", "Other")
-    
-    # The Teaching of Writing subcluster that's especially classroom-y
-    Teaching.of.Writing.1 <- c(1, 32, 30, 3, 9, 39, 41, 40)     
-    
-    # The Teaching of Writing subcluster that's a little more administrative
-    WPA <- c(45, 6, 25, 8)
-
-    
+    if(dataset_name=="noexcludes2001_2015" && ntopics==50 && iter_index==1 && subset_name=="realconsorts2001_2015") {
+        Teaching.of.Writing <- c(18, 37, 6, 42, 16, 26, 41, 49, 28, 32, 35)
+        
+    }
+}
     
 ## main wrapper function
-cluster.strength <- function (my.topics_name, # an aliased list of topic numbers; see below
+cluster.strength <- function (my.topics_name, # an aliased list of topic numbers; see above
                             dataset_name = "consorts", 
                             ntopics      = 55,
+                            iter_index   = "",
                             bad.topics   = NULL,
                             level        = 0.12,
                             cumulative   = TRUE, # can several topics add up to meet that level?
-                            subset_pubs  = NULL) 
+                            subset_pubs  = NULL, # any list of pub.numbers to subset on, e.g. for a school
+                            subset_name  = NULL) # a named subset of data. 
 {
     # Exclude non-content-bearing topics
     if(is.null(bad.topics) && dataset_name == "consorts" && ntopics == 55) {
@@ -55,7 +67,9 @@ cluster.strength <- function (my.topics_name, # an aliased list of topic numbers
                     # language markers (Italian, Spanish)
     }
     
-    my.topics <- get(my.topics_name)
+    
+    my.topics <- with(name_topic_clusters(dataset_name, ntopics, iter_index, subset_name),
+                      get(my.topics_name))
                     
     if(any(my.topics %in% bad.topics)) { 
         warning(paste("At least one topic in your list has been",
@@ -64,7 +78,8 @@ cluster.strength <- function (my.topics_name, # an aliased list of topic numbers
     if(!exists("get.doctopic.grid", mode="function")) { 
         source("get doctopic grid.R") 
     }
-    grid <- data.table(get.doctopic.grid(dataset_name, ntopics)$outputfile)
+    grid <- get.doctopic.grid(dataset_name=dataset_name, ntopics=ntopics,
+                              iter_index=iter_index)$outputfile.dt
     # str(grid)
     # head(grid)
 
@@ -136,7 +151,15 @@ if(autorun) {
     cuny.pubs <- realconsorts[which(realconsorts$School=="CUNY Graduate School and University Center"), "Pub.number"]
     pitt.pubs <- realconsorts[which(realconsorts$School=="University of Pittsburgh-Pittsburgh Campus"), "Pub.number"]
     cluster.strength("Teaching.of.Writing", subset_pubs = cuny.pubs, cumulative=F)
-    cluster.strength("Teaching.of.Writing", subset_pubs = realconsorts$Pub.number, cumulative=T)
+    cluster.strength(my.topics_name="Teaching.of.Writing", 
+                     dataset_name=dataset_name,
+                     ntopics=ntopics,
+                     iter_index=iter_index,
+                     bad.topics=bad.topics,
+                     subset_pubs = realconsorts2001_2015$Pub.number, 
+                     cumulative=F)
+    
+    
     
     # TO DO: make a scatter plot with X-axis = level and Y-axis = cumulative
     # cluster strength, and a dataseries for each cluster (all on the same
