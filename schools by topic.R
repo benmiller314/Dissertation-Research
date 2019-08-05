@@ -42,11 +42,12 @@ schools_by_topic <- function(mytopic,
     mypubs <- dt[dt[[mytopic.c]] > level, c("Pub.number", mytopic), with=F]
     setnames(mypubs, mytopic.c, "contrib")
     
-    # Use that document list to retrieve school/department info from the dataset
+    ## Use that document list to retrieve school/department info from the dataset
     if(!exists(dataset_name)) {
         source(file="dataprep 2 - load data.R")
     }
     
+    # if using subset, make sure we limit to those.
     if(!is.null(subset_name) && nchar(subset_name) > 1) {
         dataset <- get(subset_name)
     } else {
@@ -54,18 +55,26 @@ schools_by_topic <- function(mytopic,
     }
     
     index <- which(dataset$Pub.number %in% mypubs$Pub.number)
-    mydepts <- dataset[index, c("Pub.number", "School", "Department")]
+    mydepts <- dataset[index, c("Pub.number", "School", "Department", "realconsort", "realrhetmap")]
     mydepts <- as.data.table(mydepts)
+    
+    # because department names can be finicky, and because we update from alumni lists
+    # but don't always update departments, use  knownprogam bits to cluster instead
+    mydepts[, knownprogram:=(realconsort | realrhetmap)]
+    mydepts[, `:=`(realconsort=NULL, realrhetmap=NULL)]
     mydepts <- merge(mydepts, mypubs, by="Pub.number")
     
-    setkey(mydepts, School, Department)
+    setkey(mydepts, School, knownprogram)
     
-    mydepts[, avg:=mean(contrib), by=.(School, Department)]
-    toplist <- mydepts[, .N, by=.(School)][order(-N)]
+    # TO DO: get a disstotal from the larger dataset for each dept,
+    #        to serve as denominator for a DissPct (topical focus)
     
-    # TO DO: divide each DissCount (topical output) 
-    #        by disstotal from that dept for the larger dataset
-    #        to get a DissPct (topical focus)
+    
+    mydepts[, deptavg:=mean(contrib), by=.(School, knownprogram)]
+    
+    # View(mydepts[order(School)])
+    toplist <- mydepts[, .N, by=.(School, knownprogram)][order(-N)]
+    
     
     title <- paste("DissCount with topic", mytopic, ">", level)
     
@@ -92,6 +101,41 @@ schools_by_topic <- function(mytopic,
 
 if(FALSE) {
     schools_by_topic(41)
-    schools_by_topic(1, use.labels=T, ntopics=150)
+    schools_by_topic(1, use.labels=T)
 }
     
+# TO DO: finish this function, which should find differences among schools_by_topic 
+# for topics within a given hclust.rect drawn on a hierarchical clustering plot
+schools_by_topic_cluster <- function(mytopics,
+                                     dataset_name="noexcludes2001_2015",
+                                     ntopics=50,
+                                     subset_name="realconsorts2001_2015",  # set NULL if not using.
+                                     iter_index=1,     # suffix to differentiate repeat runs of same MALLET params.
+                                     outfile=NULL,     # if not provided, will be set to a default.
+                                     use.labels=FALSE, # replace topic numbers with labels
+                                     # chosen using top_topic_browser()?
+                                     bad.topics= NULL, # exclude non-content-bearing topics
+                                     tw = NULL)        # topic-word matrix. If it exists,
+                                                       # pass it in for a speed boost.)    
+{
+    
+    
+    # For all topics in a cluster, we first need a cluster
+    if(!exists("topic_distance_matrix", mode="function")) { 
+        source(file="topic_term_synonyms.R") 
+    }
+    
+    
+    twm <- topic_distance_matrix(dataset_name = dataset_name, 
+                               ntopics = ntopics, 
+                               iter_index = iter_index,
+                               dist_method = "jensen-shannon",
+                               tw = tw,
+                               bad.topics = bad.topics)
+    
+    # topic_clusters() is also from topic_term_synonyms.R
+    ag <- topic_clusters(twm, do.plot=F, use.labels=use.labels)
+    
+    hc <- as.hclust(ag)
+
+}
