@@ -212,6 +212,7 @@ schoolwise <- function(dataset_name="noexcludes", tagset_name="tagnames",
 }
 
 if (autorun) {
+    remake_figs
     # call the functions for all relevant datasets
     schoolwise("consorts", "tagnames", agn=T, hcl=F, dia=F)
     schoolwise("nonconsorts", "tagnames", agn=T, hcl=F, dia=F)
@@ -220,9 +221,13 @@ if (autorun) {
     # schoolwise("nonconsorts", "tagnames", agfixedcols=a$ag$colInd,
     #        difixedcols=a$di$colInd)
     schoolwise("consorts.plus", agn=T, hcl=F, dia=F)
-    schoolwise("noexcludes2001_2015", "tagnames")
-    schoolwise("consorts2001_2015", "tagnames")
-    schoolwise("realconsorts2001_2015", "tagnames")
+    schoolwise(dataset_name = "noexcludes2001_2015", tagset_name = "no_ped_tagnames")
+    schoolwise("consorts2001_2015", "no_ped_tagnames")
+    schoolwise("realconsorts2001_2015", "no_ped_tagnames")
+
+    schoolwise("noexcludes2011_2015", "tagnames")
+    schoolwise("consorts2011_2015", "tagnames")
+    schoolwise("realconsorts2011_2015", "tagnames")
     
     
     # next up: re-run with the simplified schema
