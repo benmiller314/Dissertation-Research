@@ -16,12 +16,12 @@ parse_tags <- function(data,
                        excludecol=tagcol) {
 	# Check that the columns we're adding don't already exist
 	while(any(names(data) %in% tagnames)) {
-		c <- readline(paste("Looks like data has already been parsed.", 
+		val <- readline(paste("Looks like data has already been parsed.", 
 							"Overwrite (O) or Abort (A)? \n parse_tags > "))
-		if(c == "A") {
+		if(val == "A") {
 			warning("Parse_tags not applied; data already parsed.")
-			return()
-		} else if (c == "O") {
+			return(data)
+		} else if (val == "O") {
 			break
 		} else {
 			print(noquote("I do not understand your response. Try again?"))
