@@ -1,3 +1,5 @@
+## TO DO: make this a function that takes dataset and flag_column as a parameter
+
 m <- noexcludes$Method.Terms
 m1 <- as.character(m)
 m2 <- sapply(m1, FUN=function(x) strsplit(x,"|",fixed=TRUE))
