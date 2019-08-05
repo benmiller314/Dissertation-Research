@@ -13,6 +13,7 @@
 topic.proportions <- function(dataset_name = "consorts", 
 						  ntopics = 55, 
 						  subset_name = NULL,
+						  iter_index = "",
 						  
 						  # if default dataset and ntopics are used, 
 						  # use default bad.topics 
@@ -132,7 +133,7 @@ topic.proportions <- function(dataset_name = "consorts",
 		if(!exists("get_topic_labels", mode="function")) { 
 			source(file="get topic labels.R") 
 		}
-		labels <- get_topic_labels(dataset_name, ntopics, subset_name)
+		labels <- get_topic_labels(dataset_name, ntopics, subset_name, iter_index)
 		labels.t <- labels[unique(mytopics), Label, key=Topic]
 
 		# merge in the counts
