@@ -15,8 +15,8 @@ topic.proportions <- function(dataset_name = "consorts",
 						  subset_name = NULL,
 						  iter_index = "",
 						  
-						  # if default dataset and ntopics are used, 
-						  # use default bad.topics 
+						  # NB: if default dataset and ntopics are used, 
+						  # we'll use default bad.topics 
 						  bad.topics = NULL,  
 						  
 						  # Draw notch in barplot to check for overlap?
@@ -29,7 +29,7 @@ topic.proportions <- function(dataset_name = "consorts",
 	if(!exists("get.doctopic.grid", mode="function")) { 
 		source("get doctopic grid.R") 
 	}
-	grid <- data.table(get.doctopic.grid(dataset_name, ntopics, subset_name)$outputfile, key="Pub.number")
+	grid <- get.doctopic.grid(dataset_name, ntopics, subset_name, iter_index)$outputfile.dt
 	# str(grid)
 	head(grid)
 	
@@ -37,7 +37,9 @@ topic.proportions <- function(dataset_name = "consorts",
 	# If none are set in parameters, use defaults:
 	if(is.null(bad.topics) && dataset_name=="consorts" && ntopics==55) { 		
 		bad.topics <- c("4", "47", "22", "2", "24", "50", "13") 
-	}
+	} 
+	
+	
 	grid.clean <- grid[, !(names(grid) %in% c(bad.topics, "Pub.number")),
 						 with=F]
 	print(head(grid.clean))
@@ -62,7 +64,7 @@ topic.proportions <- function(dataset_name = "consorts",
 		#					"-ranked topic within dissertations:"))
 		stats <- rbind(stats, boxplot.stats(grid.sorted[, i])$stats)
 	}
-
+	
 	# lower whisker, lower ‘hinge’, median, upper ‘hinge’, upper whisker
 	names(stats) <- c("lower", "Lhinge", "median", "Uhinge", "upper")
 	stats <- cbind("rank of topic within diss"=c(1, 2, 3), stats)
