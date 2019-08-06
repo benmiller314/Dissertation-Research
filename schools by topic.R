@@ -131,7 +131,7 @@ knownprogram_topical_ratio <- function(level = 0.12,     # percentage of a diss 
                                        ntopics=50,
                                        iter_index=1,     # suffix to differentiate repeat runs of same MALLET params.
                                        outfile=NULL,     # if not provided, will be set to a default.
-                                       use.labels=FALSE, # replace topic numbers with labels
+                                       use.labels=TRUE, # replace topic numbers with labels
                                        # chosen using top_topic_browser()?
                                        bad.topics= NULL, # exclude non-content-bearing topics
                                        dt=NULL,          # doctopic grid. pass in for a speed boost.
