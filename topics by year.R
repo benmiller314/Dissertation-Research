@@ -234,6 +234,13 @@ topic.variation <- function(dataset_name = "consorts",
                          to.plot=to.plot, do.plot=FALSE)
     rank.order <- df$rank.order
     df <- df$df
+    
+    if(! is.null(bad.topics)) {
+        df <- df[!names(df) %in% bad.topics]
+        rank.order <- rank.order[!rank.order %in% bad.topics]
+    }
+    
+    
 
     
     maintitle <- paste("Yearly Variation of Topic Proportions",
@@ -285,7 +292,7 @@ topic.variation <- function(dataset_name = "consorts",
     
     if(use.labels) {    
         axis(1, 
-             at = seq_along(df[!names(df) %in% "Year"][, rank.order]),
+             at = seq_along(df[!names(df) %in% c("Year", bad.topics)][, rank.order]),
              labels = topic.labels.dt[Topic %in% rank.order, Label], 
              las = 2,
              ps = 6,
@@ -293,7 +300,7 @@ topic.variation <- function(dataset_name = "consorts",
         )
     } else {
         axis(1, 
-             at = seq_along(df[!names(df) %in% "Year"][, rank.order]),
+             at = seq_along(df[!names(df) %in% c("Year", bad.topics)][, rank.order]),
              labels = topic.labels.dt[Topic %in% rank.order, Topic], 
              las = 2, 
              ps = 6,
