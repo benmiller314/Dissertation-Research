@@ -112,11 +112,11 @@ require(RColorBrewer)
         # start recording to file if desired
         if(remake_figs) {
             if(is.null(to.plot)) {
-                filename <- paste0(imageloc, maintitle, ", ", dataset_name, ntopics, subset_name, ", Topics ranked ",
-                             i, "-", (i+per.plot-1), ".pdf")
+                filename <- file.path(imageloc, paste0(maintitle, ", ", dataset_name, ntopics, subset_name, ", Topics ranked ",
+                             i, "-", (i+per.plot-1), ".pdf"))
             } else {
-                filename <- paste0(imageloc, maintitle, ", ", dataset_name, ntopics, subset_name, ", Topics ",
-                             to.plot[i], "-", to.plot[i+per.plot-1], ".pdf")
+                filename <- file.path(imageloc, paste0(maintitle, ", ", dataset_name, ntopics, subset_name, ", Topics ",
+                             to.plot[i], "-", to.plot[i+per.plot-1], ".pdf"))
             }
             
             pdf(filename)
@@ -147,13 +147,13 @@ require(RColorBrewer)
                     
                     # update filename
                     if(is.null(to.plot)) {
-                        filename <- paste0(imageloc, maintitle, ", ", dataset_name, ntopics, subset_name, 
+                        filename <- file.path(imageloc, paste0(maintitle, ", ", dataset_name, ntopics, subset_name, 
                                            ", Topics ranked ", i, "-",
-                                     (i+legend.offset), ".pdf")
+                                     (i+legend.offset), ".pdf"))
                     } else {
-                        filename <- paste0(imageloc, maintitle, ", ", dataset_name, ntopics, subset_name, 
+                        filename <- file.path(imageloc, paste0(maintitle, ", ", dataset_name, ntopics, subset_name, 
                                            ", Topics ", to.plot[i], "-",
-                                     to.plot[(i+legend.offset)], ".pdf")
+                                     to.plot[(i+legend.offset)], ".pdf"))
                     }
                     
                     # start writing a new file
@@ -270,7 +270,7 @@ topic.variation <- function(dataset_name = "consorts",
 
     # draw the plot 
     if(remake_figs) { 
-        filename <- paste0(imageloc, maintitle, ".pdf")
+        filename <- file.path(imageloc, paste0(maintitle, ".pdf"))
         pdf(filename) 
     }
     
