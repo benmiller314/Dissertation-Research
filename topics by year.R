@@ -223,10 +223,12 @@ require(RColorBrewer)
 topic.variation <- function(dataset_name = "consorts", 
                             ntopics = 55,
                             subset_name = NULL,
+                            iter_index = "",
                             to.plot = NULL,     # any pre-set topics to plot?
                             notch   = FALSE,
                             bad.topics = NULL,
-                            use.labels = F
+                            use.labels = F,
+                            show.outliers = T
                             ) {
 # okay, this is interesting
     df <- topics.by.year(dataset_name=dataset_name, ntopics=ntopics, 
@@ -265,12 +267,15 @@ topic.variation <- function(dataset_name = "consorts",
     topic.labels.dt <- get_topic_labels(dataset_name=dataset_name, ntopics=ntopics, 
                                         subset_name=subset_name, iter_index=iter_index)
     head(topic.labels.dt)
+    nrow(topic.labels.dt)
     
     # Exclude non-content-bearing topics
     if (is.null(bad.topics) && dataset_name=="consorts" && ntopics==55) {
         bad.topics <- c("4", "47", "22", "2", "24", "13", "50")
     }
     topic.labels.dt <- topic.labels.dt[!(Topic %in% bad.topics)]
+    nrow(topic.labels.dt)
+    nrow(df)
     setkey(topic.labels.dt, Rank)
     head(topic.labels.dt)
 
@@ -287,7 +292,8 @@ topic.variation <- function(dataset_name = "consorts",
         # cex.axis=0.6, las=2, 
         ylab = "Portion of Corpus (scaled to 1)",
         xaxt = "n",
-        notch = notch
+        notch = notch,
+        outline= show.outliers
         )
     
     if(use.labels) {    
