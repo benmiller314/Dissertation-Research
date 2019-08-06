@@ -19,6 +19,7 @@
 topics.by.year <- function(dataset_name = "consorts", 
                         ntopics = 55,
                         subset_name = NULL,
+                        iter_index = "",
                         to.plot = NULL,   # any pre-set topics to plot?
                         do.plot = TRUE,   # should we draw it, or just
                                           # return the dataframe?
@@ -33,7 +34,8 @@ require(RColorBrewer)
     if(!exists("get.doctopic.grid", mode="function")) { 
         source("get doctopic grid.R") 
     }
-    grid <- data.table(get.doctopic.grid(dataset_name, ntopics, subset_name)$outputfile)
+    grid <- get.doctopic.grid(dataset_name=dataset_name, ntopics=ntopics, 
+                              subset_name=subset_name, iter_index=iter_index)$outputfile.dt
     
     # Get ready to merge
     grid$Pub.number <- as.factor(grid$Pub.number)
@@ -60,7 +62,8 @@ require(RColorBrewer)
     if(!exists("get_topic_labels", mode="function")) { 
         source(file="get topic labels.R") 
     }
-    topic.labels.dt <- get_topic_labels(dataset_name, ntopics, subset_name)
+    topic.labels.dt <- get_topic_labels(dataset_name=dataset_name, ntopics=ntopics, 
+                                        subset_name=subset_name, iter_index=iter_index)
     head(topic.labels.dt)
     
     # Exclude non-content-bearing topics
@@ -226,7 +229,9 @@ topic.variation <- function(dataset_name = "consorts",
                             use.labels = F
                             ) {
 # okay, this is interesting
-    df <- topics.by.year(dataset_name, ntopics, subset_name, to.plot, do.plot=FALSE)
+    df <- topics.by.year(dataset_name=dataset_name, ntopics=ntopics, 
+                         subset_name=subset_name, iter_index=iter_index,
+                         to.plot=to.plot, do.plot=FALSE)
     rank.order <- df$rank.order
     df <- df$df
 
@@ -250,7 +255,8 @@ topic.variation <- function(dataset_name = "consorts",
     if(!exists("get_topic_labels", mode="function")) { 
         source(file="get topic labels.R") 
     }
-    topic.labels.dt <- get_topic_labels(dataset_name, ntopics, subset_name)
+    topic.labels.dt <- get_topic_labels(dataset_name=dataset_name, ntopics=ntopics, 
+                                        subset_name=subset_name, iter_index=iter_index)
     head(topic.labels.dt)
     
     # Exclude non-content-bearing topics
@@ -305,6 +311,14 @@ topic.variation <- function(dataset_name = "consorts",
 
 if(autorun) {
     remake_figs
-    topics.by.year()
+    topics.by.year(dataset_name=dataset_name, ntopics=ntopics, 
+                   subset_name=subset_name, iter_index=iter_index,
+                   bad.topics=bad.topics)
+    topic.variation(dataset_name=dataset_name, ntopics=ntopics, 
+                   subset_name=subset_name, iter_index=iter_index,
+                   bad.topics=bad.topics, 
+                   show.outliers=F,
+                   use.labels=T)
+    
     topic.variation(subset_name = "realconsorts")
 }
