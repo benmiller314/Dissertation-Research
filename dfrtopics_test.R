@@ -18,6 +18,8 @@
 heap_param <- paste("-Xmx","15g",sep="")
 options(java.parameters=heap_param)
 
+# install.packages("devtools")
+# devtools::install_github("agoldst/dfrtopics")
 library(dfrtopics)
 library(mallet) # did you raise the heap limit? 
 library(dplyr)
