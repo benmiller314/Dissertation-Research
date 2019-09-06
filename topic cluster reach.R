@@ -103,6 +103,7 @@ cluster.strength <- function (my.topics=NULL,      # either pass in a list of to
     } else {
         pubs <- grid$Pub.number
     }
+    # length(pubs)
         
     grid <- grid[(grid$Pub.number %in% pubs), ]
     
@@ -133,16 +134,20 @@ cluster.strength <- function (my.topics=NULL,      # either pass in a list of to
         maxes <- sapply(1:nrow(my.contribs), FUN = function(x) {
                              max(my.contribs[x]) } )
         winners <- which(maxes >= level)
+        my.sort <- order(maxes, decreasing = T)
         
     } else {
         # Otherwise, check whether the combined contributions from several topics
         # within the cluster add up to the minimum level or beyond.
         totals <- sapply(1:nrow(my.contribs), FUN = function(x) {
-                             sum(my.contribs[x]) > level } )
+                             sum(my.contribs[x]) } )
         winners <- which(totals >= level)
+        my.sort <- order(totals, decreasing=T)
+        # totals[my.sort]
     }   
     
         win.pubs <- pubs[winners]
+        win.pubs.sorted <- win.pubs[my.sort]
     
         win.count <- length(winners)
         win.pct <- win.count / nrow(my.contribs)
@@ -157,7 +162,7 @@ cluster.strength <- function (my.topics=NULL,      # either pass in a list of to
         invisible(list("grid" = my.contribs,
                     "number" = win.count,
                     "percentage" = win.pct,
-                    "docs" = win.pubs))
+                    "docs" = win.pubs.sorted))
 }
 
 # testing zone
@@ -193,7 +198,13 @@ if(FALSE) {
                      subset_pubs = realconsorts2001_2015$Pub.number, 
                      cumulative=F)
     
-    
+    clust6.ind <- cluster.strength(my.topics = my.topics,
+                     dataset_name = dataset_name,
+                     ntopics = ntopics,
+                     iter_index = iter_index,
+                     bad.topics = bad.topics,
+                     subset_name = "knownprograms2001_2015",
+                     cumulative = T)$docs
     
     # TO DO: make a scatter plot with X-axis = level and Y-axis = cumulative
     # cluster strength, and a dataseries for each cluster (all on the same
