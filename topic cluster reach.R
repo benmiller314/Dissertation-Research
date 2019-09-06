@@ -129,16 +129,16 @@ cluster.strength <- function (my.topics=NULL,      # either pass in a list of to
         # If `cumulative` is false, at least one individual topic in the cluster must
         # be represented at higher than the minimum level set by `level` for a dissertation
         # to be counted within this cluster's reach.
-        individuals <- sapply(1:nrow(my.contribs), FUN = function(x) {
-                             any(my.contribs[x] >= level) } )
-        winners <- which(individuals > level)
+        maxes <- sapply(1:nrow(my.contribs), FUN = function(x) {
+                             max(my.contribs[x]) } )
+        winners <- which(maxes >= level)
         
     } else {
         # Otherwise, check whether the combined contributions from several topics
         # within the cluster add up to the minimum level or beyond.
         totals <- sapply(1:nrow(my.contribs), FUN = function(x) {
-                             sum(my.contribs[x]) } )
-        winners <- which(totals > level)
+                             sum(my.contribs[x]) > level } )
+        winners <- which(totals >= level)
     }   
     
         win.pubs <- pubs[winners]
