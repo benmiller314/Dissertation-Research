@@ -49,47 +49,63 @@ name_topic_clusters <- function(dataset_name="noexcludes2001_2015",
 }
     
 ## main wrapper function
-cluster.strength <- function (my.topics_name, # an aliased list of topic numbers; see above
-                            dataset_name = "consorts", 
-                            ntopics      = 55,
-                            iter_index   = "",
+cluster.strength <- function (my.topics=NULL,      # either pass in a list of topic numbers, or
+                            my.topics_name=NULL,   # a string alias for a list of topic numbers; see above
+                            dataset_name = "noexcludes2001_2015", 
+                            ntopics      = 50,
+                            iter_index   = "1",
                             bad.topics   = NULL,
                             level        = 0.12,
                             cumulative   = TRUE, # can several topics add up to meet that level?
                             subset_pubs  = NULL, # any list of pub.numbers to subset on, e.g. for a school
-                            subset_name  = NULL) # a named subset of data. 
+                            subset_name  = NULL, # a named subset of data. 
+                            grid = NULL)         # a doc-topic grid. if it exists, offers a speed boost.
 {
-    # Exclude non-content-bearing topics
-    if(is.null(bad.topics) && dataset_name == "consorts" && ntopics == 55) {
-        bad.topics <- c("4", "47", "22", "2", "24", 
-                        # bad OCR or ProQuest boilerplate
-                    "13", "50")
-                    # language markers (Italian, Spanish)
+    # Which topics are in the cluster?
+    if(is.null(my.topics)) {
+        if(is.null(my.topics_name)) {
+            stop("cluster.strength() requires you to specify a cluster by passing either my.topics or my.topics_name.")
+        } else {
+            my.topics <- with(name_topic_clusters(dataset_name, ntopics, iter_index, subset_name),
+                              get(my.topics_name))
+        }
+    } else if(is.null(my.topics_name)) {
+        my.topics_name <- paste("topics", paste(my.topics, collapse=", "))
     }
     
-    
-    my.topics <- with(name_topic_clusters(dataset_name, ntopics, iter_index, subset_name),
-                      get(my.topics_name))
-                    
-    if(any(my.topics %in% bad.topics)) { 
-        warning(paste("At least one topic in your list has been",
-                      "identified as non-content-bearing")) 
-    }
-    if(!exists("get.doctopic.grid", mode="function")) { 
-        source("get doctopic grid.R") 
-    }
-    grid <- get.doctopic.grid(dataset_name=dataset_name, ntopics=ntopics,
+    # if we don't yet have a doctopic grid, get one
+    if(is.null(grid)) {
+        if(!exists("get.doctopic.grid", mode="function")) { 
+            source("get doctopic grid.R") 
+        }
+        grid <- get.doctopic.grid(dataset_name=dataset_name, ntopics=ntopics,
                               iter_index=iter_index)$outputfile.dt
+    }
+    
     # str(grid)
     # head(grid)
 
-    # TO DO: Enable analysis on a subset of this grid, e.g. for one school.
+    # Enable analysis on a subset of this grid, e.g. for one school.
     # Strategy: 
     # (1) add a parameter that's a list of Pub.numbers to include
+    #     (1a) can be by name, by list of Pub.numbers, or neither, but not both
     # (2) subset the rows of the doc-topic grid by using that list
+    # (3) side benefit: we now have a list of docs to pass along to top_topic_browser  
     if(!is.null(subset_pubs)) {
-        grid <- grid[(grid$Pub.number %in% subset_pubs), ]
+        if(is.null(subset_name)) {
+            pubs <- subset_pubs
+        } else {
+            stop("cluster.strength: specify at most one of subset_name or subset_pubs")
+        }
+    } else if (!is.null(subset_name)) {
+        pubs <- as.character(get(subset_name)$Pub.number)
+    } else {
+        pubs <- grid$Pub.number
     }
+        
+    grid <- grid[(grid$Pub.number %in% pubs), ]
+    
+    
     
     grid <- grid[, !(names(grid) %in% c(bad.topics, "Pub.number")), with=F]
     # head(grid)
@@ -111,6 +127,9 @@ cluster.strength <- function (my.topics_name, # an aliased list of topic numbers
                              sum(my.contribs[x]) } )
         winners <- which(totals > level)
     }   
+    
+        win.pubs <- pubs[winners]
+    
         win.count <- length(winners)
         win.pct <- win.count / nrow(my.contribs)
     
@@ -121,13 +140,14 @@ cluster.strength <- function (my.topics_name, # an aliased list of topic numbers
                       nrow(my.contribs), ", or ", 
                       round(win.pct * 100, 2), "% of the corpus."))
         
-        invisible(list("number" = win.count,
-                    "percentage" = win.pct))
-        
-        # TO DO: Somehow make return values chainable, I don't know 
+        invisible(list("grid" = my.contribs,
+                    "number" = win.count,
+                    "percentage" = win.pct,
+                    "docs" = win.pubs))
 }
 
-if(autorun) {
+# testing zone
+if(FALSE) {
     # cluster.strength("Teaching.of.Writing")
     # cluster.strength("Theories.of.Meaning.Making")
     # cluster.strength("Audience.and.Context")    
@@ -149,7 +169,7 @@ if(autorun) {
 
     # Test subsetting function by using individual schools
     cuny.pubs <- realconsorts[which(realconsorts$School=="CUNY Graduate School and University Center"), "Pub.number"]
-    pitt.pubs <- realconsorts[which(realconsorts$School=="University of Pittsburgh-Pittsburgh Campus"), "Pub.number"]
+    pitt.pubs <- realconsorts2001_2015[which(realconsorts2001_2015$School=="University of Pittsburgh-Pittsburgh Campus"), "Pub.number"]
     cluster.strength("Teaching.of.Writing", subset_pubs = cuny.pubs, cumulative=F)
     cluster.strength(my.topics_name="Teaching.of.Writing", 
                      dataset_name=dataset_name,
