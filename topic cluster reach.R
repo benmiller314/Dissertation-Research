@@ -107,9 +107,22 @@ cluster.strength <- function (my.topics=NULL,      # either pass in a list of to
     
     
     
-    grid <- grid[, !(names(grid) %in% c(bad.topics, "Pub.number")), with=F]
+    # Exclude non-content-bearing topics
+    if(is.null(bad.topics) && dataset_name == "consorts" && ntopics == 55) {
+        bad.topics <- c("4", "47", "22", "2", "24",   # bad OCR or ProQuest boilerplate
+                        "13", "50")                   # language markers (Italian, Spanish)
+    }
+    
+    grid <- grid[, setdiff(names(grid), c(bad.topics, "Pub.number")), with=F]
     # head(grid)
     
+    if(any(my.topics %in% bad.topics)) { 
+        warning(paste("At least one topic in your list has been",
+                      "identified as non-content-bearing")) 
+    }
+    
+    
+    # Narrow our doctopic grid to the topics in question
     my.contribs <- grid[, names(grid) %in% my.topics, with=F]
 
     if(!cumulative) {
