@@ -8,6 +8,7 @@
 
 
 ## helper function: define clusters of topics
+# TO DO: save an index of defined clusters for a given topic model
 name_topic_clusters <- function(dataset_name="noexcludes2001_2015", 
                                 ntopics=50, 
                                 iter_index=1,
