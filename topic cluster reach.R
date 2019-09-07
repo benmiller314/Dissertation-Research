@@ -58,8 +58,7 @@ cluster.strength <- function (my.topics=NULL,      # either pass in a list of to
                             bad.topics   = NULL,
                             level        = 0.12,
                             cumulative   = TRUE, # can several topics add up to meet that level?
-                            subset_pubs  = NULL, # any list of pub.numbers to subset on, e.g. for a school
-                            subset_name  = NULL, # a named subset of data. 
+                            subset_name  = NULL, # a named subset of data, either all columns or just Pub.numbers. 
                             grid = NULL)         # a doc-topic grid. if it exists, offers a speed boost.
 {
     # Which topics are in the cluster?
@@ -80,34 +79,18 @@ cluster.strength <- function (my.topics=NULL,      # either pass in a list of to
             source("get doctopic grid.R") 
         }
         grid <- get.doctopic.grid(dataset_name=dataset_name, ntopics=ntopics,
-                              iter_index=iter_index)$outputfile.dt
+                              iter_index=iter_index, subset_name=subset_name)$outputfile.dt
+    } else if (!is.null(subset_name)){
+        warning("cluster.strength: Using an existing doc-topic grid, but subset_name is not null. \n",
+                "Check that the grid parameter being passed has the correct number of rows.")
     }
     
     # str(grid)
     # head(grid)
+    
+    # Save Pub.numbers to filter and return for further inspection
+    pubs <- grid$Pub.number
 
-    # Enable analysis on a subset of this grid, e.g. for one school.
-    # Strategy: 
-    # (1) add a parameter that's a list of Pub.numbers to include
-    #     (1a) can be by name, by list of Pub.numbers, or neither, but not both
-    # (2) subset the rows of the doc-topic grid by using that list
-    # (3) side benefit: we now have a list of docs to pass along to top_topic_browser  
-    if(!is.null(subset_pubs)) {
-        if(is.null(subset_name)) {
-            pubs <- subset_pubs
-        } else {
-            stop("cluster.strength: specify at most one of subset_name or subset_pubs")
-        }
-    } else if (!is.null(subset_name)) {
-        pubs <- as.character(get(subset_name)$Pub.number)
-    } else {
-        pubs <- grid$Pub.number
-    }
-    # length(pubs)
-        
-    grid <- grid[(grid$Pub.number %in% pubs), ]
-    
-    
     
     # Exclude non-content-bearing topics
     if(is.null(bad.topics) && dataset_name == "consorts" && ntopics == 55) {
@@ -131,26 +114,27 @@ cluster.strength <- function (my.topics=NULL,      # either pass in a list of to
         # If `cumulative` is false, at least one individual topic in the cluster must
         # be represented at higher than the minimum level set by `level` for a dissertation
         # to be counted within this cluster's reach.
-        maxes <- sapply(1:nrow(my.contribs), FUN = function(x) {
+        win.dex <- sapply(1:nrow(my.contribs), FUN = function(x) {
                              max(my.contribs[x]) } )
-        winners <- which(maxes >= level)
-        my.sort <- order(maxes, decreasing = T)
-        
     } else {
         # Otherwise, check whether the combined contributions from several topics
         # within the cluster add up to the minimum level or beyond.
-        totals <- sapply(1:nrow(my.contribs), FUN = function(x) {
+        win.dex <- sapply(1:nrow(my.contribs), FUN = function(x) {
                              sum(my.contribs[x]) } )
-        winners <- which(totals >= level)
-        my.sort <- order(totals, decreasing=T)
-        # totals[my.sort]
-    }   
-    
-        win.pubs <- pubs[winners]
-        win.pubs.sorted <- win.pubs[my.sort]
-    
+    }
+        # Either way, max or sum, we want to be above the target level.
+        winners <- which(win.dex >= level)
         win.count <- length(winners)
         win.pct <- win.count / nrow(my.contribs)
+        
+        # And we'll want to know which is more "in" the cluster than what.
+        my.sort <- order(win.dex, decreasing = T)[seq_len(win.count)]
+        
+        # Get a list of pub.numbers that strongly represent this cluster
+        win.pubs <- pubs[winners]
+        win.pubs.sorted <- pubs[my.sort]
+    
+        
     
         message(paste0("The number of dissertations made up of at least ",
                       level*100, " percent of words from this cluster ",
@@ -205,6 +189,17 @@ if(FALSE) {
                      bad.topics = bad.topics,
                      subset_name = "knownprograms2001_2015",
                      cumulative = T)$docs
+    
+    if(! exists("top_topic_browser", mode="function")) {
+        source(file="top docs per topic.R")
+    }
+    
+    top_topic_browser(dataset_name = dataset_name,
+                      ntopics = ntopics,
+                      iter_index = iter_index,
+                      subset_name = "clust6.ind",
+                      showlabels = T,
+                      depth = 10)
     
     # TO DO: make a scatter plot with X-axis = level and Y-axis = cumulative
     # cluster strength, and a dataseries for each cluster (all on the same

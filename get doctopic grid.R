@@ -56,22 +56,45 @@ get.doctopic.grid <- function(dataset_name="consorts",
     colnames(doc_topics) <- c("Pub.number", (1:ntopics))
     head(doc_topics,3)
      
+    # Enable analysis on a subset of this grid, e.g. for one school.
+    # Strategy: 
+    # (1) add a parameter that's a list of Pub.numbers to include
+    # (2) subset the rows of the doc-topic grid by using that list
+    # (3) side benefit: we now have a list of docs to pass along to top_topic_browser, etc
     
     # If we specified a subset, filter the data tables before moving on
-    if (! is.null(subset_name)) {
-        subset_index <- as.integer(get(subset_name)$Pub.number)
-        doc_topics <- doc_topics[subset_index,]
+    if (!is.null(subset_name)) {
+        if (length(subset_name) > 1) {          # it's the data itself
+            subset <- subset_name
+        } else if (length(subset_name) == 1) {  # it's just the label; get the data
+            subset <- get(subset_name)
+        } else {
+            warning("get.doctopic.grid: subset_name was provided, but it has length < 1. Not subsetting.")
+            subset <- NULL
+        }
+    
+        if (is.null(subset)) {
+            subset_index <- doc_topics$Pub.number
+        } else if (is.vector(subset)) {         # it's a list of Pub.numbers
+            subset_index <- subset
+        } else {
+            subset_index <- subset$Pub.number   # it's a full dataset
+        }
+        
+        doc_topics <- doc_topics[(doc_topics$Pub.number %in% subset_index),]
     }
+    
     
     
     ## Find overall top topics
     # Each cell gives the percentage which the topic in that column
     # contributes to the dissertation in that row. Summing these percentages
     # and sorting gives us a rank based on percentage points.
+    # Note the workaround so we can keep Pub.numbers, for indexing:
     
     colsums <- colSums(doc_topics[,which(names(doc_topics) != "Pub.number")])
     str(colsums)
-    colsums <- c(999999, colsums)
+    colsums <- c(999999, colsums)   
     names(colsums) <- names(doc_topics)
     head(colsums)
     colsums.sort <- colsums[order(colsums, decreasing=TRUE)]
