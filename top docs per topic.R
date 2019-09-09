@@ -134,12 +134,12 @@ top_topic_browser <- function(
         source(file=file.path(sourceloc, "get doctopic grid.R"))
     }
     
-    # TO DO: Check to be sure, but didn't I put this functionality straight into get.doctopic.grid?
+    
     grids <- get.doctopic.grid(dataset_name=dataset_name, ntopics=ntopics, subset_name=subset_name, iter_index=iter_index)
         colsums <- grids$colsums
         colsums.sort <- grids$colsums.sort
         outputfile <- grids$outputfile
-        doc_topics.dt <- data.table(outputfile, key = "Pub.number")
+        doc_topics.dt <- grids$outputfile.dt
     rm(grids)
     
     
@@ -469,4 +469,6 @@ if(FALSE) {
     remake_figs=F
     top_topic_browser(dataset_name="noexcludes2001_2015", ntopics=50, iter_index=1,
                       depth=10)
+    top_topic_browser(dataset_name="noexcludes2001_2015", ntopics=50, iter_index=1,
+                      depth=10, showlabels=T, topic=41)
 }
