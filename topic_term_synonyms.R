@@ -177,9 +177,9 @@ topic_distance_matrix <- function(dataset_name="noexcludes2001_2015",
         # extract just equal-length probability vectors (sorted by token_ind)
         tw.grid <- topicword.probability.grid(tw)
         
-        if(!is.null(bad.topics)) {
-            tw.grid <- tw.grid[, !(..bad.topics)]
-        }
+        # remove bad.topics (works even if bad.topics is NULL)
+        tw.grid <- tw.grid[, setdiff(names(tw.grid), bad.topics), with=F]
+        
     } 
             
     # convert to matrix and transpose, because philentropy expects vectors as rows
@@ -194,7 +194,9 @@ topic_distance_matrix <- function(dataset_name="noexcludes2001_2015",
 
 topic_clusters <- function(twm = NULL,               # a topic-distance matrix, as above
                            tw = NULL,                # a topic-word table. if it exists, gives a big speed boost.
-                           agnes_method = "ward",   # from package(cluster)    
+                           clust.method = c("agnes", "diana"), 
+                                                     # use agglomerative (cluster::agnes) 
+                                                     # or divisive (cluster::diana) clustering?    
                            do.plot = TRUE,
                            use.labels = FALSE,
                            dataset_name = "noexcludes2001_2015",
@@ -213,7 +215,12 @@ topic_clusters <- function(twm = NULL,               # a topic-distance matrix, 
                               tw=tw)
     }
     
-    ag <- agnes(twm, diss=TRUE, method=agnes_method)
+    clust.method <- match.arg(clust.method) 
+    clust <- switch(clust.method,
+                    agnes = agnes(twm, diss=TRUE, method="ward"),
+                    diana = diana(twm, diss=TRUE)
+           )
+
     
     if(use.labels) {
         if(!exists("get_topic_labels", mode="function")) { 
@@ -223,16 +230,16 @@ topic_clusters <- function(twm = NULL,               # a topic-distance matrix, 
                                  subset_name=subset_name, iter_index=iter_index)
         setkey(labs, Topic)
         
-        ag$order.lab <- paste(ag$order.lab, 
-                              labs[as.numeric(ag$order.lab), Label])
+        clust$order.lab <- paste(clust$order.lab, 
+                              labs[as.numeric(clust$order.lab), Label])
         rm(labs)
     }
     
     if(do.plot) {
-        pltree(ag)    
+        pltree(clust)    
     }
     
-    return(ag)
+    return(clust)
 }
     
 # members <- c(18, 42, 49, 35, 27)
@@ -279,18 +286,33 @@ get_cluster_names <- function(hcr,            # result of an hclust.rect()
 
 # assessing clusters
 tw_cluster_weight <- function(mytopics,  # a set of topic numbers (presumed to be members of a given cluster)
-                              tw)
+                              dt)        # a doc-topic (NB: NOT topic-word) matrix
 {
-    if(!is.numeric(mytopics)) {
+    if(anyNA(as.numeric(mytopics))) {
         stop("mytopics should be a set of numbers corresponding to topics")
+    } else {
+        mytopics <- as.numeric(mytopics)
     }
-    tw[topic %in% mytopics, .(topicweight = sum(.SD$weight)/sum(tw$weight)), by=topic][, .(topic, topicweight, clusterweight=sum(topicweight))]    
+    
+    allweights <- colSums(dt[, which(names(dt) != "Pub.number"), with=F])
+    myweights <- colSums(dt[, which(names(dt) %in% mytopics), with=F])
+    # myweights / sum(allweights)
+    
+    tab <- data.table(topic = mytopics,
+                      topicweight = myweights/sum(allweights))
+    tab[, clusterweight := sum(topicweight) ]
+      
+    return(tab)               
+    
+    # tw[topic %in% mytopics, .(topicweight = sum(.SD$weight)/sum(tw$weight)), by=topic][, .(topic, topicweight, clusterweight=sum(topicweight))]    
 }
 
 tree_summary <- function(nclust,
-                         ag = NULL,
-                         twm = NULL, 
-                         tw = NULL,
+                         twm = NULL,    # a topic-word distance matrix 
+                         tw = NULL,     # a topic-word table
+                         tf = NULL,     # a table of top words for each topic,
+                                        # as per 'tfidf for topics.R'
+                         dt = NULL,     # a doc-topic table
                          dataset_name = "noexcludes2001_2015",
                          ntopics = 150,
                          iter_index = 1,
@@ -299,25 +321,65 @@ tree_summary <- function(nclust,
                          internal.distances=F)
 {
     
-    if(is.null(ag)) {
-        ag <- topic_clusters(twm=twm, 
-                             tw=tw,
-                             dataset_name = dataset_name,
-                             ntopics = ntopics,
-                             iter_index = iter_index,
-                             bad.topics = bad.topics)
+    # we have to re-build ag to ensure we're not using labels, which would break the tree_summary
+    ag <- topic_clusters(twm = twm, 
+                         tw = tw,
+                         dataset_name = dataset_name,
+                         ntopics = ntopics,
+                         iter_index = iter_index,
+                         bad.topics = bad.topics,
+                         use.labels = FALSE)
+    
+    # also, let's make sure we have a by_tfitf column
+    if(is.null(tf)) {
+        if(!exists("tfidf.for.topics", mode="function")) {
+            source(file="tfidf for topics.R")
+        }
+        tf <- tfidf.for.topics(tw = tw,
+                               dataset_name = dataset_name,
+                               ntopics = ntopics,
+                               iter_index = iter_index)
+    } 
+    
+    # and we'll want the doc-topic table for topic weights, too
+    if(is.null(dt)) {
+        if(!exists("get.doctopic.grid", mode="function")) { 
+            source(file="get doctopic grid.R") 
+        }
+        dt <- get.doctopic.grid(dataset_name=dataset_name, ntopics=ntopics, 
+                                subset_name=subset_name, iter_index=iter_index)$outputfile.dt
+        
+        # Ben: Exclude any NA rows included accidentally by the index file
+        dt <- na.omit(dt)
     }
+    
     
     pltree(ag)
     
     hc <- as.hclust(ag)
     rhc <- rect.hclust(hc, k=nclust)
     
+    # TO DO: store cluster membership and weight as you go, return that table
+    
+    to.return <- data.table("cluster"=seq_len(nclust),
+                            "members"=rep(as.list(NA), nclust),
+                            "size"=rep(as.numeric(NA), nclust)
+                            )
+    setkey(to.return, cluster)
+    
     for(i in seq_along(rhc)) {
-        twcw <- tw_cluster_weight(rhc[[i]], tw=tw)
-        message("Cluster: ", i, " (% of corpus: ", round(100*mean(twcw$clusterweight), 2), ")")
+        mytopics <- names(rhc[[i]])
+        mytopics <- as.numeric(mytopics)
         
-        tops <- tf$topN[rhc[[i]], by_tfitf]
+        twcw <- tw_cluster_weight(mytopics=mytopics, dt=dt)
+        pct <- round(100*mean(twcw$clusterweight), 2)
+        
+        message("Cluster ", i, " (% of corpus: ", pct, "):")
+        
+        to.return[i, `:=`(members = list(paste(mytopics, collapse=", ")), 
+                          size = pct)]
+        
+        tops <- tf$topN[topic %in% mytopics, by_tfitf]
         print(cbind(twcw, tops))
         
         if(slow) {
@@ -331,7 +393,7 @@ tree_summary <- function(nclust,
         
         if(internal.distances) {
             message("Distances between topic-word vectors for this cluster:")
-            topic_distances_in_cluster(members=rhc[[i]],
+            topic_distances_in_cluster(members=mytopics,
                                        twm=twm,
                                        tw=tw,
                                        dataset_name=dataset_name,
@@ -342,7 +404,7 @@ tree_summary <- function(nclust,
         
     }
     
-    
+    return(to.return)
 }
 
 
@@ -376,6 +438,11 @@ if(autorun) {
     
     tree_summary(ag=ag, tw=tw, nclust=10, slow=F)
     
+    
+    #*******************************************#
+    #.      noexcludes2001_2015k150_iter1      .#
+    #.                          ^^^            .#
+    #...........................................#
     # top words by topic number
     tf$topN$by_tfitf[c(1, 5, 119, 75, 8, 139)]     # digital media cluster
     tf$topN$by_tfitf[c(2, 17, 61, 57, 14, 54, 105, 30)] # rhetoric & philosophy cluster
@@ -385,9 +452,9 @@ if(autorun) {
     
     # new way to calculate cluster weight:
     
-    tw_cluster_weight(tw=tw, mytopics=c(2, 17, 61, 57, 14, 54, 105, 30))
-    tw_cluster_weight(tw=tw, mytopics=c(3, 6, 86, 22, 130, 65, 34, 146, 88, 101, 124, 141))
-    tw_cluster_weight(tw=tw, mytopics=c(27, 133, 118, 7))
+    tw_cluster_weight(td=td, mytopics=c(2, 17, 61, 57, 14, 54, 105, 30))
+    tw_cluster_weight(td=td, mytopics=c(3, 6, 86, 22, 130, 65, 34, 146, 88, 101, 124, 141))
+    tw_cluster_weight(td=td, mytopics=c(27, 133, 118, 7))
     
     
     #*******************************************#
@@ -414,6 +481,9 @@ if(autorun) {
     twm <- topic_distance_matrix(tw=tw)
     ag <- topic_clusters(twm, use.labels=T)
     k20
+    
+    tw_cluster_weight(tw=tw, mytopics=c(18,42,39,35,27))  
+    
 }
 
 

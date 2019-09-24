@@ -44,10 +44,13 @@ build_plot_title <- function(dataset_name, ntopics, iter_index, subset_name,
 
 frameToJSON <- function(dataset_name="noexcludes2001_2015",
                         ntopics=50,
-                        subset_name="realconsorts2001_2015",  # Ben: set NULL if not using.
+                        subset_name="knownprograms2001_2015",  # Ben: set NULL if not using.
                         iter_index=1,  # Ben: suffix to differentiate repeat runs of same MALLET params.
                         do.plot=TRUE,   # Ben: Use this the first time to 
                                         # find good cuts in the dendrogram.
+                        clust.method = "agnes", 
+                                        # use agglomerative (cluster::agnes) 
+                                        # or divisive (cluster::diana) clustering?    
                         groupVars=NULL, # Ben: If not provided by the calling 
                         dataVars=NULL,  # environment, these 3 parameters 
                         outfile=NULL,   # will be set to defaults.
@@ -120,11 +123,11 @@ frameToJSON <- function(dataset_name="noexcludes2001_2015",
   #from the correlation scores
   # Ben: topic_clusters() is also from topic_term_synonyms.R
   # Ben: optionally use descriptive topic labels, if we have them
-  ag <- topic_clusters(t, do.plot=F, use.labels=use.labels)
+  clust <- topic_clusters(t, do.plot=F, use.labels=use.labels, clust.method=clust.method)
   # hc <- hclust(dist(t), "ward.D2")
 
   # Ben: convert to hclust so we can interact with the plot more easily
-  hc <- (as.hclust(ag))
+  hc <- (as.hclust(clust))
   
   # Ben: I'm making this section optional, 
   # because it makes the most sense early on and has diminishing returns.
@@ -139,7 +142,7 @@ frameToJSON <- function(dataset_name="noexcludes2001_2015",
                                subset_name=subset_name, bad.topics=bad.topics, use.labels=use.labels)
       
       # restarting with topic-word-based clusters; see topic_term_synonyms.R
-      if(any(class(ag) %in% "agnes") && dataset_name=="noexcludes2001_2015" &&
+      if(any(class(clust) %in% "agnes") && dataset_name=="noexcludes2001_2015" &&
         ntopics==50 && length(bad.topics==9)) {
           if(remake_figs) { pdf(file=file.path(imageloc, paste0(main, ", jsd.pdf"))) } 
           plot(hc, main=main)
@@ -158,6 +161,29 @@ frameToJSON <- function(dataset_name="noexcludes2001_2015",
           splits <- c(2, 4, 7, 12)
       }
       
+      # what about divisive clustering?
+      if(any(class(clust) %in% "diana") && dataset_name=="noexcludes2001_2015" &&
+        ntopics==50 && length(bad.topics==9)) {
+          if(remake_figs) { pdf(file=file.path(imageloc, paste0(main, ", diana, jsd.pdf"))) } 
+          plot(hc, main=main)
+         
+           if(auto.lines) {
+            rect.hclust(hc, k=2, border="#999900")
+            abline(0.615, 0, col="#999900")
+            rect.hclust(hc, k=3, border="#FF9999")
+            abline(0.605, 0, col="#FF9999")
+            rect.hclust(hc, k=4, border="#009999")
+            abline(0.595, 0, col="#009999")
+            rect.hclust(hc, k=9, border="#009900")
+            abline(0.545, 0, col="#009900")
+            rect.hclust(hc, k=11, border="#9999FF")
+            abline(0.55, 0, col="#9999FF")
+            rect.hclust(hc, k=21, border="#99FFFF")
+          }
+          if(remake_figs) { dev.off() }
+          
+          splits <- c(2,3,4,9,11,21)
+      }
       
       # with 5 bad.topics removed   
       if(dataset_name=="consorts" && ntopics==55 && length(bad.topics) == 5) 
@@ -319,6 +345,30 @@ frameToJSON <- function(dataset_name="noexcludes2001_2015",
       
           splits=c(2, 3, 7, 9, 14, 20, 24)
               
+      } else if(dataset_name=="noexcludes2001_2015" && subset_name=="knownprograms2001_2015" 
+                && ntopics==50 && iter_index==1) {
+        if(remake_figs) { pdf(file=file.path(imageloc, paste0(main, ".pdf"))) }
+        plot(hc, main=main)
+        if(auto.lines) {
+          rect.hclust(hc, k=2, border="#99FF99")    # seafoam
+          abline(2.88, 0, col="#99FF99")
+          rect.hclust(hc, k=3, border="#009900")    # green
+          abline(2.31, 0, col="#009900")
+          rect.hclust(hc, k=7, border="#990099")    # purple
+          abline(1.91, 0, col="#990099")
+          rect.hclust(hc, k=9, border="#009999")   # teal
+          abline(1.69, 0, col="#009999")
+          rect.hclust(hc, k=14, border="#000099")   # dark blue
+          abline(1.52, 0, col="#000099")
+          rect.hclust(hc, k=20, border="#FF0099")   # pink 
+          abline(1.43, 0, col="#FF0099")
+          rect.hclust(hc, k=24, border="#999900")   # yellow
+          abline(1.37, 0, col="#999900")
+        }
+        if(remake_figs) { dev.off() } 
+        
+        splits=c(2, 3, 7, 9, 14, 20, 24)
+        
       } else if(dataset_name=="noexcludes2001_2015" && is.null(subset_name) && ntopics==60) {
           if(remake_figs) { pdf(file=file.path(imageloc, paste0(main, ".pdf"))) }
           plot(hc, main=main)
@@ -717,6 +767,7 @@ if(FALSE) {
     frameToJSON(do.plot=F, dataset_name="noexcludes2001_2015", subset_name=NULL, ntopics=50, iter_index=1, bad.topics = c(3, 12, 50, 47, 34, 36, 30, 8, 15))
     frameToJSON(do.plot=T, dataset_name="noexcludes2001_2015", subset_name="realconsorts2001_2015", ntopics=50, iter_index=1, bad.topics = c(3, 12, 50, 47, 34, 36, 30, 8, 15), use.labels=T)
     frameToJSON(do.plot=F, dataset_name="noexcludes2001_2015", subset_name="knownprograms2001_2015", ntopics=50, iter_index=1, bad.topics = c(3, 12, 50, 47, 34, 36, 30, 8, 15), use.labels=T, tw=tw)
+    frameToJSON(do.plot=T, dataset_name="noexcludes2001_2015", subset_name="knownprograms2001_2015", ntopics=50, iter_index=1, bad.topics = c(3, 12, 50, 47, 34, 36, 30, 8, 15), use.labels=T, tw=tw)
     
     
     

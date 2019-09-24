@@ -134,7 +134,7 @@ cluster.strength <- function (my.topics=NULL,      # either pass in a list of to
         win.pubs <- pubs[winners]
         win.pubs.sorted <- pubs[my.sort]
     
-        
+        win.pubs.level <- win.dex[my.sort]
     
         message(paste0("The number of dissertations made up of at least ",
                       level*100, " percent of words from this cluster ",
@@ -146,7 +146,8 @@ cluster.strength <- function (my.topics=NULL,      # either pass in a list of to
         invisible(list("grid" = my.contribs,
                     "number" = win.count,
                     "percentage" = win.pct,
-                    "docs" = win.pubs.sorted))
+                    "docs" = win.pubs.sorted,
+                    "doc_levels" = win.pubs.level))
 }
 
 # testing zone
@@ -182,6 +183,11 @@ if(FALSE) {
                      subset_pubs = realconsorts2001_2015$Pub.number, 
                      cumulative=F)
     
+    my.topics <- c(1, 40, 41)
+    my.topics <- c(1, 40, 44, 45, 6, 11, 18, 42, 49, 35, 41, 37, 27) # big diana teaching cluster
+    my.topics <- c(6, 11, 18, 42, 49, 35, 41, 37, 27) # smaller diana teaching cluster
+    
+    
     clust6.ind <- cluster.strength(my.topics = my.topics,
                      dataset_name = dataset_name,
                      ntopics = ntopics,
@@ -200,6 +206,9 @@ if(FALSE) {
                       subset_name = "clust6.ind",
                       showlabels = T,
                       depth = 10)
+    
+    
+    
     
     # TO DO: make a scatter plot with X-axis = level and Y-axis = cumulative
     # cluster strength, and a dataseries for each cluster (all on the same
