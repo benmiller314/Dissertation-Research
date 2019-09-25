@@ -155,17 +155,21 @@ top_topic_browser <- function(
     # list of topics by rank; skip Pub.num
     ind <- as.integer(names(colsums.sort)[2:(len+1)])       
 
-        # If we specified one topic, show just that topic and exit.
-        # If we specified more than one, use the top-ranked topic and exit.
+    # If we specified one topic, show just that topic and exit.
     if (! is.null(topic)) {
         if(length(topic) == 1) {
             topic.num <- topic
         } else if(length(topic > 1)) {
-            topic.num <- topic[which.min(match(topic, names(colsums.sort)))]
+    # If we specified more than one, assume it's a cluster;
+    # use the top-ranked topic of the set
+            topic.num <- topic[which.max(match(topic, names(colsums.sort)))]
             topic.num <- as.integer(topic.num)
-            warning("top_topic_browser: Multiple topics specified (", 
+            msg <- paste0("top_topic_browser: Multiple topics specified (", 
                     paste(topic, collapse=", "), "); ",
                     "using top-ranked topic from that list (", topic.num, ").")
+            message(msg)
+            warning(msg)
+            rm(msg)
         }
         
         # find and display topic rank
