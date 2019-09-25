@@ -12,8 +12,8 @@
 
 topic.proportions <- function(dataset_name = "consorts", 
 						  ntopics = 55, 
-						  subset_name = NULL,
 						  iter_index = "",
+						  subset_name = NULL,
 						  
 						  # NB: if default dataset and ntopics are used, 
 						  # we'll use default bad.topics 
@@ -23,13 +23,17 @@ topic.proportions <- function(dataset_name = "consorts",
 						  use.notch = FALSE,  
 						  
 						  # Use topic browser for outlier dissertations?
-						  explore.outliers = FALSE) 
+						  explore.outliers = FALSE,
+						  explore.lowliers = FALSE) 
 {
 	require(data.table)
 	if(!exists("get.doctopic.grid", mode="function")) { 
 		source("get doctopic grid.R") 
 	}
-	grid <- get.doctopic.grid(dataset_name, ntopics, subset_name, iter_index)$outputfile.dt
+	grid <- get.doctopic.grid(dataset_name = dataset_name, 
+	                          ntopics = ntopics, 
+	                          iter_index = iter_index,
+	                          subset_name = subset_name)$outputfile.dt
 	# str(grid)
 	head(grid)
 	
@@ -40,8 +44,7 @@ topic.proportions <- function(dataset_name = "consorts",
 	} 
 	
 	
-	grid.clean <- grid[, !(names(grid) %in% c(bad.topics, "Pub.number")),
-						 with=F]
+	grid.clean <- grid[, setdiff(names(grid), c(bad.topics, "Pub.number")), with=F]
 	print(head(grid.clean))
 
 		
@@ -69,6 +72,7 @@ topic.proportions <- function(dataset_name = "consorts",
 	names(stats) <- c("lower", "Lhinge", "median", "Uhinge", "upper")
 	stats <- cbind("rank of topic within diss"=c(1, 2, 3), stats)
 	
+    sum(stats$median) # maybe a good cutoff for cumulative cluster reach?
 	# we'll return the stats data.frame later.
 
 	
@@ -210,6 +214,70 @@ topic.proportions <- function(dataset_name = "consorts",
 		
 	} # end if(explore.outliers)
 	
+	if(explore.lowliers) {
+	        lower.whisker <- boxplot.stats(grid.sorted[, 1])$stats[1]
+	        
+	        # just look at #1 topic
+	        outliers.index <- which(grid.sorted[, 1] < lower.whisker)
+	        outliers <- cbind(grid[outliers.index, "Pub.number", with=F],
+	                          grid.sorted[outliers.index, 1:10])
+	        outliers <- outliers[order(outliers$V1, decreasing=F), ]
+	        
+	        # boxplot(outliers[, 2:ncol(outliers)])
+	        
+	        #####
+	        # I have a hypothesis that these are mostly language-based topics.
+	        # Let's look at the top topics represented here. STRATEGY: 
+	        # 1. For each Pub.number, get top-ranked topic number by finding the
+	        #    max within that row of `grid`. 
+	        # 2. Make a table of these topic numbers.
+	        # 3. Retrieve the labels for each topic in the table.
+	        
+	        mytopics <- c()		# start empty and build up
+	        myvalues <- c()		# what are those high percent-of-text values?
+	        
+	        for (i in outliers$Pub.number) {
+	            row <- grid[which(grid$Pub.number==i), 2:ncol(grid), with=F]
+	            mytopic <- which(row == min(row))
+	            mytopics <- c(mytopics, mytopic)
+	            myvalues <- c(myvalues, min(row))
+	        }
+	        
+	        # count 'em up
+	        mytopics.t <- table(mytopics)
+	        
+	        # get labels
+	        if(!exists("get_topic_labels", mode="function")) { 
+	            source(file="get topic labels.R") 
+	        }
+	        labels <- get_topic_labels(dataset_name, ntopics, subset_name, iter_index)
+	        labels.t <- labels[unique(mytopics), Label, key=Topic]
+	        
+	        # merge in the counts
+	        labels.t[, "Outlier Count"] <- mytopics.t		
+	        
+	        # merge in the values
+	        b <- aggregate(data.frame(mytopics, myvalues), by=list(mytopics),
+	                       FUN=c)
+	        labels.t <- labels.t[b, ][,mytopics:=NULL]
+	        
+	        # sort by descending outlier frequency
+	        labels.t <- labels.t[order(mytopics.t, decreasing=T), ]
+	        
+	        # report back
+	        message("Lower outliers for top-ranked topics:")
+	        print(labels.t)
+	        message(paste("Total lowliers for top-ranked topic:", 
+	                      sum(labels.t[, "Outlier Count", with=F])))
+	        
+	        # Yup, it's bad.topics for sure.
+	        
+	        message("Pub.numbers to re-OCR or remove from the model training set:")
+	        print(outliers$Pub.number)
+
+    } # end if(explore.lowliers)
+		
+		
 	message(paste("Stats for contributions of topics at various ranks",
 					"within dissertations:"))	
 	return(stats)
@@ -220,11 +288,15 @@ if(FALSE) {
 	topic.proportions(subset_name="realconsorts")
 	topic.proportions(explore.outliers=T)
 	# abline(0.11384, 0, col="#aa0000")
+	
+	
 }
 
 if(autorun) {
-    topic.proportions(dataset_name=dataset_name, subset_name=subset_name, 
-                      ntopics=ntopics, iter_index=iter_index,
+    topic.proportions(dataset_name=dataset_name, 
+                      ntopics=ntopics, 
+                      iter_index=iter_index,
+                      subset_name=subset_name, 
                       bad.topics=bad.topics,
                       explore.outliers=T)
 }
