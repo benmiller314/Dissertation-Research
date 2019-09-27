@@ -72,7 +72,14 @@ name_topic_clusters <- function(dataset_name="noexcludes2001_2015",
     
     # return variables created by this function
     newvars <- setdiff(ls(), formalArgs(name_topic_clusters))
-    return(newvars)    
+    
+    mydf <- data.frame()
+    for (i in seq_along(newvars)) {
+        mydf[i, "name"] <- newvars[i]
+        mydf[i, "topics"] <- paste(get(newvars[i]), collapse=" ")
+    }
+    
+    return(mydf)    
 }
     
 ## main wrapper function
@@ -211,21 +218,26 @@ if(FALSE) {
     
     my.topics <- c(6, 11, 18, 42, 49, 35, 41, 37, 27) # smaller diana teaching cluster
     
-    name_topic_clusters(dataset_name = dataset_name, 
-                        ntopics = ntopics, 
-                        iter_index = iter_index,
-                        subset_name = subset_name)
+   
     
+    cluster_list <- name_topic_clusters(dataset_name = dataset_name, 
+                                        ntopics = ntopics, 
+                                        iter_index = iter_index,
+                                        subset_name = subset_name)
     
-    clust6.ind <- 
-        cluster.strength(my.topics = my.topics,
+    for (i in 1:nrow(cluster_list)) {
+        assign(cluster_list[i, "name"], stretch(cluster_list[i, "topics"]))
+        
+        cluster.strength(my.topics_name = cluster_list[i, "name"],
                      dataset_name = dataset_name,
                      ntopics = ntopics,
                      iter_index = iter_index,
                      bad.topics = bad.topics,
                      subset_name = "knownprograms2001_2015",
                      cumulative = T,
-                     level = 0.5)$docs
+                     level = 0.12)#$docs
+        # )
+    }
     
     if(! exists("top_topic_browser", mode="function")) {
         source(file="top docs per topic.R")
