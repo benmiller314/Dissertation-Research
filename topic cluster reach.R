@@ -48,6 +48,28 @@ name_topic_clusters <- function(dataset_name="noexcludes2001_2015",
         Teaching.of.Writing <- c(18, 37, 6, 42, 16, 26, 41, 49, 28, 32, 35)
         
     }
+    
+    
+    if(dataset_name=="noexcludes2001_2015" && ntopics==50 && iter_index==1 && subset_name=="knownprograms2001_2015") {
+    
+        # stable clusters under both diana and agnes:    
+        big.teaching <- c(1, 6, 11, 18, 27, 35, 37, 40, 41, 42, 44, 45, 49) # includes online / digital / tech-comm topics
+        small.teaching <- c(18, 35, 42, 49) # limits it to writing process (18), K-12 writing pedagogy (42), 
+                                            # scenes of teaching (49), and institutional supports (35)
+                                            # (last to join is topic 35; could cut)
+        
+        digital.media <- c(44, 45) # digital media and online circulation minicluster
+        politics.law <- c(9, 13, 19, 29, 31) # politics and law cluster: 
+                                             # 9 Historical Public Rhetoric, esp of Women; 13 Politics, Empire, Radicalism;
+                                             # 19 Presidential Discourse; 29 Writing in Law and Government;
+                                             # 31 Labor Unions and Economic Activism
+        
+        ethnicities <- c(5, 17, 23) # race, ethnicity, nationality cluster 
+        classics <- c(14, 25, 39)   # poetics/homiletics/classics cluster
+        
+        reading.rhetoric <- c(33, 48) # 33 Rhetorical Frameworks and 48 Reading Rhetoricians, Interpreting Philosophy 
+    }
+    
     # return variables created by this function
     newvars <- setdiff(ls(), formalArgs(name_topic_clusters))
     return(newvars)    
