@@ -24,3 +24,6 @@ outside_legend <- function(...) {
     plot(0, 0, type='n', bty='n', xaxt='n', yaxt='n')
     legend(...)
 }
+
+# store and retrieve numeric vectors as one observation in a data-frame, using squish() and stretch()
+source("squish_numbers.R")
