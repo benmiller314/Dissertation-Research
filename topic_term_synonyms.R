@@ -195,8 +195,8 @@ topic_distance_matrix <- function(dataset_name="noexcludes2001_2015",
 topic_clusters <- function(twm = NULL,               # a topic-distance matrix, as above
                            tw = NULL,                # a topic-word table. if it exists, gives a big speed boost.
                            clust.method = c("agnes", "diana"), 
-                                                     # use agglomerative (cluster::agnes) 
-                                                     # or divisive (cluster::diana) clustering?    
+                                                     # use agglomerative (cluster::agnes) or
+                                                     # divisive (cluster::diana) clustering?    
                            do.plot = TRUE,
                            use.labels = FALSE,
                            dataset_name = "noexcludes2001_2015",
@@ -318,17 +318,20 @@ tree_summary <- function(nclust,
                          iter_index = 1,
                          bad.topics = NULL,
                          slow=F,                # optionally go one cluster at a time
-                         internal.distances=F)
+                         internal.distances=F,
+                         clust.method=c("agnes", "diana"))
 {
     
-    # we have to re-build ag to ensure we're not using labels, which would break the tree_summary
-    ag <- topic_clusters(twm = twm, 
+    # we have to re-build the tree to ensure we're not using labels, which would break the tree_summary
+    clust.method <- match.arg(clust.method)
+    clust <- topic_clusters(twm = twm, 
                          tw = tw,
                          dataset_name = dataset_name,
                          ntopics = ntopics,
                          iter_index = iter_index,
                          bad.topics = bad.topics,
-                         use.labels = FALSE)
+                         use.labels = FALSE,
+                         clust.method = clust.method)
     
     # also, let's make sure we have a by_tfitf column
     if(is.null(tf)) {
@@ -353,10 +356,22 @@ tree_summary <- function(nclust,
         dt <- na.omit(dt)
     }
     
+    if(remake_figs) { 
+        filename <- paste0("topic-cluster-dendrogram--",
+                                  dataset_name, 
+                                  "k", ntopics, 
+                                  "_iter", iter_index,
+                                  subset_name, "--",
+                                  clust.method, ".pdf")
+        filename <- file.path(imageloc, filename)
+        pdf(filename)
+    }
     
-    pltree(ag)
+    pltree(clust)
     
-    hc <- as.hclust(ag)
+    if(remake_figs) { dev.off() }
+    
+    hc <- as.hclust(clust)
     rhc <- rect.hclust(hc, k=nclust)
     
     # TO DO: store cluster membership and weight as you go, return that table
@@ -425,12 +440,13 @@ if(autorun) {
                                  bad.topics = bad.topics,
                                  tw=tw)
     
-    ag <- topic_clusters(twm=twm, 
+    clust <- topic_clusters(twm=twm, 
                          tw=tw,
                          dataset_name = dataset_name,
                          ntopics = ntopics,
                          iter_index = iter_index,
-                         bad.topics = bad.topics)
+                         bad.topics = bad.topics,
+                         clust.method = "d")
     
     if(!exists("tfidf.for.topics")) { source(file="tfidf for topics.R") }
     tf <- tfidf.for.topics(tw=tw)
@@ -479,7 +495,7 @@ if(autorun) {
     
 
     twm <- topic_distance_matrix(tw=tw)
-    ag <- topic_clusters(twm, use.labels=T)
+    clust <- topic_clusters(twm, use.labels=T)
     k20
     
     tw_cluster_weight(tw=tw, mytopics=c(18,42,39,35,27))  

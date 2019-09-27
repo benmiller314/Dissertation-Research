@@ -20,12 +20,18 @@ summarize_topic_clusters <- function(
     ## A dissertation is "in" a cluster if it contains more than 
     #  what cumulative level of words from all topics in the cluster?
     extent_level = 0.12,
-
+    
+    ## And how should we cluster those dissertations: 
+    # use agglomerative (cluster::agnes) or
+    # divisive (cluster::diana) clustering?    
+    clust.method = "diana", 
+    
     ## Where to save?
     outfile_slug = paste0("topic-cluster-summary--",
                                          dataset_name, "k",
                                          ntopics, "_iter", iter_index,
-                                         subset_name),
+                                         subset_name, "--",
+                                         clust.method),
     
     ## Any one topic to inspect while we're here?
     onetopic = NULL
@@ -58,11 +64,12 @@ summarize_topic_clusters <- function(
                                  bad.topics = bad.topics,
                                  tw=tw)
     
-    ag <- topic_clusters(twm=twm, 
+    clust <- topic_clusters(twm=twm, 
                          dataset_name = dataset_name,
                          ntopics = ntopics,
                          iter_index = iter_index,
                          bad.topics = bad.topics,
+                         clust.method = clust.method,
                          use.labels=T)
     
     ############ Inspect Tree, Set Number of Clusters ############
@@ -77,13 +84,14 @@ summarize_topic_clusters <- function(
                        iter_index=iter_index,
                        nclust=nclust, 
                        bad.topics=bad.topics, 
-                       slow=F)
+                       slow=F,
+                       clust.method = clust.method)
     cl[, nobads.size := round(100*size/sum(size), 2)]
     # cl
     # cl[order(-nobads.size)]
     # sum(cl$nobads.size)
     
-    pltree(ag)
+    pltree(clust)
     
     
     extent <- sapply(seq_len(nrow(cl)), FUN=function(x) {
@@ -103,7 +111,7 @@ summarize_topic_clusters <- function(
     cl[, extent := extent.vector]
     
     message("Summary of topic clusters, ", 
-            paste0(dataset_name, "k", ntopics, "_iter", iter_index, subset_name, ":"))
+            paste0(dataset_name, "k", ntopics, "_iter", iter_index, subset_name, ", using ", clust.method, ":"))
     print(cl[order(-extent)])
     message("NB: `extent` refers to the percentage of dissertations in the corpus ",
             "with topics in this cluster \ncontributing at least ", extent_level*100,
