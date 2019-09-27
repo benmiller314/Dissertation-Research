@@ -13,6 +13,7 @@ name_topic_clusters <- function(dataset_name="noexcludes2001_2015",
                                 ntopics=50, 
                                 iter_index=1,
                                 subset_name=NULL) {
+    
     if(dataset_name=="consorts" && ntopics==55 && iter_index=="" && is.null(subset_name)) {
         # The Teaching of Writing
         Teaching.of.Writing <- c(1, 32, 30, 3, 9, 39, 41, 40, 45, 6, 25, 8)
@@ -47,6 +48,9 @@ name_topic_clusters <- function(dataset_name="noexcludes2001_2015",
         Teaching.of.Writing <- c(18, 37, 6, 42, 16, 26, 41, 49, 28, 32, 35)
         
     }
+    # return variables created by this function
+    newvars <- setdiff(ls(), formalArgs(name_topic_clusters))
+    return(newvars)    
 }
     
 ## main wrapper function
@@ -183,18 +187,23 @@ if(FALSE) {
                      subset_pubs = realconsorts2001_2015$Pub.number, 
                      cumulative=F)
     
-    my.topics <- c(1, 40, 41)
-    my.topics <- c(1, 40, 44, 45, 6, 11, 18, 42, 49, 35, 41, 37, 27) # big diana teaching cluster
     my.topics <- c(6, 11, 18, 42, 49, 35, 41, 37, 27) # smaller diana teaching cluster
     
+    name_topic_clusters(dataset_name = dataset_name, 
+                        ntopics = ntopics, 
+                        iter_index = iter_index,
+                        subset_name = subset_name)
     
-    clust6.ind <- cluster.strength(my.topics = my.topics,
+    
+    clust6.ind <- 
+        cluster.strength(my.topics = my.topics,
                      dataset_name = dataset_name,
                      ntopics = ntopics,
                      iter_index = iter_index,
                      bad.topics = bad.topics,
                      subset_name = "knownprograms2001_2015",
-                     cumulative = T)$docs
+                     cumulative = T,
+                     level = 0.5)$docs
     
     if(! exists("top_topic_browser", mode="function")) {
         source(file="top docs per topic.R")
