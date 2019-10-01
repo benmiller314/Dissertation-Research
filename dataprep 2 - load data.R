@@ -175,11 +175,13 @@ rm("until", "since")
 noexcludes2001_2015 <- noexcludes[which(noexcludes$Year %in% seq(2001, 2015, 1)),]
 consorts2001_2015 <- consorts[which(consorts$Year %in% seq(2001, 2015, 1)),]
 realconsorts2001_2015 <- realconsorts[which(realconsorts$Year %in% seq(2001, 2015, 1)),]
-nonconsorts2001_2015 <- noexcludes[which(noexcludes$Year %in% seq(2001, 2015, 1)) &&
-                                   which(!noexcludes$realconsort != 1),]
+# nonconsorts2001_2015 <- noexcludes[which(noexcludes$Year %in% seq(2001, 2015, 1) &
+#                                    noexcludes$realconsort != 1 & 
+#                                    noexcludes$realrhetmap != 1),]
 rhetmaps2001_2015 <- rhetmaps[which(rhetmaps$Year %in% seq(2001, 2015, 1)),]
 realrhetmaps2001_2015 <- realrhetmaps[which(realrhetmaps$Year %in% seq(2001, 2015, 1)),]
 knownprograms2001_2015 <- knownprograms[which(knownprograms$Year %in% seq(2001, 2015, 1)),]
+nonconsorts2001_2015 <- noexcludes[noexcludes$Pub.number %in% setdiff(noexcludes2001_2015$Pub.number, knownprograms2001_2015$Pub.number),]
 
 
 # or just the new stuff
