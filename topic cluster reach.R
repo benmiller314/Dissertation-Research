@@ -114,8 +114,10 @@ cluster.strength <- function (my.topics=NULL,      # either pass in a list of to
         grid <- get.doctopic.grid(dataset_name=dataset_name, ntopics=ntopics,
                               iter_index=iter_index, subset_name=subset_name)$outputfile.dt
     } else if (!is.null(subset_name)){
-        warning("cluster.strength: Using an existing doc-topic grid, but subset_name is not null. \n",
-                "Check that the grid parameter being passed has the correct number of rows.")
+        if (nrow(get(subset_name) != nrow(grid) )) {
+            warning("cluster.strength: Using an existing doc-topic grid and subset_name, but \n",
+                "grid and subset have a different number of rows.")
+        }
     }
     
     # str(grid)
@@ -225,9 +227,37 @@ if(FALSE) {
                                         iter_index = iter_index,
                                         subset_name = subset_name)
     
+    if(!exists("stretch", mode="function")) {
+        source(file="squish_numbers.R")
+    }
+    
+    extent_level <- c(0.12, 0.2, 0.33, 0.4, 0.5, 0.66, 0.75)
+    
     for (i in 1:nrow(cluster_list)) {
         assign(cluster_list[i, "name"], stretch(cluster_list[i, "topics"]))
+    }
+    
+    for (lvl in extent_level) {
+        extent <- sapply(seq_len(nrow(cluster_list)), FUN=function(x) {
+            cluster.strength(my.topics_name = cluster_list[x, "name"], 
+                             dataset_name = dataset_name,
+                             ntopics = ntopics,
+                             iter_index = iter_index,
+                             subset_name = subset_name,
+                             bad.topics = bad.topics,
+                             cumulative = TRUE,
+                             level = lvl,
+                             grid = dt)
+        })
         
+        extent.vector <- round(100*unlist(extent["percentage", ]), 2)
+        colname <- quote(paste0("extent", lvl*100))
+        cluster_list[, eval(colname)] <- extent.vector
+    }
+    
+    cluster_list <- cluster_list[order(cluster_list[,"extent12"], decreasing = T), ]
+
+    
         cluster.strength(my.topics_name = cluster_list[i, "name"],
                      dataset_name = dataset_name,
                      ntopics = ntopics,
@@ -237,7 +267,9 @@ if(FALSE) {
                      cumulative = T,
                      level = 0.12)#$docs
         # )
-    }
+    
+    
+    
     
     if(! exists("top_topic_browser", mode="function")) {
         source(file="top docs per topic.R")

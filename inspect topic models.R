@@ -19,7 +19,7 @@ summarize_topic_clusters <- function(
     
     ## A dissertation is "in" a cluster if it contains more than 
     #  what cumulative level of words from all topics in the cluster?
-    extent_level = 0.12,
+    extent_level = c(0.12, 0.33, 0.50),
     
     ## And how should we cluster those dissertations: 
     # use agglomerative (cluster::agnes) or
@@ -113,7 +113,7 @@ summarize_topic_clusters <- function(
     
     message("Summary of topic clusters, ", 
             paste0(dataset_name, "k", ntopics, "_iter", iter_index, subset_name, ", using ", clust.method, ":"))
-    print(cl[order(-extent)])
+    print(cl[order(-size)])
     message("NB: `extent` refers to the percentage of dissertations in the corpus ",
             "with topics in this cluster \ncontributing at least ", extent_level*100,
             " percent of the diss (cumulatively). The column will sum to more than 100%:",
