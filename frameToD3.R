@@ -48,7 +48,7 @@ frameToJSON <- function(dataset_name="noexcludes2001_2015",
                         iter_index=1,  # Ben: suffix to differentiate repeat runs of same MALLET params.
                         do.plot=TRUE,   # Ben: Use this the first time to 
                                         # find good cuts in the dendrogram.
-                        clust.method = "agnes", 
+                        clust.method = c("diana", "agnes"), 
                                         # use agglomerative (cluster::agnes) 
                                         # or divisive (cluster::diana) clustering?    
                         groupVars=NULL, # Ben: If not provided by the calling 
@@ -123,7 +123,7 @@ frameToJSON <- function(dataset_name="noexcludes2001_2015",
   #from the correlation scores
   # Ben: topic_clusters() is also from topic_term_synonyms.R
   # Ben: optionally use descriptive topic labels, if we have them
-  clust <- topic_clusters(t, do.plot=F, use.labels=use.labels, clust.method=clust.method)
+  clust <- topic_clusters(t, do.plot=F, use.labels=use.labels, clust.method=match.arg(clust.method))
   # hc <- hclust(dist(t), "ward.D2")
 
   # Ben: convert to hclust so we can interact with the plot more easily
@@ -633,7 +633,8 @@ cotopic_edges <- function(dataset_name="consorts",
               min=3,        # how many times must a pair of topics co-occur?
               outfile=NULL,
               bad.topics= c("2", "4", "22", "24", "47", "50", "13"), 
-                            # exclude non-content-bearing topics
+                            # exclude non-content-bearing topics,
+              clust.method=c("diana","agnes"),
               tw=NULL    # topic-word grid, if we have one, makes this much faster
               )
 {
@@ -673,7 +674,7 @@ cotopic_edges <- function(dataset_name="consorts",
     # head(edges)
     
     # Bring in the node table
-    b <- frameToJSON(dataset_name, ntopics, subset_name, iter_index, bad.topics=bad.topics, do.plot=F, tw=tw)
+    b <- frameToJSON(dataset_name, ntopics, subset_name, iter_index, bad.topics=bad.topics, do.plot=F, tw=tw, clust.method=clust.method)
     setkey(b, topic)
     # head(b)
     
