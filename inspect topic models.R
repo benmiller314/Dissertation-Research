@@ -93,22 +93,23 @@ summarize_topic_clusters <- function(
     
     pltree(clust)
     
+    for (lvl in extent_level) {
+        extent <- sapply(seq_len(nrow(cl)), FUN=function(x) {
+                cluster.strength(my.topics = strsplit(cl[x, members][[1]], ", ")[[1]], 
+                         dataset_name = dataset_name,
+                         ntopics = ntopics,
+                         iter_index = iter_index,
+                         subset_name=subset_name,
+                         bad.topics = bad.topics,
+                         cumulative = TRUE,
+                         level = lvl,
+                         grid = dt)
+                })
     
-    extent <- sapply(seq_len(nrow(cl)), FUN=function(x) {
-            cluster.strength(my.topics = strsplit(cl[x, members][[1]], ", ")[[1]], 
-                     dataset_name = dataset_name,
-                     ntopics = ntopics,
-                     iter_index = iter_index,
-                     subset_name=subset_name,
-                     bad.topics = bad.topics,
-                     cumulative = TRUE,
-                     level = extent_level,
-                     grid = dt)
-            })
-    
-    extent.vector <- round(100*unlist(extent["percentage", ]), 2)
-
-    cl[, extent := extent.vector]
+        extent.vector <- round(100*unlist(extent["percentage", ]), 2)
+        colname <- paste0("extent", lvl*100)
+        cl[, eval(colname) := extent.vector]
+    }
     
     message("Summary of topic clusters, ", 
             paste0(dataset_name, "k", ntopics, "_iter", iter_index, subset_name, ", using ", clust.method, ":"))
@@ -116,8 +117,9 @@ summarize_topic_clusters <- function(
     message("NB: `extent` refers to the percentage of dissertations in the corpus ",
             "with topics in this cluster \ncontributing at least ", extent_level*100,
             " percent of the diss (cumulatively). The column will sum to more than 100%:",
-            " consider the example of a topic that appeared in every document at 12%.",
+            " consider the example of a topic that contributes 12% of every document.",
             " That one topic would have a scaled size of 12, but an extent of 100.")
+    
     
     if(remake_figs) {
         outfile <- file.path(imageloc,
