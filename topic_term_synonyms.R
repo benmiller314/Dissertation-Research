@@ -314,8 +314,9 @@ tree_summary <- function(nclust,
                                         # as per 'tfidf for topics.R'
                          dt = NULL,     # a doc-topic table
                          dataset_name = "noexcludes2001_2015",
-                         ntopics = 150,
+                         ntopics = 50,
                          iter_index = 1,
+                         subset_name = NULL,
                          bad.topics = NULL,
                          slow=F,                # optionally go one cluster at a time
                          internal.distances=F,
@@ -452,7 +453,7 @@ if(autorun) {
     tf <- tfidf.for.topics(tw=tw)
     
     
-    tree_summary(ag=ag, tw=tw, nclust=10, slow=F)
+    tree_summary(clust.method="diana", tw=tw, nclust=10, slow=F)
     
     
     #*******************************************#
@@ -475,6 +476,7 @@ if(autorun) {
     
     #*******************************************#
     #.       noexcludes2001_2015k50_iter1      .#
+    #.                           ^^            .#
     #...........................................#
     
     # 44: Online Circulation and Social Media;  45: Digital Media Affordances
