@@ -48,13 +48,15 @@ require(RColorBrewer)
     # Re-key by year
     setkey(grid, Year)
     
+    # Drop Pub.number and any bad.topics
+    grid <- grid[, setdiff(names(grid), c("Pub.number", bad.topics)), with=F]
+    
     # Get some stats for topics within each year
     topic.year.avg <- grid[, lapply(.SD, mean), by=Year]
-    topic.year.avg <- topic.year.avg[, !names(topic.year.avg) %in%
-                                     "Pub.number", with=F]
-    # str(topic.year.avg)       # It's a data.table
+
     
-    df <- as.data.frame(topic.year.avg)
+    ## why did I think I needed this to be a data.frame and not a data.table?
+    # df <- as.data.frame(topic.year.avg)
     
 
     # Get topic labels, which you've composed elsewhere using `top docs per
@@ -70,7 +72,9 @@ require(RColorBrewer)
     if (is.null(bad.topics) && dataset_name=="consorts" && ntopics==55) {
         bad.topics <- c("4", "47", "22", "2", "24", "13", "50")
     }
-    topic.labels.dt <- topic.labels.dt[!(Topic %in% bad.topics)]
+    if(!is.null(bad.topics)) {
+        topic.labels.dt <- topic.labels.dt[!(Topic %in% bad.topics)]
+    }
     setkey(topic.labels.dt, Rank)
     head(topic.labels.dt)
     
@@ -89,6 +93,10 @@ require(RColorBrewer)
     # Set graphing parameters; see
     # http://www.statmethods.net/graphs/line.html.
     if(do.plot) {
+        
+        ## why did I think I needed this to be a data.frame and not a data.table?
+        df <- as.data.frame(topic.year.avg)
+        
         # X axis will be years
         xrange <- range(df$Year)                    
         
@@ -103,6 +111,16 @@ require(RColorBrewer)
         
         # Nah, use same symbols for each plot
         plotchar <- rep(20, length(plot.me))                        
+        
+        # but vary line types if possible
+        if(length(per.plot) < 6) {
+            linetype <- c(1, 2, 3, 4, 5)          # skip dots: too faint
+        } else {
+            linetype <- rep(1, length(per.plot))  # not enough types, just go all solid :\
+        }
+        
+        linewidth <- 2
+        
         maintitle <- "Average Topic Proportions over Time"
         
         
@@ -162,7 +180,7 @@ require(RColorBrewer)
                 
                 # set up a blank plot in a standard size
                 plot(x = df$Year, 
-                     y = rep(yrange, length((df$Year))/2), 
+                     y = c(yrange, rep(mean(yrange), length(df$Year)-2)), 
                      type = "n", 
                      xaxs = "r", 
                      ylab = "Portion of corpus (scaled to 1)", 
@@ -215,7 +233,7 @@ require(RColorBrewer)
         if(remake_figs) {dev.off()}
     } # end if(do.plot)
     
-    invisible(list("df"=df, "rank.order"=plot.me))
+    invisible(list("df"=topic.year.avg, "rank.order"=plot.me))
     
 } # end of wrapper function topics.by.year()
 
@@ -233,30 +251,33 @@ topic.variation <- function(dataset_name = "consorts",
 # okay, this is interesting
     df <- topics.by.year(dataset_name=dataset_name, ntopics=ntopics, 
                          subset_name=subset_name, iter_index=iter_index,
-                         to.plot=to.plot, do.plot=FALSE)
+                         bad.topics=bad.topics, to.plot=to.plot, do.plot=FALSE)
     rank.order <- df$rank.order
     df <- df$df
     
-    if(! is.null(bad.topics)) {
-        df <- df[!names(df) %in% bad.topics]
-        rank.order <- rank.order[!rank.order %in% bad.topics]
+    if(!exists("build_plot_title")) {
+        source(file="build_plot_title.R")
     }
     
+    maintitle <- build_plot_title(dataset_name=dataset_name,
+                                  ntopics=ntopics,
+                                  iter_index=iter_index,
+                                  subset_name=subset_name,
+                                  bad.topics=bad.topics,
+                                  whatitis="Yearly Variation of Topic Proportions")
     
-
-    
-    maintitle <- paste("Yearly Variation of Topic Proportions",
-                        "Generally Preserves Topic Rank")
-    if(dataset_name == "consorts" && is.null(subset_name)) {
-        subtitle <- paste0("Consortium School dissertations, N", nrow(grid), 
-                            ", years 2001-2010") 
-    } else if(dataset_name == "consorts" && subset_name == "realconsorts") {
-        subtitle <- paste0("Consortium Program dissertations, N", nrow(grid), 
-                           ", years 2001-2010") 
-    } else { 
-        subtitle <- paste0(dataset_name, " dissertations, N", nrow(grid), 
-                            ", years 2001-2010") 
-    }
+    # maintitle <- paste("Yearly Variation of Topic Proportions",
+    #                     "Generally Preserves Topic Rank")
+    # if(dataset_name == "consorts" && is.null(subset_name)) {
+    #     subtitle <- paste0("Consortium School dissertations, N", nrow(grid), 
+    #                         ", years 2001-2010") 
+    # } else if(dataset_name == "consorts" && subset_name == "realconsorts") {
+    #     subtitle <- paste0("Consortium Program dissertations, N", nrow(grid), 
+    #                        ", years 2001-2010") 
+    # } else { 
+    #     subtitle <- paste0(dataset_name, " dissertations, N", nrow(grid), 
+    #                         ", years 2001-2010") 
+    # }
     
         
     # Get topic labels, which you've composed elsewhere using 'top docs per
@@ -273,7 +294,9 @@ topic.variation <- function(dataset_name = "consorts",
     if (is.null(bad.topics) && dataset_name=="consorts" && ntopics==55) {
         bad.topics <- c("4", "47", "22", "2", "24", "13", "50")
     }
-    topic.labels.dt <- topic.labels.dt[!(Topic %in% bad.topics)]
+    if(!is.null(bad.topics)) {
+        topic.labels.dt <- topic.labels.dt[!(Topic %in% bad.topics)]
+    }
     nrow(topic.labels.dt)
     nrow(df)
     setkey(topic.labels.dt, Rank)
@@ -286,7 +309,11 @@ topic.variation <- function(dataset_name = "consorts",
         pdf(filename) 
     }
     
-    boxplot(df[!names(df) %in% "Year"][, rank.order], 
+    # sort columns by overall topic rank
+    setcolorder(df, c("Year", as.character(rank.order)))
+    
+    # remove Year column from plot
+    boxplot(df[, .SD, .SDcols=!c("Year")], 
         main = maintitle, 
         # xlab="Topic Number, Arranged by Overall Rank within Corpus",
         # cex.axis=0.6, las=2, 
@@ -298,7 +325,7 @@ topic.variation <- function(dataset_name = "consorts",
     
     if(use.labels) {    
         axis(1, 
-             at = seq_along(df[!names(df) %in% c("Year", bad.topics)][, rank.order]),
+             at = seq_along(df[, .SD, .SDcols=!c("Year")]),
              labels = topic.labels.dt[Topic %in% rank.order, Label], 
              las = 2,
              ps = 6,
@@ -306,7 +333,7 @@ topic.variation <- function(dataset_name = "consorts",
         )
     } else {
         axis(1, 
-             at = seq_along(df[!names(df) %in% c("Year", bad.topics)][, rank.order]),
+             at = seq_along(df[, .SD, .SDcols=!c("Year")]),
              labels = topic.labels.dt[Topic %in% rank.order, Topic], 
              las = 2, 
              ps = 6,
@@ -333,5 +360,5 @@ if(autorun) {
                    show.outliers=F,
                    use.labels=T)
     
-    topic.variation(subset_name = "realconsorts")
+    topic.variation(dataset_name="noexcludes", ntopics=55, iter_index="", subset_name = "realconsorts")
 }
