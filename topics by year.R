@@ -189,8 +189,8 @@ require(RColorBrewer)
                      main = maintitle)
         
                 # add a legend for up to five values
-                if(i <= 10) { 
-                    legendloc <- "bottomright" 
+                if (mean(df[,as.character(plot.me[i])]) > mean(yrange)) { 
+                    legendloc <- "bottomleft" 
                 } else { 
                     legendloc <- "topright" 
                 }
@@ -204,6 +204,8 @@ require(RColorBrewer)
                             plot.me[i:(i+legend.offset)], Label]), 
                         fill=mycol[j:(j+legend.offset)],
                             border=mycol[j:(j+legend.offset)], 
+                        lty = linetype[j:(j+legend.offset)],
+                        lwd = linewidth,
                         bty="n", 
                         cex=0.8
                     )   
@@ -214,6 +216,8 @@ require(RColorBrewer)
                             plot.me[i:(i+legend.offset)], Label]), 
                         fill = mycol[j:(j+legend.offset)], 
                         border = mycol[j:(j+legend.offset)], 
+                        lty = linetype[j:(j+legend.offset)],
+                        lwd = linewidth,
                         bty = "n", 
                         cex = 0.8
                     )
@@ -225,6 +229,8 @@ require(RColorBrewer)
                   y = df[,as.character(plot.me[i])], 
                   type = "l", 
                   pch = plotchar[j], 
+                  lty = linetype[j],
+                  lwd = linewidth,
                   col = mycol[j]
             )
         } # end of for loop
