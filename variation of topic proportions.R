@@ -78,7 +78,7 @@ topic.proportions <- function(dataset_name = "consorts",
 	
 	## Time to make the plot
 	if(!exists("build_plot_title", mode="function")) {
-	    source(file="frameToD3.R")
+	    source(file="build_plot_title.R")
 	}
 	
 	bigtitle <- build_plot_title(dataset_name=dataset_name, subset_name=subset_name,

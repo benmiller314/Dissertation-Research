@@ -23,7 +23,12 @@ get.doctopic.grid <- function(dataset_name="consorts",
     # for colClasses:   Column 1 is an unneeded row index, so convert to NULL.
     #                   Column 2 is filenames; we'll clean below.
     #                   The remaining columns are the topics.
-    filename <- file.path(tmloc, paste0(dataset_name, "k", ntopics, "_composition_", iter_index, ".txt"))
+    
+    if(iter_index != "") {
+        filename <- file.path(tmloc, paste0(dataset_name, "k", ntopics, "_composition_", iter_index, ".txt"))
+    } else {
+        filename <- file.path(tmloc, paste0(dataset_name, "k", ntopics, "_composition.txt"))
+    }
     if(file.exists(filename)) {
         doc_topics <- read.delim(filename, header=F, colClasses=c("NULL", "character", rep("numeric", ntopics)))        
         

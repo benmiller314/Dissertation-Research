@@ -39,15 +39,15 @@ compare_method_ranks <- function(set1="consorts",
 		d2 <- paste0(d1, " (", round(100*d0[order(d0, decreasing=T)] / 
 					 nrow(get(set2)), 0), "%)")
 	
-		filename <- paste0(imageloc, "Ranks of methods in ", set1, " v ", 
-							set2, "--", tagset_name,", no Othr, pcts.pdf")
+		filename <- file.path(imageloc, paste0("Ranks of methods in ", set1, " v ", 
+							set2, "--", tagset_name,", no Othr, pcts.pdf"))
 	} else {
 		# Add diss counts to each tag
 		b2 <- paste0(b1, " (", b0[order(b0, decreasing=T)], ")")	
 		d2 <- paste0(d1, " (", d0[order(d0, decreasing=T)], ")")
 	
-		filename <- paste0(imageloc, "Ranks of methods in ", set1, " v ", 
-		                   set2, "--", tagset_name,", no Othr, counts.pdf")
+		filename <- file.path(imageloc, paste0("Ranks of methods in ", set1, " v ", 
+		                   set2, "--", tagset_name,", no Othr, counts.pdf"))
 	}
 	
 	## Test significance of any differences
@@ -215,6 +215,7 @@ if(autorun) {
 	compare_method_ranks("realconsorts2001_2005", "realconsorts2006_2010", tagset_name="tagnames.simple",
 	                     betterlabels=c("Consortium programs, 2001-2005",
 	                                    "Consortium programs, 2006-2010"))
+	compare_method_ranks("knownprograms2001_2015", "nonconsorts2001_2015")
 	
 } else {
     message("The following function has been loaded:")

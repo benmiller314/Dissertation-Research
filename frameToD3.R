@@ -19,28 +19,7 @@
 # needed.
 ##### 
 
-# Ben: helper function to build a filename / main title for topic-modeling figures
-build_plot_title <- function(dataset_name, ntopics, iter_index, subset_name, 
-                             bad.topics, use.labels=FALSE,
-                             whatitis="Cluster Dendrogram") {
-    if(! is.null(subset_name)) { subset_part <- paste0("--", subset_name) 
-    } else { subset_part <- "" }
-    
-    if(length(bad.topics > 0)) { bad_topics_part <- paste0(", ", length(bad.topics), " bad topics hidden")
-    } else { bad_topics_part <- "" }
-    
-    if(iter_index > 0) { iter_part <- paste0("_iter", iter_index) 
-    } else { iter_part <- "" }
-  
-    if(use.labels) { label_part <- ", topics labeled" 
-    } else { label_part <- "" }
-    
-    main <- paste0(whatitis, ", ",                                       # type of plot/file
-                   dataset_name, "k", ntopics, iter_part,                # which topic model
-                   subset_part, bad_topics_part,                         # parts of that model
-                   label_part)                                           # topics named or numbered
-    return(main)
-}
+source("build_plot_title.R")
 
 frameToJSON <- function(dataset_name="noexcludes2001_2015",
                         ntopics=50,
@@ -90,19 +69,20 @@ frameToJSON <- function(dataset_name="noexcludes2001_2015",
   if(!is.null(bad.topics)) { dt <- dt[, !names(dt) %in% bad.topics, with=F] }
 
   # Set parameter defaults if needed
-  if(!exists("groupVars") || is.null(groupVars)) {              
+  if(is.null(groupVars)) {              
         groupVars <- c("Pub.number")    # Don't treat ID column as data
   }
-  if(!exists("dataVars") || is.null(dataVars)) {   
+  if(is.null(dataVars)) {   
         dataVars <- colnames(dt)[!colnames(dt) %in% groupVars]  
         # any column that's not an ID is a datapoint
   }
-  if(!exists("outfile") || is.null(outfile)) {                
+  if(is.null(outfile)) {                
   # the desired location of the JSON file produced by the function
-        outfile <- file.path(webloc, paste0(build_plot_title(dataset_name=dataset_name, ntopics=ntopics, 
-                                                      iter_index=iter_index, subset_name=subset_name,
-                                                      bad.topics=bad.topics, 
-                                                      whatitis="radial_clusters_data_tw_jsd"), ".json"))
+        outfile_slug <- build_plot_title(dataset_name=dataset_name, ntopics=ntopics, 
+                                         iter_index=iter_index, subset_name=subset_name,
+                                         bad.topics=bad.topics, 
+                                         whatitis="radial_clusters_data_tw_jsd")
+        outfile <- file.path(webloc, paste0(outfile_slug, ", ", match.arg(clust.method), ".json"))
   }
   
   #Rolf: calculate the correlation matrix
@@ -625,10 +605,10 @@ if(dataset_name=="noexcludes2001_2015" && is.null(subset_name) && ntopics==60 &&
 #     3) convert to JSON.   
 ########
 
-cotopic_edges <- function(dataset_name="consorts", 
-              ntopics=55, 
-              subset_name=NULL,
-              iter_index="",
+cotopic_edges <- function(dataset_name="noexcludes2001_2015", 
+              ntopics=50, 
+              subset_name="knownprograms2001_2015",
+              iter_index=1,
               level=0.12,   # topic must constitute how much of each doc?
               min=3,        # how many times must a pair of topics co-occur?
               outfile=NULL,
@@ -643,11 +623,17 @@ cotopic_edges <- function(dataset_name="consorts",
 
     # the desired location of the JSON file produced by the function
     if(is.null(outfile)) {
+        if (!exists("build_plot_title", mode="function")) {
+          source(file="build_plot_title.R")
+        }
+        outfile_slug <- build_plot_title(dataset_name=dataset_name, ntopics=ntopics, 
+                                         iter_index=iter_index, subset_name=subset_name,
+                                         bad.topics=bad.topics, whatitis="edge_data") 
         outfile <- file.path(webloc, 
-                paste0(build_plot_title(dataset_name=dataset_name, ntopics=ntopics, 
-                                    iter_index=iter_index, subset_name=subset_name,
-                                    bad.topics=bad.topics, whatitis="edge_data"), 
-                       "--min", min, "--", level*100, "pct.json"))
+                             paste0(outfile_slug, 
+                             "--min", min, 
+                             "--", level*100, "pct", 
+                             "--", match.arg(clust.method), ".json"))
     }
     
     
@@ -680,7 +666,7 @@ cotopic_edges <- function(dataset_name="consorts",
     
     # merge
     b <- edges[b, ]
-    str(b)
+    # str(b)
         
     # Create a "name" column that collapses the hierarchical structure and
     # topic label, as per
@@ -747,10 +733,23 @@ cotopic_edges <- function(dataset_name="consorts",
     edge_bund <- edge_bund[!(name %in% "NA")]
 
     jsonEdge <- toJSON(edge_bund, pretty=TRUE)
+    
     if(remake_figs) {
+      if(file.exists(outfile)) {
+        message("File already exists:\n ", outfile, "\n")
+        a <- readline("Overwrite file? (y/n)   ")
+        if (startsWith(tolower(a), "y")) {
+          cat(jsonEdge, file=outfile)
+          message("File saved to ", outfile)
+        } else {
+          message("File not saved, but returning edge_data json to stdout.")
+        }
+      } else {
         cat(jsonEdge, file=outfile)
+      }
     }
-    return(jsonEdge)
+
+    invisible(jsonEdge)
 }
 
 
@@ -758,7 +757,7 @@ if(FALSE) {
     remake_figs=T
     # debug(frameToJSON)
     frameToJSON(do.plot=T)
-    frameToJSON(subset_name="realconsorts")
+    frameToJSON(dataset_name="noexcludes", subset_name="realconsorts", iter_index="")
     frameToJSON(ntopics=150, bad.topics=NULL)
     frameToJSON(do.plot=T, dataset_name="noexcludes2001_2015", subset_name=NULL, ntopics=150, iter_index=6, bad.topics = NULL)
     frameToJSON(do.plot=T, dataset_name="noexcludes2001_2015", subset_name=NULL, ntopics=150, iter_index=1, bad.topics = NULL)
@@ -768,7 +767,15 @@ if(FALSE) {
     frameToJSON(do.plot=F, dataset_name="noexcludes2001_2015", subset_name=NULL, ntopics=50, iter_index=1, bad.topics = c(3, 12, 50, 47, 34, 36, 30, 8, 15))
     frameToJSON(do.plot=T, dataset_name="noexcludes2001_2015", subset_name="realconsorts2001_2015", ntopics=50, iter_index=1, bad.topics = c(3, 12, 50, 47, 34, 36, 30, 8, 15), use.labels=T)
     frameToJSON(do.plot=F, dataset_name="noexcludes2001_2015", subset_name="knownprograms2001_2015", ntopics=50, iter_index=1, bad.topics = c(3, 12, 50, 47, 34, 36, 30, 8, 15), use.labels=T, tw=tw)
-    frameToJSON(do.plot=T, dataset_name="noexcludes2001_2015", subset_name="knownprograms2001_2015", ntopics=50, iter_index=1, bad.topics = c(3, 12, 50, 47, 34, 36, 30, 8, 15), use.labels=T, tw=tw)
+    frameToJSON(do.plot=F, 
+                dataset_name="noexcludes2001_2015", 
+                subset_name="knownprograms2001_2015", 
+                ntopics=50, 
+                iter_index=1, 
+                bad.topics = c(3, 12, 50, 47, 34, 36, 30, 8, 15), 
+                use.labels=T, 
+                tw=tw,
+                clust.method = "diana")
     
     
     
@@ -785,7 +792,12 @@ if(FALSE) {
     # all primary topics and 3/4 of secondary topics for *realconsorts*; 
     # see `Variation of Topic Proportions, Top 10 Topics per Document.pdf`
     cotopic_edges(level=0.11, min=1, tw=tw, dataset_name="noexcludes2001_2015", subset_name="knownprograms2001_2015", ntopics=50, iter_index=1, bad.topics = c(3, 12, 50, 47, 34, 36, 30, 8, 15))
-    cotopic_edges(level=0.12, min=3, tw=tw, dataset_name="noexcludes2001_2015", subset_name="knownprograms2001_2015", ntopics=50, iter_index=1, bad.topics = c(3, 12, 50, 47, 34, 36, 30, 8, 15))
+    cotopic_edges(level=0.12, min=3, tw=tw, 
+                  dataset_name="noexcludes2001_2015", 
+                  subset_name="knownprograms2001_2015", 
+                  ntopics=50, iter_index=1, 
+                  bad.topics = c(3, 12, 50, 47, 34, 36, 30, 8, 15),
+                  clust.method="diana")
 }
 
 
