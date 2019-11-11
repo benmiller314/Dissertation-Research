@@ -75,9 +75,10 @@ schools_by_topic <- function(mytopic,
     mydepts[, knownprogram:=(realconsort | realrhetmap)]
     mydepts[, `:=`(realconsort=NULL, realrhetmap=NULL)]
     
-    # note that if the subset is a form of knownprograms, mydepts$knownprogram should 
+    # Note that if the subset is a form of knownprograms, mydepts$knownprogram should 
     # all be TRUE. It may be possible to find the topics that maximize the ratio of 
     # TRUE to FALSE in this category, after returning this function with howmany=-1
+    # UPDATE: now implemented as knownprogram_topical_ratio(), below.
     
     setkey(mydepts, School, knownprogram)
     
@@ -224,4 +225,11 @@ schools_by_topic_cluster <- function(mytopics,
     
     hc <- as.hclust(ag)
 
+}
+
+if(!autorun) {
+    message("`schools by topic.R`: The following functions have been loaded: \n",
+            "* schools_by_topic(mytopic, ...) \n",
+            "* knownprogram_topical_ratio(...) \n",
+            "* schools_by_topic_cluster(mytopics, ...)")
 }

@@ -34,7 +34,11 @@ summarize_topic_clusters <- function(
                                          clust.method),
     
     ## Any one topic to inspect while we're here?
-    onetopic = NULL
+    onetopic = NULL,
+    
+    ## If you've done this already with this dataset, save some time
+    tw = NULL
+    
 ){    
     
     ############# Bind the Data #############
@@ -68,23 +72,25 @@ summarize_topic_clusters <- function(
                          dataset_name = dataset_name,
                          ntopics = ntopics,
                          iter_index = iter_index,
+                         subset_name = subset_name,
                          bad.topics = bad.topics,
                          clust.method = clust.method,
-                         use.labels=T)
+                         use.labels=use.labels)
     
     ############ Inspect Tree, Set Number of Clusters ############
-    nclust <- 20
+    nclust <- 20    # TO DO: iterate this
     
     ############ Summarize Topic Clusters ############
-    cl <- tree_summary(tw=tw, 
-                       tf=tf,
-                       dt=dt,
-                       dataset_name=dataset_name,
-                       ntopics=ntopics, 
-                       iter_index=iter_index,
-                       nclust=nclust, 
-                       bad.topics=bad.topics, 
-                       slow=F,
+    cl <- tree_summary(tw = tw, 
+                       tf = tf,
+                       dt = dt,
+                       dataset_name = dataset_name,
+                       ntopics = ntopics, 
+                       iter_index = iter_index,
+                       subset_name = subset_name,
+                       nclust = nclust, 
+                       bad.topics = bad.topics, 
+                       slow = F,
                        clust.method = clust.method)
     cl[, nobads.size := round(100*size/sum(size), 2)]
     # cl
@@ -113,13 +119,12 @@ summarize_topic_clusters <- function(
     
     message("Summary of topic clusters, ", 
             paste0(dataset_name, "k", ntopics, "_iter", iter_index, subset_name, ", using ", clust.method, ":"))
-    print(cl[order(-size)])
+    print(cl[order(-extent)])
     message("NB: `extent` refers to the percentage of dissertations in the corpus ",
             "with topics in this cluster \ncontributing at least ", extent_level*100,
             " percent of the diss (cumulatively). The column will sum to more than 100%:",
             " consider the example of a topic that contributes 12% of every document.",
             " That one topic would have a scaled size of 12, but an extent of 100.")
-    
     
     if(remake_figs) {
         outfile <- file.path(imageloc,
@@ -178,13 +183,13 @@ name_clusters <- function(cl_summary,  # result of summarize_topic_clusters (abo
     
     # and display abstracts etc for those docs
     # tops <- 
-        top_topic_browser(dataset_name=dataset_name,
-                      ntopics=ntopics,
-                      iter_index=iter_index,
-                      subset_name=my.docs,
+        top_topic_browser(dataset_name = dataset_name,
+                      ntopics = ntopics,
+                      iter_index = iter_index,
+                      subset_name = my.docs,
                       showlabels = TRUE,
-                      topic=my.topics,
-                      depth=depth
+                      topic = my.topics,
+                      depth = depth
     #                   , 
     #                   for.bind=TRUE
     )
