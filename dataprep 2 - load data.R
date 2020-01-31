@@ -198,15 +198,48 @@ knownprograms2011_2015 <- knownprograms[which(knownprograms$Year %in% seq(2011, 
 new_noexcludes <- noexcludes[-which(is.na(noexcludes$Link)), ]
 
 # five-year bins
-noexcludes2001_2005 <- noexcludes[which(noexcludes$Year %in% seq(2001, 2005, 1)),]
-noexcludes2006_2010 <- noexcludes[which(noexcludes$Year %in% seq(2006, 2010, 1)),]
-realconsorts2001_2005 <- realconsorts[which(realconsorts$Year %in% seq(2001, 2005, 1)),]
-realconsorts2006_2010 <- realconsorts[which(realconsorts$Year %in% seq(2006, 2010, 1)),]
-realrhetmaps2001_2005 <- realrhetmaps[which(realrhetmaps$Year %in% seq(2001, 2005, 1)),]
-realrhetmaps2006_2010 <- realrhetmaps[which(realrhetmaps$Year %in% seq(2006, 2010, 1)),]
-rhetmaps2001_2005 <- rhetmaps[which(rhetmaps$Year %in% seq(2001, 2005, 1)),]
-rhetmaps2006_2010 <- rhetmaps[which(rhetmaps$Year %in% seq(2006, 2010, 1)),]
+subset_by_year <- function(dataset_name, 
+                           start_year, 
+                           end_year,
+                           autoskip = FALSE,
+                           autooverwrite = FALSE) {
+    
+    new_subset_name <- paste0(dataset_name, start_year, "_", end_year)
+    if(autooverwrite || !exists(new_subset_name)) {
+        assign(new_subset_name, 
+           dataset[which(dataset$Year %in% seq(start_year, end_year, 1)), ],
+           envir= .GlobalEnv)
+    } else if (autoskip) {
+        message(new_subset_name, "already exists; autoskipping.")
+        return()
+    } else {
+        message(new_subset_name, " already exists with ", 
+                nrow(get(new_subset_name)), " rows. (O)verwrite or (S)kip?")
+        a <- readline(" ")
+        while(!(tolower(a) %in% c("o", "s"))) {
+            message("Please answer 'o' for overwrite or 's' for skip.")
+            a <- readline(" ")
+        }
+        if(tolower(a) == "o") {
+            assign(new_subset_name, 
+                   dataset[which(dataset$Year %in% seq(start_year, end_year, 1)), ],
+                   envir= .GlobalEnv)
+        } else if (tolower(a) == "s") {
+            message("overwrite of ", new_subset_name, " skipped.")
+            return()
+        }
+    }
+    message(new_subset_name, " created with ", nrow(get(new_subset_name)), " rows.")
+    invisible(get(new_subset_name))
+}
 
+subset_list <- c("noexcludes", "knownprograms", "top.nonconsorts", "realconsorts", "realrhetmaps")
+for(subset in subset_list) {
+    subset_by_year(subset, 2001, 2015, autooverwrite =T)
+    subset_by_year(subset, 2001, 2005, autooverwrite = T)
+    subset_by_year(subset, 2006, 2010, autooverwrite =T)
+    subset_by_year(subset, 2011, 2015, autooverwrite = T)
+}
 
 # re-factor all factor columns in all data subsets
 ## TO DO: use loops and assign() to *build* these subsets with less redundancy
