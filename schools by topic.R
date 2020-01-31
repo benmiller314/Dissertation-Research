@@ -131,6 +131,7 @@ knownprogram_topical_ratio <- function(level = 0.12,     # percentage of a diss 
                                        dataset_name="noexcludes2001_2015",
                                        ntopics=50,
                                        iter_index=1,     # suffix to differentiate repeat runs of same MALLET params.
+                                       subset_name=NULL,
                                        outfile=NULL,     # if not provided, will be set to a default.
                                        use.labels=TRUE, # replace topic numbers with labels
                                        # chosen using top_topic_browser()?
