@@ -75,11 +75,11 @@ compare_method_ranks <- function(set1="consorts",
 		# Bonferroni correction: divide target significance levels 
 		# by the number of comparisons in the set
 		
-		if(fish$p.value < 0.001 / length(b)) {
+		if(fish$p.value < (0.001 / length(b))) {
 			message(paste(realtags(tag, tagset_name), "is very significantly different", 
 			   "(Bonferroni corrected p < 0.001) between", set1, "and", set2))
 			return(" ** ")
-		} else if(fish$p.value < 0.05 / length(b)) {
+		} else if(fish$p.value < (0.05 / length(b))) {
 			message(paste(realtags(tag, tagset_name), "is significantly different", 
 			   "(Bonferroni corrected p < 0.05) between", set1, "and", set2))
 			return("  * ")
@@ -216,6 +216,7 @@ if(autorun) {
 	                     betterlabels=c("Consortium programs, 2001-2005",
 	                                    "Consortium programs, 2006-2010"))
 	compare_method_ranks("knownprograms2001_2015", "nonconsorts2001_2015")
+	compare_method_ranks("knownprograms2001_2005", "knownprograms2011_2015", tagset_name="tagnames.simple")
 	
 } else {
     message("The following function has been loaded:")
