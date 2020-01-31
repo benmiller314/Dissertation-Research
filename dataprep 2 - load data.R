@@ -204,6 +204,7 @@ subset_by_year <- function(dataset_name,
                            autoskip = FALSE,
                            autooverwrite = FALSE) {
     
+    dataset <- get(dataset_name)
     new_subset_name <- paste0(dataset_name, start_year, "_", end_year)
     if(autooverwrite || !exists(new_subset_name)) {
         assign(new_subset_name, 

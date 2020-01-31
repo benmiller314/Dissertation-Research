@@ -55,10 +55,10 @@ toplists <- function(dataset_name = "noexcludes",
     a <- schoolwise.data("d1", tagset_name)
 
     # 2 Star the schools in the consortium
-    c <- which(a$counts$School %in% consorts$School)
+    kp_index <- which(a$counts$School %in% knownprograms$School)
     a$counts$School <- fix_factor(a$counts$School, 
-                                  to.add = paste0(a$counts$School[c], "*"),
-                                  to.remove = a$counts$School[c])
+                                  to.add = paste0(a$counts$School[kp_index], "*"),
+                                  to.remove = a$counts$School[kp_index])
 
     ## 3. for the schools that meet the cutoff, find the "howmany" highest
     ## real values of each tag
@@ -111,8 +111,10 @@ toplists <- function(dataset_name = "noexcludes",
             a6$Total <- NULL
         } else {
             # leave per-tag count, per-tag pct, total count, and school as
-            # separate columns
-            a5 <- cbind(a2, "P"=a4, "D"=a3, "T"=a2$School.length)
+            # separate columns.
+            a5 <- cbind(a2, "P"=a4, "D"=a3)
+            names(a5) <- c("School", "T", "P", "D")
+            
             if(rank_by) {
                 a6 <- a5[, c("School", "P", "D", "T")]  
                 filename <- paste0(imageloc, "Top ", howmany, 
