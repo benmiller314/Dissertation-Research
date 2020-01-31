@@ -144,6 +144,20 @@ knownprogram_topical_ratio <- function(level = 0.12,     # percentage of a diss 
         topic_list <- setdiff(topic_list, bad.topics)
     }
     
+    if(is.null(dt)) {
+        
+        if(!exists("get.doctopic.grid", mode="function")) { 
+            source(file="get doctopic grid.R") 
+        }
+        dt <- get.doctopic.grid(dataset_name=dataset_name,
+                                ntopics=ntopics,
+                                subset_name=subset_name,
+                                iter_index=iter_index)$outputfile.dt
+        
+        # Exclude any NA rows included accidentally by the index file
+        dt <- na.omit(dt)
+    }    
+    
     ratios <- data.frame("topic.num"=numeric(),
                          "unknown.dept"=logical(),
                          "known.dept"=logical(),
@@ -160,10 +174,14 @@ knownprogram_topical_ratio <- function(level = 0.12,     # percentage of a diss 
                                          bad.topics=bad.topics,
                                          dt=dt, 
                                          quiet=TRUE)$knownprogram)
+        
+        if(is.na(result["FALSE"])) { result["FALSE"] <- 0 }
+        if(is.na(result["TRUE"])) { result["TRUE"] <- 0 }
+        
         ratios[j,] <- c(i, 
-                        result[["FALSE"]], 
-                        result[["TRUE"]], 
-                        result[["TRUE"]]/(result[["TRUE"]]+result[["FALSE"]]))
+                        result["FALSE"], 
+                        result["TRUE"], 
+                        result["TRUE"]/(result["TRUE"]+result["FALSE"]))
         j <- j+1
     }
     
@@ -185,11 +203,47 @@ knownprogram_topical_ratio <- function(level = 0.12,     # percentage of a diss 
     ratios <- ratios[myorder,]
     row.names(ratios) <- NULL
     
+    ratios <- ratios[order(ratios$pct.known, decreasing = T),]
+    
+    if(is.null(outfile)) {
+        if(!exists("build_plot_title", mode="function")) {
+            source(file="build_plot_title.R")
+        }
+        
+        outfile_slug <- build_plot_title(dataset_name = dataset_name,
+                                         ntopics = ntopics,
+                                         iter_index = iter_index,
+                                         subset_name = subset_name,
+                                         bad.topics = bad.topics,
+                                         use.labels = use.labels,
+                                         whatitis = "knownprogram-ratios-by-topic")
+        
+        outfile <- file.path(imageloc, paste0(outfile_slug, ".csv"))
+    }
+    
+    if(remake_figs) {
+        if(file.exists(outfile)) {
+            message("File already exists:\n ", outfile, "\n")
+            a <- readline("Overwrite file? (y/n)   ")
+            if (startsWith(tolower(a), "y")) {
+                write.csv(ratios, file=outfile, row.names=F)
+                message("File saved to ", outfile)
+            } else {
+                message("File not saved, but returning table to stdout.")
+            } 
+        } else {
+            write.csv(ratios, file=outfile, row.names=F)    
+            message("File saved to ", outfile)
+        }
+    }
+    
     return(ratios)
 }
 
 if(FALSE) {
-    ratios <- knownprogram_topical_ratio(bad.topics=bad.topics, dt=dt, use.labels=T)
+    remake_figs = T
+    ratios <- knownprogram_topical_ratio(bad.topics=bad.topics, 
+                                         use.labels=T)
 }
     
 # TO DO: finish this function, which should find differences among schools_by_topic 
