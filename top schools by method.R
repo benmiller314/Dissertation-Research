@@ -78,6 +78,9 @@ toplists <- function(dataset_name = "noexcludes",
         # raw number of disses at top schools
         a2 <- head(a$counts[a1,], howmany)  
         
+        # ignore columns from other tags, if they've snuck in
+        a2 <- a2[,c(grep("School", names(a2)), grep(tag, names(a2)))]
+        
         # number of disses with chosen tag
         a3 <- head(a$sums[a1,tag.sum], howmany) 
         
