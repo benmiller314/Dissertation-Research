@@ -314,7 +314,7 @@ tree_summary <- function(nclust,
                                         # as per 'tfidf for topics.R'
                          dt = NULL,     # a doc-topic table
                          dataset_name = "noexcludes2001_2015",
-                         ntopics = 50,
+                         ntopics = 150,
                          iter_index = 1,
                          subset_name = NULL,
                          bad.topics = NULL,
@@ -331,6 +331,7 @@ tree_summary <- function(nclust,
                          ntopics = ntopics,
                          iter_index = iter_index,
                          bad.topics = bad.topics,
+                         subset_name = subset_name,
                          use.labels = FALSE,
                          clust.method = clust.method)
     
@@ -453,7 +454,7 @@ if(autorun) {
     tf <- tfidf.for.topics(tw=tw)
     
     
-    tree_summary(clust.method="diana", tw=tw, nclust=10, slow=F)
+    tree_summary(ag=ag, tw=tw, nclust=10, slow=F)
     
     
     #*******************************************#
@@ -476,7 +477,6 @@ if(autorun) {
     
     #*******************************************#
     #.       noexcludes2001_2015k50_iter1      .#
-    #.                           ^^            .#
     #...........................................#
     
     # 44: Online Circulation and Social Media;  45: Digital Media Affordances
