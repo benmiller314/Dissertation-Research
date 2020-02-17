@@ -126,8 +126,6 @@ if(FALSE) {
 
 knownprogram_topical_ratio <- function(level = 0.12,     # percentage of a diss contributed by the topic
                                        # for it to "count"
-                                       howmany = 10,      # how many top schools to show?
-                                       # use -1 for all.
                                        dataset_name="noexcludes2001_2015",
                                        ntopics=50,
                                        iter_index=1,     # suffix to differentiate repeat runs of same MALLET params.
@@ -197,7 +195,6 @@ knownprogram_topical_ratio <- function(level = 0.12,     # percentage of a diss 
         finally=""
         )
     }
-    
     
     myorder <- order(ratios$pct.known, decreasing = T)
     ratios <- ratios[myorder,]
