@@ -114,11 +114,15 @@ get.doctopic.grid <- function(dataset_name="consorts",
     # Optionally save to file
     if(remake_figs) { 
         if(! is.null(subset_name)) {
-            filename <- file.path(imageloc, paste0(dataset_name, "k", ntopics, "--", subset_name, 
-                               "_topic-ranks", iter_index, ".csv"))    
+            # filename <- file.path(imageloc, paste0(dataset_name, "k", ntopics, "--", subset_name, 
+            #                    "_topic-ranks", iter_index, ".csv"))
+            filename <- file.path(imageloc, paste0("topic-labeling--", dataset_name, "k",
+                                                   ntopics, "_", iter_index, "--", subset_name, ".csv"))
         } else {
-            filename <- file.path(imageloc, paste0(dataset_name, "k", ntopics,
-                             "_topic-ranks", iter_index, ".csv"))
+            # filename <- file.path(imageloc, paste0(dataset_name, "k", ntopics,
+            #                  "_topic-ranks", iter_index, ".csv"))
+            filename <- file.path(imageloc, paste0("topic-labeling--", dataset_name, "k",
+                                                   ntopics, "_", iter_index, ".csv"))
         }
         out <- colsums.sort.pct[2:length(colsums.sort.pct)]
         head(out)
@@ -168,5 +172,9 @@ if(FALSE) {         # this will never run on its own
     
     mygrid <- get.doctopic.grid("noexcludes2001_2015", ntopics=50, iter_index=1, 
                                 subset_name="knownprograms2001_2015", 
+                                doplot=T)
+    
+    mygrid <- get.doctopic.grid("noexcludes2001_2015", ntopics=50, iter_index=1, 
+                                subset_name="knownprograms2011_2015", 
                                 doplot=T)
 }
