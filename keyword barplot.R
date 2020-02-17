@@ -56,10 +56,15 @@ keyword_barplot <- function(dataset_name="consorts.plus", 		# by default, show c
 	# barplot(kw.table[how.many+1:length(kw.table)/2],horiz=FALSE,main=paste0("Frequency of Subject Terms below ",how.many,", above median"), axisnames=TRUE,width=c(10,10),space=0.4,las=2, pty="m",mai=c(5,10,8,5))
 	
 	# if(remake_figs) { dev.off() }
+	
+	return(kw.table)
 }
 
 if(autorun) {
 	remake_figs=T
 	keyword_barplot()
+} else {
+    message("`keyword barplot.R` loaded the following function: \n",
+            "keyword_barplot(dataset_name='consorts.plus', how.many=NULL, horizontal=FALSE) ")
 }
 
