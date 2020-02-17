@@ -6,30 +6,35 @@
 # Dependencies: `extract subjects.R` (sourced during `data prep.R`)
 #####
 
-subject.barplot <- function(dataset_name = "noexcludes", 
+subject.barplot <- function(dataset_name = "knownprograms2001_2015", 
 						    top.many = 30, 		# Plot this many terms,
 						    					# starting from the top
-						    maxsum = 300,		# Set high to avoid "other"
-						    pct.deep = 0.5		# How far into the list of 
+						    maxsum = NULL,		# Set high to avoid "other"
+						    pct.deep = 0.5,		# How far into the list of 
 						    					# terms should we go? 
 						    					# Default of 0.5 means
 						    					# halfway, i.e. to the
 						    					# median; for all the way,
 						    					# set pct.deep=1.
+						    subj.column = "Subject.Terms"
 						    ) 
 {
 	# Get the data
 	dataset <- get(dataset_name)
-	subj.list <- extract_subjects(dataset$Subject)
+	subj.list <- extract_subjects(dataset[,subj.column])
 
 	# Get the frequency chart. 
 	# maxsum is needed to avoid "othering" half the list.
-	subj.table <- summary(subj.list, maxsum=300)
-
-	# Put the list in descending order by frequency, and chop out the term
-	# they all share
+	if(!is.null(maxsum)) {
+    	subj.table <- summary(subj.list, maxsum=maxsum)
+	} else {
+	    subj.table <- summary(subj.list, maxsum=length(subj.list))
+	}
+	
+	# Put the list in descending order by frequency, 
+	# and --chop out the term they all share-- NO THANK YOU, PAST SELF
 	subj.table <- sort(subj.table,decreasing=TRUE) 
-	subj.table <- subj.table[2:length(subj.table)] 
+	# subj.table <- subj.table[2:length(subj.table)] 
 
 	subj.count <- length(subj.table)
 	subj.mean <- mean(subj.table)
@@ -100,11 +105,14 @@ subject.barplot <- function(dataset_name = "noexcludes",
 		dev.off()
 	}
 	
-	return(sort(subj.table[1:top.many]))	
+	return(sort(subj.table[1:top.many], decreasing=T))	
 	
 } # end of wrapper function subject.barplot()
 
 if(autorun) {
 	remake_figs
 	subject.barplot()
+} else {
+    message("`subject terms barplot.R` loaded the following function: \n",
+            "subject.barplot(dataset_name = 'knownprograms2001_2015', ...)")
 }
