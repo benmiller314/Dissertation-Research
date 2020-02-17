@@ -19,12 +19,18 @@ summarize_topic_clusters <- function(
     
     ## A dissertation is "in" a cluster if it contains more than 
     #  what cumulative level of words from all topics in the cluster?
-    extent_level = c(0.12, 0.33, 0.50),
+    extent_level = 0.12,
     
     ## And how should we cluster those dissertations: 
     # use agglomerative (cluster::agnes) or
     # divisive (cluster::diana) clustering?    
     clust.method = "diana", 
+    
+    ## In output files, should we include topic names?
+    use.labels = TRUE,
+    
+    ## How many clusters to find?
+    nclust = 20,
     
     ## Where to save?
     outfile_slug = paste0("topic-cluster-summary--",
@@ -51,12 +57,13 @@ summarize_topic_clusters <- function(
     dt <- dt[, setdiff(names(dt), bad.topics), with=F]
     
     # Topic-word tables, to establish clusters of topics 
-    source(file="get topic word grid.R")
-    tw <- build.topicword.table(dataset_name=dataset_name, 
-                                ntopics=ntopics, 
-                                iter_index=iter_index,
-                                bad.topics=bad.topics)
-    
+    if (is.null(tw)) {
+        source(file="get topic word grid.R")
+        tw <- build.topicword.table(dataset_name=dataset_name, 
+                                    ntopics=ntopics, 
+                                    iter_index=iter_index,
+                                    bad.topics=bad.topics)
+    } 
     source(file="tfidf for topics.R")
     tf <- tfidf.for.topics(tw=tw)
     
@@ -99,23 +106,22 @@ summarize_topic_clusters <- function(
     
     pltree(clust)
     
-    for (lvl in extent_level) {
-        extent <- sapply(seq_len(nrow(cl)), FUN=function(x) {
-                cluster.strength(my.topics = strsplit(cl[x, members][[1]], ", ")[[1]], 
-                         dataset_name = dataset_name,
-                         ntopics = ntopics,
-                         iter_index = iter_index,
-                         subset_name=subset_name,
-                         bad.topics = bad.topics,
-                         cumulative = TRUE,
-                         level = lvl,
-                         grid = dt)
-                })
     
-        extent.vector <- round(100*unlist(extent["percentage", ]), 2)
-        colname <- paste0("extent", lvl*100)
-        cl[, eval(colname) := extent.vector]
-    }
+    extent <- sapply(seq_len(nrow(cl)), FUN=function(x) {
+            cluster.strength(my.topics = strsplit(cl[x, members][[1]], ", ")[[1]], 
+                     dataset_name = dataset_name,
+                     ntopics = ntopics,
+                     iter_index = iter_index,
+                     subset_name = subset_name,
+                     bad.topics = bad.topics,
+                     cumulative = TRUE,
+                     level = extent_level,
+                     grid = dt)
+            })
+    
+    extent.vector <- round(100*unlist(extent["percentage", ]), 2)
+
+    cl[, extent := extent.vector]
     
     message("Summary of topic clusters, ", 
             paste0(dataset_name, "k", ntopics, "_iter", iter_index, subset_name, ", using ", clust.method, ":"))
