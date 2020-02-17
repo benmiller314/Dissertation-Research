@@ -171,30 +171,7 @@ top.nonconsorts <- thresh(dataset="nonconsorts", until=until, since=since)$thres
 consorts.plus <- rbind(consorts, top.nonconsorts)
 rm("until", "since")
 
-# limit to 2001-2015
-noexcludes2001_2015 <- noexcludes[which(noexcludes$Year %in% seq(2001, 2015, 1)),]
-consorts2001_2015 <- consorts[which(consorts$Year %in% seq(2001, 2015, 1)),]
-realconsorts2001_2015 <- realconsorts[which(realconsorts$Year %in% seq(2001, 2015, 1)),]
-# nonconsorts2001_2015 <- noexcludes[which(noexcludes$Year %in% seq(2001, 2015, 1) &
-#                                    noexcludes$realconsort != 1 & 
-#                                    noexcludes$realrhetmap != 1),]
-rhetmaps2001_2015 <- rhetmaps[which(rhetmaps$Year %in% seq(2001, 2015, 1)),]
-realrhetmaps2001_2015 <- realrhetmaps[which(realrhetmaps$Year %in% seq(2001, 2015, 1)),]
-knownprograms2001_2015 <- knownprograms[which(knownprograms$Year %in% seq(2001, 2015, 1)),]
-nonconsorts2001_2015 <- noexcludes[noexcludes$Pub.number %in% setdiff(noexcludes2001_2015$Pub.number, knownprograms2001_2015$Pub.number),]
-
-
-# or just the new stuff
-noexcludes2011_2015 <- noexcludes[which(noexcludes$Year %in% seq(2011, 2015, 1)),]
-consorts2011_2015 <- consorts[which(consorts$Year %in% seq(2011, 2015, 1)),]
-realconsorts2011_2015 <- realconsorts[which(realconsorts$Year %in% seq(2011, 2015, 1)),]
-nonconsorts2011_2015 <- noexcludes[which(noexcludes$Year %in% seq(2011, 2015, 1)) &&
-                                       which(!noexcludes$realconsort != 1),]
-rhetmaps2011_2015 <- rhetmaps[which(rhetmaps$Year %in% seq(2011, 2015, 1)),]
-realrhetmaps2011_2015 <- realrhetmaps[which(realrhetmaps$Year %in% seq(2011, 2015, 1)),]
-knownprograms2011_2015 <- knownprograms[which(knownprograms$Year %in% seq(2011, 2015, 1)),]
-
-# better: make a subset for figuring out what you did for cccc grant in 2017ff
+# make a subset for figuring out what you did for cccc grant in 2017ff
 new_noexcludes <- noexcludes[-which(is.na(noexcludes$Link)), ]
 
 # five-year bins
