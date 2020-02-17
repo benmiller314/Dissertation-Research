@@ -29,7 +29,7 @@ library(parallel)
 # start of wrapper function	
 r2mallet <- function(
 				# Which datasets to examine?
-					datasets = c("knownprograms"),
+					datasets = c("noexcludes2001_2015"),
 				
 				# How many topics? Set kseq to a sequence to try several options.
 					kseq = c(10, 30, 50, 60, 100, 150),
@@ -63,10 +63,12 @@ r2mallet <- function(
                     # token_regex = "'\\p{L}[\\p{L}\\p{P}]*\\p{L}|\\p{L}'" 	)
 				# (letters possibly including punctuation; from Mallet website 20181130).
 				
-    				token_regex = "'\\p{L}+[\\p{L}\\p{Po}]*[-]?\\p{L}+'"    )
+    				token_regex = "'\\p{L}+[\\p{L}\\p{Po}]*[-]?\\p{L}+'"
 				# One or more letter, plus a string of zero or more letters, or punctuation characters that are not dashes,
 				# bracket, quote or connectors, plus zero or one hyphens, plus one or more letters. (This per
 				# http://www.regular-expressions.info/unicode.html.) Updated post-diss.
+				
+)
 {
 
 	# Loop through each dataset and (1) import instances 
@@ -114,29 +116,30 @@ r2mallet <- function(
 		# Train the model. Topic-number dependent.
 		# 3a. Start looping for each number of topics. 
 		# kseq is defined at the top of this file.
-		i <- 0       # TO DO: get smarter about iter_index: only advance if same k as previous
+		i <- 1
 		foreach(k = kseq) %do% {
-			i <- i + 1
+		   
 			# 2a. File names for output of model (extensions must be as shown)
 			# New naming convention: locate i within model name, e.g.
-			  model_name <- paste0(dataset_name, "k", k, "_", i)
-			  outputstate <- file.path(outputroot, paste0(model_name, "_topic-state.gz"))
+		    model_name <- paste0(dataset_name, "k", k, "_iter", i)
+		    outputstate <- file.path(outputroot, paste0(model_name, "_topic-state.gz"))
+			  
+			  # Check that the file above exists. If so, iterate model number; if not, create placeholder.
+		      while (file.exists(outputstate)) {      
+			      i <- i + 1
+			      model_name <- paste0(dataset_name, "k", k, "_iter", i)
+			      outputstate <- file.path(outputroot, paste0(model_name, "_topic-state.gz"))
+			  } 
+		    
+    	      system(paste("touch -a", outputstate))
+			  
 			  outputtopickeys <- file.path(outputroot, paste0(model_name, "_keys.txt"))
 			  outputdoctopics <- file.path(outputroot, paste0(model_name, "_composition.txt"))
 			  wordtopics <- file.path(outputroot, paste0(model_name, "_wordtopics.txt"))
 			  diagnostics <- file.path(outputroot, paste0(model_name, "_diagnostics.xml"))
 			
 			
-			# 2b. Check that the files above exist. If not, create blank ones.
-			if (system(paste0("[ -s ", outputstate, " ]"))) {
-				system(paste("touch -a", outputstate))
-			} else {
-			#   	go <- readline(paste("Outputstate file already exists", 
-			# 						 "and is not empty. Overwrite (Y/N)?"))
-			# 	  if(tolower(go) != "y") { 
-			# 		  stop("Never mind, then.") 
-			# 	  } 			
-			} 
+		
 
 			# 3b. String together command to send to MALLET via the shell  
 			train <- paste(mallet_cmd, "train-topics  --input", output,
