@@ -95,9 +95,9 @@ realconsorts_by_list <- function(dataset_name = "noexcludes",
         # from public alumni lists on departmental websites, and 
         # updated by Janetta Brundage and Michelle Hillock in spring 2018
         # new info pulled from Consortium member reports by Michael ____ (Eng dept work/study) spring 2019.
-        # alumni_file <- file.path(newdataloc, "known consortium graduates 2017-07-30.csv")  # older file
-        # alumni_file <- file.path(newdataloc, "known consortium graduates 2018-07-02.csv")  # older file
-        alumni_file <- file.path(newdataloc, "consortium-graduates-2019-06-Updated-6_14-reconciled-lastfirst.csv")
+        # alumni_file <- file.path(dataloc, "known consortium graduates 2017-07-30.csv")  # older file
+        # alumni_file <- file.path(dataloc, "known consortium graduates 2018-07-02.csv")  # older file
+        alumni_file <- file.path(dataloc, "consortium-graduates-2019-06-Updated-6_14-reconciled-lastfirst.csv")
     }
     
     if (is.null(matchlist_file)) {
@@ -444,8 +444,8 @@ realconsorts_ratios <- function(dataset_name = "consorts",
     
     if (is.null(alumni_file)) {
         # NB: this file assembled by Alyssa Hernandez from public alumni lists on departmental websites
-        # alumni_file <- file.path(newdataloc, "known consortium graduates 2017-07-30.csv")  # older file
-        alumni_file <- file.path(newdataloc, "known consortium graduates 2018-07-02.csv")
+        # alumni_file <- file.path(dataloc, "known consortium graduates 2017-07-30.csv")  # older file
+        alumni_file <- file.path(dataloc, "known consortium graduates 2018-07-02.csv")
     }
     
     if (file.exists(alumni_file)) {

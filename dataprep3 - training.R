@@ -84,7 +84,7 @@ for (i in tagnames) {
 
 nrow(to.return)
 
-filename <- file.path(newdataloc, "sample data for training2.csv")
+filename <- file.path(dataloc, "sample data for training2.csv")
 write.csv(to.return, filename)
 
 

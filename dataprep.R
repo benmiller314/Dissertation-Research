@@ -20,7 +20,7 @@ if (!exists("which_computer")) {
 ### define some broad parameters, since this file will always be run first
 
 # set the working directories, taking into account the GitHub setup
-sourceloc <- path.expand(file.path("~","Box Sync", "research", "dissertations", "data, code, and figures", "Dissertation-Research"))
+sourceloc <- normalizePath(file.path("~","Box Sync", "research", "dissertations", "data, code, and figures", "Dissertation-Research"))
 unixsourceloc <- sourceloc
 if(getwd() != sourceloc) {
 	setwd(sourceloc)
@@ -28,14 +28,13 @@ if(getwd() != sourceloc) {
 
 imageloc <- normalizePath(file.path(sourceloc, "../Dissertation Research - Figures"))
 dataloc <- normalizePath(file.path(sourceloc, ".."))
-newdataloc <- normalizePath(file.path("~", "Box Sync", "research", "dissertations"))
 malletloc <- normalizePath(file.path("~", "Applications", "mallet"))
 webloc <- normalizePath(file.path("~", "Documents", "Webdev", "datavis_testing"))
 fulltextloc <- file.path("/Volumes/Seagate_Backup_Plus_Drive/full-text_dissertations")
 if (which_computer == "work") {
     tmloc <- normalizePath(file.path(fulltextloc, "..", "topic_modeling"))
 } else if (which_computer == "laptop") {
-    tmloc <- normalizePath(file.path(newdataloc, "tm"))
+    tmloc <- normalizePath(file.path(dataloc, "..", "tm"))
 }
 WNHOME <- file.path("/usr", "local", "Cellar", "wordnet", "3.1")
 
@@ -64,7 +63,9 @@ tagnames.long <- c( "Clinical / Case Study",
 					"Other", 
 					"Pedagogical Projection"
 					)
-					
+
+no_ped_tagnames.long <- tagnames.long[-length(tagnames.long)]
+
 # provide a function to convert tag column labels to real tag names					
 realtags <- function(tag, tagset_name="tagnames") {
 	tagset <- get(tagset_name)

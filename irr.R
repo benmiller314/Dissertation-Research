@@ -24,7 +24,7 @@ source("simplifying the schema.R")
 require(irr)
 
 # invisible(readline("Select the csv file with metadata coded independently by two coders. (Press <Enter> to continue.)"))
-trainingset <- read.csv(file=file.path(newdataloc, "inter-rater reliability test data.csv"), header=TRUE)
+trainingset <- read.csv(file=file.path(dataloc, "inter-rater reliability test data.csv"), header=TRUE)
 
 coder1 <- "Sandra"
 coder2 <- "Andrew"
