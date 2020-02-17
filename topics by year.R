@@ -130,10 +130,10 @@ require(RColorBrewer)
         # start recording to file if desired
         if(remake_figs) {
             if(is.null(to.plot)) {
-                filename <- file.path(imageloc, paste0(maintitle, ", ", dataset_name, ntopics, subset_name, ", Topics ranked ",
+                filename <- file.path(imageloc, paste0(maintitle, ", ", dataset_name, "k", ntopics, subset_name, ", Topics ranked ",
                              i, "-", (i+per.plot-1), ".pdf"))
             } else {
-                filename <- file.path(imageloc, paste0(maintitle, ", ", dataset_name, ntopics, subset_name, ", Topics ",
+                filename <- file.path(imageloc, paste0(maintitle, ", ", dataset_name, "k", ntopics, subset_name, ", Topics ",
                              to.plot[i], "-", to.plot[i+per.plot-1], ".pdf"))
             }
             
@@ -363,7 +363,7 @@ if(autorun) {
     topic.variation(dataset_name=dataset_name, ntopics=ntopics, 
                    subset_name=subset_name, iter_index=iter_index,
                    bad.topics=bad.topics, 
-                   show.outliers=F,
+                   show.outliers=T,
                    use.labels=T)
     
     topic.variation(dataset_name="noexcludes", ntopics=55, iter_index="", subset_name = "realconsorts")
