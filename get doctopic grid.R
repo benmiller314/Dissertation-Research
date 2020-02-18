@@ -9,12 +9,14 @@
 # then run it here and read in the output.
 #####
 
-get.doctopic.grid <- function(dataset_name="consorts", 
-                              ntopics=55, 
-                              subset_name=NULL,
-                              iter_index="",
-                              doplot=F,
-                              do_reshape=F
+get.doctopic.grid <- function(dataset_name = "noexcludes2001_2015", 
+                              ntopics = 50, 
+                              subset_name = NULL,
+                              iter_index = "1",
+                              doplot = F,
+                              do_reshape = F,
+                              newnames = F       # newnames assumes iter_index is built into the model name;
+                                                 # if the iter_index appears at the very end of a filename, use newnames=F
                               ) {
 
     require(data.table)
@@ -25,7 +27,11 @@ get.doctopic.grid <- function(dataset_name="consorts",
     #                   The remaining columns are the topics.
     
     if(iter_index != "") {
-        filename <- file.path(tmloc, paste0(dataset_name, "k", ntopics, "_composition_", iter_index, ".txt"))
+        if(newnames) {
+            filename <- file.path(tmloc, paste0(dataset_name, "k", ntopics, "_iter", iter_index, "_composition.txt"))
+        } else {
+            filename <- file.path(tmloc, paste0(dataset_name, "k", ntopics, "_composition_", iter_index, ".txt"))
+        }
     } else {
         filename <- file.path(tmloc, paste0(dataset_name, "k", ntopics, "_composition.txt"))
     }

@@ -3,94 +3,98 @@
 # greater than (say) 10 or 5%. Map these into a (non-directed) source-target
 # edge table, for use in http://bl.ocks.org/mbostock/7607999 (hierarchical
 # edge bundling).
-# 
-# Strategy: 
-# 1. in each row i of X, find all columns with X[i,j] > level; call that A. 
+#
+# Strategy:
+# 1. in each row i of X, find all columns with X[i,j] > level; call that A.
 # 2. For all combinations of two elements in A, create a new row in a
 # source-target table called "cotopics."
-	
-	
-get.cotopics <- function(dataset_name="consorts", 
-		 ntopics=55, 
+
+
+get.cotopics <- function(dataset_name="consorts",
+		 ntopics=55,
 		 subset_name=NULL,
 		 iter_index="",
-		 level=.12, 			# what fraction of the doc (out of 1) must 
+		 newnames=F,         # where in the MALLET output filename does iter_index appear?
+		 							# set T if it's with the model, F if last in filename.
+									# Gets passed into get.doctopic.grid.
+		 level=.12, 			# what fraction of the doc (out of 1) must
 		 						# each topic account for?
 		 json=F, 				# export to JSON?
-		 min=3,					# how many times must these topics co-occur 
+		 min=3,					# how many times must these topics co-occur
 		 						# to be "co-topics"?
 		 bad.topics=c("2", "4", "22", "24", "47", "50", "13")
 		 						# exclude non-content-bearing topics
-		) 
+		)
 {
 
 	require(data.table)
 
-	if (!exists("get.doctopic.grid", mode="function")) { 
-		source(file="get doctopic grid.R") 
+	if (!exists("get.doctopic.grid", mode="function")) {
+		source(file="get doctopic grid.R")
 	}
-	grid <- get.doctopic.grid(dataset_name=dataset_name, ntopics=ntopics, 
-	                          subset_name=subset_name, iter_index=iter_index)$outputfile
+	grid <- get.doctopic.grid(dataset_name=dataset_name, ntopics=ntopics,
+	                          subset_name=subset_name, iter_index=iter_index,
+									  newnames=newnames)$outputfile
 	head(grid)
 	grid <- grid[, !names(grid) %in% bad.topics]
 	head(grid)
 
 	# start empty, build up.
-	cotopics <- data.frame(row.names=c("source","target"))	
-	for (i in 1:nrow(grid)) { 			# loop through the documents (rows). 
+	cotopics <- data.frame(row.names=c("source","target"))
+	for (i in 1:nrow(grid)) { 			# loop through the documents (rows).
 
 		# find which topics (columns) make up a big chunk.
-		A <- which(grid[i, 2:length(grid)] > level)			 
+		A <- which(grid[i, 2:length(grid)] > level)
 
 		# can't combine just one thing.
-		if (length(A) >= 2) {								
+		if (length(A) >= 2) {
 			# don't forget to get topic names, not col numbers!
-			A <- as.integer(names(grid[, 1+A]))			
-				
+			A <- as.integer(names(grid[, 1+A]))
+
 			# find all pairs of those big-chunk topics.
-			cotopics <- cbind(cotopics, combn(A,2))			
-		} 
+			cotopics <- cbind(cotopics, combn(A,2))
+		}
 	}
 
-	
+
 	# the data.frame gave us a wide array; switch to a long one.
 	cotopics <- t(cotopics)
-	
+
 	# as a data.table, we can do a fast sort and more besides
 	cotopics <- data.table(cotopics, key=c("source", "target"))
 
-	# for example, let's find unique source/target pairs, 
+	# for example, let's find unique source/target pairs,
 	# and count their occurrences! in one line! whee!
 	cotopics <- cotopics[, list(weight=.N), by=list(source, target)]
-	
+
 	# to reduce complexity, set a minimum number of co-occurrences
 	cotopics <- cotopics[which(weight > min), ]
 
-	# print and optionally save the result	
-	if(autorun) { 
-		print(cotopics) 
-		
-		if(remake_figs) { 
+	# print and optionally save the result
+	if(autorun) {
+		print(cotopics)
+
+		if(remake_figs) {
 			if(json) {
 				require(jsonlite)
 				filename <- paste0(imageloc, dataset_name, "k", ntopics, subset_name,
 								   "_edges_", level*100, ".json")
 				cat(toJSON(cotopics), file=filename)
 			} else {
-			filename <- paste0(imageloc, "co-topic edge table, ", 
-							dataset_name, "k", ntopics, subset_name, level*100, 
+			filename <- paste0(imageloc, "co-topic edge table, ",
+							dataset_name, "k", ntopics, subset_name, level*100,
 							"pct_nobads.csv")
 			write.csv(cotopics, filename)
 			}
 		}
 	}
-	
+
 	# and pass it back to the calling environment
 	return(cotopics)
 }
 
-if(autorun) { 
-	get.cotopics(level=0.2, min=2) 
+if(autorun) {
+	get.cotopics(level=0.2, min=2)
 }
 
 # Other options
@@ -106,4 +110,3 @@ if(autorun) {
   # targets <- strsplit(targets$V1, ",")
   # weights <- cotopics20[, .SD[, paste(weight, collapse=",")], by=source]
   # weights <- strsplit(weights$V1, ",")
-  
