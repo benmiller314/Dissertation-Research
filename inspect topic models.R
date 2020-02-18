@@ -12,7 +12,7 @@ summarize_topic_clusters <- function(
     dataset_name = "noexcludes2001_2015",
     ntopics = 50,
     iter_index = 1,
-    newnames=F,         # where in the MALLET output filename does iter_index appear?
+    newnames = F,         # where in the MALLET output filename does iter_index appear?
                         # set T if it's with the model, F if last in filename.
                         # Gets passed into get.doctopic.grid.
 
