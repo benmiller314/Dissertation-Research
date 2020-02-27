@@ -41,7 +41,8 @@ frameToJSON <- function(dataset_name="noexcludes2001_2015",
                         bad.topics= NULL,
                                         # exclude non-content-bearing topics
                         auto.lines=FALSE, # should we draw all the boxes on autorun?
-                        tw = NULL)      # a topic-word matrix, if it exists
+                        tw = NULL,      # a topic-word matrix, if it exists
+                        twm = NULL)     # the distance matrix for tw, if it exists
 {
 
   #packages we will need:
@@ -92,17 +93,21 @@ frameToJSON <- function(dataset_name="noexcludes2001_2015",
   #Rolf: calculate the correlation matrix
 
   # Ben: We'll use topic-word vectors, instead of topic-document
-  if(!exists("topic_distance_matrix", mode="function")) {
-    source(file="topic_term_synonyms.R")
+  if (is.null(twm)) {
+      if(!exists("topic_distance_matrix", mode="function")) {
+        source(file="topic_term_synonyms.R")
+      }
+    
+      t <- topic_distance_matrix(dataset_name = dataset_name,
+                                 ntopics = ntopics,
+                                 iter_index = iter_index,
+                                 dist_method = "jensen-shannon",
+                                 tw = tw,
+                                 bad.topics = bad.topics)
+  } else {
+    t <- twm    # back compatibility
   }
-
-  t <- topic_distance_matrix(dataset_name = dataset_name,
-                             ntopics = ntopics,
-                             iter_index = iter_index,
-                             dist_method = "jensen-shannon",
-                             tw = tw,
-                             bad.topics = bad.topics)
-
+      
   #Rolf: calculate the hierarchical cluster structure
   #from the correlation scores
   # Ben: topic_clusters() is also from topic_term_synonyms.R
