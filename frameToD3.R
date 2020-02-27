@@ -390,7 +390,7 @@ frameToJSON <- function(dataset_name="noexcludes2001_2015",
           message("Exiting function.")
           message("Using abline() and rect.hclust(), try various cut levels
                     until you find a set that seems promising.")
-          return() ## TO DO: instead of exiting, can we pause somehow but preserve the environment?
+          return(hc) ## TO DO: instead of exiting, can we pause somehow but preserve the environment?
                    ## We still need hc to do the cuts.
       }
   }   # end of if(do.plot)

@@ -16,8 +16,8 @@ summarize_topic_clusters <- function(
                         # set T if it's with the model, F if last in filename.
                         # Gets passed into get.doctopic.grid.
 
-    ## Narrow within it?
-    subset_name = "knownprograms2001_2015",
+    ## Narrow within it? Set either to NULL if not using.
+    subset_name = "knownprograms2001_2015",          
     bad.topics = c(3, 12, 50, 47, 34, 36, 30, 8, 15),
 
     ## A dissertation is "in" a cluster if it contains more than
@@ -34,6 +34,10 @@ summarize_topic_clusters <- function(
 
     ## How many clusters to find?
     nclust = 20,
+    find.nclust = FALSE,    # if TRUE, ignore nclust and plot a dendrogram of topics with frameToJSON (from frameToD3.R).
+                            # The function will then exit.
+                            # Use rect.hclust and abline to find alternate "cuts" for the next model to build.
+                            # Should also be useful for identifying bad topics.
 
     ## Where to save?
     outfile_slug = paste0("topic-cluster-summary--",
@@ -66,6 +70,7 @@ summarize_topic_clusters <- function(
         tw <- build.topicword.table(dataset_name=dataset_name,
                                     ntopics=ntopics,
                                     iter_index=iter_index,
+                                    newnames=newnames,
                                     bad.topics=bad.topics)
     }
     source(file="tfidf for topics.R")
@@ -78,6 +83,23 @@ summarize_topic_clusters <- function(
                                  iter_index = iter_index,
                                  bad.topics = bad.topics,
                                  tw=tw)
+    
+    if(find.nclust) {
+        source(file="frameToD3.R")
+        
+        hc <- frameToJSON(dataset_name = dataset_name,
+                    ntopics = ntopics,
+                    subset_name = subset_name,
+                    iter_index = iter_index,
+                    newnames = newnames,
+                    clust.method = clust.method,
+                    use.labels = use.labels,
+                    tw = tw,
+                    twm = twm,
+                    do.plot = TRUE)
+        
+        return(hc)  # keep plotting this with various cuts using hclust and abline until you're happy with a new cluster size.
+    }
 
     clust <- topic_clusters(twm=twm,
                          dataset_name = dataset_name,
@@ -89,7 +111,7 @@ summarize_topic_clusters <- function(
                          use.labels=use.labels)
 
     ############ Inspect Tree, Set Number of Clusters ############
-    nclust <- 20    # TO DO: iterate this
+    # nclust <- 20    # TO DO: iterate this via parameters
 
     ############ Summarize Topic Clusters ############
     cl <- tree_summary(tw = tw,
