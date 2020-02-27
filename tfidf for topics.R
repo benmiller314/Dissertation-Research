@@ -89,9 +89,10 @@ compare_topic_vocablists <- function(tf,        # result from above
 
 # testing area / examples
 if(FALSE) {
+    remake_figs
     tf <- tfidf.for.topics(tw=tw)    
-    compare_topic_vocablists(tf, 1)
-    lapply(1:ntopics, function(x) compare_topic_vocablists(tf, x))
+    compare_topic_vocablists(tf=tf, mytopic=1)
+    lapply(1:ntopics, function(x) compare_topic_vocablists(tf=tf, mytopic=x))
 }
 
 
