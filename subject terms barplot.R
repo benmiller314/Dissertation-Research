@@ -109,10 +109,27 @@ subject.barplot <- function(dataset_name = "knownprograms2001_2015",
 	
 } # end of wrapper function subject.barplot()
 
+###### Function to limit results by subject term ######
+subject.search <- function(term = NULL,
+                           dataset_name = "knownprograms2001_2015", 
+                           subj.column = "Subject.Terms",
+                           ignore.case = TRUE ) {
+    if(is.null(term)) {
+        stop("subject.search(): term to search for is required.")
+    }
+    
+    dataset <- get(dataset_name)
+    index <- grep(term, dataset[, subj.column], ignore.case=ignore.case)
+    
+    return(dataset[index, ])
+}
+
+
 if(autorun) {
 	remake_figs
 	subject.barplot()
 } else {
-    message("`subject terms barplot.R` loaded the following function: \n",
-            "subject.barplot(dataset_name = 'knownprograms2001_2015', ...)")
+    message("`subject terms barplot.R` loaded the following functions: \n",
+            "subject.barplot(dataset_name = 'knownprograms2001_2015', ...) \n",
+            "subject.search(term, dataset_name = 'knownprograms2001_2015', ...)")
 }

@@ -13,8 +13,11 @@ if(!exists("get.topickeys", mode="function")) {
 get_topic_labels <- function(dataset_name="consorts", 
                              ntopics=55, 
                              subset_name=NULL, 
-                             iter_index="") 
-{
+                             iter_index="",
+                             newnames=F     # where in the MALLET output filename does iter_index appear?
+                                            # Set T if it's with the model, F if last in filename.
+                                            # Gets used only if get.topickeys() is needed.
+) {
 	# original filename structure
     filename <- file.path(imageloc, paste0("topic labeling - ", dataset_name, ", K",
 						 ntopics, iter_index, ".csv"))
@@ -27,7 +30,7 @@ get_topic_labels <- function(dataset_name="consorts",
 		data.table(read.csv(filename), key="Topic"), 
 		error = function(e) {
 	  		message("File not found; using top words instead.")
-	  		keys <- get.topickeys(dataset_name=dataset_name, ntopics=ntopics, iter_index=iter_index)
+	  		keys <- get.topickeys(dataset_name=dataset_name, ntopics=ntopics, iter_index=iter_index, newnames=newnames)
 	  		outfile <- paste0(webloc, "/", dataset_name, "k", ntopics,
 	  						 "_clusters_topwords", iter_index, ".json")	
 	  		return(data.table(Topic = 1:ntopics, 

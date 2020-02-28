@@ -17,11 +17,11 @@ get.wordtopic.grid <- function(dataset_name = "noexcludes2001_2015",
                                iter_index = 1,
                                newnames = F        # where in the MALLET output filename does iter_index appear?
                                                    # set T if it's with the model, F if last in filename.
-{
+){
     require(data.table)
 
     if(newnames) {
-         filename <- paste0(dataset_name, "k", ntopics, "_iter", iter_index, "wordtopics.txt")
+         filename <- paste0(dataset_name, "k", ntopics, "_iter", iter_index, "_wordtopics.txt")
     } else {
          filename <- paste0(dataset_name, "k", ntopics, "_wordtopics_", iter_index, ".txt")
     }

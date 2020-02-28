@@ -30,7 +30,7 @@ imageloc <- normalizePath(file.path(sourceloc, "../Dissertation Research - Figur
 dataloc <- normalizePath(file.path(sourceloc, ".."))
 malletloc <- normalizePath(file.path("~", "Applications", "mallet"))
 webloc <- normalizePath(file.path("~", "Documents", "Webdev", "datavis_testing"))
-fulltextloc <- file.path("/Volumes/Seagate_Backup_Plus_Drive/full-text_dissertations")
+fulltextloc <- file.path("/Volumes/ExPostFATo/full-text_dissertations")
 if (which_computer == "work") {
     tmloc <- normalizePath(file.path(fulltextloc, "..", "topic_modeling"))
 } else if (which_computer == "laptop") {

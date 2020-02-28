@@ -1,11 +1,21 @@
 ## get topickeys.R
 #  GOAL: Given a dataset and number of topics, read in the top words for each topic in that topic model.
 
-get.topickeys <- function(dataset_name="consorts", ntopics=55, iter_index="") {
+get.topickeys <- function(dataset_name="consorts", 
+                          ntopics=55, 
+                          iter_index="", 
+                          newnames=F          # where in the MALLET output filename does iter_index appear?
+                                              # Set T if it's with the model, F if last in filename.
+) {
 	# get packages in case we've just restarted R
 	require(data.table)
 	
-	filename <- file.path(tmloc, paste0(dataset_name, "k", ntopics, "_keys_", iter_index, ".txt"))
+    if(newnames) {
+        filename <- file.path(tmloc, paste0(dataset_name, "k", ntopics, "_iter", iter_index, "_keys.txt"))
+    } else {
+        filename <- file.path(tmloc, paste0(dataset_name, "k", ntopics, "_keys_", iter_index, ".txt"))    
+    }
+	
 	topic_keys.dt <- as.data.table(read.delim(filename, header=F))
 	setnames(topic_keys.dt, c("V1", "V2", "V3"), c("topic", "alpha", "top_words"))
 	names(topic_keys.dt)
