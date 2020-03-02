@@ -66,7 +66,7 @@ summarize_topic_clusters <- function(
 
     # Topic-word tables, to establish clusters of topics
     if (is.null(tw)) {
-        source(file="get topic word grid.R")
+        source(file="get_topic_word_grid.R")
         tw <- build.topicword.table(dataset_name=dataset_name,
                                     ntopics=ntopics,
                                     iter_index=iter_index,

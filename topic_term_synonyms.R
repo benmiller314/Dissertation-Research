@@ -101,7 +101,7 @@ two_topic_synonyms <- function(topic_a,
 #       * calculate distances between all pairs of topics above a threshold weight
 #       * if distance is below a certain threshold, find synonyms
 #       * add topic labels to output, not just topic numbers
-#  DONE * use new topic-word tables from "get topic word grid.R" instead of default top 20 words
+#  DONE * use new topic-word tables from "get_topic_word_grid.R" instead of default top 20 words
 
 
 # Calculate distances between two topics
@@ -119,7 +119,7 @@ two_topic_distance <- function(topic_a,     # just a number in 1:ntopics
     require(philentropy)
 
     if(!exists("topicword.probability.grid", mode="function")) {
-        source(file="get topic word grid.R")
+        source(file="get_topic_word_grid.R")
     }
 
     # if we don't have a topic-word matrix, let's get one here,
@@ -159,7 +159,7 @@ topic_distance_matrix <- function(dataset_name="noexcludes2001_2015",
     require(philentropy)
 
     if(!exists("topicword.probability.grid", mode="function")) {
-        source(file="get topic word grid.R")
+        source(file="get_topic_word_grid.R")
     }
 
     # if we have tw.grid, skip ahead to getting distances. otherwise, build tw.grid.

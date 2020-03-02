@@ -34,7 +34,7 @@ get.wordtopic.grid <- function(dataset_name = "noexcludes2001_2015",
         )
         wt <- data.table(wt)
     } else {
-        stop("'get topic word grid.R': could not load word-topic pairs from file ",
+        stop("'get_topic_word_grid.R': could not load word-topic pairs from file ",
              filename)
     }
 
@@ -210,7 +210,7 @@ one.tw.probability.vector <- function(mytopic,     # just a number in 1:ntopics
     if(is.null(tw)) {
         # Get the topic-word info
         if(!exists("build.topicword.table", mode="function")) {
-            source(file="get topic word grid.R")
+            source(file="get_topic_word_grid.R")
         }
 
         tw <- build.topicword.table(dataset_name=dataset_name,
