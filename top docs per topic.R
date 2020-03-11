@@ -56,6 +56,8 @@ get.topics4doc <- function(pubnum,
     # get packages in case we've just restarted R
     require(data.table)
 
+    dataset.dt <- data.table(get(dataset_name), key="Pub.number")
+    
     # pubnum <- "3051708"; doc_tops <- doc_topics.dt    # test values
 
     if (!is.character(pubnum)) {
@@ -89,6 +91,8 @@ get.topics4doc <- function(pubnum,
                                         top_words)]
         topic_keys
     }
+    
+    
     list("title" = dataset.dt[pubnum, c("Title", "Pub.number", tagnames),
                                  with=F],
         "keys" = topic_keys,
@@ -314,8 +318,22 @@ top_topic_browser <- function(
                                  "rank_in_doc", tagnames), with=F]
 
         print(topdocs)
+        
+        if(for.bind) {
+            if(i < cutoff) {
+                message("Multiple topics requested, but for.bind option is currently configured ",
+                    "for only one topic at a time. Returning top ", depth, " docs for topic ", topic.num,
+                    " (rank ", i, ")")
+            } else if (i == cutoff) {
+                return(topdocs)
+            } else {
+                stop("Well, this is embarrassing. Somehow we got above the cutoff. Please
+                        debug(top_topic_browser).")
+            }
+            
+        }
 
-        if (!remake_figs && !for.bind) {
+        if (!remake_figs) {
             a <- readline(paste("Press <enter> for more detail",
                         "on these docs, or S to skip to the next topic: \n"))
         } else {
@@ -535,5 +553,5 @@ if(FALSE) {
                                 topic=32)
     top10topics <- top_topic_browser(dataset_name="noexcludes2001_2015", ntopics=50, iter_index=1,
                       subset_name="knownprograms2001_2015",
-                      depth=3, showlabels=T, start.rank=1, for.bind=T, cutoff=1)
+                      depth=3, showlabels=T, start.rank=1, for.bind=T, cutoff=2)
 }
