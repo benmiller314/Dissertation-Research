@@ -43,10 +43,10 @@ if(!exists("get.topickeys", mode="function")) {
 
 ### Helper function: retrieve top five topics for a given Pub.number
 get.topics4doc <- function(pubnum,
-                           dataset_name = "consorts",
-                           ntopics = 55,
-                           subset_name = "",
-                           iter_index = "",
+                           dataset_name = "noexcludes2001_2015",
+                           ntopics = 50,
+                           subset_name = "knownprograms2001_2015",
+                           iter_index = 1,
                            newnames=F,         # where in the MALLET output filename does iter_index appear?
                                                # set T if it's with the model, F if last in filename.
                                                # Gets passed into get.doctopic.grid.
@@ -71,7 +71,7 @@ get.topics4doc <- function(pubnum,
     this_doc_tops <- this_doc_tops[, order(this_doc_tops, decreasing = T), with=F][,1:howmany, with=F]
 
     # merge weights with keys: from all keys, narrow to just the top howmany in this doc
-    topic_keys <- data.table(get.topickeys(dataset_name, ntopics, iter_index=iter_index))
+    topic_keys <- data.table(get.topickeys(dataset_name, ntopics, iter_index=iter_index, newnames=newnames))
     topic_keys <- topic_keys[as.numeric(names(this_doc_tops))]
     topic_keys[,weight:=as.numeric(this_doc_tops)]
 
@@ -89,10 +89,10 @@ get.topics4doc <- function(pubnum,
                                         top_words)]
         topic_keys
     }
-    list("title" = noexcludes.dt[pubnum, c("Title", "Pub.number", tagnames),
+    list("title" = dataset.dt[pubnum, c("Title", "Pub.number", tagnames),
                                  with=F],
         "keys" = topic_keys,
-        "abstract" = noexcludes.dt[pubnum, c("KEYWORDS", "ABSTRACT"), with=F]
+        "abstract" = dataset.dt[pubnum, c("KEYWORDS", "ABSTRACT"), with=F]
         )
 
 # close helper function get.topics4doc
@@ -114,7 +114,7 @@ top_topic_browser <- function(
                               # set T if it's with the model, F if last in filename.
                               # Gets passed into get.doctopic.grid.
                               newnames = FALSE,
-                              
+
                               # assuming we're looping, start where?
                               start.rank = 1,
 
@@ -144,7 +144,7 @@ top_topic_browser <- function(
         source(file=file.path(sourceloc, "get doctopic grid.R"))
     }
 
-
+    
     grids <- get.doctopic.grid(dataset_name=dataset_name, ntopics=ntopics, subset_name=subset_name, iter_index=iter_index, newnames=newnames)
         colsums <- grids$colsums
         colsums.sort <- grids$colsums.sort
@@ -152,12 +152,14 @@ top_topic_browser <- function(
         doc_topics.dt <- grids$outputfile.dt
     rm(grids)
 
-
+    # get document data
+    dataset.dt <- data.table(get(dataset_name), key="Pub.number")
+    
     if(! exists("get.topickeys", mode = "function")) {
         source(file=file.path(sourceloc, "get topickeys.R"))
     }
 
-    topic_keys.dt <- get.topickeys(dataset_name, ntopics, iter_index=iter_index)
+    topic_keys.dt <- get.topickeys(dataset_name, ntopics, iter_index=iter_index, newnames=newnames)
 
     # List the keys for the top N topics, where N = cutoff
     len <- min(length(colsums)-1, cutoff)
@@ -199,7 +201,7 @@ top_topic_browser <- function(
         print(topic_keys.dt[as.integer(topic.num)])
 
         # list of top 1:depth documents for this topic
-        topdocs <- noexcludes.dt[as.character(diss.ind),
+        topdocs <- dataset.dt[as.character(diss.ind),
                                 c("Pub.number", "Title", tagnames), with=F]
 
 
@@ -255,7 +257,7 @@ top_topic_browser <- function(
                 if (tolower(a) == "s") {
                     break
                 } else if (tolower(a) == "d") {
-                    print(noexcludes.dt[i])
+                    print(dataset.dt[i])
                     a <- readline(paste("Press <enter> for next doc",
                                     "or S to skip to the next topic: \n"))
                 }
@@ -289,7 +291,7 @@ top_topic_browser <- function(
         print(topic_keys.dt[as.integer(topic.num)])
 
         # list of top 1:depth documents for this topic
-        topdocs <- noexcludes.dt[as.character(diss.ind),                ## UH OH: We shouldn't just use noexcludes.dt
+        topdocs <- dataset.dt[as.character(diss.ind),                
                         c("Pub.number", "Title", tagnames), with=F]
 
             # add a column with the weights this topic has in these docs
@@ -313,7 +315,7 @@ top_topic_browser <- function(
 
         print(topdocs)
 
-        if (!remake_figs) {
+        if (!remake_figs && !for.bind) {
             a <- readline(paste("Press <enter> for more detail",
                         "on these docs, or S to skip to the next topic: \n"))
         } else {
@@ -337,7 +339,7 @@ top_topic_browser <- function(
                 } else if (tolower(a) == "u") {
                     i <- i-1
                 } else if (tolower(a) == "d") {
-                    print(noexcludes.dt[i])
+                    print(dataset.dt[i])
                     a <- readline(paste("Press <enter> for next doc or",
                                         "S to skip to the next topic: \n"))
                 }
@@ -391,7 +393,7 @@ top_topic_browser <- function(
 
         # print(topic_keys.dt[topic.num])
 
-        # topdocs <- noexcludes.dt[as.character(diss.ind), c("Pub.number", "Title", tagnames), with=F]
+        # topdocs <- dataset.dt[as.character(diss.ind), c("Pub.number", "Title", tagnames), with=F]
 
         # print(topdocs)
 
@@ -440,9 +442,10 @@ shareable_topic <- function(  # where will our topic assignments come from?
     index <- as.character(a$Pub.number)
     ignore.cols <- c(tagnames, tagnames.simple, "Method.Terms", "Flag.notes", "Method.Count", "Exclude.Level", "Counts.simple")
 
-
-    docs <- noexcludes.dt[index]
-    docs <- docs[, !(names(noexcludes.dt) %in% ignore.cols), with=F]
+    dataset.dt <- data.table(get(dataset_name), key="Pub.number")
+    
+    docs <- dataset.dt[index]
+    docs <- docs[, !(names(dataset.dt) %in% ignore.cols), with=F]
     # names(docs)
     # names(a)
     docs$topic_weight <- a$topic_weight
@@ -455,15 +458,48 @@ shareable_topic <- function(  # where will our topic assignments come from?
     head(docs, 1)
 
     if(remake_figs) {
-        filename <- paste0(imageloc, "top ", depth, " documents for topic ", topic, ", ",
-                       dataset_name, "k", ntopics, subset_name, iter_index, ".csv")
+        # filename <- file.path(imageloc, paste0("top ", depth, " documents for topic ", topic, ", ",
+        #                dataset_name, "k", ntopics, subset_name, iter_index, ".csv"))
+        if(!exists("build_plot_title")) {
+            source(file="build_plot_title.R")
+        }
+        filename <- build_plot_title(dataset_name=dataset_name,
+                                     ntopics=ntopics,
+                                     iter_index=iter_index,
+                                     subset_name=subset_name,
+                                     whatitis=paste("top", depth, "documents for topic", topic),
+                                     for.filename = T)
+        
         write.csv(docs, filename)
     } else {
         warning("This function usually saves to .csv, but remake_figs is off.")
         warning("Printing to screen only.")
         print(docs)
     }
+    
+    return(docs)
 }
+
+# convenience function to show the top terms and documents for the top @howmany topics
+top_topic_table <- function(howmany=10,  # how many topics to show?
+                            dataset_name="noexcludes2001_2015",
+                            ntopics=50,
+                            iter_index=1,
+                            subset_name="knownprograms2001_2015",
+                            depth=3,        # how many titles per topic?
+                            showlabels=TRUE)
+{
+    a <- top_topic_browser(dataset_name=dataset_name,
+                           ntopics=ntopics,
+                           subset_name=subset_name,
+                           showlabels=showlabels,
+                           iter_index=iter_index,
+                           for.bind=T)
+    
+    
+}
+
+
 
 ## Run the big browser function above
 if (autorun) {
@@ -492,6 +528,12 @@ if(FALSE) {
     remake_figs=F
     top_topic_browser(dataset_name="noexcludes2001_2015", ntopics=50, iter_index=1,
                       depth=10)
-    top_topic_browser(dataset_name="noexcludes2001_2015", ntopics=50, iter_index=1,
-                      depth=10, showlabels=T, topic=41)
+    toptopic <- shareable_topic(dataset_name = "noexcludes2001_2015",
+                                ntopics=50,
+                                iter_index=1,
+                                subset_name = "knownprograms2001_2015",
+                                topic=32)
+    top10topics <- top_topic_browser(dataset_name="noexcludes2001_2015", ntopics=50, iter_index=1,
+                      subset_name="knownprograms2001_2015",
+                      depth=3, showlabels=T, start.rank=1, for.bind=T, cutoff=1)
 }
