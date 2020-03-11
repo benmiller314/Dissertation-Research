@@ -276,6 +276,11 @@ top_topic_browser <- function(
     message("Top ", cutoff, " topics:")
     print(topic_keys.dt[ind])               # top words for each topic
 
+    if(for.bind) {
+        # set up a container for docs to return
+        to.return <- data.table()
+    }
+    
     for (i in start.rank:len) {
         # i gives the topic rank
         topic.num <- ind[i]
@@ -317,27 +322,41 @@ top_topic_browser <- function(
             topdocs <- topdocs[, c("Pub.number", "Title", "topic_weight",
                                  "rank_in_doc", tagnames), with=F]
 
-        print(topdocs)
+        
         
         if(for.bind) {
-            if(i < cutoff) {
-                message("Multiple topics requested, but for.bind option is currently configured ",
-                    "for only one topic at a time. Returning top ", depth, " docs for topic ", topic.num,
-                    " (rank ", i, ")")
-            } else if (i == cutoff) {
-                return(topdocs)
-            } else {
+            # presumably we'll want to distinguish one topic from another
+            topdocs[, topic:=topic.num]
+            topdocs[, topic_rank:=i]
+            setcolorder(topdocs, c("topic", "topic_rank"))
+            
+            # but still have the option to return multiple topics 
+            to.return <- rbind(to.return, topdocs)
+            
+            if(i > cutoff) {
                 stop("Well, this is embarrassing. Somehow we got above the cutoff. Please
                         debug(top_topic_browser).")
-            }
             
-        }
-
-        if (!remake_figs) {
-            a <- readline(paste("Press <enter> for more detail",
-                        "on these docs, or S to skip to the next topic: \n"))
-        } else {
+            } else if (i == cutoff) {
+                return(to.return)
+                
+            } else {
+                # continue to next topic in loop
+                a <- "s"
+            }
+        } else if (remake_figs) {
+            # if outputting to file, get all the details
+            print(topdocs)
+            
             a <- ""
+            
+        } else {
+            # if neither binding to a variable or outputting to file, 
+            # assume we're in interactive mode and prompt for what to do next.
+            print(topdocs)
+            
+            a <- readline(paste("Press <enter> for more detail",
+                                "on these docs, or S to skip to the next topic: \n"))
         }
 
         while (tolower(a) != "s") {
@@ -507,14 +526,38 @@ top_topic_table <- function(howmany=10,  # how many topics to show?
                             depth=3,        # how many titles per topic?
                             showlabels=TRUE)
 {
-    a <- top_topic_browser(dataset_name=dataset_name,
+    ttt <- top_topic_browser(dataset_name=dataset_name,
                            ntopics=ntopics,
                            subset_name=subset_name,
                            showlabels=showlabels,
                            iter_index=iter_index,
+                           depth=depth,
+                           cutoff=howmany,
                            for.bind=T)
     
+    ttt <- ttt[, list(topic, topic_rank, Title, topic_weight, rank_in_doc)]
+    head(ttt)
     
+    ttt[, .(Titles = paste(paste0(Title, " (", 100*round(topic_weight, 2), "%)"), collapse=" || ")), by=topic]
+    
+    # TO DO: 
+    # add in the top keywords by_tfitf (or make it an option to do by_prob),
+    # so I don't have to merge by hand in Excel
+    
+    if(remake_figs) {
+        if(!exists ("build_plot_title")) {
+            source(file="build_plot_title.R")
+        }
+        
+        outfile <- build_plot_title(dataset_name=dataset_name,
+                                    ntopics=ntopics,
+                                    iter_index = iter_index,
+                                    subset_name = subset_name,
+                                    whatitis = paste("top", depth, "titles for top", cutoff, "topics"),
+                                    for.filename = TRUE)
+        outfile <- file.path(imageloc, paste0(outfile, ".csv"))
+        write.csv(ttt, outfile)
+    }
 }
 
 
@@ -553,5 +596,6 @@ if(FALSE) {
                                 topic=32)
     top10topics <- top_topic_browser(dataset_name="noexcludes2001_2015", ntopics=50, iter_index=1,
                       subset_name="knownprograms2001_2015",
-                      depth=3, showlabels=T, start.rank=1, for.bind=T, cutoff=2)
+                      depth=3, showlabels=T, start.rank=1, for.bind=T, cutoff=10)
+    
 }
