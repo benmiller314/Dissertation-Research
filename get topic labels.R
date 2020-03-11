@@ -14,13 +14,14 @@ get_topic_labels <- function(dataset_name="consorts",
                              ntopics=55, 
                              subset_name=NULL, 
                              iter_index="",
+                             bad.topics=NULL,
                              newnames=F     # where in the MALLET output filename does iter_index appear?
                                             # Set T if it's with the model, F if last in filename.
                                             # Gets used only if get.topickeys() is needed.
 ) {
-	# original filename structure
-    filename <- file.path(imageloc, paste0("topic labeling - ", dataset_name, ", K",
-						 ntopics, iter_index, ".csv"))
+# 	# original filename structure
+#     filename <- file.path(imageloc, paste0("topic labeling - ", dataset_name, ", K",
+# 						 ntopics, iter_index, ".csv"))
     # better filename structure
     filename <- file.path(imageloc, paste0("topic-labeling--", dataset_name, "k",
                          ntopics, "_", iter_index, ".csv"))
@@ -30,9 +31,12 @@ get_topic_labels <- function(dataset_name="consorts",
 		data.table(read.csv(filename), key="Topic"), 
 		error = function(e) {
 	  		message("File not found; using top words instead.")
-	  		keys <- get.topickeys(dataset_name=dataset_name, ntopics=ntopics, iter_index=iter_index, newnames=newnames)
-	  		outfile <- paste0(webloc, "/", dataset_name, "k", ntopics,
-	  						 "_clusters_topwords", iter_index, ".json")	
+	  		keys <- get.topickeys(dataset_name=dataset_name, 
+	  		                      ntopics=ntopics, 
+	  		                      iter_index=iter_index, 
+	  		                      newnames=newnames)
+	  		outfile <- file.path(webloc, paste0(dataset_name, "k", ntopics,
+	  						 "_clusters_topwords", iter_index, ".json"))	
 	  		return(data.table(Topic = 1:ntopics, 
 	  						  Label = keys$top_words))
 	  	},
@@ -66,6 +70,10 @@ get_topic_labels <- function(dataset_name="consorts",
 	    head(topic.labels.dt)
 	    topic.labels.dt[ranked_topics$Topic]$Pct.Contrib <- ranked_topics$Pct.Contrib
 	    topic.labels.dt[ranked_topics$Topic]$Rank <- ranked_topics$Rank
+	if(!is.null(bad.topics)) {
+	    index <- setdiff(topic.labels.dt$Topic, bad.topics)
+	    topic.labels.dt <- topic.labels.dt[index]
+	}
 	}
 	
 	return(topic.labels.dt)
@@ -73,5 +81,15 @@ get_topic_labels <- function(dataset_name="consorts",
 }
 
 if(autorun) {
-    topic_labels <- get_topic_labels("noexcludes2001_2015", ntopics=50, iter_index=1)
+    remake_figs
+    topic_labels <- get_topic_labels("noexcludes2001_2015", 
+                                     ntopics=50, 
+                                     iter_index=1, 
+                                     newnames=T)
+    topic_labels <- get_topic_labels("noexcludes2001_2015", 
+                                     ntopics=50, 
+                                     iter_index=1, 
+                                     subset_name="knownprograms2001_2015", 
+                                     newnames=T,
+                                     bad.topics=c("3", "8", "12", "15", "30", "34", "36", "47", "50"))
 }

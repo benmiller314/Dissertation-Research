@@ -1,6 +1,6 @@
 # Ben: helper function to build a filename / main title for topic-modeling figures
-build_plot_title <- function(dataset_name, ntopics, iter_index, subset_name,
-                             bad.topics, use.labels=FALSE,
+build_plot_title <- function(dataset_name, ntopics, iter_index, subset_name=NULL,
+                             bad.topics=NULL, use.labels=FALSE,
                              whatitis="Cluster Dendrogram",
                              for.filename=FALSE) {
     if(! is.null(subset_name)) { subset_part <- paste0("--", subset_name)

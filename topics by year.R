@@ -68,8 +68,9 @@ require(RColorBrewer)
     if(!exists("get_topic_labels", mode="function")) {
         source(file="get topic labels.R")
     }
-    topic.labels.dt <- get_topic_labels(dataset_name=dataset_name, ntopics=ntopics,
-                                        subset_name=subset_name, iter_index=iter_index)
+        topic.labels.dt <- get_topic_labels(dataset_name=dataset_name, ntopics=ntopics,
+                                        subset_name=subset_name, iter_index=iter_index,
+                                        bad.topics=bad.topics)
     head(topic.labels.dt)
 
     # Exclude non-content-bearing topics
@@ -360,6 +361,13 @@ topic.variation <- function(dataset_name = "consorts",
 }
 
 if(autorun) {
+    dataset_name <- "noexcludes2001_2015"
+    ntopics      <- 50
+    iter_index   <- 1
+    subset_name  <- "knownprograms2001_2015"
+    bad.topics   <- c("3", "8", "12", "15", "30", "34", "36", "47", "50")
+    
+    
     remake_figs
     topics.by.year(dataset_name=dataset_name, ntopics=ntopics,
                    subset_name=subset_name, iter_index=iter_index,
