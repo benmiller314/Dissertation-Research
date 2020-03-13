@@ -238,11 +238,11 @@ top_topic_browser <- function(
 
         # if we're saving all output, automatically cycle through everything.
         # but by default, prompt the user.
-        if (!remake_figs) {
-            a <- readline(paste("Press <enter> for more detail on",
-                        "these docs, or S to skip to the next topic: \n"))
-        } else {
+        if (remake_figs) {
             a <- ""
+        } else {
+            a <- readline(paste("Press <enter> for more detail on",
+                                "these docs, or S to skip to the next topic: \n"))
         }
 
 
@@ -265,7 +265,7 @@ top_topic_browser <- function(
                     a <- readline(paste("Press <enter> for next doc",
                                     "or S to skip to the next topic: \n"))
                 }
-            }
+            } # end of loop through Pub.numbers
             a <- "s"
         }
 
@@ -518,11 +518,11 @@ shareable_topic <- function(  # where will our topic assignments come from?
 }
 
 # convenience function to show the top terms and documents for the top @howmany topics
-top_topic_table <- function(howmany=10,  # how many topics to show?
-                            dataset_name="noexcludes2001_2015",
+top_titles_table <- function(dataset_name="noexcludes2001_2015",
                             ntopics=50,
                             iter_index=1,
                             subset_name="knownprograms2001_2015",
+                            howmany=ntopics,  # how many topics to show?
                             depth=3,        # how many titles per topic?
                             showlabels=TRUE)
 {
@@ -538,7 +538,8 @@ top_topic_table <- function(howmany=10,  # how many topics to show?
     ttt <- ttt[, list(topic, topic_rank, Title, topic_weight, rank_in_doc)]
     head(ttt)
     
-    ttt[, .(Titles = paste(paste0(Title, " (", 100*round(topic_weight, 2), "%)"), collapse=" || ")), by=topic]
+    ttt <- ttt[, .(Titles = paste(paste0(Title, " (", 100*round(topic_weight, 2), "%)"), collapse=" || ")), by=list(topic, topic_rank)]
+    head(ttt)
     
     # TO DO: 
     # add in the top keywords by_tfitf (or make it an option to do by_prob),
@@ -553,11 +554,13 @@ top_topic_table <- function(howmany=10,  # how many topics to show?
                                     ntopics=ntopics,
                                     iter_index = iter_index,
                                     subset_name = subset_name,
-                                    whatitis = paste("top", depth, "titles for top", cutoff, "topics"),
+                                    whatitis = paste("top", depth, "titles for top", howmany, "topics"),
                                     for.filename = TRUE)
         outfile <- file.path(imageloc, paste0(outfile, ".csv"))
-        write.csv(ttt, outfile)
+        write.csv(ttt, outfile, row.names = F)
     }
+    
+    return(ttt)
 }
 
 
@@ -582,11 +585,15 @@ if (autorun) {
                   "   retrieves top `howmany` topics for a document specified by `pubnum`. \n",
                   " * top_topic_browser(...): for a specified topic or range of topics,   \n",
                   "   shows the top `howmany` documents and their method tags, with   \n",
-                  "   optional detail view showing top topics for each document at a time."))
+                  "   optional detail view showing top topics for each document at a time. \n",
+                  " * top_titles_table(..., howmany, depth): for a specified dataset_name,  \n",
+                  "   ntopics, iter_index, and subset_name, show the top `depth` titles \n",
+                  "   for the top `howmany` topics, concatenated with the weight of that topic \n",
+                  "   in each doc."))
 }
 
 if(FALSE) {
-    remake_figs=F
+    remake_figs=T
     top_topic_browser(dataset_name="noexcludes2001_2015", ntopics=50, iter_index=1,
                       depth=10)
     toptopic <- shareable_topic(dataset_name = "noexcludes2001_2015",
@@ -594,8 +601,15 @@ if(FALSE) {
                                 iter_index=1,
                                 subset_name = "knownprograms2001_2015",
                                 topic=32)
-    top10topics <- top_topic_browser(dataset_name="noexcludes2001_2015", ntopics=50, iter_index=1,
-                      subset_name="knownprograms2001_2015",
-                      depth=3, showlabels=T, start.rank=1, for.bind=T, cutoff=10)
+    toptitles <- top_titles_table(dataset_name="noexcludes2001_2015",
+                                  ntopics=50,
+                                  iter_index=1,
+                                  subset_name="knownprograms2001_2015",
+                                  ## how many topics to show?
+                                  # howmany=ntopics,
+                                  howmany=10,
+                                  depth=3,        # how many titles per topic
+                                  showlabels=TRUE
+                      )
     
 }
