@@ -119,20 +119,44 @@ get.doctopic.grid <- function(dataset_name = "noexcludes2001_2015",
     
     # Optionally save to file
     if(remake_figs) { 
-        if(! is.null(subset_name)) {
-            # filename <- file.path(imageloc, paste0(dataset_name, "k", ntopics, "--", subset_name, 
-            #                    "_topic-ranks", iter_index, ".csv"))
-            filename <- file.path(imageloc, paste0("topic-labeling--", dataset_name, "k",
-                                                   ntopics, "_", iter_index, "--", subset_name, ".csv"))
-        } else {
-            # filename <- file.path(imageloc, paste0(dataset_name, "k", ntopics,
-            #                  "_topic-ranks", iter_index, ".csv"))
-            filename <- file.path(imageloc, paste0("topic-labeling--", dataset_name, "k",
-                                                   ntopics, "_", iter_index, ".csv"))
-        }
+        # what to export?
         out <- colsums.sort.pct[2:length(colsums.sort.pct)]
         head(out)
-        write.csv(out, filename)
+        
+        # where to export it?
+        if(!exists("build_plot_title", mode="function")) {
+            source(file="build_plot_title.R")
+        }
+        outfile_slug <- build_plot_title(dataset_name=dataset_name,
+                                         ntopics=ntopics,
+                                         iter_index=iter_index,
+                                         subset_name=subset_name,
+                                         bad.topics=bad.topics,
+                                         whatitis="topic-pct-contrib",
+                                         for.filename=T)
+        outfile <- file.path(imageloc, paste0(outfile_slug, ".csv"))
+        if(file.exists(outfile)) {
+            overwrite <- readline(paste("In 'get.doctopic.grid()': destination file already exists: \n", outfile, "\n",
+                                        "Overwrite (O)? New file (N)? Skip (S)? (o/n/s) > "))
+            if(tolower(overwrite) == "n") {
+                outfile <- readline(paste("Enter new filename, including directory. ",
+                                          "(Default directory is ", imageloc, ")> "))
+                write.csv(out, outfile)
+            } else if (tolower(overwrite) == "s") {
+                # just keep going. 
+                # annoying to repeat the write.csv in three conditions, but no other way
+                # to handle the "else" condition, where we do write.csv, and still skip here.
+            } else if (tolower(overwrite) == "o") {
+                write.csv(out, outfile)
+            } else {
+                outfile_slug <- paste0(outfile_slug, "+1")
+                outfile <- file.path(imageloc, paste0(outfile_slug, ".csv"))
+                warning(paste("Answer not understood. Saving with new filename: \n", outfile))
+                write.csv(out, outfile)
+            }
+        }
+        
+        
     }
     
     # Optionally get an overview of the topic sizes, as a scatterplot
@@ -181,6 +205,6 @@ if(FALSE) {         # this will never run on its own
                                 doplot=T)
     
     mygrid <- get.doctopic.grid("noexcludes2001_2015", ntopics=50, iter_index=1, 
-                                subset_name="knownprograms2011_2015", 
                                 doplot=T)
+    
 }
