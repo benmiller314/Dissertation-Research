@@ -79,6 +79,13 @@ topic.proportions <- function(dataset_name = "noexcludes2001_2015",
     sum(stats$median) # maybe a good cutoff for cumulative cluster reach?
 	# we'll return the stats data.frame later.
 
+    ## For a second way of exploring typical behavior, sort rows by top weight
+    #  Save the Pub.number so you can still look up information on each diss
+    #  (i.e. don't assume the rows here are the same as in the original doctopic grid)
+    grid.sorted2 <- data.frame(Pub.number=grid$Pub.number, grid.sorted)
+    grid.sorted2 <- grid.sorted2[order(grid.sorted2$X1, decreasing=T), ]
+    
+    
 
 	## Time to make the plot
 	if(!exists("build_plot_title", mode="function")) {
@@ -152,7 +159,7 @@ topic.proportions <- function(dataset_name = "noexcludes2001_2015",
 		if(!exists("get_topic_labels", mode="function")) {
 			source(file="get topic labels.R")
 		}
-		labels <- get_topic_labels(dataset_name, ntopics, subset_name, iter_index)
+		labels <- get_topic_labels(dataset_name, ntopics, subset_name, iter_index, newnames=newnames)
 		labels.t <- labels[unique(mytopics), Label, key=Topic]
 
 		# merge in the counts
@@ -284,7 +291,8 @@ topic.proportions <- function(dataset_name = "noexcludes2001_2015",
 
 	message(paste("Stats for contributions of topics at various ranks",
 					"within dissertations:"))
-	return(stats)
+	return(list(stats=stats,
+	            weightsbydoc=grid.sorted2))
 }
 
 if(FALSE) {
@@ -297,10 +305,18 @@ if(FALSE) {
 }
 
 if(autorun) {
-    topic.proportions(dataset_name=dataset_name,
-                      ntopics=ntopics,
-                      iter_index=iter_index,
-                      subset_name=subset_name,
-                      bad.topics=bad.topics,
-                      explore.outliers=T)
+    dataset_name <- "noexcludes2001_2015"
+    ntopics <- 50
+    iter_index <- 1
+    subset_name <- "knownprograms2001_2015"
+    bad.topics <- c("3", "8", "12", "15", "30", "34", "36", "47", "50")
+    
+    topic.proportions(dataset_name = dataset_name,
+                      ntopics = ntopics,
+                      iter_index = iter_index,
+                      subset_name = subset_name,
+                      bad.topics = bad.topics,
+                      explore.outliers = T,
+                      explore.lowliers = T,
+                      newnames = F)
 }
