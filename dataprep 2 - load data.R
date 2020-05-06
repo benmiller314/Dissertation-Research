@@ -58,7 +58,13 @@ message(paste("In this data set, there are",diss.count,"dissertations, not count
 # mark noexcludes that will remain in for abstracts, but that 
 # we'll leave out of full-text analysis (non-English, bad scans);
 # these will now have Exclude.Level=3
-noexcludes <- remove_unreadables("noexcludes")
+noexcludes <- remove_unreadables("noexcludes", more=c("3715615", "3537773",
+                                                      "3022956", "3454925",
+                                                      "3457750", "3719278", 
+                                                      "3407559", "3671259",
+                                                      "3684306", "3701093",
+                                                      "3530126", "3506182",
+                                                      "3010241"))
     
 # refactor levels for noexcludes alone
 refactor.index <- which(names(noexcludes) %in% c("Subject","KEYWORDS","School","Advisor.type","Advisor.Name","Degree","Method.Terms","pages","Flag.notes"))

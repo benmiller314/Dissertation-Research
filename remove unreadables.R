@@ -24,16 +24,18 @@ remove_unreadables <- function(dataset_name="noexcludes",
         
         dataset[unreadables, "Exclude.Level"] <- 3
         
-        if (!is.null(more)) {
-            dataset[which(dataset$Pub.number %in% more), "Exclude.Level"] <- 3
-        }
-        
-        message("Marked ", length(unreadables), " documents as unusable for full-text analyses,",
-                " leaving ", nrow(dataset) - length(unreadables), ".")
-        
     } else {
         warning("Could not find spelling statistics file; some full-text files may be unreadable.")
+        unreadables <- NULL
     }
+    
+    if (!is.null(more)) {
+        unreadables <- c(unreadables, more)
+        dataset[which(dataset$Pub.number %in% more), "Exclude.Level"] <- 3
+    }
+    
+    message("Marked ", length(unreadables), " documents as unusable for full-text analyses,",
+            " leaving ", nrow(dataset) - length(unreadables), ".")
     
     # TO DO: use system() to call the `ocr_again.sh` shell script on unreadables, 
     #        perhaps only if remake_figs == TRUE
