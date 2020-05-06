@@ -229,12 +229,12 @@ topic.proportions <- function(dataset_name = "noexcludes2001_2015",
 	        lower.whisker <- boxplot.stats(grid.sorted[, 1])$stats[1]
 
 	        # just look at #1 topic
-	        outliers.index <- which(grid.sorted[, 1] < lower.whisker)
-	        outliers <- cbind(grid[outliers.index, "Pub.number", with=F],
-	                          grid.sorted[outliers.index, 1:10])
-	        outliers <- outliers[order(outliers$V1, decreasing=F), ]
+	        lowliers.index <- which(grid.sorted[, 1] < lower.whisker)
+	        lowliers <- cbind(grid[lowliers.index, "Pub.number", with=F],
+	                          grid.sorted[lowliers.index, 1:10])
+	        lowliers <- lowliers[order(lowliers$V1, decreasing=F), ]
 
-	        # boxplot(outliers[, 2:ncol(outliers)])
+	        # boxplot(lowliers[, 2:ncol(lowliers)])
 
 	        #####
 	        # I have a hypothesis that these are mostly language-based topics.
@@ -247,7 +247,7 @@ topic.proportions <- function(dataset_name = "noexcludes2001_2015",
 	        mytopics <- c()		# start empty and build up
 	        myvalues <- c()		# what are those high percent-of-text values?
 
-	        for (i in outliers$Pub.number) {
+	        for (i in lowliers$Pub.number) {
 	            row <- grid[which(grid$Pub.number==i), 2:ncol(grid), with=F]
 	            mytopic <- which(row == min(row))
 	            mytopics <- c(mytopics, mytopic)
@@ -284,15 +284,17 @@ topic.proportions <- function(dataset_name = "noexcludes2001_2015",
 	        # Yup, it's bad.topics for sure.
 
 	        message("Pub.numbers to re-OCR or remove from the model training set:")
-	        print(outliers$Pub.number)
+	        print(lowliers$Pub.number)
 
     } # end if(explore.lowliers)
 
 
 	message(paste("Stats for contributions of topics at various ranks",
 					"within dissertations:"))
-	return(list(stats=stats,
-	            weightsbydoc=grid.sorted2))
+	print(stats)
+	return(list(stats = stats,
+	            weightsbydoc = grid.sorted2,
+	            lowliers = lowliers$Pub.number))
 }
 
 if(FALSE) {
@@ -309,9 +311,10 @@ if(autorun) {
     ntopics <- 50
     iter_index <- 1
     subset_name <- "knownprograms2001_2015"
+    # subset_name <- NULL
     bad.topics <- c("3", "8", "12", "15", "30", "34", "36", "47", "50")
     
-    topic.proportions(dataset_name = dataset_name,
+    topic_weights <- topic.proportions(dataset_name = dataset_name,
                       ntopics = ntopics,
                       iter_index = iter_index,
                       subset_name = subset_name,
