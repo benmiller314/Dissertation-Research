@@ -27,7 +27,10 @@ topic.proportions <- function(dataset_name = "noexcludes2001_2015",
 
 						  # Use topic browser for outlier dissertations?
 						  explore.outliers = FALSE,
-						  explore.lowliers = FALSE)
+						  explore.lowliers = FALSE,
+						  verbose = FALSE,
+						  markcutoff = FALSE,
+						  howmany = 3)
 {
 	require(data.table)
 	if(!exists("get.doctopic.grid", mode="function")) {
@@ -49,7 +52,9 @@ topic.proportions <- function(dataset_name = "noexcludes2001_2015",
 
 
 	grid.clean <- grid[, setdiff(names(grid), c(bad.topics, "Pub.number")), with=F]
-	print(head(grid.clean))
+	if(verbose) {
+    	print(head(grid.clean))
+	}
 
 
 	# decreasing sort across each row -- ignore column (i.e. topic) names
@@ -61,11 +66,13 @@ topic.proportions <- function(dataset_name = "noexcludes2001_2015",
 		# is the weight of the top-ranked topic for that row, column 2 the
 		# weight of the 2nd-ranked topic, and so on. Let's look at the 10
 		# top-ranked topics for every dissertation.
-	print(head(grid.sorted[, 1:10]))
+	if(verbose) {
+    	print(head(grid.sorted[, 1:10]))
+	}
 
 	# start empty, build up
 	stats <- data.frame()
-	for (i in 1:3) {
+	for (i in 1:howmany) {
 
 		# message(paste0("Stats for ", i,
 		#					"-ranked topic within dissertations:"))
@@ -74,13 +81,13 @@ topic.proportions <- function(dataset_name = "noexcludes2001_2015",
 
 	# lower whisker, lower ???hinge???, median, upper ???hinge???, upper whisker
 	names(stats) <- c("lower", "Lhinge", "median", "Uhinge", "upper")
-	stats <- cbind("rank of topic within diss"=c(1, 2, 3), stats)
+	stats <- cbind("rank of topic within diss"=seq_len(howmany), stats)
 
-    sum(stats$median) # maybe a good cutoff for cumulative cluster reach?
+    sum(stats$median[1:3]) # maybe a good cutoff for cumulative cluster reach?
 	# we'll return the stats data.frame later.
 
-    ## For a second way of exploring typical behavior, sort rows by top weight
-    #  Save the Pub.number so you can still look up information on each diss
+    ## For a second way of exploring typical behavior, sort rows by top weight.
+    #  Save the Pub.number first, so you can still look up information on each diss
     #  (i.e. don't assume the rows here are the same as in the original doctopic grid)
     grid.sorted2 <- data.frame(Pub.number=grid$Pub.number, grid.sorted)
     grid.sorted2 <- grid.sorted2[order(grid.sorted2$X1, decreasing=T), ]
@@ -114,9 +121,18 @@ topic.proportions <- function(dataset_name = "noexcludes2001_2015",
 				yaxp = c(0, 1, 10),
 				notch = use.notch
 		)
+		
+		if(markcutoff) {
 		## mark line covering top three quartiles for the 2nd-ranked topic,
 		## but only the top quartile for 3rd
-		abline(h=0.11, col="#99FF99")
+		    # abline(h=0.11, col="#99FF99")
+		    abline(h=stats[2, "Lhinge"], col="#99FF99")
+		    outside_legend("right", 
+		                   legend=paste("Lower hinge, 2nd-rank:",
+		                                round(stats[2, "Lhinge"],2)),
+                            col="#99FF99", 
+                            lwd=2)
+		}
 
 	if(remake_figs) {
 		dev.off()
@@ -185,10 +201,13 @@ topic.proportions <- function(dataset_name = "noexcludes2001_2015",
 		# dominate their dissertations.
 
 		## Browse more details of these outlier dissertations
-		if(!exists("get.topics4doc", mode="function")) {
-			source(file="top docs per topic.R")
-		}
-		if (!remake_figs) {
+		
+		if (!verbose) {
+		    a <- "s"  
+		} else if (!remake_figs) {
+		    if(!exists("get.topics4doc", mode="function")) {
+		        source(file="top docs per topic.R")
+		    }
 			a <- readline(paste("Press <enter> for more detail on these ",
 								"docs, or S to skip to the end\n"))
 		} else {
@@ -226,19 +245,19 @@ topic.proportions <- function(dataset_name = "noexcludes2001_2015",
 	} # end if(explore.outliers)
 
 	if(explore.lowliers) {
-	        lower.whisker <- boxplot.stats(grid.sorted[, 1])$stats[1]
-
-	        # just look at #1 topic
-	        lowliers.index <- which(grid.sorted[, 1] < lower.whisker)
-	        lowliers <- cbind(grid[lowliers.index, "Pub.number", with=F],
-	                          grid.sorted[lowliers.index, 1:10])
-	        lowliers <- lowliers[order(lowliers$V1, decreasing=F), ]
+	        # just look at #2 topic
+	        lower.whisker <- stats[2, "lower"]
+	        
+	        lowliers.index <- which(grid.sorted2[, "X2"] < lower.whisker)
+	        lowliers <- grid.sorted2[lowliers.index, 1:11]
 
 	        # boxplot(lowliers[, 2:ncol(lowliers)])
 
 	        #####
 	        # I have a hypothesis that these are mostly language-based topics.
-	        # Let's look at the top topics represented here. STRATEGY:
+	        # Let's look at the top topics represented here, to know what's 
+	        # so dominant in the #1 slot as to crowd out these #2 topics.
+	        # STRATEGY:
 	        # 1. For each Pub.number, get top-ranked topic number by finding the
 	        #    max within that row of `grid`.
 	        # 2. Make a table of these topic numbers.
@@ -249,9 +268,9 @@ topic.proportions <- function(dataset_name = "noexcludes2001_2015",
 
 	        for (i in lowliers$Pub.number) {
 	            row <- grid[which(grid$Pub.number==i), 2:ncol(grid), with=F]
-	            mytopic <- which(row == min(row))
+	            mytopic <- which(row == max(row))
 	            mytopics <- c(mytopics, mytopic)
-	            myvalues <- c(myvalues, min(row))
+	            myvalues <- c(myvalues, max(row))
 	        }
 
 	        # count 'em up
@@ -276,9 +295,9 @@ topic.proportions <- function(dataset_name = "noexcludes2001_2015",
 	        labels.t <- labels.t[order(mytopics.t, decreasing=T), ]
 
 	        # report back
-	        message("Lower outliers for top-ranked topics:")
+	        message("Top-ranked topics of disses with lower outliers for second-ranked topic:")
 	        print(labels.t)
-	        message(paste("Total lowliers for top-ranked topic:",
+	        message(paste("Total 'lowliers' for second-ranked topic:",
 	                      sum(labels.t[, "Outlier Count", with=F])))
 
 	        # Yup, it's bad.topics for sure.
@@ -292,11 +311,70 @@ topic.proportions <- function(dataset_name = "noexcludes2001_2015",
 	message(paste("Stats for contributions of topics at various ranks",
 					"within dissertations:"))
 	print(stats)
-	return(list(stats = stats,
+
+	if(explore.lowliers) {
+		return(list(stats = stats,
 	            weightsbydoc = grid.sorted2,
 	            lowliers = lowliers$Pub.number))
+	} else {
+	    return(list(stats = stats,
+	                weightsbydoc = grid.sorted2))
+	}
 }
 
+find.doc.by.topic.proportion <- function(topic_weights,   # as produced above
+                                         topic_rank = 1,  # top-ranked topic? 2nd?
+                                         value="median",  # where to pull from?
+                                         dataset_name = "noexcludes2001_2015",
+                                         ntopics = 50,
+                                         iter_index = 1,
+                                         subset_name = "knownprograms2001_2015",
+                                         offset = 0     # want to explore adjacent disses?
+                                         
+) {
+    wbd <- topic_weights$weightsbydoc
+    
+    mystats <- topic_weights$stats
+    
+    if (value %in% names(mystats)) {
+        if(topic_rank %in% seq_len(nrow(mystats))) {
+            mystat <- mystats[topic_rank, value]
+        } else {
+            stop("find.doc.by.topic.proportion: topic_rank, ", topic_rank, ", out of bounds")
+        }
+    }
+    
+    myindex <- which.min(abs(wbd[, (topic_rank+1)] - mystat))
+    if ((myindex + offset) < 0) {
+        warning("`find.doc.by.topic.proportion`#349: Offset would produce index outside of range; \n",
+                "using minimum index")
+        myindex <- 1
+    } else if ((myindex + offset) > nrow(wbd)) {
+        warning("`find.doc.by.topic.proportion`#349: Offset would produce index outside of range; \n",
+                "using maximum index")
+        myindex <- nrow(wbd)
+    } else {
+        myindex <- myindex + offset  
+    }
+    
+    mypub <- wbd[myindex, "Pub.number"]
+    
+    if(!exists("get.topics4doc", mode="function")) {
+        source(file="top docs per topic.R")
+    }
+    
+    get.topics4doc(pubnum = mypub, 
+                   dataset_name = dataset_name,
+                   ntopics = ntopics,
+                   iter_index = iter_index,
+                   subset_name = subset_name,
+                   showlabels = T)
+    
+    # return(mypub)
+}
+
+
+# Using the analysis; a testing space.
 if(FALSE) {
 	remake_figs
 	topic.proportions()
@@ -304,22 +382,43 @@ if(FALSE) {
 	# abline(0.11384, 0, col="#aa0000")
 
 
-}
-
-if(autorun) {
     dataset_name <- "noexcludes2001_2015"
     ntopics <- 50
     iter_index <- 1
     subset_name <- "knownprograms2001_2015"
-    # subset_name <- NULL
     bad.topics <- c("3", "8", "12", "15", "30", "34", "36", "47", "50")
+    # bad.topics <- NULL
     
     topic_weights <- topic.proportions(dataset_name = dataset_name,
                       ntopics = ntopics,
                       iter_index = iter_index,
                       subset_name = subset_name,
+                      # subset_name = NULL,
                       bad.topics = bad.topics,
                       explore.outliers = T,
                       explore.lowliers = T,
-                      newnames = F)
+                      newnames = F,
+                      markcutoff = T,
+                      howmany = 10)
+    
+    ## Confirm that upper / lower whiskers are real values, the last observed values
+    ## i.e. within 1.5 * inter-quartile distance (IQR) of the hinges
+    # IQR <- topic_weights$stats[1, "Uhinge"] - topic_weights$stats[1, "Lhinge"]
+    # 1.5 * IQR
+    # topic_weights$stats[1, "Uhinge"] + (1.5 * IQR)
+    # topic_weights$stats[1, "upper"]
+    # hinge_diss <- min(which(topic_weights$weightsbydoc[, "X1"] <= topic_weights$stats[1, "upper"]))
+    # topic_weights$weightsbydoc[(hinge_diss-1):(hinge_diss+1), 1:11]
+    # topic_weights$stats[1, "Lhinge"] - (1.5 * IQR)
+        # topic_weights$stats[1, "lower"]
+    # hinge_diss <- max(which(topic_weights$weightsbydoc[, "X1"] >= topic_weights$stats[1, "lower"]))
+    # topic_weights$weightsbydoc[(hinge_diss-1):(hinge_diss+1), 1:11]
+
+    ## Show me the median dissertation, please!
+    find.doc.by.topic.proportion(topic_weights = topic_weights,
+                                 value = "median", 
+                                 topic_rank = 1)
+    find.doc.by.topic.proportion(topic_weights = topic_weights, 
+                                 value = "Uhinge")
+    
 }

@@ -73,7 +73,10 @@ get.topics4doc <- function(pubnum,
     this_doc_tops <- this_doc_tops[, order(this_doc_tops, decreasing = T), with=F][,1:howmany, with=F]
 
     # merge weights with keys: from all keys, narrow to just the top howmany in this doc
-    topic_keys <- data.table(get.topickeys(dataset_name, ntopics, iter_index=iter_index, newnames=newnames))
+    topic_keys <- data.table(get.topickeys(dataset_name = dataset_name, 
+                                           ntopics = ntopics, 
+                                           iter_index = iter_index, 
+                                           newnames = newnames))
     topic_keys <- topic_keys[as.numeric(names(this_doc_tops))]
     topic_keys[,weight:=as.numeric(this_doc_tops)]
 
@@ -84,8 +87,11 @@ get.topics4doc <- function(pubnum,
         if(!exists("get_topic_labels", mode="function")) {
             source(file="get topic labels.R")
         }
-        topic_labels <- data.table(get_topic_labels(dataset_name, ntopics, iter_index=iter_index),
-                                                    key="Topic")
+        topic_labels <- data.table(get_topic_labels(dataset_name = dataset_name, 
+                                                    ntopics = ntopics, 
+                                                    iter_index = iter_index,
+                                                    subset_name = subset_name),
+                                   key="Topic")
         topic_keys[, current_label:=topic_labels[topic_keys$topic, Label]]
         topic_keys <- topic_keys[, list(topic, weight, alpha, current_label,
                                         top_words)]
@@ -593,9 +599,11 @@ if (autorun) {
 }
 
 if(FALSE) {
-    remake_figs=T
+    remake_figs
     top_topic_browser(dataset_name="noexcludes2001_2015", ntopics=50, iter_index=1,
                       depth=10)
+    top_topic_browser(dataset_name="noexcludes2001_2015", ntopics=50, iter_index=1,
+                      depth=3, subset_name="knownprograms2001_2015", showlabels=T)
     toptopic <- shareable_topic(dataset_name = "noexcludes2001_2015",
                                 ntopics=50,
                                 iter_index=1,
@@ -606,8 +614,8 @@ if(FALSE) {
                                   iter_index=1,
                                   subset_name="knownprograms2001_2015",
                                   ## how many topics to show?
-                                  # howmany=ntopics,
-                                  howmany=10,
+                                  howmany=ntopics,
+                                  # howmany=10,
                                   depth=3,        # how many titles per topic
                                   showlabels=TRUE
                       )
