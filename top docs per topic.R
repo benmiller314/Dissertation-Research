@@ -51,7 +51,8 @@ get.topics4doc <- function(pubnum,
                                                # set T if it's with the model, F if last in filename.
                                                # Gets passed into get.doctopic.grid.
                            howmany = 5,
-                           showlabels = FALSE)
+                           showlabels = FALSE,
+                           columns = c("Title", "Pub.number", tagnames))
 {
     # get packages in case we've just restarted R
     require(data.table)
@@ -99,8 +100,7 @@ get.topics4doc <- function(pubnum,
     }
     
     
-    list("title" = dataset.dt[pubnum, c("Title", "Pub.number", tagnames),
-                                 with=F],
+    list("title" = dataset.dt[pubnum, ..columns],
         "keys" = topic_keys,
         "abstract" = dataset.dt[pubnum, c("KEYWORDS", "ABSTRACT"), with=F]
         )
