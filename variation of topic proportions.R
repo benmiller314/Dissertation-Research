@@ -472,7 +472,8 @@ if(FALSE) {
                       explore.lowliers = T,
                       newnames = F,
                       markcutoff = T,
-                      howmany = 10)
+                      howmany = 10,
+                      lowlier.rank = 2)
     
     ## Confirm that upper / lower whiskers are real values, the last observed values
     ## i.e. within 1.5 * inter-quartile distance (IQR) of the hinges
@@ -512,5 +513,20 @@ if(FALSE) {
                                  offset = -2, 
                                  howmanytopics = 15)
     sum(diss_high$keys[1:3]$weight)
+ 
+    # Inspect topics for outlier dissertations: is this a pattern, or no? 
+    if(!exists("top_topic_browser")) {
+        source(file="top docs per topic.R")
+    }
+    for (topic in topic_weights$outliers.table$Topic) {
+        top_topic_browser(dataset_name = dataset_name,
+                          ntopics = ntopics,
+                          iter_index = iter_index,
+                          subset_name = subset_name,
+                          showlabels = TRUE,
+                          depth = 10,
+                          topic = topic)
+    }
     
+       
 }
