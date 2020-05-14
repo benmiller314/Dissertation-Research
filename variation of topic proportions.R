@@ -28,10 +28,16 @@ topic.proportions <- function(dataset_name = "noexcludes2001_2015",
 						  # Use topic browser for outlier dissertations?
 						  explore.outliers = FALSE,
 						  explore.lowliers = FALSE,
+						  lowlier.rank = 2,
+						  
+						  # should we print everything to screen as we go?
 						  verbose = FALSE,
+						  
+						  # should we draw a line at the lower hinge of rank 2?
 						  markcutoff = FALSE,
-						  howmany = 3)
-{
+						  
+						  howmany = 3    # how far into the ranks should we go?
+){
 	require(data.table)
 	if(!exists("get.doctopic.grid", mode="function")) {
 		source("get doctopic grid.R")
@@ -245,11 +251,13 @@ topic.proportions <- function(dataset_name = "noexcludes2001_2015",
 	} # end if(explore.outliers)
 
 	if(explore.lowliers) {
-	        # just look at #2 topic
-	        lower.whisker <- stats[2, "lower"]
+	    
+	        if(!( (lowlier.rank < 1) || (lowlier.rank > howmany) )) {
 	        
-	        lowliers.index <- which(grid.sorted2[, "X2"] < lower.whisker)
-	        lowliers <- grid.sorted2[lowliers.index, 1:11]
+    	        lower.whisker <- stats[lowlier.rank, "lower"]
+    	        
+    	        lowliers.index <- which(grid.sorted2[, paste0("X", lowlier.rank)] < lower.whisker)
+    	        lowliers <- grid.sorted2[lowliers.index, 1:11]
     
     	        # boxplot(lowliers[, 2:ncol(lowliers)])
     
@@ -304,6 +312,9 @@ topic.proportions <- function(dataset_name = "noexcludes2001_2015",
     
     	        message("Pub.numbers to re-OCR or remove from the model training set:")
     	        print(lowliers$Pub.number)
+	        } else {
+	            warning("Selected `lowlier.rank` parameter is out of bounds. \n",
+	                    "Choose a value between 1 and `howmany` parameter (default = 3).")
 	        }
 
     } # end if(explore.lowliers)
