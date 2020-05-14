@@ -329,7 +329,8 @@ find.doc.by.topic.proportion <- function(topic_weights,   # as produced above
                                          ntopics = 50,
                                          iter_index = 1,
                                          subset_name = "knownprograms2001_2015",
-                                         offset = 0     # want to explore adjacent disses?
+                                         offset = 0,     # want to explore adjacent disses?
+                                         howmanytopics = 5
                                          
 ) {
     wbd <- topic_weights$weightsbydoc
@@ -344,7 +345,7 @@ find.doc.by.topic.proportion <- function(topic_weights,   # as produced above
         }
     }
     
-    myindex <- which.min(abs(wbd[, (topic_rank+1)] - mystat))
+    myindex <- which.min(abs(wbd[, paste0("X", topic_rank)] - mystat))
     if ((myindex + offset) < 0) {
         warning("`find.doc.by.topic.proportion`#349: Offset would produce index outside of range; \n",
                 "using minimum index")
@@ -368,7 +369,9 @@ find.doc.by.topic.proportion <- function(topic_weights,   # as produced above
                    ntopics = ntopics,
                    iter_index = iter_index,
                    subset_name = subset_name,
-                   showlabels = T)
+                   showlabels = T,
+                   howmany = howmanytopics,
+                   columns = c("Pub.number", "Author", "Title", "School", "Department", "Year", "Pages", "Link"))
     
     # return(mypub)
 }
@@ -415,10 +418,18 @@ if(FALSE) {
     # topic_weights$weightsbydoc[(hinge_diss-1):(hinge_diss+1), 1:11]
 
     ## Show me the median dissertation, please!
-    find.doc.by.topic.proportion(topic_weights = topic_weights,
+    diss_mid <- find.doc.by.topic.proportion(topic_weights = topic_weights,
                                  value = "median", 
-                                 topic_rank = 1)
-    find.doc.by.topic.proportion(topic_weights = topic_weights, 
-                                 value = "Uhinge")
+                                 topic_rank = 1,
+                                 offset = 0,
+                                 howmanytopics = 15)
+    sum(diss_mid$keys$weight)
+    
+    # and a high-end-of-normal diss?
+    diss_high <- find.doc.by.topic.proportion(topic_weights = topic_weights, 
+                                 value = "upper",
+                                 offset = -2, 
+                                 howmanytopics = 15)
+    sum(diss_high$keys[1:3]$weight)
     
 }
