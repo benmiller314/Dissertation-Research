@@ -158,42 +158,42 @@ topic.proportions <- function(dataset_name = "noexcludes2001_2015",
 		# 2. Make a table of these topic numbers.
 		# 3. Retrieve the labels for each topic in the table.
 
-		mytopics <- c()		# start empty and build up
-		myvalues <- c()		# what are those high percent-of-text values?
+		hightopics <- c()		# start empty and build up
+		highvalues <- c()		# what are those high percent-of-text values?
 
 		for (i in outliers$Pub.number) {
 			row <- grid[which(grid$Pub.number==i), 2:ncol(grid), with=F]
 			mytopic <- which(row == max(row))
-			mytopics <- c(mytopics, mytopic)
-			myvalues <- c(myvalues, max(row))
+			hightopics <- c(hightopics, mytopic)
+			highvalues <- c(highvalues, max(row))
 		}
 
 		# count 'em up
-		mytopics.t <- table(mytopics)
+		hightopics.t <- table(hightopics)
 
 		# get labels
 		if(!exists("get_topic_labels", mode="function")) {
 			source(file="get topic labels.R")
 		}
-		labels <- get_topic_labels(dataset_name, ntopics, subset_name, iter_index, newnames=newnames)
-		labels.t <- labels[unique(mytopics), Label, key=Topic]
+		highlabels <- get_topic_labels(dataset_name, ntopics, subset_name, iter_index, newnames=newnames)
+		highlabels.t <- highlabels[unique(hightopics), Label, key=Topic]
 
 		# merge in the counts
-		labels.t[, "Outlier Count"] <- mytopics.t
+		highlabels.t[, "Outlier Count"] <- hightopics.t
 
 		# merge in the values
-		b <- aggregate(data.frame(mytopics, myvalues), by=list(mytopics),
+		b <- aggregate(data.frame(hightopics, highvalues), by=list(hightopics),
 						 FUN=c)
-		labels.t <- labels.t[b, ][,mytopics:=NULL]
+		highlabels.t <- highlabels.t[b, ][,hightopics:=NULL]
 
 		# sort by descending outlier frequency
-		labels.t <- labels.t[order(mytopics.t, decreasing=T), ]
+		highlabels.t <- highlabels.t[order(hightopics.t, decreasing=T), ]
 
 		# report back
 		message("Upper outliers for top-ranked topics:")
-		print(labels.t)
+		print(highlabels.t)
 		message(paste("Total outliers for top-ranked topic:",
-						sum(labels.t[, "Outlier Count", with=F])))
+						sum(highlabels.t[, "Outlier Count", with=F])))
 
 		# Okay,	my hypothesis is false! All sorts of topics here.
 		# Interesting. Still, I may want to remove the dissertations with
@@ -250,60 +250,61 @@ topic.proportions <- function(dataset_name = "noexcludes2001_2015",
 	        
 	        lowliers.index <- which(grid.sorted2[, "X2"] < lower.whisker)
 	        lowliers <- grid.sorted2[lowliers.index, 1:11]
-
-	        # boxplot(lowliers[, 2:ncol(lowliers)])
-
-	        #####
-	        # I have a hypothesis that these are mostly language-based topics.
-	        # Let's look at the top topics represented here, to know what's 
-	        # so dominant in the #1 slot as to crowd out these #2 topics.
-	        # STRATEGY:
-	        # 1. For each Pub.number, get top-ranked topic number by finding the
-	        #    max within that row of `grid`.
-	        # 2. Make a table of these topic numbers.
-	        # 3. Retrieve the labels for each topic in the table.
-
-	        mytopics <- c()		# start empty and build up
-	        myvalues <- c()		# what are those high percent-of-text values?
-
-	        for (i in lowliers$Pub.number) {
-	            row <- grid[which(grid$Pub.number==i), 2:ncol(grid), with=F]
-	            mytopic <- which(row == max(row))
-	            mytopics <- c(mytopics, mytopic)
-	            myvalues <- c(myvalues, max(row))
+    
+    	        # boxplot(lowliers[, 2:ncol(lowliers)])
+    
+    	        #####
+    	        # I have a hypothesis that these are mostly language-based topics.
+    	        # Let's look at the top topics represented here, to know what's 
+    	        # so dominant in the #1 slot as to crowd out these #2 topics.
+    	        # STRATEGY:
+    	        # 1. For each Pub.number, get top-ranked topic number by finding the
+    	        #    max within that row of `grid`.
+    	        # 2. Make a table of these topic numbers.
+    	        # 3. Retrieve the labels for each topic in the table.
+    
+    	        lowtopics <- c()		# start empty and build up
+    	        lowvalues <- c()		# what are those high percent-of-text values?
+    
+    	        for (i in lowliers$Pub.number) {
+    	            row <- grid[which(grid$Pub.number==i), 2:ncol(grid), with=F]
+    	            mytopic <- which(row == max(row))
+    	            lowtopics <- c(lowtopics, mytopic)
+    	            lowvalues <- c(lowvalues, max(row))
+    	        }
+    
+    	        # count 'em up
+    	        lowtopics.t <- table(lowtopics)
+    
+    	        # get labels
+    	        if(!exists("get_topic_labels", mode="function")) {
+    	            source(file="get topic labels.R")
+    	        }
+    	        lowlabels <- get_topic_labels(dataset_name, ntopics, subset_name, iter_index)
+    	        lowlabels.t <- lowlabels[unique(lowtopics), Label, key=Topic]
+    
+    	        # merge in the counts
+    	        lowlabels.t[, "Outlier Count"] <- lowtopics.t
+    
+    	        # merge in the values
+    	        b <- aggregate(data.frame(lowtopics, lowvalues), by=list(lowtopics),
+    	                       FUN=c)
+    	        lowlabels.t <- lowlabels.t[b, ][,lowtopics:=NULL]
+    
+    	        # sort by descending outlier frequency
+    	        lowlabels.t <- lowlabels.t[order(lowtopics.t, decreasing=T), ]
+    
+    	        # report back
+    	        message("Top-ranked topics of disses with lower outliers for second-ranked topic:")
+    	        print(lowlabels.t)
+    	        message(paste("Total 'lowliers' for second-ranked topic:",
+    	                      sum(lowlabels.t[, "Outlier Count", with=F])))
+    
+    	        # Yup, it's bad.topics for sure.
+    
+    	        message("Pub.numbers to re-OCR or remove from the model training set:")
+    	        print(lowliers$Pub.number)
 	        }
-
-	        # count 'em up
-	        mytopics.t <- table(mytopics)
-
-	        # get labels
-	        if(!exists("get_topic_labels", mode="function")) {
-	            source(file="get topic labels.R")
-	        }
-	        labels <- get_topic_labels(dataset_name, ntopics, subset_name, iter_index)
-	        labels.t <- labels[unique(mytopics), Label, key=Topic]
-
-	        # merge in the counts
-	        labels.t[, "Outlier Count"] <- mytopics.t
-
-	        # merge in the values
-	        b <- aggregate(data.frame(mytopics, myvalues), by=list(mytopics),
-	                       FUN=c)
-	        labels.t <- labels.t[b, ][,mytopics:=NULL]
-
-	        # sort by descending outlier frequency
-	        labels.t <- labels.t[order(mytopics.t, decreasing=T), ]
-
-	        # report back
-	        message("Top-ranked topics of disses with lower outliers for second-ranked topic:")
-	        print(labels.t)
-	        message(paste("Total 'lowliers' for second-ranked topic:",
-	                      sum(labels.t[, "Outlier Count", with=F])))
-
-	        # Yup, it's bad.topics for sure.
-
-	        message("Pub.numbers to re-OCR or remove from the model training set:")
-	        print(lowliers$Pub.number)
 
     } # end if(explore.lowliers)
 
@@ -312,14 +313,21 @@ topic.proportions <- function(dataset_name = "noexcludes2001_2015",
 					"within dissertations:"))
 	print(stats)
 
-	if(explore.lowliers) {
-		return(list(stats = stats,
-	            weightsbydoc = grid.sorted2,
-	            lowliers = lowliers$Pub.number))
-	} else {
-	    return(list(stats = stats,
-	                weightsbydoc = grid.sorted2))
+	to.return <- list(stats = stats,
+	                  weightsbydoc = grid.sorted2)
+	
+	if(explore.outliers) {
+	    to.return$outliers <- outliers
+	    to.return$outliers.table <- highlabels.t
 	}
+	
+	if(explore.lowliers) {
+		to.return$lowliers <- lowliers
+		to.return$lowliers.table <- lowlabels.t
+	} 
+	
+	
+	return(to.return)
 }
 
 find.doc.by.topic.proportion <- function(topic_weights,   # as produced above
