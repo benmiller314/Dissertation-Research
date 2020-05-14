@@ -377,6 +377,57 @@ find.doc.by.topic.proportion <- function(topic_weights,   # as produced above
 }
 
 
+## TO DO: histogram of weights of just the top topic
+top.topic.histogram <- function(topic_weights,   # as produced above
+                                topic_rank = 1,  # top-ranked topic? 2nd?
+                                value="median",  # where to pull from?
+                                dataset_name = "noexcludes2001_2015",
+                                ntopics = 50,
+                                iter_index = 1,
+                                subset_name = "knownprograms2001_2015",
+                                bad.topics = NULL,
+                                useboxstats = FALSE)
+{
+    wbd <- topic_weights$weightsbydoc
+    mystats <- topic_weights$stats
+    
+    myrank <- wbd[, paste0("X", topic_rank)]
+    
+    if(!exists("build_plot_title", mode="function")) {
+        source(file="build_plot_title.R")
+    }
+    
+    bigtitle <- build_plot_title(dataset_name=dataset_name, subset_name=subset_name,
+                                 ntopics=ntopics, iter_index=iter_index,
+                                 bad.topics=bad.topics,
+                                 whatitis=paste("Proportions of Text from Topic Ranked", 
+                                                topic_rank, "within Dissertation")
+    )
+    
+    subtitle <- paste("N = ", nrow(wbd))
+    
+    if(remake_figs) {
+        outfile <- file.path(imageloc, paste0(bigtitle, ".pdf"))
+        pdf(outfile)
+    }               
+    
+    if(useboxstats) {
+        breaks <- as.numeric(mystats[topic_rank, !(names(mystats) %in% c("rank of topic within diss"))])
+        breaks <- c(0, breaks, 1)
+    } else {
+        breaks <- seq(0, 1, 0.05)
+    }
+    
+    hist(myrank, breaks=breaks, xlab="Portion of Document (scaled to 1)",
+         main=strsplit(bigtitle, ",")[[1]][1], sub=subtitle)
+    
+    if(remake_figs) {
+        dev.off()
+    }
+    
+}
+
+
 # Using the analysis; a testing space.
 if(FALSE) {
 	remake_figs
@@ -417,6 +468,17 @@ if(FALSE) {
     # hinge_diss <- max(which(topic_weights$weightsbydoc[, "X1"] >= topic_weights$stats[1, "lower"]))
     # topic_weights$weightsbydoc[(hinge_diss-1):(hinge_diss+1), 1:11]
 
+    remake_figs=F
+    top.topic.histogram(topic_weights = topic_weights,
+                        topic_rank = 1,
+                        dataset_name = dataset_name,
+                        ntopics = ntopics,
+                        iter_index = iter_index,
+                        subset_name = subset_name,
+                        # subset_name = NULL,
+                        bad.topics = bad.topics,
+                        useboxstats = F)
+    
     ## Show me the median dissertation, please!
     diss_mid <- find.doc.by.topic.proportion(topic_weights = topic_weights,
                                  value = "median", 
