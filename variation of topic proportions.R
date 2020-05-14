@@ -515,18 +515,58 @@ if(FALSE) {
     sum(diss_high$keys[1:3]$weight)
  
     # Inspect topics for outlier dissertations: is this a pattern, or no? 
-    if(!exists("top_topic_browser")) {
+    if(!exists("top_titles_table")) {
         source(file="top docs per topic.R")
     }
+    
     for (topic in topic_weights$outliers.table$Topic) {
         top_topic_browser(dataset_name = dataset_name,
                           ntopics = ntopics,
                           iter_index = iter_index,
                           subset_name = subset_name,
                           showlabels = TRUE,
-                          depth = 10,
+                          depth = 20,
                           topic = topic)
     }
     
+    # Okay, if that looks good, go ahead
+    outliers.title.table <- data.frame(topic=numeric(),
+                                       topic_rank=numeric(),
+                                       Titles=character())
+    for (topic in topic_weights$outliers.table$Topic) {
+        row <- top_titles_table(dataset_name = dataset_name,
+                          ntopics = ntopics,
+                          iter_index = iter_index,
+                          subset_name = subset_name,
+                          showlabels = TRUE,
+                          depth = 5,
+                          topic = topic)
+        outliers.title.table <- rbind(outliers.title.table, row)
+    }
+    
+    outliers.table <- merge(topic_weights$outliers.table, 
+                            outliers.title.table, 
+                            by.x="Topic", 
+                            by.y="topic")
+    outliers.table$highvalues <- NULL 
+    setorder(outliers.table, -`Outlier Count`)
+    
+    if(remake_figs) {
+        if(!exists("build_plot_title", mode="function")) {
+            source(file="build_plot_title.R")
+        }
+        
+        outfile <- build_plot_title(dataset_name=dataset_name, subset_name=subset_name,
+                                     ntopics=ntopics, iter_index=iter_index,
+                                     bad.topics=bad.topics,
+                                     whatitis=paste("Proportions of Text from Upper Outliers, with titles"),
+                                     for.filename = T
+        )
+        outfile <- paste0(outfile, ".csv")
+        outfile <- file.path(imageloc, outfile)
+        write.csv(outliers.table, outfile, row.names=F)
+    } else {
+        print(outliers.table)
+    }
        
 }
