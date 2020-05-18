@@ -261,18 +261,9 @@ topic.proportions <- function(dataset_name = "noexcludes2001_2015",
     
     	        # boxplot(lowliers[, 2:ncol(lowliers)])
     
-    	        #####
-    	        # I have a hypothesis that these are mostly language-based topics.
-    	        # Let's look at the top topics represented here, to know what's 
-    	        # so dominant in the #1 slot as to crowd out these #2 topics.
-    	        # STRATEGY:
-    	        # 1. For each Pub.number, get top-ranked topic number by finding the
-    	        #    max within that row of `grid`.
-    	        # 2. Make a table of these topic numbers.
-    	        # 3. Retrieve the labels for each topic in the table.
     
-    	        lowtopics <- c()		# start empty and build up
-    	        lowvalues <- c()		# what are those high percent-of-text values?
+    	        lowtopics <- c()		# start empty and build up to find dominant topics
+    	        lowvalues <- c()		# what are the high percent-of-text values?
     
     	        for (i in lowliers$Pub.number) {
     	            row <- grid[which(grid$Pub.number==i), 2:ncol(grid), with=F]
@@ -303,9 +294,9 @@ topic.proportions <- function(dataset_name = "noexcludes2001_2015",
     	        lowlabels.t <- lowlabels.t[order(lowtopics.t, decreasing=T), ]
     
     	        # report back
-    	        message("Top-ranked topics of disses with lower outliers for second-ranked topic:")
+    	        message("Top-ranked topics of disses with lower outliers for topic ranked ", lowlier.rank, ":")
     	        print(lowlabels.t)
-    	        message(paste("Total 'lowliers' for second-ranked topic:",
+    	        message(paste("Total 'lowliers' for topic ranked", lowlier.rank, ":",
     	                      sum(lowlabels.t[, "Outlier Count", with=F])))
     
     	        # Yup, it's bad.topics for sure.
@@ -399,7 +390,6 @@ find.doc.by.topic.proportion <- function(topic_weights,   # as produced above
 ## TO DO: histogram of weights of just the top topic
 top.topic.histogram <- function(topic_weights,   # as produced above
                                 topic_rank = 1,  # top-ranked topic? 2nd?
-                                value="median",  # where to pull from?
                                 dataset_name = "noexcludes2001_2015",
                                 ntopics = 50,
                                 iter_index = 1,
@@ -445,6 +435,83 @@ top.topic.histogram <- function(topic_weights,   # as produced above
     }
     
 }
+
+
+# Find all the top topics while preserving identity, so we can graph subsets
+# and compare them to the corpus-wide distribution
+get_top_topics <- function(dataset_name = "noexcludes2001_2015",
+                           ntopics = 50,
+                           iter_index = 1,
+                           subset_name = "knownprograms2001_2015",
+                           grid = NULL,   # pass for a speed boost 
+                           mytopic = NULL # if NULL, return all; 
+                                          # otherwise, limit to topic of interest
+){
+    # helper function: find top topic for a specific publication
+    get_top_topic <- function(pubnum,
+                              dataset_name = "noexcludes2001_2015",
+                              ntopics = 50,
+                              iter_index = 1,
+                              subset_name = "knownprograms2001_2015",
+                              newnames = F,
+                              grid = NULL
+    ) {
+        if(!exists("get.topics4doc")) {
+            source(file="top docs per topic.R")
+        }
+        
+        top <- get.topics4doc(pubnum = pubnum,
+                              dataset_name = dataset_name,
+                              ntopics = ntopics,
+                              iter_index = iter_index,
+                              subset_name = subset_name,
+                              grid = grid,
+                              howmany = 1)$keys
+        
+        return(top)
+    }   # end of helper function
+    
+    
+    if(!is.null(subset_name)) {
+        pubs <- get(subset_name)$Pub.number    
+    } else {
+        pubs <- get(dataset_name)$Pub.number
+    }
+    
+    # start empty, build up
+    tops <- data.frame(topic=numeric(),
+                       weight=numeric(),
+                       alpha=numeric(),
+                       top_words=character())
+    
+    for (i in pubs) {    # use helper function on each pub
+        row <- get_top_topic(pubnum = i, 
+                             dataset_name = dataset_name,
+                             ntopics = ntopics,
+                             iter_index = iter_index,
+                             subset_name = subset_name,
+                             grid=grid)
+        tops <- rbind(tops, row)
+    }    
+    
+    # preserve the Pub.number for verification / further inspection
+    top_topics <- data.table(Pub.number=pubs, tops)
+    
+    # generally speaking, sort by topic; within topics, show largest proportion first
+    setorder(top_topics, topic, -weight)
+    
+    # if we have a topic of interest, just return that
+    if(! is.null(mytopic)) {
+        top_topics <- subset(top_topics, topic==mytopic)
+    }
+    
+    setkey(top_topics, "topic")
+    
+    return(top_topics)
+    
+}
+
+
 
 
 # Using the analysis; a testing space.
@@ -568,5 +635,78 @@ if(FALSE) {
     } else {
         print(outliers.table)
     }
-       
+
+    
+    ## Now show me the histograms of the top outlier topics (as opposed to full corpus)
+    # UPDATE: Well, after all that (~5 poms, ~2 new functions), to an eyeball estimation
+    # the distributions just aren't especially different from the corpus as a whole.
+    # mytopic <- 1
+    mygrid <- get.doctopic.grid(dataset_name=dataset_name, ntopics=ntopics,
+                      iter_index=iter_index, newnames=F)$outputfile.dt
+    # system.time(
+        top_topics <- get_top_topics(dataset_name = dataset_name,
+                   ntopics = ntopics,
+                   iter_index = iter_index,
+                   subset_name = subset_name,
+                   grid = mygrid)
+    # ) for 1684 dissertations, elapsed time: 28.349, even with the speed boost
+        
+    # compare the subset not to the whole, but to the complement (whole - subset);
+    # see https://stats.stackexchange.com/questions/108820/comparison-of-two-means/108828#108828
+    
+    for (mytopic in outliers.table$Topic) {
+        samp <- top_topics[topic == mytopic, weight]
+        comp <- top_topics[topic != mytopic, weight]
+        
+        tstats <- t.test(samp, comp)
+        
+        if (tstats$p.value < .05 && remake_figs) {
+            outfile <- build_plot_title(dataset_name = dataset_name,
+                                        ntopics = ntopics,
+                                        iter_index = iter_index,
+                                        subset_name = subset_name,
+                                        bad.topics = bad.topics,
+                                        for.filename = TRUE,
+                                        whatitis = paste("Top topic frequency for topic",
+                                                         mytopic, "is significantly different",
+                                                         "from the main distribution")
+            )
+            outfile <- paste0(outfile, ".pdf")
+            outfile <- file.path(imageloc, outfile)
+            pdf(outfile)
+        }
+        
+        
+        par(mfrow=c(1, 2))
+        
+        qqplot(comp, samp, 
+               ylab = paste0("Top topic is T", mytopic),
+               xlab = paste0("Top topic is NOT T", mytopic, ": ", outliers.table[Topic == mytopic, Label]),
+               xlim = c(0, 1),
+               ylim = c(0, 1),
+               main = "Quintile-Quintile Plot"
+        )
+        abline(a=0, b=1, col="#009900")
+        
+        boxplot(list(samp, comp),
+                # main = "Topic with Top Rank Within Document",
+                names = c("Sample", "Complement"),
+                xlab = paste0("T", mytopic, ": ", outliers.table[Topic == mytopic, Label]),
+                ylab = "Portion of Document (scaled to 1)",
+                ylim = c(0, 1)
+        )
+        
+        
+        outside_legend("topright", 
+               legend=paste0("p-value = ", 
+                             round(tstats$p.value, 4),
+                            "\n(", tstats$method, ")")
+        )
+        
+        if (tstats$p.value < .05 && remake_figs) {
+            dev.off()
+        }
+        
+        # readline("Press <enter> for next plot")
+    }
 }
