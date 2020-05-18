@@ -4,7 +4,7 @@
 # Tools for topic exploration
 #
 
-# Provides three functions:
+# Provides four functions:
 #         * get.topics4doc(pubnum, dataset_name, ntopics, howmany,
 #           showlabels): retrieves top `howmany` topics for a document
 #           specified by `pubnum`.
@@ -16,6 +16,10 @@
 #         * shareable_topic(topic, ...): Given a topic of interest,
 #           get clean data to share with others about the top "depth" docs
 #           time. See below for parameters.
+#         * top_titles_table(..., howmany, depth): for a specified dataset_name
+#           ntopics, iter_index, and subset_name, show the top `depth` titles
+#           for the top `howmany` topics, concatenated with the weight of that topic
+#           in each doc.
 #   Legacy support:
 #         * This used to define the function get.doc.composition(), but it ended up being a
 #           fairly simple wrapper on get.doctopic.grid, so I've now factored it out.
@@ -52,7 +56,8 @@ get.topics4doc <- function(pubnum,
                                                # Gets passed into get.doctopic.grid.
                            howmany = 5,
                            showlabels = FALSE,
-                           columns = c("Title", "Pub.number", tagnames))
+                           columns = c("Title", "Pub.number", tagnames),
+                           grid = NULL)         # if it exists, pass in for a speed boost
 {
     # get packages in case we've just restarted R
     require(data.table)
@@ -66,11 +71,15 @@ get.topics4doc <- function(pubnum,
     }
 
     # start with the doc/topic grid
-    doc_tops <- get.doctopic.grid(dataset_name=dataset_name, ntopics=ntopics,
+    if (is.null(grid)) {
+        doc_tops <- get.doctopic.grid(dataset_name=dataset_name, ntopics=ntopics,
                                   iter_index=iter_index, newnames=newnames)$outputfile.dt
+    } else {
+        doc_tops <- grid
+    }
 
     # narrow to the doc named by the pubnum; skip the pubnum for sorting by descending weight
-    this_doc_tops <- doc_tops[pubnum,2:ntopics+1, with=F]
+    this_doc_tops <- doc_tops[pubnum, -"Pub.number"]
     this_doc_tops <- this_doc_tops[, order(this_doc_tops, decreasing = T), with=F][,1:howmany, with=F]
 
     # merge weights with keys: from all keys, narrow to just the top howmany in this doc
@@ -529,15 +538,22 @@ top_titles_table <- function(dataset_name="noexcludes2001_2015",
                             iter_index=1,
                             subset_name="knownprograms2001_2015",
                             howmany=ntopics,  # how many topics to show?
+                            topic=NULL,
                             depth=3,        # how many titles per topic?
                             showlabels=TRUE)
 {
+    
+    if(!is.null(topic)) {
+        howmany = 1
+    }
+    
     ttt <- top_topic_browser(dataset_name=dataset_name,
                            ntopics=ntopics,
                            subset_name=subset_name,
                            showlabels=showlabels,
                            iter_index=iter_index,
                            depth=depth,
+                           topic=topic,
                            cutoff=howmany,
                            for.bind=T)
     
