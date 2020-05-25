@@ -95,8 +95,10 @@ cluster.strength <- function (my.topics=NULL,      # either pass in a list of to
                             level        = 0.12,
                             cumulative   = TRUE, # can several topics add up to meet that level?
                             subset_name  = NULL, # a named subset of data, either all columns or just Pub.numbers.
-                            grid = NULL)         # a doc-topic grid. if it exists, offers a speed boost.
-{
+                            grid = NULL,         # a doc-topic grid. if it exists, offers a speed boost.
+                            labels = NULL,       # result of get_topic_labels, if you want to label single topics
+                            use.labels = FALSE   # set TRUE if you want to pass labels
+){
     # Which topics are in the cluster?
     if(is.null(my.topics)) {
         if(is.null(my.topics_name)) {
@@ -106,7 +108,29 @@ cluster.strength <- function (my.topics=NULL,      # either pass in a list of to
                               get(my.topics_name))
         }
     } else if(is.null(my.topics_name)) {
-        my.topics_name <- paste("topics", paste(my.topics, collapse=", "))
+        if (length(my.topics) == 1) {
+            if (use.labels) {   # makes the most sense to spell out a topic when we only have 1
+                if (!is.null(labels)) {
+                    my.topics_name <- as.character(labels[my.topics, Label])
+                } else {
+                    if(!exists("get_topic_labels")) { source(file="get topic labels.R") }
+                    tryCatch(expr={
+                            labels <- get_topic_labels(dataset_name=dataset_name,
+                                                      ntopics=ntopics,
+                                                      subset_name=subset_name,
+                                                      iter_index=iter_index)
+                            my.topics_name <- as.character(labels[my.topics, Label])
+                        },
+                        error=function(e) e,
+                        finally=""
+                    )
+                }
+            } else {    # not using labels? stick with topic number
+                my.topics_name <- paste0("T", my.topics)
+            }
+        } else {        # for multiple topics, just use topic numbers for brevity
+            my.topics_name <- paste("topics", paste(my.topics, collapse=", "))
+        }
     }
 
     # if we don't yet have a doctopic grid, get one
@@ -118,8 +142,8 @@ cluster.strength <- function (my.topics=NULL,      # either pass in a list of to
                               iter_index=iter_index, subset_name=subset_name,
                               newnames=newnames)$outputfile.dt
     } else if (!is.null(subset_name)){
-        if (nrow(get(subset_name) != nrow(grid) )) {
-            warning("cluster.strength: Using an existing doc-topic grid and subset_name, but \n",
+        if (nrow(get(subset_name)) != nrow(grid) ) {
+            warning("`topic cluster reach.R`#125: Using an existing doc-topic grid and subset_name, but \n",
                 "grid and subset have a different number of rows.")
         }
     }
@@ -137,7 +161,7 @@ cluster.strength <- function (my.topics=NULL,      # either pass in a list of to
                         "13", "50")                   # language markers (Italian, Spanish)
     }
 
-    grid <- grid[, setdiff(names(grid), c(bad.topics, "Pub.number")), with=F]
+    grid <- grid[, setdiff(names(grid), c(bad.topics, "Pub.number")), with = F]
     # head(grid)
 
     if(any(my.topics %in% bad.topics)) {
@@ -147,24 +171,30 @@ cluster.strength <- function (my.topics=NULL,      # either pass in a list of to
 
 
     # Narrow our doctopic grid to the topics in question
-    my.contribs <- grid[, names(grid) %in% my.topics, with=F]
+    my.contribs <- grid[, names(grid) %in% my.topics, with = F]
 
-    if(!cumulative) {
+    if (length(my.topics) == 1) {
+        # If we're only looking at one topic, then my.contribs is a vector, and we can
+        # find "winners" directly. Otherwise (see below), we'll need to consolidate 
+        # several columns into a vector for comparison with our minimum target `level`.
+        win.dex <- my.contribs
+    } else if (!cumulative) {
         # If `cumulative` is false, at least one individual topic in the cluster must
         # be represented at higher than the minimum level set by `level` for a dissertation
-        # to be counted within this cluster's reach.
+        # to be counted within this cluster's reach. Use the max value of our cluster's topics.
         win.dex <- sapply(1:nrow(my.contribs), FUN = function(x) {
                              max(my.contribs[x]) } )
     } else {
-        # Otherwise, check whether the combined contributions from several topics
-        # within the cluster add up to the minimum level or beyond.
+        # If `cumulative` is true, combine the contributions from all topics
+        # within the cluster before comparing to the minimum target level.
         win.dex <- sapply(1:nrow(my.contribs), FUN = function(x) {
                              sum(my.contribs[x]) } )
     }
         # Either way, max or sum, we want to be above the target level.
         winners <- which(win.dex >= level)
         win.count <- length(winners)
-        win.pct <- win.count / nrow(my.contribs)
+        win.possible <- nrow(my.contribs)
+        win.pct <- win.count / win.possible
 
         # And we'll want to know which is more "in" the cluster than what.
         my.sort <- order(win.dex, decreasing = T)[seq_len(win.count)]
@@ -174,19 +204,21 @@ cluster.strength <- function (my.topics=NULL,      # either pass in a list of to
         win.pubs.sorted <- pubs[my.sort]
 
         win.pubs.level <- win.dex[my.sort]
-
+        
         message(paste0("The number of dissertations made up of at least ",
                       level*100, " percent of words from this cluster ",
                       "of topics (", my.topics_name, ", cumulative=",
                       cumulative, ") is ", win.count, " of ",
-                      nrow(my.contribs), ", or ",
+                      win.possible, ", or ",
                       round(win.pct * 100, 2), "% of the corpus."))
 
         invisible(list("grid" = my.contribs,
-                    "number" = win.count,
+                    "count" = win.count,
                     "percentage" = win.pct,
                     "docs" = win.pubs.sorted,
-                    "doc_levels" = win.pubs.level))
+                    "doc_levels" = win.pubs.level,
+                    "name" = my.topics_name,
+                    "topics" = my.topics))
 }
 
 # testing zone
@@ -304,4 +336,52 @@ if(FALSE) {
     # TO DO: make a scatter plot with X-axis = level and Y-axis = cumulative
     # cluster strength, and a dataseries for each cluster (all on the same
     # graph)
+    
+    
+    ## Get ranks by topic reach over all non-bad topics
+    #  (Find mystats with find.doc.by.topic.proportion() in `variation of topic proportions.R`;
+    #   mystats$Lhinge[1:5] means the 25th percentile for the top five topic-ranks)
+    require(data.table)
+    topic_reach <- data.table()
+    extent_level <- sort(round(mystats$Lhinge[1:5], 2))
+
+    for (lvl in extent_level) {
+        extent_all <- sapply(setdiff(1:ntopics, bad.topics), FUN=function(x) {
+            cluster.strength(my.topics = x,
+                         dataset_name = dataset_name,
+                         ntopics = ntopics,
+                         iter_index = iter_index,
+                         subset_name = subset_name,
+                         bad.topics = bad.topics,
+                         cumulative = FALSE,
+                         level = lvl,
+                         grid = dt,
+                         use.labels = T,
+                         labels = topic_labels)     # from get_topic_labels()
+            })
+        
+        extent_all.vector <- round(100*unlist(extent_all["percentage", ]), 2)
+        extent_all["grid", ]
+        colname <- quote(paste0("extent_all", lvl*100))
+        topic_reach[, eval(colname)] <- extent_all.vector    
+        topic_reach$label <- unlist(extent_all["name", ])
+        topic_reach$topic <- unlist(extent_all["topics", ])
+    }
+    
+    topic_reach <- topic_reach[order(topic_reach[, 1], decreasing = T)]
+    setcolorder(topic_reach, c("topic", "label"))
+    
+    if(remake_figs) {
+        outfile_slug <- build_plot_title(dataset_name = dataset_name,
+                                    ntopics = ntopics,
+                                    iter_index = iter_index,
+                                    subset_name = subset_name,
+                                    bad.topics = bad.topics,
+                                    whatitis = "Topic Reach",
+                                    for.filename = TRUE)
+        outfile <- file.path(imageloc, paste0(outfile_slug, ".csv"))
+        write.csv(topic_reach, outfile, row.names = F)
+    }
+    
+
 }
