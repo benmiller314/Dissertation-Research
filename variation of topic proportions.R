@@ -443,6 +443,7 @@ get_top_topics <- function(dataset_name = "noexcludes2001_2015",
                            ntopics = 50,
                            iter_index = 1,
                            subset_name = "knownprograms2001_2015",
+                           bad.topics = c("3", "8", "12", "15", "30", "34", "36", "47", "50"),
                            grid = NULL,   # pass for a speed boost 
                            mytopic = NULL # if NULL, return all; 
                                           # otherwise, limit to topic of interest
@@ -483,6 +484,7 @@ get_top_topics <- function(dataset_name = "noexcludes2001_2015",
                        weight=numeric(),
                        alpha=numeric(),
                        top_words=character())
+    bad.count <- 0
     
     for (i in pubs) {    # use helper function on each pub
         row <- get_top_topic(pubnum = i, 
@@ -491,11 +493,17 @@ get_top_topics <- function(dataset_name = "noexcludes2001_2015",
                              iter_index = iter_index,
                              subset_name = subset_name,
                              grid=grid)
+        if(row$topic %in% bad.topics) {
+            bad.count <- bad.count + 1
+        } 
+        
         tops <- rbind(tops, row)
+        
     }    
     
     # preserve the Pub.number for verification / further inspection
     top_topics <- data.table(Pub.number=pubs, tops)
+    setkey(top_topics, topic)
     
     # generally speaking, sort by topic; within topics, show largest proportion first
     setorder(top_topics, topic, -weight)
@@ -506,6 +514,10 @@ get_top_topics <- function(dataset_name = "noexcludes2001_2015",
     }
     
     setkey(top_topics, "topic")
+    
+    if(bad.count > 0) {
+        warning("Found and skipped ", bad.count, " dissertations with top topic in bad.topics.")
+    }
     
     return(top_topics)
     
@@ -648,19 +660,41 @@ if(FALSE) {
                    ntopics = ntopics,
                    iter_index = iter_index,
                    subset_name = subset_name,
+                   bad.topics = bad.topics,
                    grid = mygrid)
     # ) for 1684 dissertations, elapsed time: 28.349, even with the speed boost
+        
+    # remove rows in which the top topic was a bad.topic
+    top_topics <- top_topics[!.(as.numeric(bad.topics))]
         
     # compare the subset not to the whole, but to the complement (whole - subset);
     # see https://stats.stackexchange.com/questions/108820/comparison-of-two-means/108828#108828
     
-    for (mytopic in outliers.table$Topic) {
+    # get the topic labels, and make sure you don't overwrite the saved spreadsheet
+    # by temporarily turning off remake_figs, even if it's currently true
+    if(!exists("get_topic_labels")) {
+        source(file="get topic labels.R")
+    }
+    remake_figs_quo <- remake_figs
+    remake_figs <- F
+    topic_labels <- get_topic_labels(dataset_name, ntopics, subset_name, iter_index)    
+    remake_figs <- remake_figs_quo
+    rm(remake_figs_quo)
+    
+    # for (mytopic in outliers.table$Topic) {
+    for (mytopic in setdiff(seq_len(ntopics), bad.topics)) {
         samp <- top_topics[topic == mytopic, weight]
         comp <- top_topics[topic != mytopic, weight]
         
         tstats <- t.test(samp, comp)
         
         if (tstats$p.value < .05 && remake_figs) {
+            if(tstats$p.value < .001) {
+                sig_level <- "highly significantly"
+            } else {
+                sig_level <- "significantly"
+            }
+            
             outfile <- build_plot_title(dataset_name = dataset_name,
                                         ntopics = ntopics,
                                         iter_index = iter_index,
@@ -668,7 +702,7 @@ if(FALSE) {
                                         bad.topics = bad.topics,
                                         for.filename = TRUE,
                                         whatitis = paste("Top topic frequency for topic",
-                                                         mytopic, "is significantly different",
+                                                         mytopic, "is", sig_level, "different",
                                                          "from the main distribution")
             )
             outfile <- paste0(outfile, ".pdf")
@@ -681,7 +715,7 @@ if(FALSE) {
         
         qqplot(comp, samp, 
                ylab = paste0("Top topic is T", mytopic),
-               xlab = paste0("Top topic is NOT T", mytopic, ": ", outliers.table[Topic == mytopic, Label]),
+               xlab = paste0("Top topic is NOT T", mytopic, ": ", topic_labels[Topic == mytopic, Label]),
                xlim = c(0, 1),
                ylim = c(0, 1),
                main = "Quintile-Quintile Plot"
@@ -691,7 +725,7 @@ if(FALSE) {
         boxplot(list(samp, comp),
                 # main = "Topic with Top Rank Within Document",
                 names = c("Sample", "Complement"),
-                xlab = paste0("T", mytopic, ": ", outliers.table[Topic == mytopic, Label]),
+                xlab = paste0("T", mytopic, ": ", topic_labels[Topic == mytopic, Label]),
                 ylab = "Portion of Document (scaled to 1)",
                 ylim = c(0, 1)
         )
