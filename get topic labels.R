@@ -15,9 +15,12 @@ get_topic_labels <- function(dataset_name="consorts",
                              subset_name=NULL,
                              iter_index="",
                              bad.topics=NULL,
-                             newnames=F     # where in the MALLET output filename does iter_index appear?
-                                            # Set T if it's with the model, F if last in filename.
-                                            # Gets used only if get.topickeys() is needed.
+                             newnames=F,     # where in the MALLET output filename does iter_index appear?
+                                             # Set T if it's with the model, F if last in filename.
+                                             # Gets used only if get.topickeys() is needed.
+                             remake_figs=F   # most of the time we don't want to overwrite this!
+                                             # skip within local scope, override from this file 
+                                             # if you feel strongly about it.
 ) {
 # 	## original filename structure
 #     filename <- file.path(imageloc, paste0("topic labeling - ", dataset_name, ", K",
@@ -82,6 +85,9 @@ get_topic_labels <- function(dataset_name="consorts",
           if(tolower(overwrite) == "n") {
               outfile <- readline(paste("Enter new filename, including directory. ",
                                         "(Default directory is ", imageloc, ")> "))
+              if (tolower(outfile) == "s" || length(outfile == 0)) {
+                  return(topic.labels.dt)
+              }
           } else if (tolower(overwrite) == "s") {
               return(topic.labels.dt)
           } else if (tolower(overwrite) != "o") {
