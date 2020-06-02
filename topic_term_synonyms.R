@@ -1,10 +1,10 @@
 
 # load the WordNet dictionary of synsets
 require(data.table)
+
 require(wordnet)        # NB: if this crashes R, try updating Java:
                         # https://stackoverflow.com/questions/26252591/mac-os-x-and-multiple-java-versions#answer-47699905
 setDict(file.path(WNHOME, "dict"))
-
 
 # # dev values
 # dataset_name <- "noexcludes2001_2015"
@@ -236,7 +236,7 @@ topic_clusters <- function(twm = NULL,               # a topic-distance matrix, 
     }
 
     if(do.plot) {
-        pltree(clust)
+        plot(clust)
     }
 
     return(clust)
@@ -460,7 +460,36 @@ if(autorun) {
 
     tree_summary(ag=ag, tw=tw, nclust=10, slow=F)
 
-
+    clust.method = "agnes"
+    clust2 <- topic_clusters(twm=twm,
+                             tw=tw,
+                             dataset_name = dataset_name,
+                             ntopics = ntopics,
+                             iter_index = iter_index,
+                             bad.topics = bad.topics,
+                             clust.method = clust.method,
+                             use.labels = T,
+                             do.plot = F) 
+        
+        if(remake_figs) {
+            dendrogram.outfile <- build_plot_title(dataset_name = dataset_name,
+                                                   ntopics = ntopics,
+                                                   iter_index = iter_index,
+                                                   subset_name = subset_name,
+                                                   whatitis = paste0("topic cluster dendrogram--", clust.method),
+                                                   for.filename = TRUE
+            )
+            dendrogram.outfile <- paste0(dendrogram.outfile, ".pdf")
+            dendrogram.outfile <- file.path(imageloc, dendrogram.outfile)
+            pdf(dendrogram.outfile)
+        }
+    plot(clust2, which.plots = 2)
+    if(remake_figs) { 
+        dev.off()
+    }
+    
+    
+    
     #*******************************************#
     #.      noexcludes2001_2015k150_iter1      .#
     #.                          ^^^            .#
@@ -521,4 +550,6 @@ if(FALSE) {   # testing
     JSD(t(as.matrix(tw.grid[, 1:2])))
     JSD(rbind(tw_a, tw_2))
     tw_2 <- tw.grid[["2"]]
-}
+    
+    
+   }
