@@ -109,6 +109,22 @@ summarize_topic_clusters <- function(
                          bad.topics = bad.topics,
                          clust.method = clust.method,
                          use.labels=use.labels)
+    if(remake_figs) {
+        dendrogram.outfile <- build_plot_title(dataset_name = dataset_name,
+                                         ntopics = ntopics,
+                                         iter_index = iter_index,
+                                         subset_name = subset_name,
+                                         whatitis = paste0("topic cluster dendrogram--", clust.method),
+                                         for.filename = TRUE
+        )
+        dendrogram.outfile <- paste0(dendrogram.outfile, ".pdf")
+        dendrogram.outfile <- file.path(imageloc, dendrogram.outfile)
+        pdf(dendrogram.outfile)
+    }
+    plot(clust, which.plots = 2)
+    if(remake_figs) { 
+        dev.off()
+    }
 
     ############ Inspect Tree, Set Number of Clusters ############
     # nclust <- 20    # TO DO: iterate this via parameters
@@ -238,8 +254,21 @@ name_clusters <- function(cl_summary,  # result of summarize_topic_clusters (abo
 
 
 if(FALSE) {
-    cl50 <- summarize_topic_clusters(ntopics=50)
+    cl50 <- summarize_topic_clusters(ntopics=50, extent_level = 0.05, tw = tw)
     cl50$extent[]
 
     cl150 <- summarize_topic_clusters(ntopics=150, iter_index=2, bad.topics=NULL, subset_name=NULL)
+    
+    
+    myclust <- summarize_topic_clusters(dataset_name = "noexcludes2001_2015",
+                                   ntopics = 50,
+                                   iter_index = 1,
+                                   subset_name = "knownprograms2001_2015",
+                                   bad.topics = c(3, 12, 50, 47, 34, 36, 30, 8, 15),
+                                   extent_level = 0.5,
+                                   find.nclust = TRUE,
+                                   tw = tw,
+                                   use.labels = T)
+    
+    
 }
