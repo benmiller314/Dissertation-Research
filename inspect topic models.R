@@ -22,7 +22,7 @@ summarize_topic_clusters <- function(
 
     ## A dissertation is "in" a cluster if it contains more than
     #  what cumulative level of words from all topics in the cluster?
-    extent_level = 0.12,
+    extent_level = 0.05,
 
     ## And how should we cluster those dissertations:
     # use agglomerative (cluster::agnes) or
