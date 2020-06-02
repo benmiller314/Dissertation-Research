@@ -49,7 +49,7 @@ summarize_topic_clusters <- function(
     ## Any one topic to inspect while we're here?
     onetopic = NULL,
 
-    ## If you've done this already with this dataset, save some time
+    ## If you have a topic-word table already for this dataset, save some time
     tw = NULL
 
 ){
@@ -188,8 +188,13 @@ summarize_topic_clusters <- function(
         }
 
     }
-    return(list("cl"=cl,
-                "extent"=extent))
+    
+    to.return <- list("cl" = cl,
+                      "extent" = extent,
+                      "call" = match.call())
+    # names(to.return)[2] <- paste0("extent", extent_level * 100, "pct")
+    
+    return(to.return)
 }
 
 name_clusters <- function(cl_summary,  # result of summarize_topic_clusters (above)
