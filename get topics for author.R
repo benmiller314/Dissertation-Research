@@ -5,27 +5,67 @@
 if(!exists("get.topics4doc", mode="function")) { source(file="top docs per topic.R") }
 
 # main wrapper function for author search
-get.topics4author <- function(authorname, dataset_name="consorts", ntopics=55, howmany=10, showlabels=TRUE) {
+get.topics4author <- function(authorname, 
+                              dataset_name = "noexcludes2001_2015", 
+                              ntopics=50, 
+                              iter_index = 1, 
+                              subset_name = NULL,
+                              howmany = 10, 
+                              showlabels = TRUE) {
 
-	pubnum <- noexcludes[grep(authorname, noexcludes$Author, ignore.case=T), "Pub.number"]
+    require(data.table)
+    dataset.dt <- data.table(get(dataset_name), key = "Pub.number")
+    
+    author.index <- grep(authorname, dataset.dt$Author, ignore.case = T)
+    
+    if (length(author.index)) {
+        pubnum <- dataset.dt[author.index, Pub.number]
+    } else {
+        tryCatch(expr = {
+            if (!exists("namepart", mode="function")) { source(file = "advisor relations.R") }
+            authornames <- namepart(authorname, "list")
+            author.index <- c()
+            for (name in authornames) {
+                author.index <- c(author.index, grep(name, dataset.dt$Author, ignore.case = T))
+            }
+            pubnum <- dataset.dt[author.index, Pub.number]
+        }, 
+        e = "No match for that author; try just last name or first name.",
+        finally = "No exact match found; building list from space-separated name parts."
+        )
+    }
+    
 	if(length(pubnum) == 1) {
-		print(noquote(paste("$author: ", noexcludes.dt[as.character(pubnum), list(Author)]$Author)))
-		print(get.topics4doc(pubnum, dataset_name, ntopics, howmany, showlabels))
+		print(noquote(paste("$author: ", dataset.dt[as.character(pubnum), list(Author)]$Author)))
+	    
 	} else if (length(pubnum) > 1) {
 		message("More than one match; please use exact author name from list below.")
-		results <- noexcludes.dt[as.character(pubnum), list(Author, Title)]
+		results <- dataset.dt[as.character(pubnum), list(Author, Title, Pub.number)]
 		print(results)
 
 		a <- as.integer(readline("Search again using row number... "))
 		pubnum <- results[a, Pub.number]
 		print(noquote(paste("$author: ", results[a, Author])))
-		print(get.topics4doc(pubnum, dataset_name, ntopics, howmany, showlabels))
 	}
+    
+    if( !is.null(subset_name) && !(pubnum %in% get(subset_name)$Pub.number)) {
+        warning("Specified dissertation is not in the subset", subset_name)
+    }
+    
+    print(get.topics4doc(pubnum=pubnum, 
+                         dataset_name = dataset_name, 
+                         ntopics = ntopics, 
+                         iter_index = iter_index, 
+                         howmany = howmany, 
+                         showlabels = showlabels))
 }
 
 if(autorun) {
 	get.topics4author("MUELLER, DEREK")
 	get.topics4author("Lucas")
+	get.topics4author(authorname = "Adam Lawrence", dataset_name = "noexcludes2001_2015",
+	                  ntopics = 50,
+	                  iter_index = 1)
 }
 
 # Second function (get.topics4school). Given a schoolname of interest,
@@ -33,17 +73,17 @@ if(autorun) {
 # (2) sum the topic contributions of all those dissertations
 # (3) rank the resulting topics, with current labels
 get.topics4school <- function(schoolname,
-                              dataset_name = "consorts",
-                              ntopics = 55,
+                              dataset_name = "noexcludes2001_2015",
+                              ntopics = 50,
+                              iter_index = 1,
                               subset_name = NULL,
-                              iter_index = "",
-										newnames=F,         # where in the MALLET output filename does iter_index appear?
-																  # set T if it's with the model, F if last in filename.
-																  # Gets passed into get.doctopic.grid.
+                              newnames = F,       # where in the MALLET output filename does iter_index appear?
+												  # set T if it's with the model, F if last in filename.
+												  # Gets passed into get.doctopic.grid.
                               howmany = 10,
                               showlabels = TRUE,
                               use.clusters = FALSE,  # call cluster.reach()?
-                              clusterlevel = 0.12)   # if so, at what level?
+                              clusterlevel = 0.13)   # if so, at what level?
 {
     # Get the data
     if (! is.null(subset_name)) {
@@ -80,11 +120,24 @@ get.topics4school <- function(schoolname,
         if(!exists("cluster.strength", mode="function")) {
             source(file="topic cluster reach.R")
         }
+        
+        all_clusters <- name_topic_clusters(dataset_name = dataset_name,
+                                            ntopics = ntopics,
+                                            iter_index = iter_index,
+                                            subset_name = subset_name)
+        
+        if(length(grep("all_clusters", all_clusters$name))) {
+            all_clusters <- all_clusters[grep("all_clusters", all_clusters$name),
+                                         "topics"]
+            all_clusters <- strsplit(all_clusters, " ")[[1]]
+        }
+        
+        
         clusters <- sapply(all_clusters, FUN = function(x) {
-                            cluster.strength(x,
+                            cluster.strength(my.topics_name = x,
                                 dataset_name = dataset_name,
                                 ntopics = ntopics,
-                                subset_pubs = pubnums,
+                                subset_name = pubnums,
                                 level = clusterlevel)
                              })
 
