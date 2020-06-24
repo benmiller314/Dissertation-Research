@@ -147,7 +147,7 @@ summarize_topic_clusters <- function(
     # cl[order(-nobads.size)]
     # sum(cl$nobads.size)
 
-    pltree(clust)
+    plot(clust)
 
 
     extent <- sapply(seq_len(nrow(cl)), FUN=function(x) {
