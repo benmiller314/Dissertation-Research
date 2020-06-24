@@ -86,7 +86,7 @@ get.doctopic.grid <- function(dataset_name = "noexcludes2001_2015",
     
         if (is.null(subset)) {
             subset_index <- doc_topics$Pub.number
-        } else if (is.vector(subset)) {         # it's a list of Pub.numbers
+        } else if (is.atomic(subset) || is.vector(subset)) {         # it's a list of Pub.numbers
             subset_index <- subset
         } else {
             subset_index <- subset$Pub.number   # it's a full dataset
