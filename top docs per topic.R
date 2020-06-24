@@ -56,8 +56,9 @@ get.topics4doc <- function(pubnum,
                                                # Gets passed into get.doctopic.grid.
                            howmany = 5,
                            showlabels = FALSE,
-                           columns = c("Title", "Pub.number", tagnames),
-                           grid = NULL)         # if it exists, pass in for a speed boost
+                           columns = c("Title", "Pub.number", tagnames, "realconsort", "realrhetmap"),
+                           grid = NULL,         # if it exists, pass in for a speed boost
+                           verbose = F)
 {
     # get packages in case we've just restarted R
     require(data.table)
@@ -109,10 +110,16 @@ get.topics4doc <- function(pubnum,
     }
     
     
-    list("title" = dataset.dt[pubnum, ..columns],
+    to.return <- list("title" = dataset.dt[pubnum, ..columns],
         "keys" = topic_keys,
         "abstract" = dataset.dt[pubnum, c("KEYWORDS", "ABSTRACT"), with=F]
         )
+    
+    if(verbose) {
+        print(to.return)
+    }
+    
+    return(to.return)
 
 # close helper function get.topics4doc
 }
@@ -192,7 +199,8 @@ top_topic_browser <- function(
             topic.num <- topic
         } else if(length(topic > 1)) {
     # If we specified more than one, assume it's a cluster;
-    # use the top-ranked topic of the set
+    # for now, use the top-ranked topic of the set,
+    # but TO DO find a way to compile the sum and then work from there.
             topic.num <- topic[which.max(match(topic, names(colsums.sort)))]
             topic.num <- as.integer(topic.num)
             msg <- paste0("top_topic_browser: Multiple topics specified (",
@@ -585,6 +593,78 @@ top_titles_table <- function(dataset_name="noexcludes2001_2015",
     return(ttt)
 }
 
+# build a table for a cluster of topics using the function above
+# TO DO: just combine these functions and handle multiple named topics
+cluster_titles_table <- function(cluster_members=NULL,    # vector of topic numbers
+                                 cluster_name=NULL,       # what should we call it?
+                                 dataset_name="noexcludes2001_2015",
+                                 ntopics=50,
+                                 iter_index=1,
+                                 subset_name="knownprograms2001_2015",
+                                 depth=3,        # how many titles per topic?
+                                 use.labels=TRUE,
+                                 mygrid = NULL,    # pass for slight speed boost 
+                                 verbose = F,
+                                 level = 0.5)
+{
+    if (! exists("cluster.strength", mode="function")) {
+        source(file = "topic cluster reach.R")
+    }
+    
+    this_cluster <- cluster.strength(my.topics = cluster_members,
+                     my.topics_name = cluster_name, 
+                     dataset_name = dataset_name,
+                     ntopics = ntopics,
+                     iter_index = iter_index,
+                     subset_name = subset_name,
+                     use.labels = use.labels,
+                     level = level,
+                     grid = mygrid)
+    
+    mypubs <- head(this_cluster$docs, depth)
+    myweights <- head(this_cluster$doc_levels, depth)
+    
+    mytable <- data.table(Pub.number = mypubs,
+               ClusterWeight = myweights,
+               key = "Pub.number")
+    
+    dataset <- data.table(get(dataset_name), key = "Pub.number")
+    
+    mytable[, Title:=dataset[mypubs, Title]]
+    mytable[, "Weight":=round(ClusterWeight, 4) * 100]
+    
+    to.return <- mytable[order(-ClusterWeight), list(Title, Weight)]
+    
+    if(verbose) {
+        for (pubnum in mypubs) { 
+            message("Pubnum ", pubnum, ", with cluster at ", mytable[pubnum, Weight])
+            get.topics4doc(pubnum = pubnum, 
+                           showlabels = T, 
+                           verbose = T
+            )
+            readline("<press any key to continue>") 
+        }
+    }
+    
+    if (remake_figs) { 
+        if(!exists ("build_plot_title")) {
+            source(file="build_plot_title.R")
+        }
+        
+        outfile <- build_plot_title(dataset_name=dataset_name,
+                                    ntopics=ntopics,
+                                    iter_index = iter_index,
+                                    subset_name = subset_name,
+                                    whatitis = paste("top titles for topics in cluster", cluster_name),
+                                    for.filename = TRUE)
+        outfile <- file.path(imageloc, paste0(outfile, ".csv"))
+        write.csv(to.return, outfile, row.names = F)
+    }
+    
+    return(to.return)
+        
+}
+
 
 
 ## Run the big browser function above
@@ -611,7 +691,10 @@ if (autorun) {
                   " * top_titles_table(..., howmany, depth): for a specified dataset_name,  \n",
                   "   ntopics, iter_index, and subset_name, show the top `depth` titles \n",
                   "   for the top `howmany` topics, concatenated with the weight of that topic \n",
-                  "   in each doc."))
+                  "   in each doc. \n",
+                  " * cluster_titles_table(cluster_members, cluster_name, ..., howmany, depth): \n", 
+                  "   like top_titles_table(), but for a combined set of topics, treated cumulatively."
+    ))
 }
 
 if(FALSE) {
@@ -636,4 +719,29 @@ if(FALSE) {
                                   showlabels=TRUE
                       )
     
+    bad.topics.table <- cluster_titles_table(dataset_name="noexcludes2001_2015",
+                                         ntopics=50,
+                                         iter_index=1,
+                                         subset_name="knownprograms2001_2015",
+                                         depth=3,        # how many titles per topic
+                                         showlabels=TRUE, 
+                                         cluster_members = bad.topics
+    ) 
+    
+    remake_figs
+    cluster_titles_table(cluster_members = c(9, 19, 29, 13, 31),
+                         cluster_name = "public rhetoric")
+    
+    
+    # Reconsidering language-based topics. What if they're real?
+    shareable_topic(dataset_name = "noexcludes2001_2015",
+                    ntopics = 50,
+                    iter_index = 1,
+                    subset_name = "knownprograms2001_2015",
+                    topic = 47)   # spanish language
+    shareable_topic(dataset_name = "noexcludes2001_2015",
+                    ntopics = 50,
+                    iter_index = 1,
+                    subset_name = "knownprograms2001_2015",
+                    topic = 30)   # german language
 }
