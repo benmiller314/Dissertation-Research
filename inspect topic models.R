@@ -18,7 +18,9 @@ summarize_topic_clusters <- function(
 
     ## Narrow within it? Set either to NULL if not using.
     subset_name = "knownprograms2001_2015",          
-    bad.topics = c(3, 12, 50, 47, 34, 36, 30, 8, 15),
+    bad.topics = c(3, 12, 50, 
+                   # 47,        # spanish language. bring it back in!
+                   34, 36, 30, 8, 15),
 
     ## A dissertation is "in" a cluster if it contains more than
     #  what cumulative level of words from all topics in the cluster?
@@ -33,7 +35,7 @@ summarize_topic_clusters <- function(
     use.labels = TRUE,
 
     ## How many clusters to find?
-    nclust = 20,
+    nclust = 17,
     find.nclust = FALSE,    # if TRUE, ignore nclust and plot a dendrogram of topics with frameToJSON (from frameToD3.R).
                             # The function will then exit.
                             # Use rect.hclust and abline to find alternate "cuts" for the next model to build.
@@ -44,7 +46,8 @@ summarize_topic_clusters <- function(
                                          dataset_name, "k",
                                          ntopics, "_iter", iter_index,
                                          subset_name, "--",
-                                         clust.method),
+                                         length(bad.topics), "bads",
+                                         "--", clust.method),
 
     ## Any one topic to inspect while we're here?
     onetopic = NULL,
@@ -115,6 +118,7 @@ summarize_topic_clusters <- function(
                                          ntopics = ntopics,
                                          iter_index = iter_index,
                                          subset_name = subset_name,
+                                         bad.topics = bad.topics,
                                          whatitis = paste0("topic cluster dendrogram--", clust.method),
                                          for.filename = TRUE
         )
