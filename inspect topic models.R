@@ -78,6 +78,7 @@ summarize_topic_clusters <- function(
 
 
     source(file="topic_term_synonyms.R")
+    source(file="topic_term_synonyms.R") # here twice to set the WordNet 'dict' directory
     twm <- topic_distance_matrix(dataset_name = dataset_name,
                                  ntopics = ntopics,
                                  iter_index = iter_index,
