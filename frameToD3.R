@@ -42,7 +42,8 @@ frameToJSON <- function(dataset_name="noexcludes2001_2015",
                                         # exclude non-content-bearing topics
                         auto.lines=FALSE, # should we draw all the boxes on autorun?
                         tw = NULL,      # a topic-word matrix, if it exists
-                        twm = NULL)     # the distance matrix for tw, if it exists
+                        twm = NULL,     # the distance matrix for tw, if it exists
+                        dt = NULL)      # the doc-topic grid, if it exists
 {
 
   #packages we will need:
@@ -51,27 +52,30 @@ frameToJSON <- function(dataset_name="noexcludes2001_2015",
   require(cluster)
 
   # Ben: Get topic weights for every document we have
-  if(!exists("get.doctopic.grid", mode="function")) { 
-        source(file="get doctopic grid.R")
+  if(is.null(dt)) {
+    if(!exists("get.doctopic.grid", mode="function")) { 
+          source(file="get doctopic grid.R")
+    }
+    dt <- get.doctopic.grid(dataset_name=dataset_name, ntopics=ntopics,
+                            subset_name=subset_name, iter_index=iter_index,
+                            newnames=newnames)$outputfile.dt
   }
-  dt <- get.doctopic.grid(dataset_name=dataset_name, ntopics=ntopics,
-                          subset_name=subset_name, iter_index=iter_index,
-                          newnames=newnames)$outputfile.dt
-
   # Ben: Exclude any NA rows included accidentally by the index file
   dt <- na.omit(dt)
 
 
   # Ben: Optionally exclude non-content-bearing topics
-  if (is.null(bad.topics)) {
-      if (dataset_name=="consorts" && ntopics==55 && iter_index=="") {
-          bad.topics <- c("2", "4", "22", "24", "47", "50", "13")
-      } else if (dataset_name=="noexcludes2001_2015" && ntopics==50 && iter_index==1) {
-          bad.topics <- c("3", "8", "12", "15", "30", "34", "36", "47", "50")
-      }
-  }
+  # if (is.null(bad.topics)) {
+  #     if (dataset_name=="consorts" && ntopics==55 && iter_index=="") {
+  #         bad.topics <- c("2", "4", "22", "24", "47", "50", "13")
+  #     } else if (dataset_name=="noexcludes2001_2015" && ntopics==50 && iter_index==1) {
+  #         bad.topics <- c("3", "8", "12", "15", "30", "34", "36", 
+  #                         # "47", 
+  #                         "50")
+  #     }
+  # }
 
-  if(!is.null(bad.topics)) { dt <- dt[, !names(dt) %in% bad.topics, with=F] }
+  if(!is.null(bad.topics)) { dt <- dt[, setdiff(names(dt), bad.topics), with=F] }
 
   # Set parameter defaults if needed
   if(is.null(groupVars)) {
@@ -635,9 +639,13 @@ cotopic_edges <- function(dataset_name="noexcludes2001_2015",
         if (!exists("build_plot_title", mode="function")) {
           source(file="build_plot_title.R")
         }
-        outfile_slug <- build_plot_title(dataset_name=dataset_name, ntopics=ntopics,
-                                         iter_index=iter_index, subset_name=subset_name,
-                                         bad.topics=bad.topics, whatitis="edge_data")
+        outfile_slug <- build_plot_title(dataset_name = dataset_name, 
+                                         ntopics = ntopics,
+                                         iter_index = iter_index, 
+                                         subset_name = subset_name,
+                                         bad.topics = bad.topics, 
+                                         whatitis = "edge_data",
+                                         for.filename = T)
         outfile <- file.path(webloc,
                              paste0(outfile_slug,
                              "--min", min,
@@ -763,7 +771,7 @@ cotopic_edges <- function(dataset_name="noexcludes2001_2015",
 
 
 if(FALSE) {
-    remake_figs=T
+    remake_figs
     # debug(frameToJSON)
     frameToJSON(do.plot=T)
     frameToJSON(dataset_name="noexcludes", subset_name="realconsorts", iter_index="")
@@ -781,17 +789,30 @@ if(FALSE) {
                 subset_name="knownprograms2001_2015",
                 ntopics=50,
                 iter_index=1,
-                bad.topics = c(3, 12, 50, 47, 34, 36, 30, 8, 15),
+                bad.topics = c(3, 12, 50, 
+                               # 47, 
+                               34, 36, 30, 8, 15),
                 use.labels=T,
                 tw=tw,
-                clust.method = "diana")
+                clust.method = "agnes")
 
 
 
     # 12% determined by `variation of topic proportions.R` to include nearly
     # all primary topics and 3/4 of secondary topics for *consorts*;
     # see `Variation of Topic Proportions, Top 10 Topics per Document.pdf`
-    cotopic_edges(level=0.12, min=1, dataset_name="noexcludes2001_2015", subset_name="knownprograms2001_2015", ntopics=50, iter_index=1, bad.topics = c(3, 12, 50, 47, 34, 36, 30, 8, 15))
+    remake_figs=T
+    cotopic_edges(level=0.05, 
+                  min=1, 
+                  dataset_name="noexcludes2001_2015", 
+                  ntopics=50, 
+                  iter_index=1, 
+                  subset_name="knownprograms2001_2015", 
+                  bad.topics = c(3, 12, 50, 
+                                 # 47,   # spanish language
+                                 34, 36, 30, 8, 15),
+                  tw = tw,
+                  clust.method="agnes")
     cotopic_edges(level=0.12, min=2)
     cotopic_edges(level=0.12, min=3, dataset_name="noexcludes2001_2015", ntopics=50, iter_index=1, bad.topics = c(3, 12, 50, 47, 34, 36, 30, 8, 15))
     cotopic_edges(level=0.12, min=4)

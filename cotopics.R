@@ -10,49 +10,58 @@
 # source-target table called "cotopics."
 
 
-get.cotopics <- function(dataset_name="consorts",
-		 ntopics=55,
-		 subset_name=NULL,
-		 iter_index="",
-		 newnames=F,         # where in the MALLET output filename does iter_index appear?
-		 							# set T if it's with the model, F if last in filename.
-									# Gets passed into get.doctopic.grid.
-		 level=.12, 			# what fraction of the doc (out of 1) must
+get.cotopics <- function(dataset_name = "noexcludes2001_2015",
+		 ntopics = 50,
+		 subset_name = "knownprograms2001_2015",
+		 iter_index = 1,
+		 newnames = F,          # where in the MALLET output filename does iter_index appear?
+		 						# set T if it's with the model, F if last in filename.
+								# Gets passed into get.doctopic.grid.
+		 level = .13, 			# what fraction of the doc (out of 1) must
 		 						# each topic account for?
-		 json=F, 				# export to JSON?
-		 min=3,					# how many times must these topics co-occur
+		 outfile = NULL,        # optionally pass a name; use defaults otherwise
+		 json = T, 				# export to JSON?
+		 min = 3,				# how many times must these topics co-occur
 		 						# to be "co-topics"?
-		 bad.topics=c("2", "4", "22", "24", "47", "50", "13")
-		 						# exclude non-content-bearing topics
+		 bad.topics = NULL,		# optionally exclude non-content-bearing topics
+		 dt = NULL              # optionally pass doc-topic grid
 		)
 {
 
 	require(data.table)
 
-	if (!exists("get.doctopic.grid", mode="function")) {
-		source(file="get doctopic grid.R")
-	}
-	grid <- get.doctopic.grid(dataset_name=dataset_name, ntopics=ntopics,
-	                          subset_name=subset_name, iter_index=iter_index,
-									  newnames=newnames)$outputfile
-	head(grid)
-	grid <- grid[, !names(grid) %in% bad.topics]
-	head(grid)
+    if(is.null(dt)) {
+    	if (!exists("get.doctopic.grid", mode="function")) {
+    		source(file="get doctopic grid.R")
+    	}
+        
+    	dt <- get.doctopic.grid(dataset_name=dataset_name, ntopics=ntopics,
+    	                        subset_name=subset_name, iter_index=iter_index,
+    							newnames=newnames)$outputfile.dt
+    	
+    	dt <- dt[, setdiff(names(dt), bad.topics), with=F]
+    	dt <- na.omit(dt)
+    	# head(dt)
+    }
 
 	# start empty, build up.
 	cotopics <- data.frame(row.names=c("source","target"))
-	for (i in 1:nrow(grid)) { 			# loop through the documents (rows).
-
+	for (i in 1:nrow(dt)) { 			# loop through the documents (rows).
+	# for (i in 1:5) {  # test values
 		# find which topics (columns) make up a big chunk.
-		A <- which(grid[i, 2:length(grid)] > level)
+		A <- which(dt[i, 2:length(dt)] > level)
 
 		# can't combine just one thing.
 		if (length(A) >= 2) {
 			# don't forget to get topic names, not col numbers!
-			A <- as.integer(names(grid[, 1+A]))
+			A <- as.integer(names(dt[, 1+A, with=F]))
 
+			# print(combn(A,2))
+			
 			# find all pairs of those big-chunk topics.
 			cotopics <- cbind(cotopics, combn(A,2))
+			
+			# print(cotopics)
 		}
 	}
 
@@ -68,33 +77,61 @@ get.cotopics <- function(dataset_name="consorts",
 	cotopics <- cotopics[, list(weight=.N), by=list(source, target)]
 
 	# to reduce complexity, set a minimum number of co-occurrences
-	cotopics <- cotopics[which(weight > min), ]
+	cotopics.over.min <- cotopics[which(weight >= min), ]
 
 	# print and optionally save the result
-	if(autorun) {
-		print(cotopics)
-
-		if(remake_figs) {
-			if(json) {
-				require(jsonlite)
-				filename <- paste0(imageloc, dataset_name, "k", ntopics, subset_name,
-								   "_edges_", level*100, ".json")
-				cat(toJSON(cotopics), file=filename)
-			} else {
-			filename <- paste0(imageloc, "co-topic edge table, ",
-							dataset_name, "k", ntopics, subset_name, level*100,
-							"pct_nobads.csv")
-			write.csv(cotopics, filename)
-			}
+	if(remake_figs) {
+	    
+	    if(!exists ("build_plot_title")) {
+	        source(file="build_plot_title.R")
+	    }
+	    outfile_slug <- build_plot_title(dataset_name=dataset_name,
+	                                ntopics=ntopics,
+	                                iter_index = iter_index,
+	                                subset_name = subset_name,
+	                                whatitis = paste0("cotopic-edges_", level*100),
+	                                for.filename = TRUE)
+	    
+		if(json) {
+			require(jsonlite)
+		    
+		    if(is.null(outfile)) {
+		        outfile <- file.path(imageloc, paste0(outfile_slug, ".json"))
+		    } else {
+		        if(substring(outfile, nchar(outfile)-4) != ".json")	{
+		            warning("Output file does not use .json extension, but json option is selected")
+		        }
+			} 
+		    
+		    tryCatch(
+		        expr = cat(toJSON(cotopics.over.min), file=outfile),
+		        error = warning("file save failed:", match.call()),
+		        finally = message("Cotopic edges file saved to ", outfile)
+		    )
+	    } else {
+	        if(is.null(outfile)) {
+	            outfile <- file.path(imageloc, paste0(outfile_slug, ".csv"))
+	        } else {
+	            if(substring(outfile, nchar(outfile)-3) != ".csv")	{
+	                warning("Output file does not use .csv extension, but json option is not selected ",
+	                        "and csv is the only other currently implemented option")
+	            } 
+	        }
+	        tryCatch(
+	            expr = write.csv(cotopics.over.min, filename),
+	            error = warning("file save failed:", match.call()),
+	            finally = message("Cotopic edges file saved to ", outfile)
+	        )
+					
 		}
-	}
+	} # end of remake_figs=T
 
 	# and pass it back to the calling environment
-	return(cotopics)
+	return(cotopics.over.min)
 }
 
 if(autorun) {
-	get.cotopics(level=0.2, min=2)
+	get.cotopics(level=0.13, min=4)
 }
 
 # Other options
