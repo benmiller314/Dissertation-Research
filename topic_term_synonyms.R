@@ -76,14 +76,12 @@ two_topic_synonyms <- function(topic_a,
     keys <- tfidf.for.topics(dataset_name=dataset_name, ntopics=ntopics,
                              iter_index=iter_index, tw=tw)$topN
 
-    if (term_source == "by_tfitf") {
-        keys <- keys$by_tfitf
-    } else if(term_source == "by_prob") {
-        keys <- keys$by_prob
-    }
-
-        a_words <- strsplit(as.character(keys[topic_a]), " ")[[1]]
-        b_words <- strsplit(as.character(keys[topic_b]), " ")[[1]]
+    
+    a_keys <- keys[topic == topic_a]
+    b_keys <- keys[topic == topic_b]
+    
+    a_words <- strsplit(as.character(a_keys[, ..term_source]), " ")[[1]]
+    b_words <- strsplit(as.character(b_keys[, ..term_source]), " ")[[1]]
 
     # For each term in topic A, check for synonyms in topic B
     matchlist <- match_lists(a_words, b_words)
