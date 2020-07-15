@@ -29,9 +29,10 @@ tfidf.for.topics <- function(nwords=20,   # how many top words to display?
                                     ntopics=ntopics, 
                                     iter_index=iter_index)
     }
+    
         
-    tw[, ITF:=log(max(topic)/.N), by=token]     # data.table has a built-in function, .N, for 
-                                                # counting frequencies across the whole table
+    tw[, ITF:=log(ntopics/.N), by=token]     # .N is the number of rows in each group (determined by "by") 
+                                                
     tw[, TFITF:=weight*ITF]
                                                 # IMPORTANT NOTE: because of how := works (by reference),
                                                 # the data.table tw will change in the calling environment, too,
@@ -89,10 +90,17 @@ compare_topic_vocablists <- function(tf,        # result from above
 
 # testing area / examples
 if(FALSE) {
-    remake_figs
+    remake_figs=T
+    tf <- tfidf.for.topics()
     tf <- tfidf.for.topics(tw=tw)    
     compare_topic_vocablists(tf=tf, mytopic=1)
     lapply(1:ntopics, function(x) compare_topic_vocablists(tf=tf, mytopic=x))
+    
+    for (row in 1:nrow(tf_comparison)) {
+        print(tf_comparison[row, .(topic, by_tfitf.x, by_tfitf.y)])
+        readline("<press any key for next>")
+    }
+    
 }
 
 
