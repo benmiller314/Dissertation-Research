@@ -382,11 +382,15 @@ if(FALSE) {
         source(file="squish_numbers.R")
     }
 
-    extent_level <- c(0.12, 0.2, 0.33, 0.4, 0.5, 0.66, 0.75)
+#TO DO: Wrap this in a convenient function
+    
+    extent_level <- c(0.05, 0.06, 0.09, 0.13, 0.22, 0.33, 0.4, 0.5, 0.66, 0.75)
 
     for (i in 1:nrow(cluster_list)) {
         assign(cluster_list[i, "name"], stretch(cluster_list[i, "topics"]))
     }
+    
+    cluster_list <- cluster_list[(cluster_list$name != "all_clusters"), ]
 
     for (lvl in extent_level) {
         extent <- sapply(seq_len(nrow(cluster_list)), FUN=function(x) {
@@ -406,7 +410,28 @@ if(FALSE) {
         cluster_list[, eval(colname)] <- extent.vector
     }
 
-    cluster_list <- cluster_list[order(cluster_list[,"extent12"], decreasing = T), ]
+    cluster_list <- cluster_list[order(cluster_list[,"extent5"], decreasing = T), ]
+    
+    if (remake_figs) {
+        if( !exists("build_plot_title")) {
+            source(file = "build_plot_title.R")
+        }
+        outfile_slug <- build_plot_title(dataset_name = dataset_name,
+                                    ntopics = ntopics,
+                                    iter_index = iter_index,
+                                    subset_name = subset_name,
+                                    bad.topics = NULL,
+                                    whatitis = "cluster reach",
+                                    for.filename = T)
+        outfile <- file.path(imageloc, paste0(outfile_slug, ".csv"))
+        i <- 1
+        while (file.exists(outfile)) {
+            outfile <- file.path(imageloc, paste0(outfile_slug, "_", i, ".csv"))
+            i <- i + 1
+        } 
+        write.csv(cluster_list, outfile, row.names = F)                     
+        
+    } # end of if(remake_figs)
 
 
 
@@ -416,6 +441,7 @@ if(FALSE) {
 
     for (cluster in cluster_list$name) {
         # cluster <- "small.teaching"
+        # cluster <- "justice"
         mydocs <- cluster.strength(my.topics_name = cluster,
                      dataset_name = dataset_name,
                      ntopics = ntopics,
@@ -423,7 +449,7 @@ if(FALSE) {
                      bad.topics = bad.topics,
                      subset_name = "knownprograms2001_2015",
                      cumulative = T,
-                     level = 0.12)$docs
+                     level = 0.22)$docs
 
         top_topic_browser(dataset_name = dataset_name,
                           ntopics = ntopics,
