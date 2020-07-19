@@ -75,14 +75,19 @@ tfidf.for.topics <- function(nwords=20,   # how many top words to display?
 
 # side-by-side alphabetized lists of the two kinds of toplists, for a given topic
 compare_topic_vocablists <- function(tf,        # result from above
-                                     mytopic    # a topic number
-                                     )      
+                                     mytopic,    # a topic number
+                                     alphasort = T)      
 {
     topwords <- tf$topN[mytopic, by_prob]
-    topwords <- sort(strsplit(topwords, " ")[[1]])
+    topwords <- strsplit(topwords, " ")[[1]]
     
     itfwords <- tf$topN[mytopic, by_tfitf]
-    itfwords <- sort(strsplit(itfwords, " ")[[1]])
+    itfwords <- strsplit(itfwords, " ")[[1]]
+    
+    if(alphasort) {
+        topwords <- sort(topwords)
+        itfwords <- sort(itfwords)
+    }
     
     data.table(topwords, itfwords)
 }
@@ -94,12 +99,14 @@ if(FALSE) {
     tf <- tfidf.for.topics()
     tf <- tfidf.for.topics(tw=tw)    
     compare_topic_vocablists(tf=tf, mytopic=1)
-    lapply(1:ntopics, function(x) compare_topic_vocablists(tf=tf, mytopic=x))
+    compare_topic_vocablists(tf=tf, mytopic=1, alphasort=F)
+    lapply(1:ntopics, function(x) {
+        message("Topic:", x)
+        print(compare_topic_vocablists(tf=tf, mytopic=x, alphasort=F))
+        readline("<press any key for next topic>")
+        })
+
     
-    for (row in 1:nrow(tf_comparison)) {
-        print(tf_comparison[row, .(topic, by_tfitf.x, by_tfitf.y)])
-        readline("<press any key for next>")
-    }
     
 }
 
