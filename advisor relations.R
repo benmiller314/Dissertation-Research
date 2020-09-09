@@ -30,15 +30,17 @@ reverseName <- function(x) {
     paste0(last, ", ", first)
 }
 
-namepart <- function(name, part=c("first", "last")) {
+namepart <- function(name, part=c("first", "last", "list")) {
     name <- unreverseName(reverseName(unreverseName(name)))
     namelist <- strsplit(name, " ")[[1]]
-    if (part == "first") {
+    if (part == "list") {
+        return(namelist)
+    } else if (part == "first") {
         return(head(namelist, 1))
     } else if (part == "last") {
         return(tail(namelist, 1))
     } else {
-        warning("Only 'first' and 'last' parts are implemented for namepart();",
+        warning("Only 'first', 'last', and 'list' parts are implemented for namepart();",
                 " name returned unchanged.")
         return(name)
     }
