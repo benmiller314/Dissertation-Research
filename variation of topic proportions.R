@@ -402,7 +402,7 @@ find.doc.by.topic.proportion <- function(topic_weights,   # as produced above
 
 
 ## Histogram of weights of just the nth-ranked topic
-top.topic.histogram <- function(topic_weights = NULL,   # as produced above
+top_topic_histogram <- function(topic_weights = NULL,   # as produced above
                                 topic_rank = 1,  # top-ranked topic? 2nd?
                                 dataset_name = "noexcludes2001_2015",
                                 ntopics = 50,
@@ -585,7 +585,7 @@ top_topics_comparison <- function(mytopics,  # which topic or topics to focus on
         } else {
             bad.count <- nrow(top_topics[topic %in% bad.topics])
             top_topics <- top_topics[!topic %in% bad.topics]
-            message("top_topics_comparison(): Removed ", bad.count, "dissertations ",
+            message("top_topics_comparison(): Removed ", bad.count, " dissertations ",
                     "with top topic marked as non-content-bearing (bad.topics)")
         }
     }
@@ -599,6 +599,7 @@ top_topics_comparison <- function(mytopics,  # which topic or topics to focus on
                                                 subset_name = subset_name),
                                key="Topic")
     
+    # TO DO: return summary stats for each of mytopics
     
     # loop through topics in mytopics
     for (mytopic in mytopics) {
@@ -621,6 +622,8 @@ top_topics_comparison <- function(mytopics,  # which topic or topics to focus on
         } else {
             sig_level <- "NOT significantly"
         }
+        
+        ## TO DO: also record the direction, based on which median is higher (or go with UHinge, since I think there may be one median tie)
             
         outfile <- build_plot_title(dataset_name = dataset_name,
                                     ntopics = ntopics,
@@ -653,21 +656,24 @@ top_topics_comparison <- function(mytopics,  # which topic or topics to focus on
         if(do.boxplot) {
             boxplot(list(samp, comp),
                         # main = "Topic with Top Rank Within Document",
-                        names = c("Sample", "Complement"),
+                        names = c(paste0("Sample (N=", length(samp), ")"),
+                                  paste0("Complement (N=", length(comp), ")")),
                         xlab = paste0("T", mytopic, ": ", topic_labels[Topic == mytopic, Label]),
                         ylab = "Portion of Document (scaled to 1)",
-                        ylim = c(0, 1)
+                        ylim = c(0, 1),
+                        frame.plot = F
             )
         }    
         
         if(do.qqplot) {
             qqplot(comp, samp, 
-                   ylab = "Sample",
-                   xlab = "Complement",
+                   ylab = paste0("Sample (N=", length(samp), ")"),
+                   xlab = paste0("Complement (N=", length(comp), ")"),
                    xlim = c(0, 1),
                    ylim = c(0, 1),
-                   main = "Quantile-Quantile Plot",
-                   sub = paste0("T", mytopic, ": ", topic_labels[Topic == mytopic, Label])
+                   # main = "Quantile-Quantile Plot",
+                   sub = paste0("T", mytopic, ": ", topic_labels[Topic == mytopic, Label]),
+                   frame.plot = F
             )
             abline(a=0, b=1, col="#009900")
         }
@@ -677,7 +683,8 @@ top_topics_comparison <- function(mytopics,  # which topic or topics to focus on
         outside_legend("topright", 
                        legend=paste0("p-value = ", 
                                      round(tstats$p.value, 4),
-                                     "\n(", tstats$method, ")")
+                                     "\n(", tstats$method, ")"),
+                       bty="n"
         )
         
         if (remake_figs) {
@@ -692,7 +699,115 @@ top_topics_comparison <- function(mytopics,  # which topic or topics to focus on
     
 }
     
+
+# For dissertations with a given top topic, what are the other topics they most pair with?
+# See also cotopics.R for topic pairings at any rank
+top_topic_assists <- function(mytopics,            # which topic or topics to focus on?
+                              cutoff = 0.05,       # drop topic weights below this 
+                              top_topics = NULL,   # as produced above
+                              dataset_name = "noexcludes2001_2015",
+                              ntopics = 50,
+                              iter_index = 1,
+                              subset_name = "knownprograms2001_2015",
+                              bad.topics = NULL,
+                              cull.bad.topics = T,
+                              dt = NULL            # doc-topic grid. pass for speed boost.
+){
+    require(data.table)
     
+    if(is.null(top_topics)) {
+        top_topics <- get_top_topics(dataset_name = dataset_name, 
+                                     ntopics = ntopics, 
+                                     iter_index = iter_index,
+                                     subset_name = subset_name,
+                                     bad.topics = bad.topics,
+                                     grid = dt)
+    }
+    
+    if(cull.bad.topics) {
+        if(is.null(bad.topics)) {
+            warning("top_topics_comparison(): Couldn't remove dissertations ",
+                    "with non-content-bearing top topics; ",
+                    "no list of bad.topics provided.")
+        } else {
+            bad.count <- nrow(top_topics[topic %in% bad.topics])
+            top_topics <- top_topics[!topic %in% bad.topics]
+            message("top_topics_comparison(): Removed ", bad.count, " dissertations ",
+                    "with top topic marked as non-content-bearing (bad.topics)")
+            
+            # to do: avoid using with=F (may require updating data.table; be cautious)
+            dt <- dt[, setdiff(names(dt), bad.topics), with=F]
+        }
+    }
+    
+    for (mytopic in mytopics) {
+        disses <- top_topics[topic == mytopic, Pub.number]
+        topic_weights <- dt[Pub.number %in% disses]
+        
+        # Cut off low-ranked values before calculating medians. This thing is skewed way low, 
+        # and otherwise normal values (i.e. anything above 5%) are all outliers
+        
+        topic_weights_long <- melt(topic_weights, id.vars=c("Pub.number"), variable.name = "Topic", value.name = "Weight")
+        topic_weights_long <- topic_weights_long[Weight > cutoff]
+        
+        medians <- topic_weights_long[, median(Weight), by=Topic]   # a data table
+        
+        myorder <- order(medians$V1, decreasing=T)
+        medians <- medians[myorder]
+        
+        topic_weights_wide <- dcast(topic_weights_long, Pub.number ~ Topic, value.var="Weight") 
+        topic_weights_wide <- topic_weights_wide[, Pub.number:=NULL]
+        topic_weights_wide <- topic_weights_wide[, ..myorder]
+        
+        ## TO DO: report *counts,* not just medians. Wait, does that just recreate the earlier cotopic graph? Sigh.
+        
+        # first column should now equal the chosen topic. drop it.
+        if(names(topic_weights_wide[, 1]) == mytopic) {
+            topic_weights_wide <- topic_weights_wide[, 1:=NULL]
+            medians <- medians[Topic != mytopic]
+        } else {
+            warning("top_topic_assists(): Something's gone wrong: chosen topic ", 
+                    mytopic, " is not top-ranked in these dissertations.")
+        }
+        
+        # Get human-readable labels
+        if(!exists("get_topic_labels", mode="function")) {
+            source(file="get topic labels.R")
+        }
+        topic_labels <- data.table(get_topic_labels(dataset_name = dataset_name, 
+                                                    ntopics = ntopics, 
+                                                    iter_index = iter_index,
+                                                    subset_name = subset_name),
+                                   key="Topic")
+        
+        # Draw plot
+        # TO DO: Add title, add human-readable labels to the plot itself
+        boxplot(as.matrix(topic_weights_wide))
+                
+        
+        # TO DO: Better format these (merge somehow)
+        message("These topics tend to co-occur when top topic is ", mytopic, " (", 
+                 topic_labels[Topic == mytopic, Label], "): ")
+        myresult <- topic_labels[Topic %in% names(topic_weights_wide), .(Topic, Label), ]
+        myresult$Topic <- factor(myresult$Topic)
+        myresult <- merge(myresult, medians)
+        setnames(myresult, "V1", "MedianWeight")
+        setorder(myresult, -MedianWeight)
+        myresult[, MedianWeight:=round(MedianWeight, 4)]
+        print(myresult)
+        
+        readline("Press <enter> for detailed stats")
+        
+        print(summary(topic_weights_wide))
+        
+        readline("Press <enter> for next topic")
+    }
+    
+    # To do: return summary for all topics in loop, not just the last
+    
+    return(myresult)
+}
+
 
 # Using the analysis; a testing space.
 if(FALSE) {
@@ -736,7 +851,7 @@ if(FALSE) {
     # topic_weights$weightsbydoc[(hinge_diss-1):(hinge_diss+1), 1:11]
 
     remake_figs=F
-    top.topic.histogram(topic_weights = topic_weights,
+    top_topic_histogram(topic_weights = topic_weights,
                         topic_rank = 1,
                         dataset_name = dataset_name,
                         ntopics = ntopics,
@@ -866,6 +981,13 @@ if(FALSE) {
     topic_labels <- get_topic_labels(dataset_name, ntopics, subset_name, iter_index)    
     remake_figs <- remake_figs_quo
     rm(remake_figs_quo)
+
     
+    # Test function to see which topics are generally high-ranked below a given top topic
+    top_topic_assists(mytopics = c(27, 1), 
+                      bad.topics = bad.topics, 
+                      dt = dt, 
+                      top_topics = top_topics)
+        
     
 }
