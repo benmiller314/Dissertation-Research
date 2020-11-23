@@ -25,5 +25,4 @@ outside_legend <- function(...) {
     legend(...)
 }
 
-# store and retrieve numeric vectors as one observation in a data-frame, using squish() and stretch()
-source("squish_numbers.R")
+source(file="squish_numbers.R")
