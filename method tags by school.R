@@ -1,5 +1,5 @@
 #############################################################################
-# tags by school.R
+# method tags by school.R
 #
 # GOAL: Given a tagged set of dissertation data and a tagging schema,
 # aggregate tag frequency and distribution at each school in the dataset.
@@ -211,9 +211,13 @@ schoolwise <- function(dataset_name="noexcludes", tagset_name="tagnames",
 # close wrapper function schoolwise()
 }
 
-if (autorun) {
-    remake_figs
+if (FALSE) {
+    remake_figs=F
     # call the functions for all relevant datasets
+    
+    schoolwise("knownprograms2001_2015", "no_ped_tagnames")
+    
+    
     schoolwise("consorts", "tagnames", agn=T, hcl=F, dia=F)
     schoolwise("nonconsorts", "tagnames", agn=T, hcl=F, dia=F)
     schoolwise("top.nonconsorts", "tagnames", agn=T, hcl=F, dia=F)
