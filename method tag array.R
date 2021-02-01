@@ -18,10 +18,10 @@ parse_tags <- function(data,
 	while(any(names(data) %in% tagnames)) {
 		val <- readline(paste("Looks like data has already been parsed.", 
 							"Overwrite (O) or Abort (A)? \n parse_tags > "))
-		if(tolower(val) == "a") {
+		if(val == "A") {
 			warning("Parse_tags not applied; data already parsed.")
 			return(data)
-		} else if (tolower(val) == "o") {
+		} else if (val == "O") {
 			break
 		} else {
 			print(noquote("I do not understand your response. Try again?"))
@@ -31,15 +31,6 @@ parse_tags <- function(data,
     # Check that tagstyle is legal
     if (!tagstyle %in% c("long", "short")) {
         stop("Only 'long' and 'short' are implemented for tagstyle parameter.")
-    }
-    
-    # When we parse tags, we want to know whether to treat 
-    # Pedagogical Projection as its own method, or not. 
-    # The value for `useped` should be set in `rerun all analyses.R`;
-    # the tagnames, tagnames.long, etc are defined in `dataprep.R`
-    if(!useped) {
-        tagnames <- no_ped_tagnames
-        tagnames.long <- no_ped_tagnames.long
     }
     
     # Remove blank rows. (I can't think of an occasion when you'd want to leave these in.)
@@ -82,7 +73,7 @@ parse_tags <- function(data,
     					"Discourse", "Ethnographic", "Experimental",
     					"Historical", "Interview", "Meta-Analy", "Model",
     					"Philosophical", "Poetic", "Practitioner", "Rhetorical",
-    					"Survey", "Other", "Pedagog")
+    					"Survey", "Other", "Pedagogical Projection")
 	} else if (tagstyle == "short") {
 	    searchterms <- tagnames
 	}
