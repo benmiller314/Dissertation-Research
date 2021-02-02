@@ -53,7 +53,7 @@ frameToJSON <- function(dataset_name="noexcludes2001_2015",
 
   # Ben: Get topic weights for every document we have
   if(is.null(dt)) {
-    if(!exists("get.doctopic.grid", mode="function")) { 
+    if(!exists("get.doctopic.grid", mode="function")) {
           source(file="get doctopic grid.R")
     }
     dt <- get.doctopic.grid(dataset_name=dataset_name, ntopics=ntopics,
@@ -69,8 +69,8 @@ frameToJSON <- function(dataset_name="noexcludes2001_2015",
   #     if (dataset_name=="consorts" && ntopics==55 && iter_index=="") {
   #         bad.topics <- c("2", "4", "22", "24", "47", "50", "13")
   #     } else if (dataset_name=="noexcludes2001_2015" && ntopics==50 && iter_index==1) {
-  #         bad.topics <- c("3", "8", "12", "15", "30", "34", "36", 
-  #                         # "47", 
+  #         bad.topics <- c("3", "8", "12", "15", "30", "34", "36",
+  #                         # "47",
   #                         "50")
   #     }
   # }
@@ -101,7 +101,7 @@ frameToJSON <- function(dataset_name="noexcludes2001_2015",
       if(!exists("topic_distance_matrix", mode="function")) {
         source(file="topic_term_synonyms.R")
       }
-    
+
       t <- topic_distance_matrix(dataset_name = dataset_name,
                                  ntopics = ntopics,
                                  iter_index = iter_index,
@@ -111,7 +111,7 @@ frameToJSON <- function(dataset_name="noexcludes2001_2015",
   } else {
     t <- twm    # back compatibility
   }
-      
+
   #Rolf: calculate the hierarchical cluster structure
   #from the correlation scores
   # Ben: topic_clusters() is also from topic_term_synonyms.R
@@ -125,7 +125,7 @@ frameToJSON <- function(dataset_name="noexcludes2001_2015",
   # Ben: I'm making this section optional,
   # because it makes the most sense early on and has diminishing returns.
   if(do.plot) {
-      #Rolf: take a look at your strucutre:
+      #Rolf: take a look at your structure:
       # Ben: optionally save clustering figure
 
       # Ben: Try various cut levels until you find a set that seems
@@ -145,7 +145,7 @@ frameToJSON <- function(dataset_name="noexcludes2001_2015",
               rect.hclust(hc, k=4, border="#FF9999")
               abline(0.7, 0, col="#FF9999")
               rect.hclust(hc, k=7, border="#009900")
-              abline(0.63, 0, col="#9999FF")
+              abline(0.63, 0, col="#009900")
               rect.hclust(hc, k=12, border="#9999FF")
               abline(0.55, 0, col="#9999FF")
           }
@@ -474,7 +474,11 @@ if(dataset_name=="noexcludes2001_2015" && is.null(subset_name) && ntopics==60 &&
   if(!exists("tfidf.for.topics", mode="function")) {
         source(file="tfidf for topics.R")
   }
+  status_quo <- remake_figs
+  remake_figs <- F
   topwords <- tfidf.for.topics(tw=tw)$topN
+  remake_figs <- status_quo
+  rm(status_quo)
 
   # Ben: Also add top dissertation titles
   filename <- file.path(imageloc, paste0("top_titles_per_topic-", dataset_name, "k", ntopics, subset_name, iter_index, ".csv"))
@@ -622,28 +626,42 @@ cotopic_edges <- function(dataset_name="noexcludes2001_2015",
               ntopics=50,
               subset_name="knownprograms2001_2015",
               iter_index=1,
-              level=0.12,   # topic must constitute how much of each doc?
-              min=3,        # how many times must a pair of topics co-occur?
-              outfile=NULL,
-              bad.topics= c("2", "4", "22", "24", "47", "50", "13"),
-                            # exclude non-content-bearing topics,
+              level=0.13,       # topic must constitute how much of each doc?
+              min=3,            # how many times must a pair of topics co-occur?
+              outfile=NULL,     # if null, defaults to naming the parameters
+              cull.bad.topics = TRUE, # exclude non-content-bearing topics?
+              bad.topics= NULL, # if so, which?
               clust.method=c("diana","agnes"),
               tw=NULL    # topic-word grid, if we have one, makes this much faster
               )
 {
 
     ## set default parameters if needed
+  
+    if(cull.bad.topics) {
+        if(is.null(bad.topics))
+            if(dataset_name=="noexcludes2001_2015" && ntopics==50 && iter_index==1) {
+                bad.topics <- c("3", "8", "12", "15", "30", "34", "36", "47", "50")
+            } else {
+                warning("cotopic_edges(): can't cull bad.topics if they're unknown")
+            }
+    } else {
+        if(!is.null(bad.topics)) {
+            warning("cotopic_edges(): bad.topics specified, but cull.bad.topics is False.",
+                    " If you want to include all topics, set bad.topics <- c()")
+        }
+    }
 
     # the desired location of the JSON file produced by the function
     if(is.null(outfile)) {
         if (!exists("build_plot_title", mode="function")) {
           source(file="build_plot_title.R")
         }
-        outfile_slug <- build_plot_title(dataset_name = dataset_name, 
+        outfile_slug <- build_plot_title(dataset_name = dataset_name,
                                          ntopics = ntopics,
-                                         iter_index = iter_index, 
+                                         iter_index = iter_index,
                                          subset_name = subset_name,
-                                         bad.topics = bad.topics, 
+                                         bad.topics = bad.topics,
                                          whatitis = "edge_data",
                                          for.filename = T)
         outfile <- file.path(webloc,
@@ -700,8 +718,8 @@ cotopic_edges <- function(dataset_name="noexcludes2001_2015",
 
     # We're going to build our JSON for edge bundling with a name, size, and
     # (to take advantage of Mike Bostock's
-    # http://mbostock.github.io/d3/talk/20111116/packages.js) we'll call the
-    # edges "imports"
+    # http://mbostock.github.io/d3/talk/20111116/packages.js) 
+    # we'll call the edges "imports"
 
     # We start empty...
     edge_bund <- data.table(name=rep("NA", max(b$source)),
@@ -783,17 +801,22 @@ if(FALSE) {
     frameToJSON(do.plot=T, dataset_name="noexcludes2001_2015", subset_name="realconsorts2001_2015", ntopics=60, iter_index=4, bad.topics = NULL)
     frameToJSON(do.plot=F, dataset_name="noexcludes2001_2015", subset_name=NULL, ntopics=50, iter_index=1, bad.topics = c(3, 12, 50, 47, 34, 36, 30, 8, 15))
     frameToJSON(do.plot=T, dataset_name="noexcludes2001_2015", subset_name="realconsorts2001_2015", ntopics=50, iter_index=1, bad.topics = c(3, 12, 50, 47, 34, 36, 30, 8, 15), use.labels=T)
-    frameToJSON(do.plot=F, dataset_name="noexcludes2001_2015", subset_name="knownprograms2001_2015", ntopics=50, iter_index=1, bad.topics = c(3, 12, 50, 47, 34, 36, 30, 8, 15), use.labels=T, tw=tw)
+    frameToJSON(do.plot=F, dataset_name="noexcludes2001_2015", 
+                subset_name="knownprograms2001_2015", ntopics=50, iter_index=1, 
+                bad.topics = c(3, 12, 50, 47, 34, 36, 30, 8, 15), use.labels=T, 
+                
+                tw=tw)        # see get_topic_word_grid.R
+    
     frameToJSON(do.plot=F,
                 dataset_name="noexcludes2001_2015",
                 subset_name="knownprograms2001_2015",
                 ntopics=50,
                 iter_index=1,
-                bad.topics = c(3, 12, 50, 
-                               # 47, 
+                bad.topics = c(3, 12, 50,
+                               # 47,
                                34, 36, 30, 8, 15),
                 use.labels=T,
-                tw=tw,
+                tw=tw,        # see get_topic_word_grid.R
                 clust.method = "agnes")
 
 
@@ -802,13 +825,13 @@ if(FALSE) {
     # all primary topics and 3/4 of secondary topics for *consorts*;
     # see `Variation of Topic Proportions, Top 10 Topics per Document.pdf`
     remake_figs=T
-    cotopic_edges(level=0.05, 
-                  min=1, 
-                  dataset_name="noexcludes2001_2015", 
-                  ntopics=50, 
-                  iter_index=1, 
-                  subset_name="knownprograms2001_2015", 
-                  bad.topics = c(3, 12, 50, 
+    edges <- cotopic_edges(level=0.05,
+                  min=1,
+                  dataset_name="noexcludes2001_2015",
+                  ntopics=50,
+                  iter_index=1,
+                  subset_name="knownprograms2001_2015",
+                  bad.topics = c(3, 12, 50,
                                  # 47,   # spanish language
                                  34, 36, 30, 8, 15),
                   tw = tw,
@@ -822,10 +845,19 @@ if(FALSE) {
     # all primary topics and 3/4 of secondary topics for *realconsorts*;
     # see `Variation of Topic Proportions, Top 10 Topics per Document.pdf`
     cotopic_edges(level=0.11, min=1, tw=tw, dataset_name="noexcludes2001_2015", subset_name="knownprograms2001_2015", ntopics=50, iter_index=1, bad.topics = c(3, 12, 50, 47, 34, 36, 30, 8, 15))
-    cotopic_edges(level=0.12, min=3, tw=tw,
+    
+    # 13% for *knownprograms2001_2015*: 
+    remake_figs=T
+    cotopic_edges(tw=tw,
+                  level=0.13,
+                  # level=0.05,
+                  # level=0.22,
+                  # min=3, 
+                  min=12,
                   dataset_name="noexcludes2001_2015",
                   subset_name="knownprograms2001_2015",
                   ntopics=50, iter_index=1,
                   bad.topics = c(3, 12, 50, 47, 34, 36, 30, 8, 15),
-                  clust.method="diana")
+                  clust.method="agnes")
+    remake_figs=F
 }
