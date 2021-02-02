@@ -113,7 +113,7 @@ two_topic_distance <- function(topic_a,     # just a number in 1:ntopics
                                tw=NULL)     # if we have a topic-word matrix,
                                             # don't waste time rebuilding it
 {
-    # load required functions
+    # load required functions for measuring distance
     require(philentropy)
 
     if(!exists("topicword.probability.grid", mode="function")) {
@@ -163,7 +163,7 @@ topic_distance_matrix <- function(dataset_name="noexcludes2001_2015",
     # if we have tw.grid, skip ahead to getting distances. otherwise, build tw.grid.
     if(is.null(tw.grid)) {
         # if we don't have a topic-word matrix, let's get one here,
-        # so we don't have to do it twice (once for each topic)
+        # so we don't have to do it once for each topic
 
         if(is.null(tw)) {
             tw <- build.topicword.table(dataset_name=dataset_name,
@@ -429,7 +429,7 @@ tree_summary <- function(nclust,
 
 if(autorun) {
     dataset_name <- "noexcludes2001_2015"
-    ntopics <- 150
+    ntopics <- 50
     iter_index <- 1
     bad.topics <- NULL
 
