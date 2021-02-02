@@ -8,7 +8,7 @@
  
 #####   Programs for Preparing the Working Environment  #####
 
-# Set working directory to the location of R script files.
+## Set working directory to the location of R script files.
     setwd("~/Box Sync/research/dissertations/data, code, and figures/Dissertation-Research")
 
 ## Reload helper functions from personal RStudio setup
@@ -25,10 +25,20 @@
 #                if FALSE, load functions but do not call.            
         autorun <- FALSE
 
+        
+## 
+# Global variables controling how data is loaded and parsed initially.
+# These condition how `dataprep.R` and `dataprep 2 - load data.R` behave.
 #       dual_source: Set TRUE if merging an old datafile with a new datafile;
 #                    set FALSE if loading an already-merged file
 #                    (e.g. an exported version of noexcludes with realconsorts updated)
         dual_source <- FALSE
+        
+#       useped: Set TRUE if Pedagogical Projection should be counted as an
+#               independent method; set FALSE if this move is not considered
+#               part of the methodology or is folded in with Prac or Phil.
+#               
+        useped <- FALSE
         
 #       update_realconsorts: If TRUE, overwrite file list index of dissertations from
 #                real consortium program dissertations, for text mining purposes.
