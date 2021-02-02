@@ -10,23 +10,21 @@
 # source-target table called "cotopics."
 
 
-get.cotopics <- function(dataset_name = "noexcludes2001_2015",
+get.cotopics <- function(level = .13, 			# what fraction of the doc (out of 1) must
+                                                # each topic account for?
+         min = 3,				# how many times must these topics co-occur to be "co-topics"?
+         dataset_name = "noexcludes2001_2015",
 		 ntopics = 50,
 		 subset_name = "knownprograms2001_2015",
 		 iter_index = 1,
 		 newnames = F,          # where in the MALLET output filename does iter_index appear?
 		 						# set T if it's with the model, F if last in filename.
 								# Gets passed into get.doctopic.grid.
-		 level = .13, 			# what fraction of the doc (out of 1) must
-		 						# each topic account for?
 		 outfile = NULL,        # optionally pass a name; use defaults otherwise
 		 json = T, 				# export to JSON?
-		 min = 3,				# how many times must these topics co-occur
-		 						# to be "co-topics"?
 		 bad.topics = NULL,		# optionally exclude non-content-bearing topics
-		 dt = NULL              # optionally pass doc-topic grid
-		)
-{
+		 dt = NULL              # optionally pass doc-topic grid for speed boost
+){
 
 	require(data.table)
 
@@ -130,8 +128,15 @@ get.cotopics <- function(dataset_name = "noexcludes2001_2015",
 	return(cotopics.over.min)
 }
 
+
+
+
+
+
 if(autorun) {
 	get.cotopics(level=0.13, min=4)
+} else {
+    message("cotopics.R loaded the following function: get.cotopics()")
 }
 
 # Other options
