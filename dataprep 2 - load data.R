@@ -65,6 +65,8 @@ noexcludes <- remove_unreadables("noexcludes", more=c("3715615", "3537773",
                                                       "3684306", "3701093",
                                                       "3530126", "3506182",
                                                       "3010241"))
+
+# noexcludes <- noexcludes[which(noexcludes$Exclude.Level == 0),]
     
 # refactor levels for noexcludes alone
 refactor.index <- which(names(noexcludes) %in% c("Subject","KEYWORDS","School","Advisor.type","Advisor.Name","Degree","Method.Terms","pages","Flag.notes"))
@@ -137,16 +139,24 @@ unknownprograms <- noexcludes[unknownprograms.index, ]
 # write.csv(unknownprograms, file=file.path(dataloc, paste0("maybeconsorts_", Sys.Date(), ".csv")), row.names=F, na="")
 unknownprograms.count <- length(union(consorts.index, rhetmaps.index)) - length(knownprograms.index)
 
+nonrcws.index <- intersect(which(noexcludes$realrhetmap == 0),
+                       which(noexcludes$realconsort == 0))
+nonrcws <- noexcludes[nonrcws.index, ]
+
 # report back what we've found
 
 message("Of ", consort.count, " dissertations at Consortium schools, ",
         realconsort.count, " are confirmed from Consortium programs, ",
-        "and ", length(which(noexcludes$realconsort == 0)), " confirmed to be otherwise.")
+        "and ", length(which(consorts$realconsort == 0)), " confirmed to be otherwise.")
 message("Of ", rhetmap.count, " dissertations at Rhetmap schools, ",
         realrhetmap.count, " are confirmed from Rhetmap programs, ",
-        "and ", length(which(noexcludes$realrhetmap == 0)), " confirmed to be otherwise.")
-message("This brings the total count confirmed from known programs to ", nrow(knownprograms), ", ",
-        "with ", unknownprograms.count, " programs at these schools remaining to be tracked down.")
+        "and ", length(which(rhetmaps$realrhetmap == 0)), " confirmed to be otherwise.")
+message("This brings the total count confirmed from known programs to ", nrow(knownprograms), 
+        " (accessible with the variable `knownprograms`), ",
+        "with ", unknownprograms.count, " programs at these schools (`unknownprograms`) ",
+        "remaining to be tracked down.")
+message("The total number of dissertations confirmed to be at non-RCWS programs is ", 
+        nrow(nonrcws), "; these can be accessed with the variable `nonrcws`.")
 
 
 # index of disses that need to be checked for realconsort status
@@ -214,10 +224,18 @@ subset_by_year <- function(dataset_name,
         }
     }
     message(new_subset_name, " created with ", nrow(get(new_subset_name)), " rows.")
+    
+    # make sure factor levels are limited to the subsets; 
+    # the function `refactor.all()` is defined in `Factor-Bug fixing.R` 
+    # and sourced in `dataprep.R`
+    assign(new_subset_name, refactor.all(new_subset_name), envir= .GlobalEnv)
+    message("Factors in ", new_subset_name, " have been re-leveled.")
+    
     invisible(get(new_subset_name))
 }
 
-subset_list <- c("noexcludes", "knownprograms", "top.nonconsorts", "realconsorts", "realrhetmaps")
+subset_list <- c("noexcludes", "knownprograms", "top.nonconsorts", 
+                 "realconsorts", "realrhetmaps", "nonrcws")
 for(subset in subset_list) {
     subset_by_year(subset, 2001, 2015, autooverwrite =T)
     subset_by_year(subset, 2001, 2005, autooverwrite = T)
@@ -236,7 +254,7 @@ subset_list <- c("consorts", "nonconsorts", "realconsorts", "top.nonconsorts", "
                  "new_noexcludes", "rhetmaps", "rhetmaps2001_2015", "rhetmaps2011_2015",
                  "realrhetmaps", "realrhetmaps2001_2015", "realrhetmaps2011_2015",
                  "knownprograms", "knownprograms2001_2015", "knownprograms2011_2015",
-                 "maybeconsorts", "unknownprograms")
+                 "maybeconsorts", "unknownprograms", "nonrcws")
 
 for (subset in subset_list) {
     if(exists(subset)) {
