@@ -11,6 +11,10 @@
 # Set working directory to the location of R script files.
     setwd("~/Box Sync/research/dissertations/data, code, and figures/Dissertation-Research")
 
+## Reload helper functions from personal RStudio setup
+    source(file=".Rprofile")
+
+
 ## 
 # Global variables called in many functions. 
 #       remake_figs: If TRUE, save new files for figures; 
