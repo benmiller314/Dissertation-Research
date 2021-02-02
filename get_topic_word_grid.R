@@ -5,7 +5,7 @@
 # 1. tmloc (character): a file.path to a directory of topic modeling files
 # 2. MALLET output files are in that directory, named by dataset, number of topics,
 #    and a numeric indicator of the particular iteration of the model
-#    for that dataset and ntopics. See lines 20-21 for what I mean.
+#    for that dataset and ntopics. See lines 24-26 for what I mean.
 # 3. When running MALLET, you used the --word-topic-counts-file option
 #    My MALLET settings are in the file "r2mallet with foreach.R"
 
@@ -28,7 +28,7 @@ get.wordtopic.grid <- function(dataset_name = "noexcludes2001_2015",
     filename <- file.path(tmloc, filename)
 
     if(file.exists(filename)) {
-        # oneline <- readLines(file.path(tmloc, filename), n=1)
+        # oneline <- readLines(filename, n=1)
         wt <- read.table(filename, header=FALSE, fill=TRUE,
                     col.names=c("index", "token", paste0("TopicRanked", 1:ntopics))
         )
@@ -54,7 +54,7 @@ just.value <- function(key.value) {
 }
 
 
-# Make grid smaller by trimming rows
+# Make grid smaller by trimming rows (i.e. words)
 # for which the top-ranked topic is really low weight
 trim.wordtopic.grid <- function(wt,            # wordtopic grid, as above
                                 threshold=5)   # minimum word-weight in top-ranked topic
@@ -65,21 +65,37 @@ trim.wordtopic.grid <- function(wt,            # wordtopic grid, as above
 }
 
 
+
+    
 # To compare topics to one another, we want to reshape this so as to
 # index by topic. We'll start by assembling one topic vector, then compile.
 find.topic.in.one.col <- function(topic,     # search by topic number
                                   rank.col,  # name columns by topic.ranked.X
                                   wt)        # a wordtopic grid, as above
 {
+    require(data.table)
+    
+    # Build the column name from a topic rank
     colname <- paste0("TopicRanked", rank.col)
+    
+    # Build the search string from a topic number
     my_expr <- paste0("^", topic-1, ":")    # note the offset (convert 0-index to 1-index)
+    
+    # Search the column, allowing for more than one possible result
     index <- grep(my_expr, wt[[colname]])
+    
+    # use the search results to extract tokens
+    tokens <- wt[index, token]
+    
+    # ... and key:value pairs
     key.value.pairs <- wt[index, ..colname] # this syntax requires data.table 1.10.2 or higher;
                                             # see https://github.com/Rdatatable/data.table/blob/master/NEWS.md#changes-in-v1102--31-jan-2017
 
     values <- sapply(key.value.pairs[[1]], just.value)
 
-    data.table(token_ind=as.integer(index), weight=as.integer(values))
+    result <- data.table(token_ind = as.integer(index), 
+                         token = as.character(tokens),
+                         weight = as.integer(values))
 }
 
 
@@ -88,7 +104,10 @@ find.topic.in.all.cols <- function(topic,
                                    wt,             # a wordtopic grid, as above
                                    threshold=5)    # minimum weight per token
 {
-    topic_word_vec <- data.table(token_ind=numeric(), weight=numeric())
+    # start with an empty container, then fill it
+    topic_word_vec <- data.table(token_ind = numeric(), 
+                                 token     = character(),
+                                 weight    = numeric())
     for (column in seq_len(ntopics)) {
         topic_word_vec <- rbindlist(list(topic_word_vec,
                                          find.topic.in.one.col(topic, column, wt)
@@ -103,7 +122,6 @@ find.topic.in.all.cols <- function(topic,
     setkey(topic_word_vec, token_ind)
 
     # add useful info
-    topic_word_vec[, token:=wt[topic_word_vec$token_ind, token]]
     topic_word_vec[, probability:=weight/sum(weight)]
 
     return(topic_word_vec)
@@ -245,5 +263,9 @@ if(FALSE) {
     tw[topic==1]
     tw[topic==1][order(-probability)]
     head(tw[topic==1][order(-probability)][, token], 20)
+    
+    # get some examples for explaining the method
+    write.csv(head(wt, 5), file=file.path(imageloc, "wt-example.csv"), row.names=F)
+    
 
 }
