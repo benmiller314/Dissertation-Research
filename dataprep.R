@@ -43,7 +43,7 @@ tagnames <- c("Clin","Crit",
 			  # "Cult",
 			  "Disc","Ethn","Expt","Hist","Intv","Meta","Modl","Phil","Poet","Prac","Rhet","Surv","Othr", "Ped")
 
-no_ped_tagnames <- tagnames[-length(tagnames)]
+no_ped_tagnames <- tagnames[!(tagnames %in% "Ped")]
 
 tagnames.long <- c( "Clinical / Case Study", 
 					"Critical / Hermeneutical",
@@ -64,7 +64,7 @@ tagnames.long <- c( "Clinical / Case Study",
 					"Pedagogical Projection"
 					)
 
-no_ped_tagnames.long <- tagnames.long[-length(tagnames.long)]
+no_ped_tagnames.long <- tagnames.long[!names(tagnames.long) %in% "Pedagogical Projection"]
 
 # provide a function to convert tag column labels to real tag names					
 realtags <- function(tag, tagset_name="tagnames") {
@@ -75,6 +75,8 @@ realtags <- function(tag, tagset_name="tagnames") {
 	return(tagset.long[index])
 }
 
+# TO DO: move these to where they're actually needed,
+# so we don't clutter the environment every time.
 sumnames <- sapply(tagnames, FUN=function(x) paste0(x,".sum"))
 meannames <- sapply(tagnames, FUN=function(x) paste0(x,".mean"))
 topnames <- sapply(tagnames, FUN=function(x) as.list(tolower(paste0("top.",x))))
