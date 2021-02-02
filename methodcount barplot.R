@@ -11,7 +11,17 @@ methods.barplot <- function(dataset_name="noexcludes",
     } else if(tagset_name=="tagnames.simple") {
         data <- get(dataset_name)$Counts.simple
     } else {
-        stop("Error: I don't know tagset '", tagset_name, "'.")
+        tryCatch(expr = {
+                dataset <- get(dataset_name)
+                mycols <- dataset[, get(tagset_name)]
+                data <- apply(mycols, MARGIN=1, FUN=sum)
+                message("Method counts recalculated for tagset `",
+                        tagset_name, "`")
+            },
+            error = function(e) {e;
+                stop("Error in methods.barplot(): I can't parse tagset '", tagset_name, "'.")}
+         )
+        
     }
     
     data.t <- table(data)
@@ -43,6 +53,7 @@ methods.barplot <- function(dataset_name="noexcludes",
     
     data.mean <- mean(data)
     data.sd <- sd(data)
+    data.median <- median(data)
 
     # add some stats
     mtext(side = 4, 
@@ -54,10 +65,22 @@ methods.barplot <- function(dataset_name="noexcludes",
         )
 
     if (remake_figs) {dev.off()}
+    
+    return(list("table" = data.t,
+                "pcts" = round((data.t / rows) * 100, 2),
+                "mean" = data.mean,
+                "median" = data.median,
+                "sd" = data.sd,
+                "N" = rows))
 }
 
-if (autorun) {
+if(!autorun) {
+    message("Function loaded: methods.barplot(dataset_name, tagset_name)")
+}
+
+if (FALSE) {
     remake_figs
+    methods.barplot("knownprograms2001_2015", "no_ped_tagnames")
     methods.barplot("noexcludes")
     methods.barplot("noexcludes2001_2015")
     methods.barplot("consorts")
