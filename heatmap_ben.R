@@ -23,13 +23,23 @@ heatmap.ben <- function (
 	verbose  = TRUE,		# Should we add a subtitle about solo tags?
 	legend   = TRUE,		# Should we output a separate file with a legend 
 							# for the color map?
-	dendro	 = FALSE		# Should we output dendrograms showing method
+	dendro	 = FALSE,		# Should we output dendrograms showing method
 							# clustering?
+	mytitle    = NULL,         # optionally pass a title for the plot
+	clust.method = "agnes"  # any option from cluster package
 	) 
 {
+    
+    require(cluster)
+    
     # get the data
      
     if (!is.null(sum.by.tags)) {
+        if((dataset_name != sum.by.tags$dataset_name) ||
+           (tagset_name != sum.by.tags$tagset_name)) {
+            warning("heatmap.ben: dataset or tagset mismatch.\n",
+                    "Using values from passed correlation matrix.")
+        }
         dataset_name <- sum.by.tags$dataset_name
         tagset_name <- sum.by.tags$tagset_name
     } else {
@@ -40,7 +50,7 @@ heatmap.ben <- function (
     } 
     
     dataset <- get(dataset_name)
-    tagset <- get(tagset_name)
+    
     
 	# extract the matrix, if need be
 	if(!is.matrix(sum.by.tags)) {
@@ -61,16 +71,18 @@ heatmap.ben <- function (
 	hcr <- hclust(dist(sum.by.tags.s))				# Cluster based on distances
     ddr <- as.dendrogram(hcr)						# Convert to dendrogram 
 													# (which we might use later)
-   	ddr <- reorder(ddr, Rowv)						# Reorder the dendrogram
-    rowInd <- order.dendrogram(ddr)					# Extract the row order 
+   	ddr <- reorder(ddr, -Rowv)						# Reorder the dendrogram, 
+   	                                                # highest values on top
+    rowInd <- order.dendrogram(ddr)					# Extract the new row order 
    	Colv <- colMeans(sum.by.tags.s, na.rm = TRUE)	# Find column means
     hcc <- hclust(dist( if(symm) {sum.by.tags.s}	# Cluster based on distances 
 													# (from the col perspective)
   						else {t(sum.by.tags.s)}))
 	ddc <- as.dendrogram(hcc)						# Convert to dendrogram 
 													# (which we might use later)
-	ddc <- reorder(ddc, Colv)						# Reorder the dendrogram
-	colInd <- order.dendrogram(ddc)					# Extract the column order
+	ddc <- reorder(ddc, -Colv)						# Reorder the dendrogram, 
+	                                                # highest values at left
+	colInd <- order.dendrogram(ddc)					# Extract the new column order
 	
 	sum.by.tags.s <- sum.by.tags.s[rowInd, colInd]	# Apply row and column 
 													# orders from above
@@ -170,11 +182,15 @@ heatmap.ben <- function (
 	        raw_or_cooked <- "raw"
 	    }
     	
-	    filename <- file.path(imageloc, paste0("Method correlation heatmap (",
+	    if (!is.null(mytitle)) {
+	        filename <- file.path(imageloc, paste0(mytitle, ".pdf"))
+	    } else {
+    	    filename <- file.path(imageloc, paste0("Method correlation heatmap (",
                                                raw_or_cooked, " values), ",
 	                                           dataset_name, ", ",
 	                                           tagset_name, ", N",
 	                                           nrow(dataset), ".pdf"))
+	    }
 	    pdf(filename)
 	}
 	
@@ -220,21 +236,19 @@ heatmap.ben <- function (
 		 las = 2, 
 		 col="white"
 	)
-	plot(ddc)
 	
 	# add subtitle indicating scaled / not scaled
 	if (verbose) {
 		if (rowscale) {
-			h2 <- paste("Each row normed by dividing over total number 
-						of dissertations for that row's tag.",
-						"\n",
-						"Diagonals represent tags occurring on one-method 
-						dissertations.")
+			title(main = mytitle,
+			       sub = paste("Each row normed by dividing over total number", 
+						"of dissertations for that row's tag."))
+		    mtext(side=3, text="A box in row Y, column X gives the probability that a dissertation tagged Y is also tagged X")
 		} else {
-			h2 <- "Diagonals represent tags occurring on one-method dissertations."
-		}
-		
-		title(sub=h2)
+		    mtext(side=3, text="A box in row Y, column X gives the number of dissertations tagged Y that are also tagged X")
+		} 
+	    
+	    mtext(side=4, text="Diagonals represent tags occurring on one-method dissertations.")
 	}
 	
 	if(remake_figs) {
@@ -264,7 +278,7 @@ heatmap.ben <- function (
 									" method row correlations.pdf"))
 				pdf(filename)
 			} 
-		plot(ddr)
+	    	plot(ddr)
 			if(remake_figs) { dev.off() }
 
 		}
@@ -272,15 +286,15 @@ heatmap.ben <- function (
 	
 } # end of wrapper function heatmap.ben()
 
-if(autorun) {
+if(FALSE) {
     heatmap.ben(dataset_name="noexcludes2001_2015", 
                 tagset_name="no_ped_tagnames",
                 diags=T,
                 rowscale=T)
     
-    heatmap.ben(dataset_name="realconsorts2001_2015", 
+    heatmap.ben(dataset_name="knownprograms2001_2015", 
                 tagset_name="no_ped_tagnames",
                 diags=T,
-                rowscale=T)
+                rowscale=F)
     
 }
