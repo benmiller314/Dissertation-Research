@@ -125,3 +125,66 @@ find_person_in_column <- function(person_name,
 # test3 <- find_person_in_column("Collin Brooke", dataset_name = "noexcludes", search_column = c("Advisor", "Advisor.Name"))
 
 
+# Find all advisors who were also authors in the dataset, so we can see what holds across "generations"
+find_advisors_as_authors <- function(dataset_name = "knownprograms",
+                                     author_column = "Author",
+                                     advisor_column = "Advisor.Name")
+{
+    
+    require(data.table)
+    
+    # load data
+    dataset.dt <- data.table(get(dataset_name), key="Pub.number")
+    
+    # isolate lists of authors and advisors, regularizing name order and capitalization
+    authors <- sapply(unlist(dataset.dt[, .SD, .SDcols=author_column]), 
+                      namepart, part= 'all', casefunction=titleCase)
+    advisors <- c()
+    for (i in seq_along(advisor_column)) {
+        advisors <- c(advisors, 
+                      sapply(unlist(dataset.dt[, .SD, .SDcols=advisor_column[i]]), 
+                             namepart, part= 'all', casefunction=titleCase)
+                      )
+    }
+    
+    
+    # don't search the same name multiple times
+    advisors <- unique(advisors)
+    
+    # account for multiple advisors on one diss
+    multiples_index <- grep("[;|]", advisors)
+    multiples <- advisors[multiples_index]
+    multiples <- unlist(lapply(multiples, strsplit, '[;|] '))
+    advisors <- unique(c(advisors[-multiples_index], multiples))
+    
+    # trim "Degree Supervisor." and deduplicate again
+    advisors <- unique(gsub(" Degree Supervisor.", "", advisors))
+    
+    
+    # start with *advisors* (there are fewer of them), and search in the list of authors
+    
+    advisor_as_author <- data.table()
+        
+    for (advisor in advisors) {
+        advisor_as_author <- rbind(advisor_as_author,
+                               find_person_in_column(person_name = advisor,
+                                                    dataset_name = dataset_name,
+                                                    search_column = author_column)
+                             )
+    }
+    
+    if(remake_figs) {
+        outfile <- file.path(dataloc, paste0("advisors-as-authors--", dataset_name, ".csv"))
+        
+        # NB: safesave is defined in safesave.R and loaded in .Rprofile
+        safesave(write.csv, advisor_as_author, outfile)
+    } else {
+        print(advisor_as_author)
+        
+        save_anyway <- readline("remake_figs is set to false; save your work anyway? (y/n) ")
+        if(!tolower(substr(save_anyway, 1, 1)) == "y") {
+            safesave(write.csv, advisor_as_author, outfile)
+        } else {
+            message("Not saving advisor_as_author.")
+        }
+    }
