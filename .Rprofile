@@ -8,6 +8,7 @@ debugs <- function() {
     names(which(sapply(unlist(lapply(search(), function(x) lsf.str(pos=x))), isdebugged)))
 }
 
+
 # set timezone
 Sys.setenv(TZ='America/New_York') 
 
@@ -26,3 +27,4 @@ outside_legend <- function(...) {
 }
 
 source(file="squish_numbers.R")
+source(file="safesave.R")
