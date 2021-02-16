@@ -72,7 +72,7 @@ if(verbose) {
 
 
 ## Older approaches
-# # this file assumes you've already run "collocation heatmap.R"
+# # this file assumes you've already run "method collocation heatmap.R"
 
 # head(sum.by.tags.n)
 
