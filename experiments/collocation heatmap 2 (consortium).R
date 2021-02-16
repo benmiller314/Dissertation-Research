@@ -1,5 +1,5 @@
 # let's repeat the whole thing for just consortium schools! yes, there is a better way. no time now.
-# NB: this file assumes you've already run 'collocation heatmap.R'
+# NB: this file assumes you've already run 'method collocation heatmap.R'
 
 tagarray.c <- tagarray[consorts.index,]
 

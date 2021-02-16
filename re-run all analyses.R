@@ -46,8 +46,8 @@
 
 #       Are we working at home or at the office? 
 #       Some file locations will be slightly different.
-        which_computer <- "work"
-        # which_computer <- "laptop"
+        # which_computer <- "work"
+        which_computer <- "laptop"
 
 #       Try not to run out of memory, would you? Need to set this before loading the rJava VM.
         if (which_computer == "work") {
@@ -124,7 +124,7 @@ source(file="methodcount barplot.R")
 #     keyword-tag counts, by overall frequency. Median frequency turns out
 #     to be 1, making this figure visually not so different from empty axes.
 source(file="subject terms barplot.R")
-#             source(file="keyword barplot.R")
+source(file="keyword barplot.R")
 
 ##
 #   `frequency of method tags.R`: tabulates and plots the number
@@ -155,7 +155,7 @@ source(file="top schools by method.R")
 
 
 ## 
-#   `collocation heatmap.R`: If a dissertation is tagged X, how
+#   `method collocation heatmap.R`: If a dissertation is tagged X, how
 #         many times is it also tagged Y? Provides one function:
 #           * sumbytags(dataset_name, tagset_name, doplot, normed, dendro):
 #         Aggregates methods tags by each method tag, with an option to
@@ -163,7 +163,7 @@ source(file="top schools by method.R")
 #         count. Optionally plots a heatmap of results as an adjacency
 #         matrix. 
 #   Dependencies: heatmap_ben.R
-source(file="collocation heatmap.R")
+source(file="method collocation heatmap.R")
 
 
 #####       Functions for Topic Modeling        #####
@@ -174,6 +174,9 @@ source(file="topic modeling 3.R")
 
 ## Tools for topic exploration ##
 
+        ## TO DO: Add new stuff since summer 2019, e.g. `inspect topic models.R`
+        
+        
 ## 
 #   `top docs per topic.R`: browse topics to generate labels. Provides four
 #   functions:

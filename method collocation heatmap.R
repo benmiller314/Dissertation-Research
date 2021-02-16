@@ -1,6 +1,6 @@
 
 ### 
-# `collocation heatmap.R`: Given method tags, collocate them and 
+# `method collocation heatmap.R`: Given method tags, collocate them and 
 # construct a heat plot. That is, if a dissertation is tagged X, 
 # how many times is it also tagged Y?
 
@@ -130,7 +130,13 @@ if (FALSE) {
               normed=F, 
               dendro=T)
     
-	# sum.by.tags <- sumbytags() 
+    sumbytags("knownprograms2001_2015", "tagnames", 
+              doplot=T, 
+              normed=F, 
+              dendro=T)
+    
+    
+    # sum.by.tags <- sumbytags() 
 	sumbytags("consorts.plus")
 	sumbytags("consorts.plus", normed=T)
 	sumbytags("top.nonconsorts")

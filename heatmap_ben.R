@@ -5,7 +5,7 @@
 # core heatmap function, modified to print the value for each square of the
 # grid.
 #
-# This file will be called by `collocation heatmap.R`. Or maybe it should go 
+# This file will be called by `method collocation heatmap.R`. Or maybe it should go 
 # the other way. Apparently I used to just clutter my files with a lot of
 # junk code. So. Still working on that.
 #####
