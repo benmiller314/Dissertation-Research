@@ -2,7 +2,7 @@
 
 # make sure the data exists
 if (!exists("noexcludes")) {source('/Users/benmiller314/Dropbox/coursework, etc/dissertation/data, code, and figures/Dissertation Research/start here.R')}
-if(!exists("sumbytags", mode="function")) { source(file="collocation heatmap.R") }
+if(!exists("sumbytags", mode="function")) { source(file="method collocation heatmap.R") }
 
 
     # narrow to a particular school 		TO DO: make this a parameter of a wraparound function... and loopable
