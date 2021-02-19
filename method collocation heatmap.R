@@ -88,8 +88,26 @@ sumbytags <- function(dataset_name = "noexcludes",
 				 "solo.counts"  = solo.counts,
 				 "total.counts" = total.counts)
 
+    if(remake_figs) {
+        # NB: all remake_figs file output for figures is now in heatmap.ben(), 
+        # which will be called if doplot = T. So here we only need to save csv's
+        # for analysis elsewhere, e.g. network maps in Gephi.
+        
+        dataset_slug <- paste0("--", dataset_name, "-", tagset_name, "--N", nrow(dataset))
+        
+        filename <- paste0("method-correlatons", dataset_slug, ".csv")
+        safesave(write.csv, to.return$correlations, file.path(imageloc, filename))
+        
+        filename <- paste0("method-solo-counts", dataset_slug, ".csv")
+        safesave(write.csv, to.return$solo.counts, file.path(imageloc, filename))
+        
+        filename <- paste0("method-total-counts", dataset_slug, ".csv")
+        safesave(write.csv, to.return$total.counts, file.path(imageloc, filename))
+        
+    }
+	
 	if(doplot) {
-        # NB: all remake_figs file output is now in heatmap.ben()
+        
 		if(!exists("heatmap.ben", mode="function")) {
 			source(file="heatmap_ben.R")
 		}
@@ -123,7 +141,7 @@ if (!autorun) {
 
 # Testing area
 if (FALSE) { 
-	remake_figs=T
+	remake_figs=F
 	
     sumbytags("knownprograms2001_2015", "no_ped_tagnames", 
               doplot=T, 
