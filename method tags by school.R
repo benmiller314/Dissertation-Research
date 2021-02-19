@@ -11,6 +11,7 @@
 require(doBy)
 require(cluster)
 require(RColorBrewer)
+require(data.table)
 
 # make sure we've run dataprep.R
 if(!exists("imageloc")) {
@@ -19,37 +20,46 @@ if(!exists("imageloc")) {
 
 
 # function for getting data
-schoolwise.data <- function(dataset_name="consorts", tagset_name="tagnames") {
+schoolwise.data <- function(dataset_name="knownprograms2001_2015", tagset_name="no_ped_tagnames") {
     
     # 0. convert variable names to variables. we'll use the names later in
     # the figure titles.
-    dataset <- get(dataset_name, envir=parent.frame())
-    tagset <- get(tagset_name, envir=parent.frame())
-    tagset.mean <- sapply(tagset, FUN=function(x) paste0(x,".mean"))
-    tagset.sum <- sapply(tagset, FUN=function(x) paste0(x,".sum"))
+    dataset <- get(dataset_name, envir=globalenv())
+    tagset <- get(tagset_name, envir=globalenv())
     
-    # 1. remove columns other than method tags and school
-    dataset <- dataset[, which(names(dataset) %in% c("School", tagset))]
+    # 1. remove columns other than method tags and school; convert to data table
+    tagarray <- dataset[, which(names(dataset) %in% c("School", tagset))]
+    tagarray <- data.table(tagarray, key="School")
     
-    # 2. do the summary of each method type for all schools. 
-    d1 <- summaryBy(. ~ School, data=dataset, FUN=mean)
-    d2 <- summaryBy(. ~ School, data=dataset, FUN=sum)
-    d3 <- summaryBy(. ~ School, data=dataset, FUN=length)
-        
-    return(list("means" = d1, "sums" = d2, "counts" = d3))
+    
+    # 2. do the summary of each method type for all schools.
+    totals <- tagarray[, .N, by="School"]
+    counts <- tagarray[, lapply(.SD, sum), by="School"]
+    
+    normed <- round((counts[, ..tagset] / totals$N) * 100, 2)
+    normed$School <- totals$School
+    setkey(normed, School)
+    setcolorder(normed)
+    
+    return(list("totals" = totals, "counts" = counts, "normed" = normed))
 }
 
 # function for graphing data
-schoolwise <- function(dataset_name="noexcludes", tagset_name="tagnames", 
+schoolwise <- function(dataset_name="knownprograms2001_2015", tagset_name="no_ped_tagnames", 
             agn=TRUE,        # run agglomerative clustering (using agnes)?
             hcl=TRUE,        # run hierarchical clustering (using hclust)?
             dia=TRUE,        # run divisive clustering (using diana)?
-            counts=FALSE,    # label each row with the number of
+            show.totals=FALSE,    # label each row with the number of
                              #   dissertations per school?
+            measure=c("normed", "counts"), # how to present tag data for each school: 
+                             # as methodological focus (normed by school totals), or 
+                             # as methodological output (raw counts of each tag)?
             agfixedcols=NULL,   # optional pre-set order of columns for 
                                 #   comparison btwn agnes plots
             difixedcols=NULL,   # optional pre-set order of columns for 
-                                #   comparison btwn diana plots
+                                #   comparison btwn diana plots,
+            hcfixedcols=NULL,   # optional pre-set order of columns for 
+                                #   comparison btwn hclust plots,
             myCol=NULL)         # optional color palette
     {
     
@@ -61,24 +71,30 @@ schoolwise <- function(dataset_name="noexcludes", tagset_name="tagnames",
     # the figure titles.
     dataset <- get(dataset_name)
     tagset <- get(tagset_name)
-    tagset <- sapply(tagset, FUN=function(x) paste0(x,".mean"))
     
     # 1-2 call the data-grabbing function
     m1 <- schoolwise.data(dataset_name, tagset_name)
-    m2 <- m1$means
+    measure <- match.arg(measure)
+    m2 <- m1[[measure]]
 
     # 3. get more meaningful row names (and a purely numerical matrix, for
     # heatmapping) Note that the first column will always be the list of
-    # schools because of the query in step 2.
-    if (counts) {
-        row.names(m2) <- paste0(m2$School, " (", 
-                                m1$counts$School.length, ")") 
+    # schools because of the query in step 2; every tag.length in m1$counts 
+    # should be the same.
+    m3 <- data.matrix(m2[, -("School")])
+    head(m3)
+    
+    if (show.totals) {
+        row.names(m3) <- paste0(m2$School, " (", 
+                                m1$totals$N, ")") 
     } else {
-        row.names(m2) <- m2$School
+        row.names(m3) <- m2$School
     }
-    m2 <- m2[,2:ncol(m2)]
-    m2 <- data.matrix(m2)
-    head(m2)
+    
+    colnames(m3) <- colnames(m2[, -("School")])
+    
+    head(m3)
+    
     
     # try this old approach to finding the best sort method
         # agn_methods <- c("average","single","complete","ward","weighted");
@@ -89,11 +105,17 @@ schoolwise <- function(dataset_name="noexcludes", tagset_name="tagnames",
         #                         agn[[4]]$ac, agn[[5]]$ac))
     
     # 4. make the heatmap: use pre-determined columns if need be.
-
+    if(!exists("heatmap.fixedcols", mode="function")) {
+        source(file="headmap fixedcols.R")
+    }
+    
+    # reset the plot device
+    plot.new()
+    
     # 4b. divisive clustering (diana):
     if(dia) {
-    filename <- file.path(imageloc, paste0("tags by schools, ", dataset_name, 
-                    ", N", nrow(dataset), ", ", tagset_name, ", diana.pdf"))
+    filename <- file.path(imageloc, paste0("method tags by school, ", dataset_name, 
+                    ", N", nrow(dataset), ", ", tagset_name, " (", measure, "), diana.pdf"))
     maintitle <- paste0("Method Tag Averages by school, ", dataset_name, 
                     ", ", tagset_name, ", diana")
     
@@ -102,7 +124,7 @@ schoolwise <- function(dataset_name="noexcludes", tagset_name="tagnames",
         }
         
         if(!is.null(difixedcols)) {
-            di <- heatmap.fixedcols(m2, 
+            di <- heatmap.fixedcols(m3, 
                         myColInd = difixedcols,
                         hclustfun = function(d){ diana(d, metric="ward") },
                         scale = "row", 
@@ -110,7 +132,7 @@ schoolwise <- function(dataset_name="noexcludes", tagset_name="tagnames",
                         main = maintitle, 
                         margins = c(5,10))
         } else {
-            di <- heatmap(m2, 
+            di <- heatmap(m3, 
                         hclustfun = function(d){ diana(d, metric="ward") },
                         scale = "row", 
                         col = myCol, 
@@ -130,7 +152,7 @@ schoolwise <- function(dataset_name="noexcludes", tagset_name="tagnames",
     # 4a. agglomerative clustering (agnes):
     if(agn) {
         filename <- file.path(imageloc, paste0("tags by schools, ", dataset_name, 
-                ", N", nrow(dataset), ", ", tagset_name, ", agnes.pdf"))
+                ", N", nrow(dataset), ", ", tagset_name, " (", measure, "), agnes.pdf"))
         maintitle <- paste0("Method Tag Averages by school, ", dataset_name,
                 ", ", tagset_name, ", agnes")
     
@@ -139,7 +161,7 @@ schoolwise <- function(dataset_name="noexcludes", tagset_name="tagnames",
         }
         
         if(!is.null(agfixedcols)) {
-            ag <- heatmap.fixedcols(m2, 
+            ag <- heatmap.fixedcols(m3, 
                         myColInd = agfixedcols,
                         hclustfun = function(d){ agnes(d, method="ward") },
                         scale = "row", 
@@ -148,7 +170,7 @@ schoolwise <- function(dataset_name="noexcludes", tagset_name="tagnames",
                         margins = c(5,10)
             )
         } else {
-            ag <- heatmap(m2, 
+            ag <- heatmap(m3, 
                         hclustfun = function(d){ agnes(d,method="ward") }, 
                         scale = "row", 
                         col = myCol, 
@@ -168,7 +190,7 @@ schoolwise <- function(dataset_name="noexcludes", tagset_name="tagnames",
         # 4c. agglomerative clustering via hclust:
     if(hcl) {
         filename <- file.path(imageloc, paste0("tags by schools, ", dataset_name, 
-                    ", N", nrow(dataset), ", ", tagset_name, ", hclust.pdf"))
+                    ", N", nrow(dataset), ", ", tagset_name, " (", measure, "), hclust.pdf"))
         maintitle <- paste0("Method Tag Averages by school, ", dataset_name,
                     ", ", tagset_name, ", hclust")
     
@@ -176,16 +198,16 @@ schoolwise <- function(dataset_name="noexcludes", tagset_name="tagnames",
             pdf(file = filename)
         }
         
-        if(!is.null(agfixedcols)) {
-            hc <- heatmap.fixedcols(m2, 
-                        myColInd = agfixedcols, 
+        if(!is.null(hcfixedcols)) {
+            hc <- heatmap.fixedcols(m3, 
+                        myColInd = hcfixedcols, 
                         scale = "row", 
                         col = myCol, 
                         main = maintitle, 
                         margins = c(5,10)
             )
         } else {
-            hc <- heatmap(m2, 
+            hc <- heatmap(m3, 
                         scale = "row", 
                         col = myCol, 
                         main = maintitle, 
@@ -215,8 +237,27 @@ if (FALSE) {
     remake_figs=F
     # call the functions for all relevant datasets
     
-    schoolwise("knownprograms2001_2015", "no_ped_tagnames")
+    agn = T
+    hcl = T
+    dia = T
     
+    kp_order <- schoolwise(dataset_name = "knownprograms2001_2015", 
+                           tagset_name = "no_ped_tagnames",
+                           show.totals = T,
+                           agn = agn,
+                           hcl = hcl,
+                           dia = dia)
+    
+    schoolwise(dataset_name = "knownprograms2001_2015",
+               tagset_name = "no_ped_tagnames",
+               # agfixedcols = ifelse(agn, kp_order$ag$colInd, NULL),
+               # difixedcols = ifelse(hcl, kp_order$di$colInd, NULL),
+               # hcfixedcols = ifelse(dia, kp_order$hc$colInd, NULL),
+               show.totals = T,
+               measure = "counts",
+               agn = agn,
+               hcl = hcl,
+               dia = dia)
     
     schoolwise("consorts", "tagnames", agn=T, hcl=F, dia=F)
     schoolwise("nonconsorts", "tagnames", agn=T, hcl=F, dia=F)
