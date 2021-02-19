@@ -75,12 +75,12 @@ realtags <- function(tag, tagset_name="tagnames") {
 	return(tagset.long[index])
 }
 
-# TO DO: move these to where they're actually needed,
-# so we don't clutter the environment every time.
-sumnames <- sapply(tagnames, FUN=function(x) paste0(x,".sum"))
-meannames <- sapply(tagnames, FUN=function(x) paste0(x,".mean"))
-topnames <- sapply(tagnames, FUN=function(x) as.list(tolower(paste0("top.",x))))
-topnames <- lapply(topnames, FUN=function(x) substr(x,1,8))
+# # TO DO: move these to where they're actually needed,
+# # so we don't clutter the environment every time.
+# sumnames <- sapply(tagnames, FUN=function(x) paste0(x,".sum"))
+# meannames <- sapply(tagnames, FUN=function(x) paste0(x,".mean"))
+# topnames <- sapply(tagnames, FUN=function(x) as.list(tolower(paste0("top.",x))))
+# topnames <- lapply(topnames, FUN=function(x) substr(x,1,8))
 
 
 ## prep some useful functions
