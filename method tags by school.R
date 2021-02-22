@@ -7,11 +7,11 @@
 # data and tags.
 #####
 
-# load required packages
-require(doBy)
+## load required packages
+# require(doBy)
 require(cluster)
-require(RColorBrewer)
 require(data.table)
+require(gplots)
 
 # make sure we've run dataprep.R
 if(!exists("imageloc")) {
@@ -60,12 +60,18 @@ schoolwise <- function(dataset_name="knownprograms2001_2015", tagset_name="no_pe
                                 #   comparison btwn diana plots,
             hcfixedcols=NULL,   # optional pre-set order of columns for 
                                 #   comparison btwn hclust plots,
-            myCol=NULL)         # optional color palette
-    {
+            myCol=NULL,         # optional color palette
+            mycex = 0.5,        # scaling factor for label font size
+            myroworder = TRUE,  # if you have schools or tags sorted from a prior run,
+            mycolorder = TRUE   # you can pass the Rowv (schools) or Colv(tags) here to use
+                                # that ordering. TRUE means use the clustering method to 
+                                # recalculate the ordering now.
+                          
+    ){
     
     # if colors are not provided, default to black and white
-    require(RColorBrewer)
-    if(is.null(myCol)) { myCol <- brewer.pal(9, "Greys") }
+    require(grDevices)
+    if(is.null(myCol)) { myCol <- gray.colors(9, start=0, end=1, rev=T) }
     
     # 0. convert variable names to variables. we'll use the names later in
     # the figure titles.
@@ -110,13 +116,13 @@ schoolwise <- function(dataset_name="knownprograms2001_2015", tagset_name="no_pe
     }
     
     # reset the plot device
-    plot.new()
+    # plot.new(); dev.off()
     
     # 4b. divisive clustering (diana):
     if(dia) {
     filename <- file.path(imageloc, paste0("method tags by school, ", dataset_name, 
                     ", N", nrow(dataset), ", ", tagset_name, " (", measure, "), diana.pdf"))
-    maintitle <- paste0("Method Tag Averages by school, ", dataset_name, 
+    maintitle <- paste0("Method Tag Output (", measure, ") by school, \n", dataset_name, 
                     ", ", tagset_name, ", diana")
     
         if(remake_figs) {
@@ -127,22 +133,28 @@ schoolwise <- function(dataset_name="knownprograms2001_2015", tagset_name="no_pe
             di <- heatmap.fixedcols(m3, 
                         myColInd = difixedcols,
                         hclustfun = function(d){ diana(d, metric="ward") },
-                        scale = "row", 
+                        # scale = "row", 
                         col = myCol, 
                         main = maintitle, 
-                        margins = c(5,10))
+                        margins = c(5,10),
+                        cexRow = mycex)
         } else {
             di <- heatmap(m3, 
                         hclustfun = function(d){ diana(d, metric="ward") },
-                        scale = "row", 
+                        # scale = "row", 
                         col = myCol, 
                         main = maintitle, 
-                        margins = c(5,10)
+                        margins = c(5,10),
+                        cexRow = mycex,
+                        Rowv = myroworder,
+                        Colv = mycolorder
             )
         }
-        mtext(paste("Each cell gives the likelihood that a given", 
-                "dissertation from the school in row Y is tagged with the",
-                "method in column X.", side = 1))
+        
+        mtext(paste("Each cell gives the ", measure, "frequency",
+                "that a given dissertation from the school in row Y",
+                "is tagged with the method in column X.", side = 1))
+    
                 
         if(remake_figs) {
             dev.off()
@@ -153,8 +165,8 @@ schoolwise <- function(dataset_name="knownprograms2001_2015", tagset_name="no_pe
     if(agn) {
         filename <- file.path(imageloc, paste0("tags by schools, ", dataset_name, 
                 ", N", nrow(dataset), ", ", tagset_name, " (", measure, "), agnes.pdf"))
-        maintitle <- paste0("Method Tag Averages by school, ", dataset_name,
-                ", ", tagset_name, ", agnes")
+        maintitle <- paste0("Method Tag Output (", measure, ") by school, \n", dataset_name, 
+                            ", ", tagset_name, ", agnes")
     
         if(remake_figs) {
             pdf(file = filename)
@@ -164,23 +176,28 @@ schoolwise <- function(dataset_name="knownprograms2001_2015", tagset_name="no_pe
             ag <- heatmap.fixedcols(m3, 
                         myColInd = agfixedcols,
                         hclustfun = function(d){ agnes(d, method="ward") },
-                        scale = "row", 
+                        # scale = "row", 
                         col = myCol, 
                         main = maintitle, 
-                        margins = c(5,10)
+                        margins = c(5,10),
+                        cexRow = mycex
             )
         } else {
             ag <- heatmap(m3, 
                         hclustfun = function(d){ agnes(d,method="ward") }, 
-                        scale = "row", 
+                        # scale = "row", 
                         col = myCol, 
                         main = maintitle, 
-                        margins = c(5,10)
+                        margins = c(5,10),
+                        cexRow = mycex,
+                        Rowv = myroworder,
+                        Colv = mycolorder
             )
         }
-        mtext(paste("Each cell gives the likelihood that",
-                    "a given dissertation from the school in row Y",
+        mtext(paste("Each cell gives the ", measure, "frequency",
+                    "that a given dissertation from the school in row Y",
                     "is tagged with the method in column X.", side = 1))
+
     
         if(remake_figs) {
             dev.off()
@@ -191,8 +208,8 @@ schoolwise <- function(dataset_name="knownprograms2001_2015", tagset_name="no_pe
     if(hcl) {
         filename <- file.path(imageloc, paste0("tags by schools, ", dataset_name, 
                     ", N", nrow(dataset), ", ", tagset_name, " (", measure, "), hclust.pdf"))
-        maintitle <- paste0("Method Tag Averages by school, ", dataset_name,
-                    ", ", tagset_name, ", hclust")
+        maintitle <- paste0("Method Tag Output (", measure, ") by school, \n", dataset_name, 
+                            ", ", tagset_name, ", hclust")
     
         if(remake_figs) {
             pdf(file = filename)
@@ -201,20 +218,24 @@ schoolwise <- function(dataset_name="knownprograms2001_2015", tagset_name="no_pe
         if(!is.null(hcfixedcols)) {
             hc <- heatmap.fixedcols(m3, 
                         myColInd = hcfixedcols, 
-                        scale = "row", 
+                        # scale = "row", 
                         col = myCol, 
                         main = maintitle, 
-                        margins = c(5,10)
+                        margins = c(5,10),
+                        cexRow = mycex
             )
         } else {
             hc <- heatmap(m3, 
-                        scale = "row", 
+                        # scale = "row", 
                         col = myCol, 
                         main = maintitle, 
-                        margins = c(5,10)
+                        margins = c(5,10),
+                        cexRow = mycex,
+                        Rowv = myroworder,
+                        Colv = mycolorder
             )
         }
-        mtext(paste("Each cell gives the likelihood",
+        mtext(paste("Each cell gives the ", measure, "frequency",
                     "that a given dissertation from the school in row Y",
                     "is tagged with the method in column X.", side = 1))
                     
@@ -234,19 +255,21 @@ schoolwise <- function(dataset_name="knownprograms2001_2015", tagset_name="no_pe
 }
 
 if (FALSE) {
-    remake_figs=F
+    remake_figs=T
     # call the functions for all relevant datasets
     
-    agn = T
+    agn = F
     hcl = T
-    dia = T
+    dia = F
     
     kp_order <- schoolwise(dataset_name = "knownprograms2001_2015", 
                            tagset_name = "no_ped_tagnames",
                            show.totals = T,
+                           measure = "normed",
                            agn = agn,
                            hcl = hcl,
-                           dia = dia)
+                           dia = dia,
+                           myCol = gray.colors(20, start = 0, end = 1, rev=T))
     
     schoolwise(dataset_name = "knownprograms2001_2015",
                tagset_name = "no_ped_tagnames",
@@ -257,7 +280,29 @@ if (FALSE) {
                measure = "counts",
                agn = agn,
                hcl = hcl,
-               dia = dia)
+               dia = dia,
+               myroworder = kp_order$hc$rowInd,
+               myCol = gray.colors(20, start = 0, end = 1, rev=T))
+    
+    remake_figs=F
+    require(RColorBrewer)
+    schoolwise(dataset_name = "knownprograms2001_2015", 
+               tagset_name = "no_ped_tagnames",
+               show.totals = T,
+               measure = "normed",
+               agn = F,
+               hcl = T,
+               dia = F,
+               myCol = c("#FFFFFF", brewer.pal(8, "YlOrRd"), "#000000"))
+    
+    schoolwise(dataset_name = "knownprograms2001_2015", 
+               tagset_name = "no_ped_tagnames",
+               show.totals = T,
+               measure = "normed",
+               agn = F,
+               hcl = T,
+               dia = F)
+    
     
     schoolwise("consorts", "tagnames", agn=T, hcl=F, dia=F)
     schoolwise("nonconsorts", "tagnames", agn=T, hcl=F, dia=F)
