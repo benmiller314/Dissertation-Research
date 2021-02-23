@@ -46,32 +46,30 @@ schoolwise.data <- function(dataset_name="knownprograms2001_2015", tagset_name="
 
 # function for graphing data
 schoolwise <- function(dataset_name="knownprograms2001_2015", tagset_name="no_ped_tagnames", 
-            agn=TRUE,        # run agglomerative clustering (using agnes)?
-            hcl=TRUE,        # run hierarchical clustering (using hclust)?
-            dia=TRUE,        # run divisive clustering (using diana)?
+            myclustfun = c("agnes", "diana", "hclust"),
+                                # run agglomerative clustering (using agnes)?
+                                # run divisive clustering (using diana)?
+                                # run hierarchical clustering (using hclust)?
             show.totals=FALSE,    # label each row with the number of
                              #   dissertations per school?
             measure=c("normed", "counts"), # how to present tag data for each school: 
                              # as methodological focus (normed by school totals), or 
                              # as methodological output (raw counts of each tag)?
-            agfixedcols=NULL,   # optional pre-set order of columns for 
-                                #   comparison btwn agnes plots
-            difixedcols=NULL,   # optional pre-set order of columns for 
-                                #   comparison btwn diana plots,
-            hcfixedcols=NULL,   # optional pre-set order of columns for 
-                                #   comparison btwn hclust plots,
             myCol=NULL,         # optional color palette
             mycex = 0.5,        # scaling factor for label font size
             myroworder = TRUE,  # if you have schools or tags sorted from a prior run,
-            mycolorder = TRUE   # you can pass the Rowv (schools) or Colv(tags) here to use
-                                # that ordering. TRUE means use the clustering method to 
-                                # recalculate the ordering now.
+            mycolorder = TRUE   # you can pass the Rowv (schools) or Colv (tags) here 
+                                # to use that ordering. TRUE means use the clustering method 
+                                # to recalculate the ordering now.
                           
     ){
     
     # if colors are not provided, default to black and white
     require(grDevices)
     if(is.null(myCol)) { myCol <- gray.colors(9, start=0, end=1, rev=T) }
+    
+    # make sure we're using a legal clustering function
+    myclustfun <- match.arg(myclustfun, several.ok = TRUE)
     
     # 0. convert variable names to variables. we'll use the names later in
     # the figure titles.
@@ -111,145 +109,64 @@ schoolwise <- function(dataset_name="knownprograms2001_2015", tagset_name="no_pe
         #                         agn[[4]]$ac, agn[[5]]$ac))
     
     # 4. make the heatmap: use pre-determined columns if need be.
-    if(!exists("heatmap.fixedcols", mode="function")) {
-        source(file="headmap fixedcols.R")
+    
+    # 4a. base names (add clust method and .pdf to the ends)
+    filenamebase <- file.path(imageloc, paste0("method tags by school, ", dataset_name, 
+                          ", N", nrow(dataset), ", ", tagset_name, " (", measure, ")"))
+    if(measure == "normed") {
+        title_keyword <- "Focus"
+    } else {
+        title_keyword <- "Output"
     }
+    maintitlebase <- paste0("Methodological ", title_keyword," (", measure, ") by school, ",
+                            dataset_name, ", ", tagset_name)
     
-    # reset the plot device
-    # plot.new(); dev.off()
     
-    # 4b. divisive clustering (diana):
-    if(dia) {
-    filename <- file.path(imageloc, paste0("method tags by school, ", dataset_name, 
-                    ", N", nrow(dataset), ", ", tagset_name, " (", measure, "), diana.pdf"))
-    maintitle <- paste0("Method Tag Output (", measure, ") by school, \n", dataset_name, 
-                    ", ", tagset_name, ", diana")
+    # 4b. iterate through possible clustering methods
     
+    to.return <- list()
+    
+    for (fun_name in myclustfun) {
+        fun <- match.fun(fun_name)
+        if(fun_name %in% c("agnes", "diana")) {
+            myfun <- function(d) { fun(d, metric="ward") }
+        } else {
+            myfun <- fun
+        }
+        
+        filename <- paste0(filenamebase, " -- ", fun_name, ".pdf")
+        maintitle <- paste0(maintitlebase, " -- ", fun_name)
+        
         if(remake_figs) {
             pdf(file = filename)
         }
         
-        if(!is.null(difixedcols)) {
-            di <- heatmap.fixedcols(m3, 
-                        myColInd = difixedcols,
-                        hclustfun = function(d){ diana(d, metric="ward") },
-                        # scale = "row", 
-                        col = myCol, 
-                        main = maintitle, 
-                        margins = c(5,10),
-                        cexRow = mycex)
-        } else {
-            di <- heatmap(m3, 
-                        hclustfun = function(d){ diana(d, metric="ward") },
-                        # scale = "row", 
+        tmp <- heatmap(m3, 
+                        hclustfun = myfun,
+                        scale = "none", 
                         col = myCol, 
                         main = maintitle, 
                         margins = c(5,10),
                         cexRow = mycex,
                         Rowv = myroworder,
-                        Colv = mycolorder
-            )
-        }
+                        Colv = mycolorder,
+                        keep.dendro = T
+                )
         
-        mtext(paste("Each cell gives the ", measure, "frequency",
-                "that a given dissertation from the school in row Y",
-                "is tagged with the method in column X.", side = 1))
-    
-                
-        if(remake_figs) {
-            dev.off()
-        }
-    } # end of if(dia)
-        
-    # 4a. agglomerative clustering (agnes):
-    if(agn) {
-        filename <- file.path(imageloc, paste0("tags by schools, ", dataset_name, 
-                ", N", nrow(dataset), ", ", tagset_name, " (", measure, "), agnes.pdf"))
-        maintitle <- paste0("Method Tag Output (", measure, ") by school, \n", dataset_name, 
-                            ", ", tagset_name, ", agnes")
-    
-        if(remake_figs) {
-            pdf(file = filename)
-        }
-        
-        if(!is.null(agfixedcols)) {
-            ag <- heatmap.fixedcols(m3, 
-                        myColInd = agfixedcols,
-                        hclustfun = function(d){ agnes(d, method="ward") },
-                        # scale = "row", 
-                        col = myCol, 
-                        main = maintitle, 
-                        margins = c(5,10),
-                        cexRow = mycex
-            )
-        } else {
-            ag <- heatmap(m3, 
-                        hclustfun = function(d){ agnes(d,method="ward") }, 
-                        # scale = "row", 
-                        col = myCol, 
-                        main = maintitle, 
-                        margins = c(5,10),
-                        cexRow = mycex,
-                        Rowv = myroworder,
-                        Colv = mycolorder
-            )
-        }
         mtext(paste("Each cell gives the ", measure, "frequency",
                     "that a given dissertation from the school in row Y",
                     "is tagged with the method in column X.", side = 1))
-
-    
+        
         if(remake_figs) {
             dev.off()
-        }
-    }   # end of if(agn)
-
-        # 4c. agglomerative clustering via hclust:
-    if(hcl) {
-        filename <- file.path(imageloc, paste0("tags by schools, ", dataset_name, 
-                    ", N", nrow(dataset), ", ", tagset_name, " (", measure, "), hclust.pdf"))
-        maintitle <- paste0("Method Tag Output (", measure, ") by school, \n", dataset_name, 
-                            ", ", tagset_name, ", hclust")
-    
-        if(remake_figs) {
-            pdf(file = filename)
         }
         
-        if(!is.null(hcfixedcols)) {
-            hc <- heatmap.fixedcols(m3, 
-                        myColInd = hcfixedcols, 
-                        # scale = "row", 
-                        col = myCol, 
-                        main = maintitle, 
-                        margins = c(5,10),
-                        cexRow = mycex
-            )
-        } else {
-            hc <- heatmap(m3, 
-                        # scale = "row", 
-                        col = myCol, 
-                        main = maintitle, 
-                        margins = c(5,10),
-                        cexRow = mycex,
-                        Rowv = myroworder,
-                        Colv = mycolorder
-            )
-        }
-        mtext(paste("Each cell gives the ", measure, "frequency",
-                    "that a given dissertation from the school in row Y",
-                    "is tagged with the method in column X.", side = 1))
-                    
-        if(remake_figs) {
-            dev.off()
-        }
-    }   # end of if(clust)
-
-    if(!exists("di", inherits=F)) di <- noquote("Not run")
-    if(!exists("ag", inherits=F)) ag <- noquote("Not run")
-    if(!exists("hc", inherits=F)) hc <- noquote("Not run")
+        to.return[fun_name] <- list(tmp)
+    } # end of for loop: repeat for each clustering method 
+    
 
     # save the row and column orders to allow for consistent sorting later
-    return(list("di" = di, "ag" = ag, "hc" = hc))
+    return(to.return)
     
 # close wrapper function schoolwise()
 }
@@ -266,22 +183,15 @@ if (FALSE) {
                            tagset_name = "no_ped_tagnames",
                            show.totals = T,
                            measure = "normed",
-                           agn = agn,
-                           hcl = hcl,
-                           dia = dia,
+                           myclustfun = c("di"),
                            myCol = gray.colors(20, start = 0, end = 1, rev=T))
     
     schoolwise(dataset_name = "knownprograms2001_2015",
                tagset_name = "no_ped_tagnames",
-               # agfixedcols = ifelse(agn, kp_order$ag$colInd, NULL),
-               # difixedcols = ifelse(hcl, kp_order$di$colInd, NULL),
-               # hcfixedcols = ifelse(dia, kp_order$hc$colInd, NULL),
                show.totals = T,
                measure = "counts",
-               agn = agn,
-               hcl = hcl,
-               dia = dia,
-               myroworder = kp_order$hc$rowInd,
+               myclustfun = c("di"),
+               myroworder = kp_order$diana$Rowv,
                myCol = gray.colors(20, start = 0, end = 1, rev=T))
     
     remake_figs=F
