@@ -56,11 +56,12 @@ schoolwise <- function(dataset_name="knownprograms2001_2015", tagset_name="no_pe
                              # as methodological focus (normed by school totals), or 
                              # as methodological output (raw counts of each tag)?
             myCol=NULL,         # optional color palette
-            mycex = 0.5,        # scaling factor for label font size
+            mycex = 0.4,        # scaling factor for label font size
             myroworder = TRUE,  # if you have schools or tags sorted from a prior run,
-            mycolorder = TRUE   # you can pass the Rowv (schools) or Colv (tags) here 
+            mycolorder = TRUE,   # you can pass the Rowv (schools) or Colv (tags) here 
                                 # to use that ordering. TRUE means use the clustering method 
                                 # to recalculate the ordering now.
+            filename_suffix = NULL
                           
     ){
     
@@ -70,6 +71,11 @@ schoolwise <- function(dataset_name="knownprograms2001_2015", tagset_name="no_pe
     
     # make sure we're using a legal clustering function
     myclustfun <- match.arg(myclustfun, several.ok = TRUE)
+    
+    # better filenames
+    if(!is.null(filename_suffix) && substr(filename_suffix, 2, 2) != "-") {
+        filename_suffix <- paste0(" -- ", filename_suffix)
+    }
     
     # 0. convert variable names to variables. we'll use the names later in
     # the figure titles.
@@ -118,7 +124,7 @@ schoolwise <- function(dataset_name="knownprograms2001_2015", tagset_name="no_pe
     } else {
         title_keyword <- "Output"
     }
-    maintitlebase <- paste0("Methodological ", title_keyword," (", measure, ") by school, ",
+    maintitlebase <- paste0("Methodological ", title_keyword," (", measure, ") by school,\n",
                             dataset_name, ", ", tagset_name)
     
     
@@ -134,7 +140,7 @@ schoolwise <- function(dataset_name="knownprograms2001_2015", tagset_name="no_pe
             myfun <- fun
         }
         
-        filename <- paste0(filenamebase, " -- ", fun_name, ".pdf")
+        filename <- paste0(filenamebase, " -- ", fun_name, filename_suffix, ".pdf")
         maintitle <- paste0(maintitlebase, " -- ", fun_name)
         
         if(remake_figs) {
@@ -147,11 +153,13 @@ schoolwise <- function(dataset_name="knownprograms2001_2015", tagset_name="no_pe
                         col = myCol, 
                         main = maintitle, 
                         margins = c(5,10),
+                        mar = c(5, 5, 10, 10),
                         cexRow = mycex,
                         Rowv = myroworder,
                         Colv = mycolorder,
-                        keep.dendro = T
-                )
+                        keep.dendro = T,
+                        cex.main = 0.7
+        )
         
         mtext(paste("Each cell gives the ", measure, "frequency",
                     "that a given dissertation from the school in row Y",
@@ -175,43 +183,43 @@ if (FALSE) {
     remake_figs=T
     # call the functions for all relevant datasets
     
-    agn = F
-    hcl = T
-    dia = F
+    require(RColorBrewer)
+    require(viridisLite)
     
-    kp_order <- schoolwise(dataset_name = "knownprograms2001_2015", 
+    colorscheme <- list(name = "grayscale", values = gray.colors(20, start = 0, end = 1, rev=T))
+    colorscheme <- list(colorscheme,
+                            list(name = "YlOrRd", values = c("#FFFFFF", brewer.pal(9, "YlOrRd"))),
+                            list(name = "magma", values = c("#FFFFFF", magma(99, dir=-1)))
+                        )
+    
+    
+    for (clustfun in c("diana", "agnes", "hclust")) {
+        for(i in seq_along(colorscheme)) {
+        
+            kp_order <- schoolwise(dataset_name = "knownprograms2001_2015", 
                            tagset_name = "no_ped_tagnames",
                            show.totals = T,
                            measure = "normed",
-                           myclustfun = c("di"),
-                           myCol = gray.colors(20, start = 0, end = 1, rev=T))
+                           myclustfun = clustfun,
+                           myCol = if(is.null(colorscheme$values)) colorscheme[[i]]$values else colorscheme$values,
+                           filename_suffix = if(is.null(colorscheme$name)) colorscheme[[i]]$name else colorscheme$name
+            )
     
-    schoolwise(dataset_name = "knownprograms2001_2015",
-               tagset_name = "no_ped_tagnames",
-               show.totals = T,
-               measure = "counts",
-               myclustfun = c("di"),
-               myroworder = kp_order$diana$Rowv,
-               myCol = gray.colors(20, start = 0, end = 1, rev=T))
+            schoolwise(dataset_name = "knownprograms2001_2015",
+                       tagset_name = "no_ped_tagnames",
+                       show.totals = T,
+                       measure = "counts",
+                       myclustfun = clustfun,
+                       myroworder = kp_order[[clustfun]]$Rowv,
+                       mycolorder = kp_order[[clustfun]]$Colv,
+                       myCol = if(is.null(colorscheme$values)) colorscheme[[i]]$values else colorscheme$values,
+                       filename_suffix = if(is.null(colorscheme$name)) colorscheme[[i]]$name else colorscheme$name
+            )
+        }
+    }
     
     remake_figs=F
-    require(RColorBrewer)
-    schoolwise(dataset_name = "knownprograms2001_2015", 
-               tagset_name = "no_ped_tagnames",
-               show.totals = T,
-               measure = "normed",
-               agn = F,
-               hcl = T,
-               dia = F,
-               myCol = c("#FFFFFF", brewer.pal(8, "YlOrRd"), "#000000"))
     
-    schoolwise(dataset_name = "knownprograms2001_2015", 
-               tagset_name = "no_ped_tagnames",
-               show.totals = T,
-               measure = "normed",
-               agn = F,
-               hcl = T,
-               dia = F)
     
     
     schoolwise("consorts", "tagnames", agn=T, hcl=F, dia=F)
