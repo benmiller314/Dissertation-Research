@@ -61,7 +61,8 @@ schoolwise <- function(dataset_name="knownprograms2001_2015", tagset_name="no_pe
             mycolorder = TRUE,   # you can pass the Rowv (schools) or Colv (tags) here 
                                 # to use that ordering. TRUE means use the clustering method 
                                 # to recalculate the ordering now.
-            filename_suffix = NULL
+            myCol=NULL,         # optional color palette
+            filename_suffix = NULL,  # used primarily for indicating color scheme
             min_disses = 1,       # how many dissertations per school before we include it?
             thresh_start = 2001, # start of range within which to achieve threshold counts
             thresh_end = 2015    # end of range within which to achieve threshold counts
@@ -207,9 +208,15 @@ if (FALSE) {
                             list(name = "YlOrRd", values = c("#FFFFFF", brewer.pal(9, "YlOrRd"))),
                             list(name = "magma", values = c("#FFFFFF", magma(99, dir=-1)))
                         )
+    # test color palettes; UPDATE: viridisLite::magma is the clear winner!
+    # colorscheme <- list(name = "grayscale", values = gray.colors(20, start = 0, end = 1, rev=T))
+    # colorscheme <- list(colorscheme,
+                            # list(name = "YlOrRd", values = c("#FFFFFF", brewer.pal(9, "YlOrRd"))),
+    colorscheme <-          list(name = "magma", values = c("#FFFFFF", magma(99, dir=-1)))
     
     
     for (clustfun in c("diana", "agnes", "hclust")) {
+    # for (clustfun in c("hclust")) {
         for(i in seq_along(colorscheme)) {
         
             kp_order <- schoolwise(dataset_name = "knownprograms2001_2015", 
@@ -218,7 +225,8 @@ if (FALSE) {
                            measure = "normed",
                            myclustfun = clustfun,
                            myCol = if(is.null(colorscheme$values)) colorscheme[[i]]$values else colorscheme$values,
-                           filename_suffix = if(is.null(colorscheme$name)) colorscheme[[i]]$name else colorscheme$name
+                           filename_suffix = if(is.null(colorscheme$name)) colorscheme[[i]]$name else colorscheme$name,
+                           min_disses = 5
             )
     
             schoolwise(dataset_name = "knownprograms2001_2015",
