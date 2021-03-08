@@ -24,8 +24,8 @@ schoolwise.data <- function(dataset_name="knownprograms2001_2015", tagset_name="
     
     # 0. convert variable names to variables. we'll use the names later in
     # the figure titles.
-    dataset <- get(dataset_name, envir=globalenv())
-    tagset <- get(tagset_name, envir=globalenv())
+    dataset <- get(dataset_name, envir=parent.frame())
+    tagset <- get(tagset_name, envir=parent.frame())
     
     # 1. remove columns other than method tags and school; convert to data table
     tagarray <- dataset[, which(names(dataset) %in% c("School", tagset))]
@@ -62,6 +62,9 @@ schoolwise <- function(dataset_name="knownprograms2001_2015", tagset_name="no_pe
                                 # to use that ordering. TRUE means use the clustering method 
                                 # to recalculate the ordering now.
             filename_suffix = NULL
+            min_disses = 1,       # how many dissertations per school before we include it?
+            thresh_start = 2001, # start of range within which to achieve threshold counts
+            thresh_end = 2015    # end of range within which to achieve threshold counts
                           
     ){
     
@@ -78,14 +81,27 @@ schoolwise <- function(dataset_name="knownprograms2001_2015", tagset_name="no_pe
     }
     
     # 0. convert variable names to variables. we'll use the names later in
-    # the figure titles.
+    # the figure titles. UPDATE: do we need this? REPLY: it helps debug, and does little harm
     dataset <- get(dataset_name)
     tagset <- get(tagset_name)
+    nrow(dataset)
     
-    # 1-2 call the data-grabbing function
-    m1 <- schoolwise.data(dataset_name, tagset_name)
+    # 1. Thresh the data to ensure we're looking at active programs
+    if (!exists("thresh", mode="function")) {
+        source(file = "thresh.R")
+    }
+    
+    m0 <- thresh(dataset_name, tagset_name,
+                 threshold = min_disses,
+                 since = thresh_start,
+                 until = thresh_end)$thresh.data
+    nrow(m0)
+    
+    # 2. Extract just the relevant tag data
+    m1 <- schoolwise.data("m0", tagset_name)
     measure <- match.arg(measure)
     m2 <- m1[[measure]]
+    
 
     # 3. get more meaningful row names (and a purely numerical matrix, for
     # heatmapping) Note that the first column will always be the list of
@@ -214,6 +230,7 @@ if (FALSE) {
                        mycolorder = kp_order[[clustfun]]$Colv,
                        myCol = if(is.null(colorscheme$values)) colorscheme[[i]]$values else colorscheme$values,
                        filename_suffix = if(is.null(colorscheme$name)) colorscheme[[i]]$name else colorscheme$name
+                       min_disses = 5
             )
         }
     }
