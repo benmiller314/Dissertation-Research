@@ -55,10 +55,9 @@ schoolwise <- function(dataset_name="knownprograms2001_2015", tagset_name="no_pe
             measure=c("normed", "counts"), # how to present tag data for each school: 
                              # as methodological focus (normed by school totals), or 
                              # as methodological output (raw counts of each tag)?
-            myCol=NULL,         # optional color palette
             mycex = 0.4,        # scaling factor for label font size
             myroworder = TRUE,  # if you have schools or tags sorted from a prior run,
-            mycolorder = TRUE,   # you can pass the Rowv (schools) or Colv (tags) here 
+            mycolorder = TRUE,  # you can pass the Rowv (schools) or Colv (tags) here 
                                 # to use that ordering. TRUE means use the clustering method 
                                 # to recalculate the ordering now.
             myCol=NULL,         # optional color palette
@@ -197,22 +196,29 @@ schoolwise <- function(dataset_name="knownprograms2001_2015", tagset_name="no_pe
 }
 
 if (FALSE) {
-    remake_figs=T
+    remake_figs=F
     # call the functions for all relevant datasets
     
     require(RColorBrewer)
     require(viridisLite)
     
-    colorscheme <- list(name = "grayscale", values = gray.colors(20, start = 0, end = 1, rev=T))
-    colorscheme <- list(colorscheme,
-                            list(name = "YlOrRd", values = c("#FFFFFF", brewer.pal(9, "YlOrRd"))),
-                            list(name = "magma", values = c("#FFFFFF", magma(99, dir=-1)))
-                        )
     # test color palettes; UPDATE: viridisLite::magma is the clear winner!
     # colorscheme <- list(name = "grayscale", values = gray.colors(20, start = 0, end = 1, rev=T))
     # colorscheme <- list(colorscheme,
                             # list(name = "YlOrRd", values = c("#FFFFFF", brewer.pal(9, "YlOrRd"))),
     colorscheme <-          list(name = "magma", values = c("#FFFFFF", magma(99, dir=-1)))
+                        # )
+    
+    if(!exists("sumbytags", mode="function")) {
+        source(file = "method collocation heatmap.R")
+    }
+    
+    method_corrs <- sumbytags(dataset_name, tagset_name, 
+                              doplot=T, 
+                              normed=T, 
+                              dendro=T)
+    
+    school_corrs <- schoolwise.data(dataset_name, tagset_name)
     
     
     for (clustfun in c("diana", "agnes", "hclust")) {
@@ -235,15 +241,38 @@ if (FALSE) {
                        measure = "counts",
                        myclustfun = clustfun,
                        myroworder = kp_order[[clustfun]]$Rowv,
-                       mycolorder = kp_order[[clustfun]]$Colv,
+                       mycolorder = method_corrs$Colv,
                        myCol = if(is.null(colorscheme$values)) colorscheme[[i]]$values else colorscheme$values,
-                       filename_suffix = if(is.null(colorscheme$name)) colorscheme[[i]]$name else colorscheme$name
+                       filename_suffix = if(is.null(colorscheme$name)) colorscheme[[i]]$name else colorscheme$name,
                        min_disses = 5
             )
         }
     }
     
-    remake_figs=F
+    if(!exists("method_corrs_one_row", mode="function")) {
+        source(file = "method collocation heatmap.R")
+    }
+    
+    myrows <- c("Pennsylvania State University-Main Campus",
+                "New Mexico State University-Main Campus",
+                "University of Pittsburgh-Pittsburgh Campus")
+    
+    for(row in myrows) {
+        method_corrs_one_row(myrow = row,
+                         corr_type = "school",
+                         dataset_name = "knownprograms2001_2015",
+                         tagset_name = "no_ped_tagnames",
+                         color_groups = T,
+                         taggroups = no_ped_taggroups,
+                         normed = F,
+                         # normed = T,   # maybe normed axis, use text() to add count values?
+                         corr_obj = school_corrs,  # the object with correlation data.
+                         colInd = method_corrs$colInd)
+    }                                 
+    
+    
+    remake_figs=T
+
     
     
     

@@ -17,7 +17,8 @@ sumbytags <- function(dataset_name = "noexcludes",
 		tagset_name	= "tagnames",
 		doplot = TRUE,
 		normed = FALSE,	# should we divide by total dissertations per row?
-  		dendro = FALSE	# should we output dendrograms showing method clusters?
+  		dendro = FALSE,	# should we output dendrograms showing method clusters?
+		savecsv = remake_figs
 ){
 	
 
@@ -88,8 +89,8 @@ sumbytags <- function(dataset_name = "noexcludes",
 				 "solo.counts"  = solo.counts,
 				 "total.counts" = total.counts)
 
-    if(remake_figs) {
-        # NB: all remake_figs file output for figures is now in heatmap.ben(), 
+    if(savecsv) {
+        # NB: all remake_figs file output for *figures* is now in heatmap.ben(), 
         # which will be called if doplot = T. So here we only need to save csv's
         # for analysis elsewhere, e.g. network maps in Gephi.
         
@@ -135,40 +136,78 @@ sumbytags <- function(dataset_name = "noexcludes",
 } # end of wrapper function sumbytags()
 
 
-one_method_corrs_barplot <- function(onetag,
-                                     dataset_name = "knownprograms2001_2015",
-                                     tagset_name = "no_ped_tagnames",
-                                     taggroups = no_ped_taggroups,
-                                     normed = F,
-                                     method_corrs = NULL # pass for speed boost if it exists
+method_corrs_one_row <- function(myrow,
+                                 corr_type = c("method", "school"),
+                                 dataset_name = "knownprograms2001_2015",
+                                 tagset_name = "no_ped_tagnames",
+                                 color_groups = T,
+                                 taggroups = no_ped_taggroups,
+                                 normed = F,
+                                 corr_obj = NULL,  # the object with correlation data.
+                                                   # pass for speed boost if it exists.
+                                 colInd = NULL,    # column order, if you have it
+                                 ...               # other graphing parameters
 ){
-    if(is.null(method_corrs$rowInd)) {
-        method_corrs <- sumbytags(dataset_name, tagset_name, 
-                                  doplot=T, 
-                                  normed=normed, 
-                                  dendro=T)
+    corr_type <- match.arg(corr_type)
+    
+    # Use the method-method tag clustering order for columns regardless, 
+    # because it's based on co-occurrence within actual dissertations
+    
+    if(is.null(colInd)) {
+        myorder <- sumbytags(dataset_name = dataset_name,
+                         tagset_name = tagset_name, 
+                         doplot = T, 
+                         normed = T, 
+                         dendro = T,
+                         savecsv = F)$colInd
+    } else {
+        myorder <- colInd
     }
     
-    myorder <- method_corrs$colInd
-    
-    tagset <- get(tagset_name)
-    mygroups <- taggroups[names(taggroups) %in% tagset][myorder]
+    if(is.null(corr_obj)) {
+        if(corr_type == "method") {
+            corr_obj <- sumbytags(dataset_name = dataset_name,
+                              tagset_name = tagset_name, 
+                              doplot = F, 
+                              normed = normed, 
+                              dendro = F,
+                              savecsv = F)
+            
+        } else if (corr_type == "school") {
+            if(is.null(corr_obj)) {
+                if(! exists("schoolwise.data", mode="function")) {
+                    source(file = "method tags by school.R")
+                }
+                corr_obj <- schoolwise.data(dataset_name = dataset_name,
+                                        tagset_name = tagset_name)
+            }
+            
+        } else {
+            stop("method_corrs_one_row(): Only 'method' and 'school' correlations are implemented.")
+        }
+    }
     
     # get group labels in the right order, assign them a color palette
-    require(viridisLite)
-    group_pal <- viridis(4+length(unique(mygroups)))
-    if(length(group_pal) > 8) {
-        group_pal <- c(group_pal[c(3, 6, 8, 9)], "#FFFFFF")
-    } 
-    
-    if(!exists("get_tags", mode="function")) { source(file="get tags.R") }
-    mysort <- order(get_tags(dataset_name=dataset_name, tagset_name=tagset_name), 
-                    decreasing = T)
-    names(group_pal) <- unique(taggroups[mysort])
-    
-    group_pal
-    
-    group_pal[mygroups[names(method_corrs$correlations[onetag, myorder])]]
+    if(color_groups) {
+        
+        tagset <- get(tagset_name)
+        mygroups <- taggroups[names(taggroups) %in% tagset][myorder]
+        
+        require(viridisLite)
+        group_pal <- viridis(4+length(unique(mygroups)))
+        if(length(group_pal) > 8) {
+            group_pal <- c(group_pal[c(3, 6, 8, 9)], "#FFFFFF")
+        } 
+        
+        if(!exists("get_tags", mode="function")) { source(file="get tags.R") }
+        mysort <- order(get_tags(dataset_name=dataset_name, tagset_name=tagset_name, verbose=F), 
+                        decreasing = T)
+        names(group_pal) <- unique(taggroups[mysort])
+        
+        group_pal
+    } else {
+        group_pal <- NULL
+    }
     
     if(!exists("build_plot_title", mode="function")) {
         source(file = "build_plot_title.R")
@@ -177,7 +216,10 @@ one_method_corrs_barplot <- function(onetag,
                                   subset_name = tagset_name,
                                   ntopics = NULL,
                                   iter_index = NULL,
-                                  whatitis = paste("Method correlations for", onetag),
+                                  whatitis = paste0("method-", corr_type, 
+                                                    " correlation ",
+                                                    if(normed) "pcts" else "counts",
+                                                    " for ", myrow),
                                   for.filename = remake_figs)
     maintitle <- sub(",", "\n", maintitle)
     
@@ -185,6 +227,45 @@ one_method_corrs_barplot <- function(onetag,
             col = group_pal[mygroups[names(method_corrs$correlations[onetag, myorder])]],
             main = maintitle)
     
+    if(corr_type == "method") {
+        to_plot <- corr_obj$correlations[myrow, myorder]
+        if(any(is.na(to_plot))) { stop("row '", myrow ,"' not found")}
+        if(normed) {
+            to_plot <- to_plot / corr_obj$total.counts[myrow]
+        }
+        
+    } else if (corr_type == "school") {
+        if(normed) {
+            corr_obj <- corr_obj$normed
+        } else {
+            corr_obj <- corr_obj$counts
+        }
+        
+        to_plot <- corr_obj[myrow, .SD, .SDcols=!c("School")]
+            if(any(is.na(to_plot))) { stop("row '", myrow ,"' not found")}
+        to_plot <- unlist(to_plot[, ..myorder])
+        
+    }
+    
+    if(remake_figs) {
+        filename <- file.path(imageloc, paste0(maintitle, ".pdf"))
+        pdf(filename)
+    } 
+    
+        maintitle <- sub(",", "\n", maintitle)
+        maintitle <- sub("--", "\n", maintitle)
+        # maintitle <- gsub("_", " ", maintitle)
+    
+        myplot <- barplot(to_plot,
+                          col = if(color_groups) group_pal[mygroups[names(to_plot)]] else NULL,
+                          main = maintitle,
+                          las = 2)
+    if(remake_figs) {
+        dev.off()
+    }
+    
+        
+    invisible(myplot)
 }
 
 
@@ -210,14 +291,21 @@ if (FALSE) {
               normed=T, 
               dendro=T)
     
+    remake_figs = T
+    tagset <- c("Phil", "Ethn", "Disc", "Meta")
     for(tag in tagset) {
-        one_method_corrs_barplot(onetag = tag,
-                                 dataset_name = dataset_name,
-                                 tagset_name = tagset_name,
-                                 taggroups = taggroups,
-                                 method_corrs = method_corrs)    
+        method_corrs_one_row(myrow = tag,
+        # method_corrs_one_row(myrow = "Ethn",
+                             dataset_name = dataset_name,
+                             tagset_name = tagset_name,
+                             taggroups = taggroups,
+                             # normed = F, # maybe normed axis, use text() to add count values?
+                             normed = T,
+                             color_groups = T,
+                             colInd = method_corrs$colInd)    
     }
     
+    remake_figs=F
     
     # test colors: viridis do distinguish methodological groups, magma for values
     require(viridisLite)
