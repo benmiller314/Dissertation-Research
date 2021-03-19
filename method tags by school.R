@@ -5,13 +5,20 @@
 # aggregate tag frequency and distribution at each school in the dataset.
 # After building the function for the analysis, run it on various subsets of
 # data and tags.
+# 
+# TO DO: Update to use heatmap.2 to automatically incorporate color labels
+# See https://www.youtube.com/watch?v=T7_j444LMZs for an example
+# 
+# MAYBE: add a sidecolor for subcategories of schools, 
+# e.g. size / methodological range, as in my annotated printout?
+# 
 #####
 
 ## load required packages
 # require(doBy)
-require(cluster)
-require(data.table)
-require(gplots)
+require(cluster)     # for divisive and agglomerative clustering
+require(data.table)  # for fast indexing and aggregating by school
+require(gplots)      # for heatmap.2, to get sidecolors
 
 # make sure we've run dataprep.R
 if(!exists("imageloc")) {
@@ -41,7 +48,15 @@ schoolwise.data <- function(dataset_name="knownprograms2001_2015", tagset_name="
     setkey(normed, School)
     setcolorder(normed)
     
-    return(list("totals" = totals, "counts" = counts, "normed" = normed))
+    # 3. how many methods are represented at each school?
+    spread <- counts[, rowSums(.SD > 0), .SDcols=-"School", by="School"]
+    names(spread) <- c("School", "Methods")
+    
+    
+    return(list("totals" = totals, 
+                "counts" = counts, 
+                "normed" = normed, 
+                "spread" = spread))
 }
 
 # function for graphing data
@@ -132,10 +147,8 @@ schoolwise <- function(dataset_name="knownprograms2001_2015", tagset_name="no_pe
     
     # 4. make the heatmap: use pre-determined columns if need be.
     
-    # 4a. base names (add clust method and .pdf to the ends)
     # 4a. base names (we'll later add clust method and .pdf to the ends)
     filenamebase <- file.path(imageloc, paste0("method tags by school, ", dataset_name, 
-                          ", N", nrow(dataset), ", ", tagset_name, " (", measure, ")"))
                           ", N", nrow(m0), ", ", tagset_name, " (", measure, "), min ",
                           min_disses, ", ", thresh_start, "-", thresh_end))
     if(measure == "normed") {
@@ -180,10 +193,8 @@ schoolwise <- function(dataset_name="knownprograms2001_2015", tagset_name="no_pe
                         cex.main = 0.7
         )
         
-        mtext(paste("Each cell gives the ", measure, "frequency",
         mtext(paste("Each cell gives the", measure, "frequency",
                     "that a given dissertation from the school in row Y",
-                    "is tagged with the method in column X.", side = 1))
                     "is tagged with the method in column X."), side = 1)
         
         if(remake_figs) {
@@ -227,7 +238,6 @@ if (FALSE) {
     
     remake_figs <- T
     
-    for (clustfun in c("diana", "agnes", "hclust")) {
     for (clustfun in c("diana"
                        # , "agnes", "hclust"
                        )) {
@@ -259,13 +269,23 @@ if (FALSE) {
         }
     }
     
+    remake_figs <- F
+    
     if(!exists("method_corrs_one_row", mode="function")) {
         source(file = "method collocation heatmap.R")
     }
     
+    remake_figs = T
+    
     myrows <- c("Pennsylvania State University-Main Campus",
                 "New Mexico State University-Main Campus",
                 "University of Pittsburgh-Pittsburgh Campus")
+    
+    myrows <- c("Indiana University of Pennsylvania",
+                "University of Arizona",
+                "Purdue University-Main Campus")
+    
+    row <- "University of California-Irvine"
     
     for(row in myrows) {
         method_corrs_one_row(myrow = row,
@@ -280,11 +300,32 @@ if (FALSE) {
                          colInd = method_corrs$colInd)
     }                                 
     
-    
-    remake_figs=T
+    remake_figs=F
 
     
+    # Is there a correlation between school size and method spread?
+    school_corrs <- schoolwise.data(dataset_name, tagset_name)
+    x <- school_corrs$totals$N
+    y <- school_corrs$spread$Methods
+    plot(x, y, pch=1, bty="n", las=1,
+         xlab = "Confirmed RCWS Dissertations at school, 2001-2015",
+         ylab = "Methods represented (out of 15)") 
     
+    # answer: yes, inverse power curve. Schools below the curve are more focused,
+    # schools above the curve are 
+    model <- lm(y ~ x + I(x^(1/6)))
+    summary(model)
+    myPredict <- predict(model) 
+    myIndex <- order(x)
+    lines(x[myIndex], myPredict[myIndex],
+          col=2, lwd=2)
+    coeff <- round(model$coefficients , 2)
+    text(70, 6, paste0("Model: ", coeff[1], " + ", coeff[2], "x^(1/6) \n",
+                      "Adjusted R-squared: = ",round(summary(model)$adj.r.squared,2)))
+    
+    # TO DO (maybe):
+    # Add shading for the scatter plot above (Methods ~ N) based on school position in
+    # the major clusters of the diana heatmap 
     
     schoolwise("consorts", "tagnames", agn=T, hcl=F, dia=F)
     schoolwise("nonconsorts", "tagnames", agn=T, hcl=F, dia=F)
