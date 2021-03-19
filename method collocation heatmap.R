@@ -149,7 +149,9 @@ method_corrs_one_row <- function(myrow,
                                  ...               # other graphing parameters
 ){
     corr_type <- match.arg(corr_type)
-    
+  
+    require(data.table)
+      
     # Use the method-method tag clustering order for columns regardless, 
     # because it's based on co-occurrence within actual dissertations
     
@@ -221,25 +223,29 @@ method_corrs_one_row <- function(myrow,
                                                     if(normed) "pcts" else "counts",
                                                     " for ", myrow),
                                   for.filename = remake_figs)
-    maintitle <- sub(",", "\n", maintitle)
     
-    barplot(method_corrs$correlations[onetag, myorder],
-            col = group_pal[mygroups[names(method_corrs$correlations[onetag, myorder])]],
-            main = maintitle)
     
     if(corr_type == "method") {
+        myrow.disscount <- corr_obj$total.counts[myrow]
+        
         to_plot <- corr_obj$correlations[myrow, myorder]
         if(any(is.na(to_plot))) { stop("row '", myrow ,"' not found")}
         if(normed) {
-            to_plot <- to_plot / corr_obj$total.counts[myrow]
+            to_plot <- to_plot / myrow.disscount
         }
         
+        
+        
     } else if (corr_type == "school") {
+        myrow.disscount <- corr_obj$totals[myrow]$N
+        
         if(normed) {
             corr_obj <- corr_obj$normed
         } else {
             corr_obj <- corr_obj$counts
         }
+        
+        
         
         to_plot <- corr_obj[myrow, .SD, .SDcols=!c("School")]
             if(any(is.na(to_plot))) { stop("row '", myrow ,"' not found")}
@@ -260,6 +266,15 @@ method_corrs_one_row <- function(myrow,
                           col = if(color_groups) group_pal[mygroups[names(to_plot)]] else NULL,
                           main = maintitle,
                           las = 2)
+        
+        # outside_
+        legend(x = "top", 
+                       legend = c(names(group_pal), paste("N =", myrow.disscount)), 
+                       fill = c(group_pal, "white"),
+                       border = c(rep("black", length(group_pal)), "white")
+        )
+        
+        
     if(remake_figs) {
         dev.off()
     }
