@@ -133,8 +133,11 @@ schoolwise <- function(dataset_name="knownprograms2001_2015", tagset_name="no_pe
     # 4. make the heatmap: use pre-determined columns if need be.
     
     # 4a. base names (add clust method and .pdf to the ends)
+    # 4a. base names (we'll later add clust method and .pdf to the ends)
     filenamebase <- file.path(imageloc, paste0("method tags by school, ", dataset_name, 
                           ", N", nrow(dataset), ", ", tagset_name, " (", measure, ")"))
+                          ", N", nrow(m0), ", ", tagset_name, " (", measure, "), min ",
+                          min_disses, ", ", thresh_start, "-", thresh_end))
     if(measure == "normed") {
         title_keyword <- "Focus"
     } else {
@@ -178,8 +181,10 @@ schoolwise <- function(dataset_name="knownprograms2001_2015", tagset_name="no_pe
         )
         
         mtext(paste("Each cell gives the ", measure, "frequency",
+        mtext(paste("Each cell gives the", measure, "frequency",
                     "that a given dissertation from the school in row Y",
                     "is tagged with the method in column X.", side = 1))
+                    "is tagged with the method in column X."), side = 1)
         
         if(remake_figs) {
             dev.off()
@@ -220,8 +225,12 @@ if (FALSE) {
     
     school_corrs <- schoolwise.data(dataset_name, tagset_name)
     
+    remake_figs <- T
     
     for (clustfun in c("diana", "agnes", "hclust")) {
+    for (clustfun in c("diana"
+                       # , "agnes", "hclust"
+                       )) {
     # for (clustfun in c("hclust")) {
         for(i in seq_along(colorscheme)) {
         
@@ -230,6 +239,7 @@ if (FALSE) {
                            show.totals = T,
                            measure = "normed",
                            myclustfun = clustfun,
+                           mycolorder = method_corrs$Colv,
                            myCol = if(is.null(colorscheme$values)) colorscheme[[i]]$values else colorscheme$values,
                            filename_suffix = if(is.null(colorscheme$name)) colorscheme[[i]]$name else colorscheme$name,
                            min_disses = 5
