@@ -27,7 +27,9 @@ if(!exists("imageloc")) {
 
 
 # function for getting data
-schoolwise.data <- function(dataset_name="knownprograms2001_2015", tagset_name="no_ped_tagnames") {
+schoolwise.data <- function(dataset_name = "knownprograms2001_2015", 
+                            tagset_name = "no_ped_tagnames",
+                            spread_threshold = 1) {
     
     # 0. convert variable names to variables. we'll use the names later in
     # the figure titles.
@@ -49,18 +51,23 @@ schoolwise.data <- function(dataset_name="knownprograms2001_2015", tagset_name="
     setcolorder(normed)
     
     # 3. how many methods are represented at each school?
-    spread <- counts[, rowSums(.SD > 0), .SDcols=-"School", by="School"]
-    names(spread) <- c("School", "Methods")
+    schoolspread <- counts[, rowSums(.SD >= spread_threshold), .SDcols=-"School", by="School"]
+    names(schoolspread) <- c("School", "MethodCount")
+    
+    # 4. at how many schools is each method represented?
+    methodspread <- counts[, colSums(.SD >= spread_threshold), .SDcols=-"School"]
     
     
     return(list("totals" = totals, 
                 "counts" = counts, 
                 "normed" = normed, 
-                "spread" = spread))
+                "methodspread" = methodspread,
+                "schoolspread" = schoolspread))
 }
 
 # function for graphing data
-schoolwise <- function(dataset_name="knownprograms2001_2015", tagset_name="no_ped_tagnames", 
+schoolwise <- function(dataset_name="knownprograms2001_2015", 
+            tagset_name="no_ped_tagnames", 
             myclustfun = c("agnes", "diana", "hclust"),
                                 # run agglomerative clustering (using agnes)?
                                 # run divisive clustering (using diana)?
@@ -210,6 +217,78 @@ schoolwise <- function(dataset_name="knownprograms2001_2015", tagset_name="no_pe
     
 # close wrapper function schoolwise()
 }
+
+# What methods are most and least distributed across schools?
+method_spread_across_schools <- function(dataset_name = "knownprograms2001_2015",
+                                         tagset_name = "no_ped_tagnames",
+                                         min_disses = 1,       # how many dissertations per school before we include it?
+                                         thresh_start = 2001, # start of range within which to achieve threshold counts
+                                         thresh_end = 2015,    # end of range within which to achieve threshold counts
+                                         do.plot = T,
+                                         color_palette = group_pal,
+                                         spread_threshold = 1,
+                                         pcts = T
+                                         
+){
+    
+    # 1. Thresh the data to ensure we're looking at active programs
+    if (!exists("thresh", mode="function")) {
+        source(file = "thresh.R")
+    }
+    
+    m0 <- thresh(dataset_name, tagset_name,
+                 threshold = min_disses,
+                 since = thresh_start,
+                 until = thresh_end)$thresh.data
+    
+    
+    school_corrs <- schoolwise.data("m0",
+                                    tagset_name,
+                                    spread_threshold)
+    
+    methodspread.index <- order(school_corrs$methodspread, decreasing = T)
+    
+    if(remake_figs) { 
+        outfile <- paste0("method-spread--", dataset_name, "--", tagset_name,
+                          "--tagmin", spread_threshold, "--schoolmin", min_disses)
+        outfile <- paste0(outfile, ".pdf")
+        pdf(file.path(imageloc, outfile)) 
+    }
+    
+    if(do.plot) {
+        
+        to.plot <- school_corrs$methodspread[methodspread.index] 
+        if(pcts) {
+            to.plot <- to.plot / nrow(school_corrs$counts)
+        }
+        
+        p <- barplot(to.plot,
+                     las = 2,
+                     col = color_palette[taggroups[names(school_corrs$methodspread)[methodspread.index]]],
+                     yaxp = if(pcts) c(0, 1, 5) else c(0, nrow(school_corrs$counts), 5),
+                     yaxs = "r",
+                     # main = "Presence of methods across schools \nis broader than raw counts would suggest",
+                     main = paste0(if(pcts) {"Percentage"} else {"Number"}, " of programs with dissertations\nusing methods in the schema"),
+                     sub = paste0(dataset_name, ", N = ", nrow(school_corrs$counts), " schools with at least ",
+                                  min_disses, " dissertation", if(min_disses > 1) "s", ", ", thresh_start, "-", thresh_end, ";\n",
+                                  "A school is counted if at least ", spread_threshold, " diss", if(spread_threshold > 1) "es",
+                                  " there ", if(spread_threshold > 1) "are" else "is", " tagged with the method"
+                     )
+        )
+    }
+    
+    outside_legend(x = "topright", 
+                   legend = names(color_palette), 
+                   fill = color_palette, 
+                   bty="n"
+    )
+    
+    if(remake_figs) { dev.off() }
+    
+    return(school_corrs$methodspread)
+}   # close function method_spread_across_schools() 
+
+
 
 if (FALSE) {
     remake_figs=F
