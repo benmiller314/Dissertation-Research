@@ -385,7 +385,15 @@ if (FALSE) {
     # Is there a correlation between school size and method spread?
     school_corrs <- schoolwise.data(dataset_name, tagset_name)
     x <- school_corrs$totals$N
-    y <- school_corrs$spread$Methods
+    y <- school_corrs$schoolspread$MethodCount
+    
+    if(remake_figs) { 
+        outfile <- paste0("method_count-v-diss_count--", dataset_name, 
+                          "--", tagset_name, ".pdf")
+        outfile <- file.path(imageloc, outfile)
+        pdf(outfile)
+    }
+    
     plot(x, y, pch=1, bty="n", las=1,
          xlab = "Confirmed RCWS Dissertations at school, 2001-2015",
          ylab = "Methods represented (out of 15)") 
@@ -399,12 +407,119 @@ if (FALSE) {
     lines(x[myIndex], myPredict[myIndex],
           col=2, lwd=2)
     coeff <- round(model$coefficients , 2)
-    text(70, 6, paste0("Model: ", coeff[1], " + ", coeff[2], "x^(1/6) \n",
+    text(70, 6, paste0("Fit curve: ", coeff[1], " + ", coeff[2], "x^(1/6) \n",
                       "Adjusted R-squared: = ",round(summary(model)$adj.r.squared,2)))
     
-    # TO DO (maybe):
+    if (remake_figs) {
+        dev.off()
+    }
+    
+    
+    
     # Add shading for the scatter plot above (Methods ~ N) based on school position in
     # the major clusters of the diana heatmap 
+    
+    mydend <- as.hclust(kp_order$diana$Rowv)
+    plot(mydend)
+    rect.hclust(mydend, height=)
+    school_clusters <- cutree(mydend, k=7)    
+    names(school_clusters) <- sapply(names(school_clusters), function (d) {
+        strsplit(d, " [(]")[[1]][1]
+    })
+    school_clusters
+    # NEXT: grep for Chapel Hill, use that clusterlabel (2) also for the grep results for 
+    # San Antonio (7), East Carolina (3) 
+    # [DONE]
+    
+    
+    plot(x, y, pch=16, bty="n", las=1, 
+         col=c("gray", "gray", "gray", "gray", "black")[school_clusters],
+         xlab = "Confirmed RCWS Dissertations at school, 2001-2015",
+         ylab = "Methods represented (out of 15)") 
+    lines(x[myIndex], myPredict[myIndex],
+          col=2, lwd=2)
+    
+    # UPDATE: not actually interesting! All the major divisions are distributed
+    # pretty equally to the left and right (equivalently: above and below) the line.
+    # Huh. So... maybe all I'm really showing here is just a fantasy, and school size
+    # is the main determining factor? But no -- *which* methods appear still varies.
+    # And that's still important.
+    
+    #####
+    # What happens if we try the heatmap with tagnames.simple?
+    
+    dataset_name <- "knownprograms2001_2015"
+    tagset_name <- "tagnames.simple"
+    
+    if(!exists("sumbytags", mode="function")) {
+        source(file = "method collocation heatmap.R")
+    }
+    
+    method_corrs_simple <- sumbytags(dataset_name, tagset_name, 
+                                     doplot=T, 
+                                     normed=T, 
+                                     dendro=T)
+    
+    colorscheme <- list(name = "magma", values = c("#FFFFFF", magma(99, dir=-1)))
+    clustfun <- "diana"
+    
+    remake_figs <- T
+    
+    heatmap_simple <- schoolwise(dataset_name = "knownprograms2001_2015", 
+               tagset_name = "tagnames.simple",
+               show.totals = T,
+               measure = "normed",
+               myclustfun = clustfun,
+               mycolorder = method_corrs_simple$Colv,
+               myCol = if(is.null(colorscheme$values)) colorscheme[[i]]$values else colorscheme$values,
+               filename_suffix = if(is.null(colorscheme$name)) colorscheme[[i]]$name else colorscheme$name,
+               min_disses = 5)
+    
+    remake_figs <- F
+    
+    heatmap_simple_counts <- schoolwise(dataset_name = "knownprograms2001_2015", 
+                                        tagset_name = "tagnames.simple",
+                                        show.totals = T,
+                                        measure = "counts",
+                                        myclustfun = clustfun,
+                                        mycolorder = method_corrs_simple$Colv,
+                                        myroworder = heatmap_simple$diana$Rowv,
+                                        myCol = if(is.null(colorscheme$values)) colorscheme[[i]]$values else colorscheme$values,
+                                        filename_suffix = if(is.null(colorscheme$name)) colorscheme[[i]]$name else colorscheme$name,
+                                        min_disses = 5)
+    
+    school_clusters_simple <- as.hclust(heatmap_simple$diana$Rowv)
+    plot(school_clusters_simple)
+    
+    # Huh. So this is interesting: the methodology most likely to be left out isn't 
+    # Aggregable, but Enactment-based: the practitioner studies are more concentrated
+    # than I'd have expected. No school has zero Dialectical; 5 have no Phenomenological;
+    # 3 schools have no Aggregable studies; and 13 of 85 schools have zero dissertations
+    # that include any Enactment-based method. (And many others have low values.)
+    
+    
+    rect.hclust(school_clusters_simple, k=13)
+        
+    ######
+    # What methods are most and least distributed across schools?
+    remake_figs = T
+    method_spread_across_schools()
+    method_spread_across_schools(min_disses = 5)
+    method_spread_across_schools(spread_threshold = 2)
+    method_spread_across_schools(spread_threshold = 3)
+    remake_figs = F
+    
+    
+    # is that the same as overall distribution?
+    # interestingly not! Surv and Meta are higher than would be expected
+    
+    
+    kp2001_2015_thresh5 <- thresh("knownprograms2001_2015", tagset_name = "no_ped_tagnames",
+           threshold = 5, since = 2001, until = 2015)$thresh.data
+    school_corrs_thresh5 <- schoolwise.data(dataset_name = "kp2001_2015_thresh5",
+                                    tagset_name = "no_ped_tagnames")
+    sort(school_corrs_thresh5$schoolspread, decreasing = T)
+    
     
     schoolwise("consorts", "tagnames", agn=T, hcl=F, dia=F)
     schoolwise("nonconsorts", "tagnames", agn=T, hcl=F, dia=F)
@@ -435,8 +550,9 @@ if (FALSE) {
     #        difixedcols=c$di$colInd)
 } else {
     message("Loaded the following functions:")
-    message("    schoolwise.data()    # helper function to load data")
-    message("    schoolwise()         # function to graph data")
+    message("    schoolwise.data()    # helper function to load data: methods per school")
+    message("    schoolwise()         # function to graph data as heatplot")
+    message("    method_spread_across_schools()  # barplot of columns for schoolwise's heatplot")
 }
 
 
