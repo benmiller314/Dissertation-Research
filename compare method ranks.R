@@ -113,8 +113,8 @@ compare_method_ranks <- function(set1="consorts",
 	if(remake_figs) { pdf(file=filename) }
 
 		# set up a blank plot
-		plot(x=c(rep(0, length(b)), 5), 
-			 y=0:length(b)+1, 
+		plot(x=c(rep(0, length(b)+2), 5), 
+			 y=0:(length(b)+2), 
 			 axes=FALSE, 
 			 type="n", 
 			 xlab="", 
@@ -122,7 +122,7 @@ compare_method_ranks <- function(set1="consorts",
 		
 		# arrange set1 in descending rank order on the left, set2 on right
 		# myoffset <- length(b2)/3 + 0.4
-		myoffset <- 0.25
+		myoffset <- 0.3
 		
 		text(labels=b2, 
 			 x=rep(1, length(b2)), 
@@ -175,27 +175,27 @@ compare_method_ranks <- function(set1="consorts",
 			if(length(betterlabels)==2) {
 				text(labels=betterlabels, 
 					 x=c(1, 4), 
-					 y=rep(length(b)+1, 2)
+					 y=rep(length(b)+2, 2)
 				)
 			} else {
 				warning("Incorrect number of betterlabels: ",
 						"must be vector of length 2. Using set names.")
 				text(labels=c(set1, set2), 
 					 x=c(1, 4), 
-					 y=rep(length(b) + 1, 2)
+					 y=rep(length(b) + 2, 2)
 				)
 			}
 		} else {
 		    text(labels=c(set1, set2), 
 		         x=c(1, 4), 
-		         y=rep(length(b) + 1, 2)
+		         y=rep(length(b) + 2, 2)
 		    )
 		}
 	
 		text(labels=c(paste0("(N=", nset1, ")"), 
 					  paste0("(N=", nset2, ")")), 
 		     x=c(1, 4), 
-		     y=rep(length(b) + 2*myoffset, 2),
+		     y=rep(length(b) + 1, 2),
 			 cex=0.8
 		)
 		
