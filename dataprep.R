@@ -42,8 +42,24 @@ WNHOME <- file.path("/usr", "local", "Cellar", "wordnet", "3.1")
 tagnames <- c("Clin","Crit",
 			  # "Cult",
 			  "Disc","Ethn","Expt","Hist","Intv","Meta","Modl","Phil","Poet","Prac","Rhet","Surv","Othr", "Ped")
-
-no_ped_tagnames <- tagnames[!(tagnames %in% "Ped")]
+taggroups <- c("Phenomenological", # Clin
+               "Dialectical",      # Crit 
+               "Aggregable",       # Disc          
+               "Phenomenological", # Ethn 
+               "Aggregable",       # Expt 
+               "Dialectical",      # Hist
+               "Aggregable",       # Intv
+               "Aggregable",       # Meta
+               "Dialectical",      # Modl
+               "Dialectical",      # Phil
+               "Performance-Based",# Poet
+               "Performance-Based",# Prac
+               "Dialectical",      # Rhet
+               "Aggregable",       # Surv
+               "Other",              # Othr
+               "Dialectical"       # Ped
+)
+names(taggroups) <- tagnames
 
 tagnames.long <- c( "Clinical / Case Study", 
 					"Critical / Hermeneutical",
@@ -64,7 +80,21 @@ tagnames.long <- c( "Clinical / Case Study",
 					"Pedagogical Projection"
 					)
 
-no_ped_tagnames.long <- tagnames.long[!names(tagnames.long) %in% "Pedagogical Projection"]
+no_ped_tagnames <- tagnames[!(tagnames %in% "Ped")]
+no_ped_taggroups <- taggroups[!(names(taggroups) %in% "Ped")]
+no_ped_tagnames.long <- tagnames.long[!(tagnames.long) %in% "Pedagogical Projection"]
+
+# color palette from viridisLite, determined while working on `method collocation heatmap.R`
+group_pal <- c("#3B528BFF", # dark blue
+               "#27AD81FF", # teal
+               "#AADC32FF", # green
+               "#FDE725FF", # yellow
+               "#FFFFFF")   # white
+names(group_pal) <- c("Dialectical", 
+                      "Phenomenological", 
+                      "Aggregable",
+                      "Performance-Based",
+                      "Other")
 
 # provide a function to convert tag column labels to real tag names					
 realtags <- function(tag, tagset_name="tagnames") {
