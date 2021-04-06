@@ -6,8 +6,32 @@
 # aggregated over all documents, as a boxplot of contribution (y-axis) sorted
 # by topic rank (x-axis).
 #
-#  Rationale: I want to know at what level to cut off "cotopics": what's a
-#  realistic scenario?
+# Rationale: I want to know at what level to cut off "cotopics": what's a
+# realistic scenario?
+#
+# Functions:
+# 
+# topic.proportions(dataset_name, ntopics, iter_index, ...): the boxplot 
+#                   described above, showing distribution of topic weights.
+# find.doc.by.topic.proportion(topic.weights, topic_rank, value, ...): given a
+#                   distribution of topic weights, find a representative diss
+#                   at high, low, or median values. Useful for demonstrating
+#                   what single-topic focused or multi-topic disses look like.
+# top_topic_histogram(topic.weights, topic_rank, ...): Histogram of values 
+#                   for the nth-ranked topic; a zoom-in on topic.proportions().
+# get_top_topics(dataset_name, ntopics, iter_index, ...): Find all the top topics 
+#                   while preserving identity, so we can graph subsets
+#                   and compare them to the corpus-wide distribution.
+# top_topics_comparison(mytopics, top_topics, ...): Compare top-topic distribution 
+#                   for one topic as compared to the rest of the dataset. 
+#                   Useful for testing topical independence (see: writing centers)
+# top_topic_assists(mytopics, cutoff, sort_by, ...): For dissertations with 
+#                   a given rank1 topic, what are the other top-ranked topics 
+#                   they most pair with? (See also cotopics.R)
+# top_topic_assists2(mytopic, top_topics, topic_depth, n_per_rank, ...): now more
+#                   specific results at rank2, 3, etc. (TO DO: graph as alluvial plot)
+# top_topic_combos(topic_depth, ...): Topic-triples at the top, regardless of order.
+# 
 #####
 
 topic.proportions <- function(dataset_name = "noexcludes2001_2015",
@@ -935,9 +959,9 @@ top_topic_assists2 <- function(mytopic,             # which topic to focus on?
                           })
     
     
-    # TO DO: transpose disses_tops matrix to form triplets,
-    #        sort triplets so as to build compact Sankey flow from rank to rank...
-    #        or just to count and rank the unique combinations (regardless of order)
+    # transpose disses_tops matrix to form triplets,
+    # sort triplets so as to build compact Sankey flow from rank to rank...
+    # or just to count and rank the unique combinations (regardless of order)
     
     disslets <- data.table(t(disses_tops))
     setkey(disslets) # without a second argument, sorts increasing on all columns
@@ -1173,6 +1197,30 @@ top_topic_combos <- function(topic_depth = 3,
     return(unique_combos)
 }
 
+if(!autorun) {
+    message("Loaded the following functions from `variation of topic proportions.R`:\n",
+            "  topic.proportions(dataset_name, ntopics, iter_index, ...): the boxplot\n",
+            "                  described above, showing distribution of topic weights.\n",
+            "  find.doc.by.topic.proportion(topic.weights, topic_rank, value, ...): given a\n",
+            "                  distribution of topic weights, find a representative diss\n",
+            "                  at high, low, or median values. Useful for demonstrating\n",
+            "                  what single-topic focused or multi-topic disses look like.\n",
+            "  top_topic_histogram(topic.weights, topic_rank, ...): Histogram of values\n",
+            "                  for the nth-ranked topic; a zoom-in on topic.proportions().\n",
+            "  get_top_topics(dataset_name, ntopics, iter_index, ...): Find all the top topics\n",
+            "                  while preserving identity, so we can graph subsets\n",
+            "                  and compare them to the corpus-wide distribution.\n",
+            "  top_topics_comparison(mytopics, top_topics, ...): Compare top-topic distribution\n",
+            "                  for one topic as compared to the rest of the dataset.\n",
+            "                  Useful for testing topical independence (see: writing centers)\n",
+            "  top_topic_assists(mytopics, cutoff, sort_by, ...): For dissertations with\n",
+            "                  a given rank1 topic, what are the other top-ranked topics\n",
+            "                  they most pair with? (See also cotopics.R)\n",
+            "  top_topic_assists2(mytopic, top_topics, topic_depth, n_per_rank, ...): now more\n",
+            "                  specific results at rank2, 3, etc. (TO DO: graph as alluvial plot)\n",
+            "  top_topic_combos(topic_depth, ...): Topic-triples at the top, regardless of order.\n"
+            )
+}
 
 # Using the analysis; a testing space.
 if(FALSE) {
