@@ -49,15 +49,27 @@ get_topic_labels <- function(dataset_name="consorts",
 	topic.labels.dt <- tryCatch(
 		data.table(read.csv(infile), key="Topic"),
 		error = function(e) {
-	  		message("`get topic labels.R`#49 : File not found; using top words instead.")
-	  		keys <- get.topickeys(dataset_name=dataset_name,
-	  		                      ntopics=ntopics,
-	  		                      iter_index=iter_index,
-	  		                      newnames=newnames)
-	  		outfile <- file.path(webloc, paste0(dataset_name, "k", ntopics,
-	  						 "_clusters_topwords", iter_index, ".json"))
-	  		return(data.table(Topic = 1:ntopics,
-	  						  Label = keys$top_words))
+		    if(!is.null(subset_name)) {
+    		    message("`get topic labels.R`: File ", infile, " not found; \n",
+    		            "trying again without subset.")
+		        return(get_topic_labels(dataset_name=dataset_name,
+		                                ntopics=ntopics,
+		                                subset_name=NULL,
+		                                iter_index=iter_index,
+		                                bad.topics=bad.topics,
+		                                newnames=newnames,
+		                                remake_figs=remake_figs))
+		    } else {
+    	  		message("`get topic labels.R`: File not found; using top words instead.")
+    	  		keys <- get.topickeys(dataset_name=dataset_name,
+    	  		                      ntopics=ntopics,
+    	  		                      iter_index=iter_index,
+    	  		                      newnames=newnames)
+    	  		outfile <- file.path(webloc, paste0(dataset_name, "k", ntopics,
+    	  						 "_clusters_topwords", iter_index, ".json"))
+    	  		return(data.table(Topic = 1:ntopics,
+    	  						  Label = keys$top_words))
+		    }
 	  	},
 	  	finally = { message("done.") }
 	)
