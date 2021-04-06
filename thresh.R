@@ -33,9 +33,16 @@ thresh <- function(dataset_name = "noexcludes",
 							 " from ", since, "-", until, ") with ",
 							 threshold, " or more dissertations.")
 
-	## 2. get full 10-year tag data for those schools
+	## 2. get full tag data for those schools
 	d4 <- dataset[which(dataset$School %in% d3),]
 	
 	return(list("thresh.data" = d4, 
 				"thresh.report" = thresh.report))
+}
+
+if(autorun) {
+    thresh()
+} else {
+    message("Function loaded: thresh(dataset_name, tagset_name, threshold = 5, \n",
+            "                        since = 2006, until = 2010) ")
 }
