@@ -181,7 +181,9 @@ if(FALSE) {
 #     r2mallet("real.consorts")
     r2mallet(datasets=c("noexcludes2001_2015"), kseq=c(50, 15, 23), cmdonly=F)
     
-} else if (autorun) {
+} 
+
+if (autorun) {   # NB: autorun set globally
     train <- r2mallet(cmdonly=T)
     message("\n(r2mallet with foreach.R) ",
             "Current default instance-training command is: \n\n",
