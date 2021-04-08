@@ -15,6 +15,9 @@ library(foreach)
 library(parallel)
 
 ## Set up stable elements of the working environment
+#
+#   I've elsewhere defined malletloc <- normalizePath(file.path("~", "Applications", "mallet"))
+#
 # 	# Let's assume we're typically going to need more Java heap space;
 # 	# this sets the maximum allocation for a 4GB MacBook Pro
 # 	    heap_param <- paste("-Xmx","2g",sep="") 
@@ -48,7 +51,7 @@ r2mallet <- function(
                 # To use with the command line, just output the command and exit
 				    cmdonly = F,
 				
-				# What is the command that runs MALLET?
+				# What is the command that runs MALLET? 
 				    mallet_cmd = file.path(malletloc, "bin", "mallet"),
 				
 				# What's the directory within which to find text files for the corpus?
