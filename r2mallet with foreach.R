@@ -16,7 +16,8 @@ library(parallel)
 
 ## Set up stable elements of the working environment
 #
-#   I've elsewhere defined malletloc <- normalizePath(file.path("~", "Applications", "mallet"))
+#   I've elsewhere defined malletloc <- normalizePath(file.path("~", "Applications", "mallet")),
+#   along with output directory tmloc and input directory fulltextloc.
 #
 # 	# Let's assume we're typically going to need more Java heap space;
 # 	# this sets the maximum allocation for a 4GB MacBook Pro
