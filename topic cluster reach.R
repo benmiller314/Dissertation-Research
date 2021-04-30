@@ -50,7 +50,9 @@ name_topic_clusters <- function(dataset_name="noexcludes2001_2015",
     }
 
 
-    if(dataset_name=="noexcludes2001_2015" && ntopics==50 && iter_index==1 && !is.null(subset_name) && subset_name=="knownprograms2001_2015") {
+    if(dataset_name=="noexcludes2001_2015" && ntopics==50 && iter_index==1
+       # && !is.null(subset_name) && subset_name=="knownprograms2001_2015"
+       ) {
 
         # stable clusters under both diana and agnes:
         
@@ -80,8 +82,30 @@ name_topic_clusters <- function(dataset_name="noexcludes2001_2015",
         narrative <- c(16, 26)               # 16 creative writing/reflection 26 personal narr. + oral history
         entertainment <- c(7, 43)            # 7 popular media (film, tv, music) + 43 sports
         
+        # clusters actually used in book:
+        Theoretical.Orientations <- c(2, 21, 48, 33, 28, 32)
+        Teaching.and.Administration <- c(18, 35, 42, 49)
+        Public.Rhetorics.and.Political.Writing <- c(9, 13, 19, 29, 31)
+        Narrative.and.Reflection <- c(16,26)
+        People.and.Places <- c(4, 20, 5, 17, 23, 10)
+        Poetics.and.Oratory <- c(14, 25, 39)
+        Popular.Entertainment <- c(7, 43)
+        Unstable.Group <- c(1, 41, 40, 46, 6, 37, 11, 22, 44, 45)
+        Applied.Composition.Combo <- c(1, 40, 44, 45, 6, 11, 18, 42, 49, 35, 41, 37, 27)
+        
+        
         all_clusters <- c("small.teaching", "politics.law", "justice", "classics",
                           "big.rhetoric", "narrative")
+        all_clusters_used <- c("Theoretical.Orientations",
+                               "Teaching.and.Administration",
+                               "Public.Rhetorics.and.Political.Writing",
+                               "Narrative.and.Reflection",
+                               "People.and.Places",
+                               "Poetics.and.Oratory",
+                               "Popular.Entertainment",
+                               "Unstable.Group",
+                               "Applied.Composition.Combo")
+                               
     }
 
     # return variables created by this function
@@ -159,7 +183,13 @@ cluster.strength <- function (my.topics=NULL,      # either pass in a list of to
     } else if (!is.null(subset_name)){
         if (nrow(get(subset_name)) != nrow(grid) ) {
             warning("`topic cluster reach.R`#125: Using an existing doc-topic grid and subset_name, but \n",
-                "grid and subset have a different number of rows.")
+                "grid and subset have a different number of rows. Recalculating grid for subset.")
+            if(!exists("get.doctopic.grid", mode="function")) {
+                source("get doctopic grid.R")
+            }
+            grid <- get.doctopic.grid(dataset_name=dataset_name, ntopics=ntopics,
+                                      iter_index=iter_index, subset_name=subset_name,
+                                      newnames=newnames)$outputfile.dt
         }
     }
 
@@ -234,7 +264,8 @@ cluster.strength <- function (my.topics=NULL,      # either pass in a list of to
                     "doc_levels" = win.pubs.level,
                     "name" = my.topics_name,
                     "topics" = my.topics))
-}
+
+} # end of cluster_strength()
 
 
 ## Get ranks by topic reach over all (individual) non-bad topics
@@ -373,10 +404,16 @@ if(FALSE) {
     # my.topics <- c(4, 20, 5, 17, 23, 10) # social justice / identities cluster
 
 
+    # pick one
+    subset_name = "knownprograms2001_2015"
+    subset_name = "nonrcws2001_2015sans_badtops"
+    
     cluster_list <- name_topic_clusters(dataset_name = dataset_name,
                                         ntopics = ntopics,
                                         iter_index = iter_index,
                                         subset_name = subset_name)
+    
+    
 
     if(!exists("stretch", mode="function")) {
         source(file="squish_numbers.R")
@@ -384,14 +421,22 @@ if(FALSE) {
 
 #TO DO: Wrap this in a convenient function
     
-    extent_level <- c(0.05, 0.06, 0.09, 0.13, 0.22, 0.33, 0.4, 0.5, 0.66, 0.75)
 
+    # recover scoped variables from name_topic_clusters. choose which subset:
+    cluster_list <- cluster_list[(cluster_list$name != "all_clusters"), ]
+    # or
+    cluster_list <- data.table(cluster_list, key="name")
+    cluster_list <- cluster_list[all_clusters_used]
+    cluster_list <- data.frame(cluster_list)
+    
     for (i in 1:nrow(cluster_list)) {
         assign(cluster_list[i, "name"], stretch(cluster_list[i, "topics"]))
     }
     
-    cluster_list <- cluster_list[(cluster_list$name != "all_clusters"), ]
-
+    extent_level <- c(0.05, 0.06, 0.09, 0.13, 0.22, 0.33, 0.4, 0.5, 0.66, 0.75)
+    # subset_name <- "nonrcws2001_2015sans_badtops"
+    subset_name <- "knownprograms2001_2015"
+    
     for (lvl in extent_level) {
         extent <- sapply(seq_len(nrow(cluster_list)), FUN=function(x) {
             cluster.strength(my.topics_name = cluster_list[x, "name"],
@@ -484,6 +529,7 @@ if(FALSE) {
                      bad.topics = bad.topics,
                      level = 0.05,
                      subset_name = subset_name)
+    
     
     
 
