@@ -26,5 +26,6 @@ outside_legend <- function(...) {
     legend(...)
 }
 
+source(file="na_plus.R")
 source(file="squish_numbers.R")
 source(file="safesave.R")
