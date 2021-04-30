@@ -33,7 +33,9 @@ newarray <- read.csv(file=newdatafile)
 
 
 
-# parse the method tags... including for the collapsed schema. parse_tags() is from `method tag array.R`.
+# parse the method tags... including for the collapsed schema. 
+# parse_tags() is from `method tag array.R`. short_schema() is from 'simplifying the schema.R'
+# both files are sourced in `dataprep.R`.
 newarray <- parse_tags(newarray, tagstyle="short", excludecol="Flags")
 newarray <- short_schema(newarray)
 
@@ -143,6 +145,7 @@ nonrcws.index <- intersect(which(noexcludes$realrhetmap == 0),
                        which(noexcludes$realconsort == 0))
 nonrcws <- noexcludes[nonrcws.index, ]
 
+
 # report back what we've found
 
 message("Of ", consort.count, " dissertations at Consortium schools, ",
@@ -243,6 +246,17 @@ for(subset in subset_list) {
     subset_by_year(subset, 2011, 2015, autooverwrite = T)
 }
 
+# remove disses with bad.topics in the top slot (usually bad OCR or entirely in another language)
+source(file = "variation of topic proportions.R")
+# system.time(
+get_top_topics(dataset_name="noexcludes2001_2015",
+               ntopics = 50,
+               iter_index = 1,
+               subset_name = NULL)  # produces bad.on.top as a side effect. slow (1-2 min on laptop)
+# )
+nonrcws2001_2015sans_badtops <- nonrcws2001_2015[-which(nonrcws2001_2015$Pub.number %in% bad.on.top),]
+
+
 # re-factor all factor columns in all data subsets
 ## TO DO: use loops and assign() to *build* these subsets with less redundancy
 
@@ -254,7 +268,7 @@ subset_list <- c("consorts", "nonconsorts", "realconsorts", "top.nonconsorts", "
                  "new_noexcludes", "rhetmaps", "rhetmaps2001_2015", "rhetmaps2011_2015",
                  "realrhetmaps", "realrhetmaps2001_2015", "realrhetmaps2011_2015",
                  "knownprograms", "knownprograms2001_2015", "knownprograms2011_2015",
-                 "maybeconsorts", "unknownprograms", "nonrcws")
+                 "maybeconsorts", "unknownprograms", "nonrcws", "nonrcws2001_2015sans_badtops")
 
 for (subset in subset_list) {
     if(exists(subset)) {
@@ -282,7 +296,8 @@ export_file_list <- function(dataset_names) {
 if(remake_figs || update_realconsorts) {
     export_file_list(c("noexcludes",
                    "noexcludes2001_2015",
-                   "knownprograms2001_2015"))
+                   "knownprograms2001_2015",
+                   "nonrcws2001_2015sans_badtops"))
 }
 
 #### The next 10 lines or so now replaced by export_file_list, above ####

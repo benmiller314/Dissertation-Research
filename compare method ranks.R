@@ -218,7 +218,9 @@ compare_method_ranks <- function(set1="consorts",
 
 }		# end of wrapper function compare_method_ranks
 
-if(autorun) {
+
+# Testing area
+if(FALSE) {   
 	remake_figs=F
 	compare_method_ranks("consorts", "nonconsorts", 
 						betterlabels=c("Consortium", "All Non-Consortium"))
@@ -236,8 +238,18 @@ if(autorun) {
 	compare_method_ranks("knownprograms2001_2015", "nonconsorts2001_2015")
 	compare_method_ranks("knownprograms2001_2005", "knownprograms2011_2015", tagset_name="tagnames.simple")
 	
-	compare_method_ranks("knownprograms2001_2015", "nonrcws2001_2015", tagset_name="no_ped_tagnames",
+	compare_method_ranks("knownprograms2001_2015", 
+	                     "nonrcws2001_2015", 
+	                     tagset_name="no_ped_tagnames",
 	                     colorful=T)
+	
+	compare_method_ranks(set1="knownprograms2001_2015", 
+	                     set2="nonrcws2001_2015sans_badtops", 
+	                     betterlabels=c("Confirmed RCWS dissertations", 
+	                                    "Confirmed non-RCWS dissertations"), 
+	                     tagset_name="no_ped_tagnames")
+	
+	
 	
 } else {
     message("The following function has been loaded:")

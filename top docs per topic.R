@@ -4,7 +4,7 @@
 # Tools for topic exploration
 #
 
-# Provides four functions:
+# Provides five functions:
 #         * get.topics4doc(pubnum, dataset_name, ntopics, howmany,
 #           showlabels): retrieves top `howmany` topics for a document
 #           specified by `pubnum`.
@@ -20,6 +20,8 @@
 #           ntopics, iter_index, and subset_name, show the top `depth` titles
 #           for the top `howmany` topics, concatenated with the weight of that topic
 #           in each doc.
+#         * cluster_titles_table(cluster_members, cluster_name, ..., howmany, depth): 
+#           like top_titles_table, but for a combined set of topics, treated cumulatively.
 #   Legacy support:
 #         * This used to define the function get.doc.composition(), but it ended up being a
 #           fairly simple wrapper on get.doctopic.grid, so I've now factored it out.
@@ -135,11 +137,11 @@ get.topics4doc <- function(pubnum,
 ### Browse through the top topics and their top-proportioned dissertations
 top_topic_browser <- function(
                               # where will our topic assignments come from?
-                              dataset_name = "consorts",
-                              ntopics = 55,
+                              dataset_name = "noexcludes2001_2015",
+                              ntopics = 50,
 
                               # if we've run the params above many times, which one now?
-                              iter_index = "",
+                              iter_index = 1,
 
                               # do we want to show the full dataset, or a subset?
                               subset_name = NULL,
@@ -262,6 +264,8 @@ top_topic_browser <- function(
         # if we're just looking at one topic, maybe we want to save that list
         # of docs and their metadata, and exit.
         if(for.bind) {
+            topdocs[, topic:=topic]
+            topdocs[, topic_rank:=topic.rank]
             return(topdocs)
         } else {
             print(topdocs)
@@ -559,9 +563,9 @@ top_titles_table <- function(dataset_name="noexcludes2001_2015",
                             showlabels=TRUE)
 {
 
-    if(!is.null(topic)) {
-        howmany = 1
-    }
+    # if(!is.null(topic)) {
+    #     howmany = 1
+    # }
 
     ttt <- top_topic_browser(dataset_name=dataset_name,
                            ntopics=ntopics,
@@ -706,6 +710,13 @@ if (autorun) {
 }
 
 if(FALSE) {
+    dataset_name <- "noexcludes2001_2015"
+    # subset_name <- "knownprograms2001_2015"
+    subset_name <- "nonrcws2001_2015"
+    ntopics <- 50
+    iter_index <- 1
+    bad.topics <- c("3", "8", "12", "15", "30", "34", "36", "47", "50")
+    
     remake_figs
     top_topic_browser(dataset_name="noexcludes2001_2015", ntopics=50, iter_index=1,
                       depth=10)
@@ -752,4 +763,46 @@ if(FALSE) {
                     iter_index = 1,
                     subset_name = "knownprograms2001_2015",
                     topic = 30)   # german language
+    
+    #### non-rcws analyses
+    toptitles2 <- top_titles_table(dataset_name = "noexcludes2001_2015",
+                                  ntopics = 50,
+                                  iter_index = 1,
+                                  subset_name = "nonrcws2001_2015",
+                                  ## how many topics to show?
+                                  # howmany = ntopics,
+                                  howmany = 10,
+                                  depth = 3,        # how many titles per topic
+                                  showlabels = TRUE
+    )
+    
+    
+    
+    for (mytopic in c(35, 49, 18, 42)) { # cluster_name = "Teaching.and.Administration" 
+        tab1 <- top_titles_table(subset_name = "nonrcws2001_2015",
+                         topic = mytopic,
+                         depth = 8,
+                         showlabels = TRUE)
+        tab2 <- top_titles_table(subset_name = "knownprograms2001_2015",
+                                 topic = mytopic,
+                                 depth = 8,
+                                 showlabels = TRUE)
+        
+        report <- merge(tab1, tab2, by="topic", all=T)
+        names(report) <- c("Topic", "Non-RCWS Rank", "Non-RCWS Titles", "RCWS Rank", "RCWS Titles")
+        
+        print(topic_labels[mytopic, Label])
+        print(report)
+        
+        invisible(readline("Press <enter> to continue.\n"))
+    }
+        
+    toptitles3 <- top_titles_table(cluster_name = "Teaching.and.Administration",
+                                       cluster_members = c(18, 35, 42, 49),
+                                       subset_name = "knownprograms2001_2015")
+    
+    toptitles4 <- cluster_titles_table(cluster_name = "Teaching.and.Administration",
+                                       cluster_members = c(18, 35, 42, 49),
+                                       subset_name = "nonrcws2001_2015sans_badtops")
+    
 }
