@@ -135,26 +135,30 @@ get.doctopic.grid <- function(dataset_name = "noexcludes2001_2015",
                                          whatitis="topic-pct-contrib",
                                          for.filename=T)
         outfile <- file.path(imageloc, paste0(outfile_slug, ".csv"))
-        if(file.exists(outfile)) {
-            overwrite <- readline(paste("In 'get.doctopic.grid()': destination file already exists: \n", outfile, "\n",
-                                        "Overwrite (O)? New file (N)? Skip (S)? (o/n/s) > "))
-            if(tolower(overwrite) == "n") {
-                outfile <- readline(paste("Enter new filename, including directory. ",
-                                          "(Default directory is ", imageloc, ")> "))
-                write.csv(out, outfile)
-            } else if (tolower(overwrite) == "s") {
-                # just keep going. 
-                # annoying to repeat the write.csv in three conditions, but no other way
-                # to handle the "else" condition, where we do write.csv, and still skip here.
-            } else if (tolower(overwrite) == "o") {
-                write.csv(out, outfile)
-            } else {
-                outfile_slug <- paste0(outfile_slug, "+1")
-                outfile <- file.path(imageloc, paste0(outfile_slug, ".csv"))
-                warning(paste("Answer not understood. Saving with new filename: \n", outfile))
-                write.csv(out, outfile)
-            }
-        }
+        
+        # see .Rprofile
+        safesave(write.csv, out, outfile, col.names = c("Topic", "Pct of Corpus"))
+        
+        # if(file.exists(outfile)) {
+        #     overwrite <- readline(paste("In 'get.doctopic.grid()': destination file already exists: \n", outfile, "\n",
+        #                                 "Overwrite (O)? New file (N)? Skip (S)? (o/n/s) > "))
+        #     if(tolower(overwrite) == "n") {
+        #         outfile <- readline(paste("Enter new filename, including directory. ",
+        #                                   "(Default directory is ", imageloc, ")> "))
+        #         write.csv(out, outfile)
+        #     } else if (tolower(overwrite) == "s") {
+        #         # just keep going. 
+        #         # annoying to repeat the write.csv in three conditions, but no other way
+        #         # to handle the "else" condition, where we do write.csv, and still skip here.
+        #     } else if (tolower(overwrite) == "o") {
+        #         write.csv(out, outfile)
+        #     } else {
+        #         outfile_slug <- paste0(outfile_slug, "+1")
+        #         outfile <- file.path(imageloc, paste0(outfile_slug, ".csv"))
+        #         warning(paste("Answer not understood. Saving with new filename: \n", outfile))
+        #         write.csv(out, outfile)
+        #     }
+        # }
         
         
     }
@@ -197,7 +201,7 @@ get.doctopic.grid <- function(dataset_name = "noexcludes2001_2015",
 }   # end of get.doctopic.grid()
 
 if(FALSE) {         # this will never run on its own
-    remake_figs
+    remake_figs=T
     mygrid <- get.doctopic.grid("noexcludes2001_2015", ntopics=23, subset_name=NULL, 3, doplot=T)
     
     mygrid <- get.doctopic.grid("noexcludes2001_2015", ntopics=50, iter_index=1, 
@@ -207,4 +211,8 @@ if(FALSE) {         # this will never run on its own
     mygrid <- get.doctopic.grid("noexcludes2001_2015", ntopics=50, iter_index=1, 
                                 doplot=T)
     
+    doctopics <- get.doctopic.grid("noexcludes2001_2015", ntopics=50, iter_index=1, 
+                                subset_name="nonrcws2001_2015", 
+                                doplot=T)
+    remake_figs=F
 }
