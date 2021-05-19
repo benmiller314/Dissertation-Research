@@ -100,6 +100,7 @@ frameToJSON <- function(dataset_name="noexcludes2001_2015",
   if (is.null(twm)) {
       if(!exists("topic_distance_matrix", mode="function")) {
         source(file="topic_term_synonyms.R")
+        source(file="topic_term_synonyms.R") # run twice to get WNHOME
       }
 
       t <- topic_distance_matrix(dataset_name = dataset_name,
@@ -694,6 +695,10 @@ cotopic_edges <- function(dataset_name="noexcludes2001_2015",
     setkey(edges, source)
     # head(edges)
 
+    # TO DO: allow for directed edges, where a source node means 
+    # the topic is top-ranked in its diss. 
+    # See get_top_topics() in 'variation of topic proportions.R'.
+    
     # Bring in the node table
     b <- frameToJSON(dataset_name, ntopics, subset_name, iter_index, bad.topics=bad.topics, do.plot=F, tw=tw, clust.method=clust.method)
     setkey(b, topic)
