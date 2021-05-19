@@ -227,7 +227,8 @@ method_spread_across_schools <- function(dataset_name = "knownprograms2001_2015"
                                          do.plot = T,
                                          color_palette = group_pal,
                                          spread_threshold = 1,
-                                         pcts = T
+                                         pcts = T,
+                                         horizontal = T
                                          
 ){
     
@@ -246,7 +247,7 @@ method_spread_across_schools <- function(dataset_name = "knownprograms2001_2015"
                                     tagset_name,
                                     spread_threshold)
     
-    methodspread.index <- order(school_corrs$methodspread, decreasing = T)
+    methodspread.index <- order(school_corrs$methodspread, decreasing = !horizontal)
     
     if(remake_figs) { 
         outfile <- paste0("method-spread--", dataset_name, "--", tagset_name,
@@ -258,30 +259,57 @@ method_spread_across_schools <- function(dataset_name = "knownprograms2001_2015"
     if(do.plot) {
         
         to.plot <- school_corrs$methodspread[methodspread.index] 
-        if(pcts) {
-            to.plot <- to.plot / nrow(school_corrs$counts)
-        }
+        my.pcts <- to.plot / nrow(school_corrs$counts)
+
+        
+        # TO DO:  increase margins to have a better shot at including the text labels later
+        # par(mar = c(5, 10, 10, 2))  # default: c(5, 4, 4, 2) + 0.1.
         
         p <- barplot(to.plot,
+                     horiz = horizontal,
                      las = 2,
-                     col = color_palette[taggroups[names(school_corrs$methodspread)[methodspread.index]]],
-                     yaxp = if(pcts) c(0, 1, 5) else c(0, nrow(school_corrs$counts), 5),
-                     yaxs = "r",
+                     col = color_palette[taggroups[names(to.plot)]],
+                     # xaxp = if(pcts) c(0, 1, 5) else c(0, nrow(school_corrs$counts), 5),
+                     xaxt = "n",
                      # main = "Presence of methods across schools \nis broader than raw counts would suggest",
                      main = paste0(if(pcts) {"Percentage"} else {"Number"}, " of programs with dissertations\nusing methods in the schema"),
                      sub = paste0(dataset_name, ", N = ", nrow(school_corrs$counts), " schools with at least ",
                                   min_disses, " dissertation", if(min_disses > 1) "s", ", ", thresh_start, "-", thresh_end, ";\n",
                                   "A school is counted if at least ", spread_threshold, " diss", if(spread_threshold > 1) "es",
                                   " there ", if(spread_threshold > 1) "are" else "is", " tagged with the method"
-                     )
+                     ) # end of sub
+                     # mar = c(5, 10, 10, 2)
+        ) # end of barplot
+        
+        # add count values to the right of each bar
+        text(x = if (horizontal) to.plot else p,
+             y = if (horizontal) p else to.plot,
+             labels = to.plot,
+             pos = if (horizontal) 4 else 3
         )
-    }
+        
+        # add percentage values to the left of each label
+        text(x = if (horizontal) 0 else p,
+             y = if (horizontal) p else 0,
+             labels = round(100 * my.pcts, 1),
+             pos = if (horizontal) 2 else 1,
+             offset = 4)
+                 
+        text(x = if (horizontal) 0 else p,
+             y = if (horizontal) p[length(p)] else 0,
+             labels = "%",
+             pos = if (horizontal) 2 else 1,
+             offset = 3)
     
-    outside_legend(x = "topright", 
-                   legend = names(color_palette), 
-                   fill = color_palette, 
-                   bty="n"
-    )
+        outside_legend(x = "topright", 
+                       legend = names(color_palette), 
+                       fill = color_palette, 
+                       bty="n"
+        )    
+        
+        # reset margins
+        # par(mar = c(5,4,4,2) + 0.1)
+    }
     
     if(remake_figs) { dev.off() }
     
@@ -296,6 +324,9 @@ if (FALSE) {
     
     require(RColorBrewer)
     require(viridisLite)
+    
+    dataset_name <- "knownprograms2001_2015"
+    tagset_name <- "no_ped_tagnames"
     
     # test color palettes; UPDATE: viridisLite::magma is the clear winner!
     # colorscheme <- list(name = "grayscale", values = gray.colors(20, start = 0, end = 1, rev=T))
@@ -350,10 +381,7 @@ if (FALSE) {
     
     remake_figs <- F
     
-    if(!exists("method_corrs_one_row", mode="function")) {
-        source(file = "method collocation heatmap.R")
-    }
-    
+    # Let's see the methodological distribution at some individual schools
     remake_figs = T
     
     myrows <- c("Pennsylvania State University-Main Campus",
@@ -364,8 +392,16 @@ if (FALSE) {
                 "University of Arizona",
                 "Purdue University-Main Campus")
     
+    myrows <- c("The University of Texas at El Paso",
+                "Wayne State University",
+                "University of South Carolina-Columbia")
+    
     row <- "University of California-Irvine"
     
+    
+    if(!exists("method_corrs_one_row", mode="function")) {
+        source(file = "method collocation heatmap.R")
+    }
     for(row in myrows) {
         method_corrs_one_row(myrow = row,
                          corr_type = "school",
@@ -504,7 +540,7 @@ if (FALSE) {
     # What methods are most and least distributed across schools?
     remake_figs = T
     method_spread_across_schools()
-    method_spread_across_schools(min_disses = 5)
+    method_spread_across_schools(min_disses = 5, spread_threshold = 2, do.plot=T)
     method_spread_across_schools(spread_threshold = 2)
     method_spread_across_schools(spread_threshold = 3)
     remake_figs = F
@@ -519,6 +555,11 @@ if (FALSE) {
     school_corrs_thresh5 <- schoolwise.data(dataset_name = "kp2001_2015_thresh5",
                                     tagset_name = "no_ped_tagnames")
     sort(school_corrs_thresh5$schoolspread, decreasing = T)
+    
+    
+    # and how about at non-RCWS schools?
+    method_spread_across_schools(dataset_name = "nonrcws2001_2015", horizontal=F)
+    # Disc is up into the top 4, tying Hist ... and Surv is down. Meta is way down.
     
     
     schoolwise("consorts", "tagnames", agn=T, hcl=F, dia=F)
