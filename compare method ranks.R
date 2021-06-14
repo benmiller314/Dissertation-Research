@@ -228,6 +228,7 @@ method_line_graph <- function(tagset = no_ped_tagnames,     # character vector o
                               do.plot = TRUE, 
                               label_year_n = TRUE,
                               mycolors = NULL,
+                              method_group_colors = FALSE, # should we use group_pal as in dataprep.R?
                               ... )   # graphing parameters
 {
     # Placeholders for data
@@ -319,7 +320,9 @@ method_line_graph <- function(tagset = no_ped_tagnames,     # character vector o
     # If no colors are provided, use pretty colors
     if(is.null(mycolors)) {
         require(viridisLite)
-        mycolors <- viridis(n = length(tagset))
+        mycolors = if(method_group_colors) { 
+                        group_pal[no_ped_taggroups[tagset]]   # see dataprep.R
+                   } else { viridis(length(tagset), end=0.8) }
     }
     
     # Use preferred labels to distinguish lines
@@ -334,11 +337,15 @@ method_line_graph <- function(tagset = no_ped_tagnames,     # character vector o
               col = mycolors[i])
     }
     
-    outside_legend("topright", 
+    if(length(tagset) > 1) {
+        outside_legend("topright", 
                    legend = tagset, 
                    col = mycolors, 
                    pch = mypch,
                    bty = "l")
+    } else {
+        title(realtags(tagset))
+    }
     
     if(remake_figs) {
         dev.off()
@@ -354,19 +361,22 @@ if(FALSE) {
 	remake_figs=F
 
 	method_line_graph(tagset=c("Ethn"), mycolors = "black")
-	method_line_graph(tagset=c("Rhet", "Meta", "Clin"))
+	method_line_graph(tagset=c("Rhet", "Meta", "Hist"), method_group_colors = T)
 	
 	method_line_graph(tagset=no_ped_tagnames)
 	
 	remake_figs=T
     	require(viridisLite)
-    	mycolors <- viridis(n = length(no_ped_tagnames))
-    	# TO DO: use method-group colors as per chapter 3
-    	# TO DO: make small multiples plot with all methods
-    	
-    	for (i in seq_along(no_ped_tagnames)) {
-    	    method_line_graph(tagset=c(no_ped_tagnames[i]), mycolors = mycolors[i])
+    	# TO DO: make small multiples plot with all methods >> mfrow is annoying!
+    
+	    
+    	for (i in seq_along(no_ped_tagnames[!(no_ped_tagnames %in% "Othr")])) {
+    	    method_line_graph(tagset = c(no_ped_tagnames[i]), 
+    	                      method_group_colors = T,
+    	                      scaled = T)
     	}
+	
+	
 	remake_figs=F
 	
 	compare_method_ranks("consorts", "nonconsorts", 
@@ -448,7 +458,7 @@ if(FALSE) {
 	                     tagset_name="no_ped_tagnames",
 	                     betterlabels=c("RCWS 2001-2002", "RCWS 2014-2015"),
 	                     verbose = T)
-	method_line_graph()
+	
 } else {
     message("The following function has been loaded:\n",
             "    compare_method_ranks(set1, set2, pcts, colorful, betterlabels, tagset_name) \n",
