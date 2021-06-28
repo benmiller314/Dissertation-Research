@@ -1657,7 +1657,22 @@ if(FALSE) {
    print(topic18assists_rcws$simpler)
    print(topic18assists_nonrcws$simpler)
    
-   # Hmm. Inconclusive. Maybe the sample size is just too small for subsets of subsets.
+   # Hmm. Inconclusive. Maybe the sample size is just too small 
+   # for subsets of subsets. 
+   # Let's try overall combos...?
+   
+   topicassists_nonrcws <- top_topic_combos(topic_depth = 3,
+                                dataset_name = "noexcludes2001_2015",
+                                ntopics = 50,
+                                iter_index = 1,
+                                subset_name = "nonrcws2001_2015sans_badtops",
+                                bad.topics = bad.topics,
+                                # mygrid = dtgrid,
+                                topic_labels = topic_labels,
+                                showlabels = T,
+                                anywhere = T)
+   # See the Excel file for follow-on analysis: top_topic_partners--anywhere_in_depth_3--noexcludes2001_2015k50_iter1--nonrcws2001_2015sans_badtops
+   
        
    # T42: "K12 Writing Pedagogy"
    topic42assists_rcws <- top_topic_assists2(mytopic = 42,   
