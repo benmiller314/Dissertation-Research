@@ -31,13 +31,15 @@ tfidf.for.topics <- function(nwords=20,   # how many top words to display?
     }
     
         
+    # IMPORTANT NOTE: because of how := works (by reference),
+    # the data.table tw will change in the calling environment, too,
+    # if it exists there.
+    
     tw[, ITF:=log(ntopics/.N), by=token]     # .N is the number of rows in each group (determined by "by") 
-                                                
-    tw[, TFITF:=weight*ITF]
-                                                # IMPORTANT NOTE: because of how := works (by reference),
-                                                # the data.table tw will change in the calling environment, too,
-                                                # if it exists there.
-
+                                             
+    tw[, TFITF:=weight*ITF]                  # Note that the order is identical if using 
+                                             # weight as TF or probability as TF
+                                               
     
     # Make simple version for data labeling, synonym-finding, etc
     # first by tfitf 
