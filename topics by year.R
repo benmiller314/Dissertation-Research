@@ -16,10 +16,10 @@
 #        for easier comparison of the variability of topic contributions.
 #####
 
-topics.by.year <- function(dataset_name = "consorts",
-                        ntopics = 55,
-                        subset_name = NULL,
-                        iter_index = "",
+topics.by.year <- function(dataset_name = "noexcludes2001_2015",
+                        ntopics = 50,
+                        subset_name = "knownprograms2001_2015",
+                        iter_index = 1,
                         newnames=F,         # where in the MALLET output filename does iter_index appear?
                                             # set T if it's with the model, F if last in filename.
                                             # Gets passed into get.doctopic.grid.
@@ -27,11 +27,16 @@ topics.by.year <- function(dataset_name = "consorts",
                         do.plot = TRUE,   # should we draw it, or just
                                           # return the dataframe?
                         per.plot = 5,     # maximum how many lines per plot?
-                        bad.topics = NULL
+                        bad.topics = c(3, 8, 12, 15, 30, 34, 36, 47, 50),
+                        smoothing = 1/3,   # f span for LOWESS smoothing, as a proportion of points 
+                                          # in the plot to incorporate. Must be > 0, but set close to 0
+                                          # for unsmoothed plot.
+                        legendloc_init = NULL  # optionally specify where the legend should be
                         )
 {
 require(data.table)
-require(RColorBrewer)
+# require(RColorBrewer)
+require(viridisLite)
 
     # Get topic weights for every document we have
     if(!exists("get.doctopic.grid", mode="function")) {
@@ -87,6 +92,8 @@ require(RColorBrewer)
     # not actually plotting.
     if (!is.null(to.plot)) {            # any pre-set topics to plot?
         plot.me <- to.plot
+        plot.me <- plot.me[order(plot.me)] # data.tables strongly prefer ordered input,
+                                           # and this is kludgy but at least the legend should match
     } else {
         # plot.me <- c(51, 26, 46, 27, 43)  # A range of topics to plot
         # plot.me <- 2:ncol(df)-1           # gives 1:ntopics by topic number
@@ -109,7 +116,10 @@ require(RColorBrewer)
         yrange <- c(0, max(df[, !names(df) %in% "Year"]))
 
         # Use different colors for each plot
-        mycol <- brewer.pal(n=per.plot, name="Dark2")
+        # require(RColorBrewer)
+        # mycol <- brewer.pal(n=per.plot, name="Dark2")
+        require(viridisLite)
+        mycol <- viridis(n=per.plot, end=0.9)
 
         # Use different symbols for each plot?
         # plotchar <- seq(18, 18+length(plot.me), 1)
@@ -139,7 +149,7 @@ require(RColorBrewer)
                              i, "-", (i+per.plot-1), ".pdf"))
             } else {
                 filename <- file.path(imageloc, paste0(maintitle, ", ", dataset_name, "k", ntopics, subset_name, ", Topics ",
-                             to.plot[i], "-", to.plot[i+per.plot-1], ".pdf"))
+                             plot.me[i], "-", plot.me[i+per.plot-1], ".pdf"))
             }
 
             pdf(filename)
@@ -175,8 +185,7 @@ require(RColorBrewer)
                                      (i+legend.offset), ".pdf"))
                     } else {
                         filename <- file.path(imageloc, paste0(maintitle, ", ", dataset_name, ntopics, subset_name,
-                                           ", Topics ", to.plot[i], "-",
-                                     to.plot[(i+legend.offset)], ".pdf"))
+                                           ", Topic", if(length(plot.me)>1) "s", " ", paste(plot.me[i:(i+legend.offset)], collapse="-"), ".pdf"))
                     }
 
                     # start writing a new file
@@ -192,12 +201,19 @@ require(RColorBrewer)
                      xlab = "Year",
                      bty = "n",
                      main = maintitle)
-
+                
+                # label the smoothing
+                mtext(paste("Lowess smoothing span:", round(smoothing, 2)), side=1, line=4, cex=0.7)
+                
                 # add a legend for up to five values
-                if (mean(df[,as.character(plot.me[i])]) > mean(yrange)) {
-                    legendloc <- "bottomleft"
+                if(is.null(legendloc_init)) {
+                    if (mean(df[,as.character(plot.me[i])]) > mean(yrange)) {
+                        legendloc <- "bottomleft"
+                    } else {
+                        legendloc <- "topleft"
+                    }
                 } else {
-                    legendloc <- "topright"
+                    legendloc <- legendloc_init
                 }
 
                 if(is.null(to.plot)) {
@@ -206,10 +222,10 @@ require(RColorBrewer)
                               nrow(topic.labels.dt)),
                         legend = paste0(plot.me[seq(i, (i+legend.offset),
                             1)], ": ", topic.labels.dt[Topic %in%
-                            plot.me[i:(i+legend.offset)], Label]),
-                        fill=mycol[j:(j+legend.offset)],
-                            border=mycol[j:(j+legend.offset)],
-                        lty = linetype[j:(j+legend.offset)],
+                            plot.me[i:(i+legend.offset)], Label, keyby=Topic]$Label),
+                        fill=mycol[((j:(j+legend.offset) -1) %% length(mycol) + 1)],
+                        border=mycol[((j:(j+legend.offset) -1) %% length(mycol) + 1)],
+                        lty = linetype[((j:(j+legend.offset) -1) %% length(linetype) + 1)],
                         lwd = linewidth,
                         bty="n",
                         cex=0.8
@@ -218,10 +234,10 @@ require(RColorBrewer)
                     legend(legendloc, title="Topics",
                         legend = paste0(plot.me[seq(i, (i+legend.offset),
                             1)], ": ", topic.labels.dt[Topic %in%
-                            plot.me[i:(i+legend.offset)], Label]),
-                        fill = mycol[j:(j+legend.offset)],
-                        border = mycol[j:(j+legend.offset)],
-                        lty = linetype[j:(j+legend.offset)],
+                            plot.me[i:(i+legend.offset)], Label, keyby=Topic]$Label),
+                        fill=mycol[((j:(j+legend.offset) -1) %% length(mycol) + 1)],
+                        border=mycol[((j:(j+legend.offset) -1) %% length(mycol) + 1)],
+                        lty = linetype[((j:(j+legend.offset) -1) %% length(linetype) + 1)],
                         lwd = linewidth,
                         bty = "n",
                         cex = 0.8
@@ -230,16 +246,20 @@ require(RColorBrewer)
             }   # end new plot + legend
 
             # draw the line and loop back
-            lines(x = df$Year,
+            lines(lowess(x = df$Year,
                   y = df[,as.character(plot.me[i])],
+                  f = smoothing),
                   type = "l",
-                  pch = plotchar[j],
-                  lty = linetype[j],
+                  pch = plotchar[(j - 1) %% length(plotchar) + 1],
+                  lty = linetype[(j - 1) %% length(linetype) + 1],
                   lwd = linewidth,
-                  col = mycol[j]
+                  col = mycol[(j - 1) %% length(mycol) + 1]
             )
+            
+            
         } # end of for loop
 
+        
         # now that we're done looping, close the final file connection
         if(remake_figs) {dev.off()}
     } # end if(do.plot)
@@ -257,7 +277,8 @@ topic.variation <- function(dataset_name = "consorts",
                             notch   = FALSE,
                             bad.topics = NULL,
                             use.labels = F,
-                            show.outliers = T
+                            show.outliers = T,
+                            bigchange = NULL    # set to a value between 0 and 1 to highlight big changes
                             ) {
 # okay, this is interesting
     df <- topics.by.year(dataset_name=dataset_name, ntopics=ntopics,
@@ -313,17 +334,36 @@ topic.variation <- function(dataset_name = "consorts",
     setkey(topic.labels.dt, Rank)
     head(topic.labels.dt)
 
+    # get colors based on some threshold range
+    if(!is.null(bigchange)) {
+        highlights <- df[, lapply(.SD, FUN=function(x) {
+                                        d <- as.numeric(summary(x)[5] - summary(x)[2])
+                                        if(d > bigchange) { 
+                                            return("#FDE725FF") # dark yellow
+                                        } else { 
+                                            return("white")
+                                        }} )
+                    , .SDcols=!c("Year")]
+    }
 
     # draw the plot
     if(remake_figs) {
         filename <- file.path(imageloc, paste0(maintitle, ".pdf"))
         pdf(filename)
     }
+    
 
     # sort columns by overall topic rank
     setcolorder(df, c("Year", as.character(rank.order)))
-
+    if(!is.null(bigchange)) {
+        setcolorder(highlights, as.character(rank.order))
+    }
+    
     # remove Year column from plot
+    if(use.labels) {
+        par(mar=c(13, 4, 4, 2))
+    }
+    
     boxplot(df[, .SD, .SDcols=!c("Year")],
         main = maintitle,
         # xlab="Topic Number, Arranged by Overall Rank within Corpus",
@@ -331,16 +371,19 @@ topic.variation <- function(dataset_name = "consorts",
         ylab = "Portion of Corpus (scaled to 1)",
         xaxt = "n",
         notch = notch,
-        outline= show.outliers
+        outline= show.outliers,
+        col = if(!is.null(bigchange)) { as.character(highlights) }
         )
 
     if(use.labels) {
+        # par(mar = c(10, 4, 4, 2))
         axis(1,
              at = seq_along(df[, .SD, .SDcols=!c("Year")]),
              labels = topic.labels.dt[Topic %in% rank.order, Label],
              las = 2,
              ps = 6,
-             lheight=0.5
+             lheight=0.5,
+             cex.axis = 0.7
         )
     } else {
         axis(1,
@@ -352,7 +395,11 @@ topic.variation <- function(dataset_name = "consorts",
         )
     }
 
-    mtext(subtitle, side=3)
+    
+    if(!is.null(bigchange)) {
+        mtext(paste0("Highlighted cells have IQR > ", bigchange), side=3, cex=0.7)
+    }
+    # mtext(subtitle, side=3)
     # abline(v=(0.5+seq(from=5,to=length(plot.me), by=5)), lty="dotdash")
 
     if(remake_figs) {
@@ -360,7 +407,7 @@ topic.variation <- function(dataset_name = "consorts",
     }
 }
 
-if(autorun) {
+if(FALSE) {
     dataset_name <- "noexcludes2001_2015"
     ntopics      <- 50
     iter_index   <- 1
@@ -368,15 +415,39 @@ if(autorun) {
     bad.topics   <- c("3", "8", "12", "15", "30", "34", "36", "47", "50")
     
     
-    remake_figs
-    topics.by.year(dataset_name=dataset_name, ntopics=ntopics,
+    remake_figs=T
+        topics.by.year(dataset_name=dataset_name, ntopics=ntopics,
                    subset_name=subset_name, iter_index=iter_index,
-                   bad.topics=bad.topics)
-    topic.variation(dataset_name=dataset_name, ntopics=ntopics,
+                   bad.topics=bad.topics, smoothing=1/2)
+    
+        topic.variation(dataset_name=dataset_name, ntopics=ntopics,
                    subset_name=subset_name, iter_index=iter_index,
                    bad.topics=bad.topics,
                    show.outliers=T,
-                   use.labels=T)
+                   use.labels=T,
+                   bigchange = 0.015)
+    remake_figs=F
+        
+    topics_of_interest <- c(44, # online circulation and social media (increasing)
+                            2,  # image, body, materiality (increasing)
+                            28, # literacy practices (increasing)
+                            32, # disciplinary formations (decreasing)
+                            35, # institutional supports, barriers, constraints (stable)
+                            26, # personal narrative and oral history (cosine wave??)
+                            49, # scenes of teaching (decreasing)
+                            46  # medical discourse (last minute increase)
+                            )
+    remake_figs=T
+        topics.by.year(smoothing = 1/2, 
+                    to.plot = c(32, 35, 44), 
+                    # per.plot = 6, 
+                    legendloc_init="topright")
+        topics.by.year(smoothing = 1/2, 
+                    to.plot = c(2, 28, 26, 49), 
+                    # per.plot = 6, 
+                    legendloc_init="bottom")
+    remake_figs=F
+    
 
-    topic.variation(dataset_name="noexcludes", ntopics=55, iter_index="", subset_name = "realconsorts")
+    # topic.variation(dataset_name="noexcludes", ntopics=55, iter_index="", subset_name = "realconsorts")
 }
