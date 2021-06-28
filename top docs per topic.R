@@ -481,24 +481,23 @@ top_topic_browser <- function(
 
 ########
 ## Given a topic of interest, get clean data to share with others about the top N docs
-shareable_topic <- function(  # where will our topic assignments come from?
-                              dataset_name = "consorts",
-                              ntopics = 55,
-
-                              # if we've run this model multiple times, which iteration?
-                              iter_index = "",
-
-                              # do we want to show the full dataset, or a subset?
-                              subset_name = "realconsorts",
-
-                              # must specify one topic
-                              topic,
-
-                              # how many docs to show for each topic?
-                              depth = 10,
-
-                              # show current topic labels for indiv. docs?
-                              showlabels = TRUE
+shareable_topic <- function(topic, # must specify one topic
+                            
+                            # how many docs to show for each topic?
+                            depth = 10,
+                            
+                            # where will our topic assignments come from?
+                            dataset_name = "noexcludes2001_2015",
+                            ntopics = 50,
+                            
+                            # if we've run this model multiple times, which iteration?
+                            iter_index = 1,
+                            
+                            # do we want to show the full dataset, or a subset?
+                            subset_name = "knownprograms2001_2015",
+                            
+                            # show current topic labels for indiv. docs?
+                            showlabels = TRUE
 
 
 ) {
@@ -764,6 +763,12 @@ if(FALSE) {
                     subset_name = "knownprograms2001_2015",
                     topic = 30)   # german language
     
+    shareable_topic(dataset_name = "noexcludes2001_2015",
+                    ntopics = 50,
+                    iter_index = 1,
+                    subset_name = "nonrcws2001_2015sans_badtops",
+                    topic = 28)   # literacy practices
+    
     #### non-rcws analyses
     toptitles2 <- top_titles_table(dataset_name = "noexcludes2001_2015",
                                   ntopics = 50,
@@ -791,7 +796,7 @@ if(FALSE) {
         report <- merge(tab1, tab2, by="topic", all=T)
         names(report) <- c("Topic", "Non-RCWS Rank", "Non-RCWS Titles", "RCWS Rank", "RCWS Titles")
         
-        print(topic_labels[mytopic, Label])
+        message(topic_labels[mytopic, Label])
         print(report)
         
         invisible(readline("Press <enter> to continue.\n"))
