@@ -2,7 +2,7 @@
 # in some clusters or branches within a cluster
 
 schools_by_topic <- function(mytopic,
-                             level = 0.12,     # percentage of a diss contributed by the topic
+                             level = 0.13,     # percentage of a diss contributed by the topic
                                                # for it to "count"
                              howmany = 10,      # how many top schools to show?
                                                # use -1 for all.
@@ -128,7 +128,7 @@ if(FALSE) {
     table(schools_by_topic(1, subset_name=NULL, howmany=-1)$knownprogram)
 }
 
-knownprogram_topical_ratio <- function(level = 0.12,     # percentage of a diss contributed by the topic
+knownprogram_topical_ratio <- function(level = 0.13,     # percentage of a diss contributed by the topic
                                        # for it to "count"
                                        dataset_name="noexcludes2001_2015",
                                        ntopics=50,
@@ -143,6 +143,7 @@ knownprogram_topical_ratio <- function(level = 0.12,     # percentage of a diss 
                                        bad.topics= NULL, # exclude non-content-bearing topics
                                        dt=NULL,          # doctopic grid. pass in for a speed boost.
                                        quiet=TRUE)      # if TRUE, suppress messages
+                        # TO DO:       normed=T)        # if TRUE, divide by totals possible in known/unknown
 {
     topic_list <- seq_len(ntopics)
     if(! is.null(bad.topics) ) {
@@ -165,9 +166,9 @@ knownprogram_topical_ratio <- function(level = 0.12,     # percentage of a diss 
     }
 
     ratios <- data.frame("topic.num"=numeric(),
-                         "unknown.dept"=logical(),
-                         "known.dept"=logical(),
-                         "pct.known"=numeric())
+                         "nonrcws"=logical(),
+                         "rcws"=logical(),
+                         "pct.rcws"=numeric())
     j <- 1
     for(i in topic_list) {
         result <- table(schools_by_topic(i,
@@ -249,6 +250,20 @@ if(FALSE) {
     remake_figs = T
     ratios <- knownprogram_topical_ratio(bad.topics=bad.topics,
                                          use.labels=T)
+    
+    ratios2 <- data.table(ratios, key="topic.num")
+    ratios2[, "nonrcws.rate" := unknown.dept/nrow(nonrcws2001_2015sans_badtops)]
+    ratios2[, "rcws.rate" := known.dept/nrow(knownprograms2001_2015)]
+    ratios2[, "normed.known.ratio" := rcws.rate / (rcws.rate + nonrcws.rate)]
+    setkey(ratios2, normed.known.ratio)
+    tail(ratios2)
+    
+    # get it ready to print
+    ratios2[, .("Topic"=paste0(Label, " (T", topic.num, ")"), 
+                "RCWS count"=known.dept, 
+                "Non-RCWS count"=unknown.dept, 
+                "Normed RCWS proportion"=round(100*normed.known.ratio, 2))]
+    
 }
 
 # TO DO: finish this function, which should find differences among schools_by_topic
