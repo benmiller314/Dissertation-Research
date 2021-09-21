@@ -239,12 +239,22 @@ subset_by_year <- function(dataset_name,
 
 subset_list <- c("noexcludes", "knownprograms", "top.nonconsorts", 
                  "realconsorts", "realrhetmaps", "nonrcws")
+# 5 year bins for everybody
 for(subset in subset_list) {
     subset_by_year(subset, 2001, 2015, autooverwrite =T)
     subset_by_year(subset, 2001, 2005, autooverwrite = T)
     subset_by_year(subset, 2006, 2010, autooverwrite =T)
     subset_by_year(subset, 2011, 2015, autooverwrite = T)
 }
+
+# 1 year bins for knownprograms... and nonrcws
+for(startyear in 2001:2015) {
+    endyear <- startyear
+    subset_by_year("knownprograms", start_year = startyear, end_year=endyear, autooverwrite = T)
+    subset_by_year("nonrcws2001_2015sans_badtops", start_year = startyear, end_year=endyear, autooverwrite = T)
+}
+
+
 
 # remove disses with bad.topics in the top slot (usually bad OCR or entirely in another language)
 source(file = "variation of topic proportions.R")
