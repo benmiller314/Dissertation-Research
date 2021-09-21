@@ -51,7 +51,7 @@ get_topic_labels <- function(dataset_name="consorts",
 		error = function(e) {
 		    if(!is.null(subset_name)) {
     		    message("`get topic labels.R`: File ", infile, " not found; \n",
-    		            "trying again without subset.")
+    		            "trying again without subset...")
 		        return(get_topic_labels(dataset_name=dataset_name,
 		                                ntopics=ntopics,
 		                                subset_name=NULL,
