@@ -361,13 +361,14 @@ if(FALSE) {
 	remake_figs=F
 
 	method_line_graph(tagset=c("Ethn"), mycolors = "black")
-	method_line_graph(tagset=c("Rhet", "Meta", "Hist"), method_group_colors = T)
+	method_line_graph(tagset=c("Rhet", "Meta", "Hist"))
 	
-	method_line_graph(tagset=no_ped_tagnames)
+	method_line_graph(tagset=no_ped_tagnames, method_group_colors = T)
 	
 	remake_figs=T
     	require(viridisLite)
     	# TO DO: make small multiples plot with all methods >> mfrow is annoying!
+	    # at least find a way to fix the scale so you can assemble them in Illustrator... 
     
 	    
     	for (i in seq_along(no_ped_tagnames[!(no_ped_tagnames %in% "Othr")])) {
