@@ -146,7 +146,7 @@ r2mallet <- function(
 		
 
 			# 3b. String together command to send to MALLET via the shell  
-			train <- paste(mallet_cmd, "train-topics  --input", output,
+			train <- paste(mallet_cmd, "train-topics  --input", output, # i.e. the output of the instancer (step 1)
 						 "--num-topics", k, 
 						 "--optimize-interval", optint, 
 						 "--optimize-burn-in", optburnin, 
