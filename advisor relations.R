@@ -188,3 +188,26 @@ find_advisors_as_authors <- function(dataset_name = "knownprograms",
             message("Not saving advisor_as_author.")
         }
     }
+}
+    
+    # FOLLOW-UP ANALYSIS: for each match (except for "Na"), build a comparison of the method array from when that advisor was an author
+    # and when they were an advisor
+if(FALSE) {
+    # test value
+    advisor <- advisor_as_author[1]
+    
+    for (advisor in advisor_as_author) {
+        author_index <- grep(advisor, dataset[, author_column])
+        advisor_index <- grep(advisor, dataset[, advisor_column])
+    }
+    
+    
+    
+    
+    # for matches, 
+    
+    
+}
+
+
+
