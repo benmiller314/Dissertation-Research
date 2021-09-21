@@ -426,26 +426,26 @@ tree_summary <- function(nclust,
     return(to.return)
 }
 
-
-if(autorun) {
+# testing, parameter archive, and interactive execution:
+if(FALSE) { 
     dataset_name <- "noexcludes2001_2015"
     ntopics <- 50
     iter_index <- 1
     bad.topics <- NULL
 
-    tw <- build.topicword.table(dataset_name=dataset_name,
-                                    ntopics=ntopics,
-                                    iter_index=iter_index,
-                                    bad.topics=bad.topics)
+    tw <- build.topicword.table(dataset_name = dataset_name,
+                                ntopics = ntopics,
+                                iter_index = iter_index,
+                                bad.topics = bad.topics)
 
     twm <- topic_distance_matrix(dataset_name = dataset_name,
                                  ntopics = ntopics,
                                  iter_index = iter_index,
                                  bad.topics = bad.topics,
-                                 tw=tw)
+                                 tw = tw)
 
-    clust <- topic_clusters(twm=twm,
-                         tw=tw,
+    clust <- topic_clusters(twm = twm,
+                         tw = tw,
                          dataset_name = dataset_name,
                          ntopics = ntopics,
                          iter_index = iter_index,
@@ -455,8 +455,6 @@ if(autorun) {
     if(!exists("tfidf.for.topics")) { source(file="tfidf for topics.R") }
     tf <- tfidf.for.topics(tw=tw)
 
-
-    tree_summary(ag=ag, tw=tw, nclust=10, slow=F)
 
     clust.method = "agnes"
     clust2 <- topic_clusters(twm=twm,
@@ -468,7 +466,9 @@ if(autorun) {
                              clust.method = clust.method,
                              use.labels = T,
                              do.plot = F) 
-        
+    
+    tree_summary(ag=ag, tw=tw, nclust=10, slow=F)
+    
         if(remake_figs) {
             dendrogram.outfile <- build_plot_title(dataset_name = dataset_name,
                                                    ntopics = ntopics,
