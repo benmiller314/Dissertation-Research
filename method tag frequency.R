@@ -14,7 +14,7 @@ source(file="compare method ranks.R")
 # Step 1. Sum the tag columns
 if(!exists("get_tags", mode="function")) { source(file="get tags.R") }
 
-if(FALSE) {
+if(FALSE) {      # test values
 	a <- get_tags("noexcludes")
 	b <- get_tags("consorts")
 	d <- get_tags("nonconsorts")
