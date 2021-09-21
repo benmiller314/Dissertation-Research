@@ -342,7 +342,7 @@ if (FALSE) {
                                    dendro=T)
     method_corrs_nonrcws <- sumbytags("nonrcws2001_2015sans_badtops", "no_ped_tagnames", 
                                       doplot=T, 
-                                      normed=T, 
+                                      normed=F, 
                                       dendro=T,
                                       rowInd = method_corrs_rcws$rowInd,
                                       colInd = method_corrs_rcws$colInd)
@@ -397,9 +397,9 @@ if (FALSE) {
         mtext("Normed by method totals", side=1, outer=T)
         
         
-    
-    
-    
+    # Can I just go straight to heatmap.2 for modifications of the sumbytags plot?
+            
+       
     # sum.by.tags <- sumbytags() 
 	sumbytags("consorts.plus")
 	sumbytags("consorts.plus", normed=T)
