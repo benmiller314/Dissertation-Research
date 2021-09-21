@@ -36,7 +36,7 @@
         
 #       useped: Set TRUE if Pedagogical Projection should be counted as an
 #               independent method; set FALSE if this move is not considered
-#               part of the methodology or is folded in with Prac or Phil.
+#               part of the methodology schema or is folded in with Prac or Phil.
 #               
         useped <- FALSE
         
@@ -58,18 +58,16 @@
         options(java.parameters=heap_param)        
         
 ## 
-# `dataprep.R`: prepares working environment by loading helper
-#         functions and setting key variables (such as tagset).
+# `dataprep.R`: prepares working environment by loading helper functions
+#         and setting key variables (such as tagset).
 # 
 # `dataprep 2 - load data.R`: loads in a .csv file of tagged
 #     spreadsheet data, generates a tag array, and defines various
 #     subsets. You will be prompted to select the file via file.choose(). 
-#   Dependencies: "extract subjects.R", "Factor-Bug fixing.R",
+#  Dependencies: "extract subjects.R", "Factor-Bug fixing.R",
 #        "heatmap_ben.R", "heatmap fixedcols.R", "method tag array.R",
 #        "thresh.R", "simplifying the schema.R", "check count.R",
 #        library(data.table)
-# NB: These two functions can be called jointly via `source(file="start 
-#     here.R")`
 source(file="dataprep.R") 
 source(file="dataprep 2 - load data.R")
 
