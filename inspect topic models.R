@@ -12,14 +12,14 @@ summarize_topic_clusters <- function(
     dataset_name = "noexcludes2001_2015",
     ntopics = 50,
     iter_index = 1,
-    newnames = F,         # where in the MALLET output filename does iter_index appear?
+    newnames = F,       # where in the MALLET output filename does iter_index appear?
                         # set T if it's with the model, F if last in filename.
                         # Gets passed into get.doctopic.grid.
 
     ## Narrow within it? Set either to NULL if not using.
-    subset_name = "knownprograms2001_2015",          
-    bad.topics = c(3, 12, 50, 
-                   # 47,        # spanish language. bring it back in!
+    subset_name = "knownprograms2001_2015",
+    bad.topics = c(3, 12, 50,
+                   47,        # spanish language. bring it back in? tried, but it clusters with other non-content-bearing topics... could be worth a future co-topic analysis with all language groups, or a new model with non-English stoplists.
                    34, 36, 30, 8, 15),
 
     ## A dissertation is "in" a cluster if it contains more than
@@ -87,10 +87,10 @@ summarize_topic_clusters <- function(
                                  iter_index = iter_index,
                                  bad.topics = bad.topics,
                                  tw=tw)
-    
+
     if(find.nclust) {
         source(file="frameToD3.R")
-        
+
         hc <- frameToJSON(dataset_name = dataset_name,
                     ntopics = ntopics,
                     subset_name = subset_name,
@@ -101,7 +101,7 @@ summarize_topic_clusters <- function(
                     tw = tw,
                     twm = twm,
                     do.plot = TRUE)
-        
+
         return(hc)  # keep plotting this with various cuts using hclust and abline until you're happy with a new cluster size.
     }
 
@@ -127,7 +127,7 @@ summarize_topic_clusters <- function(
         pdf(dendrogram.outfile)
     }
     plot(clust, which.plots = 2)
-    if(remake_figs) { 
+    if(remake_figs) {
         dev.off()
     }
 
@@ -209,12 +209,12 @@ summarize_topic_clusters <- function(
         }
 
     }
-    
+
     to.return <- list("cl" = cl,
                       "extent" = extent,
                       "call" = match.call())
     # names(to.return)[2] <- paste0("extent", extent_level * 100, "pct")
-    
+
     return(to.return)
 }
 
@@ -263,8 +263,8 @@ if(FALSE) {
     cl50$extent[]
 
     cl150 <- summarize_topic_clusters(ntopics=150, iter_index=2, bad.topics=NULL, subset_name=NULL)
-    
-    
+
+
     myclust <- summarize_topic_clusters(dataset_name = "noexcludes2001_2015",
                                    ntopics = 50,
                                    iter_index = 1,
@@ -274,6 +274,6 @@ if(FALSE) {
                                    find.nclust = TRUE,
                                    tw = tw,
                                    use.labels = T)
-    
-    
+
+
 }
