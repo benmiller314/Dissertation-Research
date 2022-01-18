@@ -290,12 +290,81 @@ method_corrs_one_row <- function(myrow,
     invisible(myplot)
 }
 
+method_corr_diffs <- function(set1 = "knownprograms2001_2015",
+                              set2 = "nonrcws2001_2015sans_badtops",
+                              tagset_name = "no_ped_tagnames",
+                              normed = T,
+                              mycolors = NULL,
+                              filetype = c(".pdf", ".tiff"))
+{
+    require(gplots)
 
+		filetype <- match.arg(filetype)
+
+    # Get correlation matrices for each set
+    method_corrs1 <- sumbytags(set1, tagset_name, doplot=T, normed, dendro=F, legend=F)
+    method_corrs2 <- sumbytags(set2, tagset_name, doplot=T, normed, dendro=F, legend=F,
+                               rowInd = method_corrs1$rowInd,
+                               colInd = method_corrs1$colInd)
+
+    # Find the differences between these two correlation matrices
+    diffs <- method_corrs1$plottedData - method_corrs2$plottedData
+
+    if(is.null(mycolors)) {
+        # red-blue diverging palette from https://gka.github.io/palettes/#/25|d|b41f19|255590|1|1
+        # (but I replaced the 0 value )
+        mycolors <-  c('#4f69a5', '#6279b6', '#738ac6', '#859bd6',
+                       '#97ace6', '#a9bef7', '#c0d0fd', '#dbe3f9',
+                       '#f5f5f5',
+                       '#f8ddd6', '#fbc5b5', '#feab93', '#f5957c',
+                       '#e78169', '#da6d57', '#cc5944', '#ba4635'
+        )
+    }
+
+    maintitle <- paste("Method correlation heatmap (scaled by row): differences between",
+                       set1, "and", set2)
+    subtitle <- paste("Values indicate", if(normed) "percentage point" else "count",
+                      "increase in", set1, "relative to", set2)
+
+    if(remake_figs) {
+        outfile <- paste("Method Tag Co-Occurrence Diffs",
+                         if(normed) "(normed by row)" else "(raw counts)",
+                         "--", set1, "relative to", set2)
+        outfile <- file.path(imageloc, paste0(outfile, filetype))
+
+        switch(filetype,
+               ".pdf" = pdf(outfile),
+               ".tiff" = tiff(outfile, height=2400, width=2400, units="px", res=400, compression="lzw")
+        )
+
+    }
+
+    # Plot differences
+    to_return <- heatmap.2(diffs,
+                           scale="none",
+                           col=mycolors,
+                           trace="none",
+                           Colv=NULL,
+                           Rowv=NULL,
+                           dendrogram="none",
+                           keysize = 1,
+                           density.info="none",
+                           cellnote=100*round(diffs, 2),
+                           notecex=0.7,
+                           notecol="black",
+                           main = maintitle,
+                           sub = subtitle)
+
+    if(remake_figs) { dev.off() }
+
+    return(to_return)
+}
 
 if (!autorun) {
     message("The following functions have been loaded: \n",
             " sumbytags(dataset_name, tagset_name, doplot=T, normed=F, dendro=F)\n",
-            " one_method_corrs_barplot(onetag, dataset_name, tagset_name, normed=F, method_corrs=NULL)")
+            " one_method_corrs_barplot(onetag, dataset_name, tagset_name, normed=F, method_corrs=NULL)\n",
+            " method_corr_diffs(set1, set2, tagset_name, normed=T)")
 }
 
 # Testing area
@@ -307,13 +376,20 @@ if (FALSE) {
 	tagset_name <- "no_ped_tagnames"
 	tagset <- get(tagset_name)
 	taggroups <- no_ped_taggroups
-	
-	
-    method_corrs <- sumbytags(dataset_name, tagset_name, 
-              doplot=T, 
-              normed=T, 
+
+
+	sumbytags("knownprograms2001_2015",
+	          tagset_name,
+	          doplot=T,
+	          normed=F,
+	          dendro=F)
+
+
+    method_corrs <- sumbytags(dataset_name, tagset_name,
+              doplot=T,
+              normed=T,
               dendro=T)
-    
+
     remake_figs = T
     tagset <- c("Phil", "Ethn", "Disc", "Meta", "Modl")
     for(tag in tagset) {
@@ -325,67 +401,22 @@ if (FALSE) {
                              # normed = F, # maybe normed axis, use text() to add count values?
                              normed = T,
                              color_groups = T,
-                             colInd = method_corrs$colInd)    
+                             colInd = method_corrs$colInd)
     }
-    
+
     remake_figs=F
-    
+
     # test colors: viridis to distinguish methodological groups, magma for values
     require(viridisLite)
     mypal <- magma(19, direction = -1)
     mypal <- c("#FFFFFF", mypal)
-    
-    # Compare RCWS to nonRCWS
-    method_corrs_rcws <- sumbytags("knownprograms2001_2015", "no_ped_tagnames", 
-                                   doplot=T, 
-                                   normed=T, 
-                                   dendro=T)
-    method_corrs_nonrcws <- sumbytags("nonrcws2001_2015sans_badtops", "no_ped_tagnames", 
-                                      doplot=T, 
-                                      normed=F, 
-                                      dendro=T,
-                                      rowInd = method_corrs_rcws$rowInd,
-                                      colInd = method_corrs_rcws$colInd)
-    
-    
-    # Find the differences between these two correlation matrices
-    method_corr_diffs <- method_corrs_rcws$plottedData - method_corrs_nonrcws$plottedData
-    
-    # red-blue diverging palette from https://gka.github.io/palettes/#/25|d|b41f19|255590|1|1
-    # (but I replaced the 0 value from )
-    diverge_rb <- c('#4f69a5', '#6279b6', '#738ac6', '#859bd6', 
-                    '#97ace6', '#a9bef7', '#c0d0fd', '#dbe3f9', 
-                                    '#f5f5f5', 
-                    '#f8ddd6', '#fbc5b5', '#feab93', '#f5957c', 
-                    '#e78169', '#da6d57', '#cc5944', '#ba4635'
-                    )
-    require(gplots)
-    
-    maintitle <- "Method correlation heatmap (scaled by row): differences between RCWS and nonRCWS"
-    subtitle <- "Values indicate percentage point increase in RCWS relative to nonRCWS"
-    
-    if(remake_figs) {
-        outfile <- "Method Tag Co-Occurrence Diffs (normed by row) -- knownprograms2001_2015 relative to nonrcws2001_2015sans_badtops"
-        outfile <- file.path(imageloc, paste0(outfile, ".pdf"))
-        pdf(outfile)
-    }
-    
-    heatmap.2(method_corr_diffs, 
-              scale="none", 
-              col=diverge_rb, 
-              trace="none", 
-              Colv=NULL, 
-              Rowv=NULL, 
-              dendrogram="none", 
-              keysize = 1,
-              density.info="none", 
-              cellnote=100*round(method_corr_diffs, 2),
-              notecex=0.7,
-              notecol="black",
-              main = maintitle,
-              sub = subtitle)
-    dev.off()
-    
+
+    # Compare method tag correlation in and out of RCWS programs:
+    method_corr_diffs(set1 = "knownprograms2001_2015",
+                      set2 = "nonrcws2001_2015sans_badtops",
+                      tagset_name = "no_ped_tagnames")
+
+
     # Compare clustering of method co-occurrence in and out of RCWS programs:
     knownprog_dend <- method_corrs_rcws$Colv
     nonrcws_dend <- method_corrs_nonrcws$Colv
