@@ -1,11 +1,11 @@
 #############################################################################
 # heatmap_ben.R
-# 
+#
 # Construct a map of squares, shaded according to value. Based heavily on R's
 # core heatmap function, modified to print the value for each square of the
 # grid.
 #
-# This file will be called by `method collocation heatmap.R`. Or maybe it should go 
+# This file will be called by `method collocation heatmap.R`. Or maybe it should go
 # the other way. Apparently I used to just clutter my files with a lot of
 # junk code. So. Still working on that.
 #####
@@ -23,23 +23,26 @@ heatmap.ben <- function (
 	numCols  = 10,			# How many different shades?
 	rowscale = FALSE,		# Should we norm each row by tag totals?
 	verbose  = TRUE,		# Should we add a subtitle about solo tags?
-	legend   = TRUE,		# Should we output a separate file with a legend 
+	legend   = TRUE,		# Should we output a separate file with a legend
 							# for the color map?
 	dendro	 = FALSE,		# Should we output dendrograms showing method
 							# clustering?
 	mytitle    = NULL,      # optionally pass a title for the plot
 	clust.method = hclust,  # or any option from cluster package, like agnes or diana
 	rowInd = NULL,          # use for replicating row order across samples
-	colInd = NULL           # use for replicating column order across samples
-	) 
+	colInd = NULL,          # use for replicating column order across samples
+	filetype = c(".pdf", ".tiff")  # how to output if remake_figs = T?
+	)
 {
-    
+
     require(cluster)
-    
+
+		filetype <- match.arg(filetype)
+
     # get the data
-     
+
     if (!is.null(sum.by.tags)) {
-        
+
         # if it exists and is a matrix, move on!
         # if it's not a matrix, extract dataset/tagset info from it.
         if(!is.matrix(sum.by.tags)) {
@@ -48,65 +51,65 @@ heatmap.ben <- function (
                (tagset_name != sum.by.tags$tagset_name)) {
                 warning("heatmap.ben: dataset or tagset mismatch.\n",
                         "Using values from passed correlation matrix, ",
-                        "but filenames may be inaccurate. \n", 
+                        "but filenames may be inaccurate. \n",
                         "Internal remake_figs set to FALSE; save manually or fix mismatch.")
                 remake_figs <- F
             }
             dataset_name <- sum.by.tags$dataset_name
             tagset_name <- sum.by.tags$tagset_name
         }
-        
-    # if the data doesn't exist, create it now.     
+
+    # if the data doesn't exist, create it now.
     } else {
         if(!exists("sumbytags", mode="function")) {
             source(file="sum by tags.R")
         }
         sum.by.tags <- sumbytags(dataset_name, tagset_name)
-    } 
-    
+    }
+
     dataset <- get(dataset_name)
-    
-    
+
+
 	# extract the matrix, if need be
 	if(!is.matrix(sum.by.tags)) {
 		sum.by.tags.s <- sum.by.tags$correlations
-		if(is.null(sum.by.tags.s)) { 
-			sum.by.tags.s <- as.matrix(sum.by.tags) 
+		if(is.null(sum.by.tags.s)) {
+			sum.by.tags.s <- as.matrix(sum.by.tags)
 		}
-	} else { 
-		sum.by.tags.s <- sum.by.tags 
+	} else {
+		sum.by.tags.s <- sum.by.tags
 	}
-	
+
 	# is it symmetrical?
 	symm <- all(sum.by.tags.s == t(sum.by.tags.s))
 
 	## sort the matrix (borrowed from heatmap())
-	
+
 	Rowv <- rowMeans(sum.by.tags.s, na.rm = TRUE)	# Find row means
 	hcr <- clust.method(dist(sum.by.tags.s))				# Cluster based on distances
-    ddr <- as.dendrogram(hcr)						# Convert to dendrogram 
+    ddr <- as.dendrogram(hcr)						# Convert to dendrogram
 													# (which we might use later)
-   	ddr <- reorder(ddr, -Rowv)						# Reorder the dendrogram, 
-   	
+   	ddr <- reorder(ddr, -Rowv)						# Reorder the dendrogram,
+
    	if(is.null(rowInd)) {                                                # highest values on top
-        rowInd <- order.dendrogram(ddr)					# Extract the new row order 
+        rowInd <- order.dendrogram(ddr)					# Extract the new row order
    	}
    	Colv <- colMeans(sum.by.tags.s, na.rm = TRUE)	# Find column means
-    hcc <- clust.method(dist( if(symm) {sum.by.tags.s}	# Cluster based on distances 
+    hcc <- clust.method(dist( if(symm) {sum.by.tags.s}	# Cluster based on distances
 													# (from the col perspective)
   						else {t(sum.by.tags.s)}))
-	ddc <- as.dendrogram(hcc)						# Convert to dendrogram 
+	ddc <- as.dendrogram(hcc)						# Convert to dendrogram
 													# (which we might use later)
-	ddc <- reorder(ddc, -Colv)						# Reorder the dendrogram, 
-	
+	ddc <- reorder(ddc, -Colv)						# Reorder the dendrogram,
+
 	if(is.null(colInd)) {                                            # highest values at left
 	    colInd <- order.dendrogram(ddc)					# Extract the new column order
 	}
-	
-	sum.by.tags.s <- sum.by.tags.s[rowInd, colInd]	# Apply row and column 
+
+	sum.by.tags.s <- sum.by.tags.s[rowInd, colInd]	# Apply row and column
 													# orders from above
-	
-	
+
+
 	# make variables more readable for later
 	n.col <- ncol(sum.by.tags.s); # print(n.col)
 	n.row <- nrow(sum.by.tags.s); # print(n.row)
@@ -115,25 +118,25 @@ heatmap.ben <- function (
 	# norm by tag totals
     if (rowscale) {
 		# get the totals from the sumbytags() list object
-		totals <- sum.by.tags$total.counts			
-		
+		totals <- sum.by.tags$total.counts
+
 		# put it in the same order as the rows
-		totals <- totals[rowInd]					
-		
+		totals <- totals[rowInd]
+
 		# divide each row by the total of that row's tag
-		sum.by.tags.s <- apply(sum.by.tags.s, 1, 	
+		sum.by.tags.s <- apply(sum.by.tags.s, 1,
 			FUN=function(x) { x/totals })
-			
-		# round to make it prettier	
-		sum.by.tags.s <- round(sum.by.tags.s, 2) 	
+
+		# round to make it prettier
+		sum.by.tags.s <- round(sum.by.tags.s, 2)
 		sapply(sum.by.tags.s, FUN=function(x) { if(is.na(x)) x <- 0 })
     }
 
 	## color function
-	
-	
+
+
     # if we're norming rows, override defaults and use white for 0 and black for 100%
-		if (rowscale) {				
+		if (rowscale) {
 			max.val <- 1
 			min.val <- 0
 			highval <- "#000000"
@@ -142,15 +145,15 @@ heatmap.ben <- function (
 		    max.val <- max(sum.by.tags.s)
 			min.val <- min(sum.by.tags.s)
 		}
-	
+
 	# but if a palette already exists, use it.
-    	if (is.null(palette)) { 
+    	if (is.null(palette)) {
     	    pal <- colorRampPalette(c(lowval, highval))
     	    cols <- pal(numCols)
     	} else {
     	    # if the palette isn't a function, let's hope it's a vector of colors...
     	    if (mode(palette) == "function") {
-        	    pal <- palette 
+        	    pal <- palette
     	        cols <- pal(numCols)
     	    } else if (mode(palette) == "character") {
         	    cols <- palette
@@ -161,61 +164,64 @@ heatmap.ben <- function (
     	        cols <- pal(numCols)
         	}
     	}
-	
-	
+
+
 
 	colorme <- function (val) {
 	    # make sure actual zero values have blank/white backgrounds
 	    if(val == 0) { return ("#FFFFFF") }
-	    
+
 	    # otherwise, use the palette defined above
 	    # TO DO: ugh, forgot to account for negative numbers. Maybe a uniform shift up by abs(min.val)?
-	    
+
 		colIndex <- round(numCols * (val - min.val) / (max.val - min.val))
 		colIndex <- max(1,colIndex)
 		return(cols[colIndex])
 	}
-	
+
 	if(legend) {
-		if(remake_figs) { 
+		if(remake_figs) {
 			if(rowscale) {
-				filename <- file.path(imageloc, paste0("color legend for ", 
-									dataset_name, 
-									" method correlations, normed.pdf"))
+				filename <- file.path(imageloc, paste0("color legend for ",
+									dataset_name,
+									" method correlations, normed", filetype))
 			} else {
-				filename <- file.path(imageloc, paste0("color legend for ", 
-				                    dataset_name, 
-									" method correlations, raw.pdf"))
+				filename <- file.path(imageloc, paste0("color legend for ",
+				                    dataset_name,
+									" method correlations, raw", filetype))
 			}
-			pdf(filename)
+		    switch(filetype,
+		           ".pdf" = pdf(filename),
+		           ".tiff" = tiff(filename, height=2400, width=2400, units="px", res=400, compression="lzw")
+		    )
 		}
 		xleft <- seq(0, 1, length.out=numCols)
 		xdiff <- xleft[2]-xleft[1]
-		plot(x = 0, 
-			 y = 0, 
-			 xlim = c(0,1+xdiff), 
-			 ylim = c(0,1), 
-			 type = "n", 
-			 xaxt = "n", 
-			 yaxt = "n", 
-			 xlab = "", 
-			 ylab = "", 
+		plot(x = 0,
+			 y = 0,
+			 xlim = c(0,1+xdiff),
+			 ylim = c(0,1),
+			 type = "n",
+			 xaxt = "n",
+			 yaxt = "n",
+			 xlab = "",
+			 ylab = "",
 			 bty="n"
 		)
-		
-		rect(xleft = xleft, 
-			 xright = xleft + xdiff, 
-			 ybottom = 1, 
-			 ytop = 1 - xdiff, 
+
+		rect(xleft = xleft,
+			 xright = xleft + xdiff,
+			 ybottom = 1,
+			 ytop = 1 - xdiff,
 			 col = cols
 		)
-		
-		text(x = xleft + xdiff / 2, 
-			 y = 1 - 2 * xdiff, 
+
+		text(x = xleft + xdiff / 2,
+			 y = 1 - 2 * xdiff,
 			 labels = round(seq(min.val, max.val, length.out=numCols), 1))
 
 		if(remake_figs) { dev.off() }
-		
+
 	} # end of if(legend)
 
 	# plot the heatmap itself
@@ -225,19 +231,22 @@ heatmap.ben <- function (
 	    } else {
 	        raw_or_cooked <- "raw"
 	    }
-    	
+
 	    if (!is.null(mytitle)) {
-	        filename <- file.path(imageloc, paste0(mytitle, ".pdf"))
+	        filename <- file.path(imageloc, paste0(mytitle, filetype))
 	    } else {
     	    filename <- file.path(imageloc, paste0("Method correlation heatmap (",
                                                raw_or_cooked, " values), ",
 	                                           dataset_name, ", ",
 	                                           tagset_name, ", N",
-	                                           nrow(dataset), ".pdf"))
+	                                           nrow(dataset), filetype))
 	    }
-	    pdf(filename)
+	    switch(filetype,
+	           ".pdf" = pdf(filename),
+	           ".tiff" = tiff(filename, height=2400, width=2400, units="px", res=400, compression="lzw")
+	    )
 	}
-	
+
 	# set up a blank canvas of the right size
 	plot(0, 0, xlim=c(0.5,0.5+n.col), ylim=c(0.5,0.5+n.row), type="n", xaxt="n", yaxt="n", xlab="", ylab="", bty="n")
 
@@ -252,100 +261,107 @@ heatmap.ben <- function (
 
 			symbols(x = j,
 					y = 1 + n.row - i,
-					squares = 1, 
-					add = TRUE, 
-					inches = FALSE, 
-					fg = diagcheck, 
-					bg = colorme(sum.by.tags.s[i,j]))
+					squares = 1,
+					add = TRUE,
+					inches = FALSE,
+					fg = diagcheck,
+					bg = colorme(sum.by.tags.s[i,j])
+			)
 			text(x = j,
 				 y = 1 + n.row - i,
-				 round(sum.by.tags.s[i,j], 2), 
+				 round(sum.by.tags.s[i,j], 2),
 				 cex=0.65
 			)
 		}
 	}
 
 	# add axis labels
-	axis(side = 2, 
-		 at = n.row:1, 
-		 labels = rownames(sum.by.tags.s), 
-		 pos = 0.5, 
-		 las = 2, 
-		 col = "white"
+	axis(side = 2,
+		 at = n.row:1,
+		 labels = rownames(sum.by.tags.s),
+		 pos = 0.5,
+		 las = 2,
+		 tick = F
 	)
-	axis(side = 1, 
-		 at = 1:n.col, 
-		 labels = colnames(sum.by.tags.s), 
-		 pos = 0.5, 
-		 las = 2, 
-		 col="white"
+	axis(side = 1,
+		 at = 1:n.col,
+		 labels = colnames(sum.by.tags.s),
+		 pos = 0.5,
+		 las = 2,
+		 tick = F
 	)
-	
+
 	# add subtitle indicating scaled / not scaled
 	if (verbose) {
 		if (rowscale) {
 			title(main = mytitle,
-			       sub = paste("Each row normed by dividing over total number", 
+			       sub = paste("Each row normed by dividing over total number",
 						"of dissertations for that row's tag."))
 		    mtext(side=3, text="A box in row Y, column X gives the probability that a dissertation tagged Y is also tagged X")
 		} else {
 		    mtext(side=3, text="A box in row Y, column X gives the number of dissertations tagged Y that are also tagged X")
-		} 
-	    
+		}
+
 	    mtext(side=4, text="Diagonals represent tags occurring on one-method dissertations.")
 	}
-	
+
 	if(remake_figs) {
 	    dev.off()
 	}
-	
+
 	if(dendro) {
-		if(remake_figs) { 
+		if(remake_figs) {
 			if(rowscale) {
-				filename <- file.path(imageloc, paste0("dendrogram for ", 
-									dataset_name, 
-									" method column correlations.pdf"))
+				filename <- file.path(imageloc, paste0("dendrogram for ",
+									dataset_name,
+									" method column correlations", filetype))
 			} else {
-				filename <- file.path(imageloc, paste0("dendrogram for ", 
-									dataset_name, 
-									" method correlations, raw.pdf"))
+				filename <- file.path(imageloc, paste0("dendrogram for ",
+									dataset_name,
+									" method correlations, raw", filetype))
 			}
-			pdf(filename)
+		    switch(filetype,
+		           ".pdf" = pdf(filename),
+		           ".tiff" = tiff(filename, height=2400, width=2400, units="px", res=400, compression="lzw")
+		    )
 		}
 		plot(ddc)
 		if(remake_figs) { dev.off() }
-		
-		if(rowscale) { 
+
+		if(rowscale) {
 			if(remake_figs) {
-				filename <- file.path(imageloc, paste0("dendrogram for ", 
-									dataset_name, 
-									" method row correlations.pdf"))
-				pdf(filename)
-			} 
+				filename <- file.path(imageloc, paste0("dendrogram for ",
+									dataset_name,
+									" method row correlations", filetype))
+				switch(filetype,
+				       ".pdf" = pdf(filename),
+				       ".tiff" = tiff(filename, height=2400, width=2400, units="px", res=400, compression="lzw")
+				)
+			}
 	    	plot(ddr)
 			if(remake_figs) { dev.off() }
 
 		}
 	} # end of if(dendro)
-	
+
 	# return stuff you might use (e.g. for duplicating this row/column order)
 	invisible(list(plottedData = sum.by.tags.s,
-	               rowInd = rowInd, 
-	               colInd = colInd, 
-	               Rowv = ddr, 
+	               rowInd = rowInd,
+	               colInd = colInd,
+	               Rowv = ddr,
 	               Colv = ddc))
-	
+
 } # end of wrapper function heatmap.ben()
 
 if(FALSE) {
-    a <- heatmap.ben(dataset_name="noexcludes2001_2015", 
+    a <- heatmap.ben(dataset_name="noexcludes2001_2015",
                 tagset_name="no_ped_tagnames",
                 diags=T,
                 rowscale=T)
-    
-    heatmap.ben(dataset_name="knownprograms2001_2015", 
+
+    heatmap.ben(dataset_name="knownprograms2001_2015",
                 tagset_name="no_ped_tagnames",
                 diags=T,
                 rowscale=F)
-    
+
 }

@@ -10,28 +10,28 @@
 # realistic scenario?
 #
 # Functions:
-# 
-# topic.proportions(dataset_name, ntopics, iter_index, ...): the boxplot 
+#
+# topic.proportions(dataset_name, ntopics, iter_index, ...): the boxplot
 #                   described above, showing distribution of topic weights.
 # find.doc.by.topic.proportion(topic.weights, topic_rank, value, ...): given a
 #                   distribution of topic weights, find a representative diss
 #                   at high, low, or median values. Useful for demonstrating
 #                   what single-topic focused or multi-topic disses look like.
-# top_topic_histogram(topic.weights, topic_rank, ...): Histogram of values 
+# top_topic_histogram(topic.weights, topic_rank, ...): Histogram of values
 #                   for the nth-ranked topic; a zoom-in on topic.proportions().
-# get_top_topics(dataset_name, ntopics, iter_index, ...): Find all the top topics 
+# get_top_topics(dataset_name, ntopics, iter_index, ...): Find all the top topics
 #                   while preserving identity, so we can graph subsets
 #                   and compare them to the corpus-wide distribution.
-# top_topics_comparison(mytopics, top_topics, ...): Compare top-topic distribution 
-#                   for one topic as compared to the rest of the dataset. 
+# top_topics_comparison(mytopics, top_topics, ...): Compare top-topic distribution
+#                   for one topic as compared to the rest of the dataset.
 #                   Useful for testing topical independence (see: writing centers)
-# top_topic_assists(mytopics, cutoff, sort_by, ...): For dissertations with 
-#                   a given rank1 topic, what are the other top-ranked topics 
+# top_topic_assists(mytopics, cutoff, sort_by, ...): For dissertations with
+#                   a given rank1 topic, what are the other top-ranked topics
 #                   they most pair with? (See also cotopics.R)
 # top_topic_assists2(mytopic, top_topics, topic_depth, n_per_rank, ...): now more
 #                   specific results at rank2, 3, etc. (TO DO: graph as alluvial plot)
 # top_topic_combos(topic_depth, ...): Topic-triples at the top, regardless of order.
-# 
+#
 #####
 
 topic.proportions <- function(dataset_name = "noexcludes2001_2015",
@@ -61,12 +61,15 @@ topic.proportions <- function(dataset_name = "noexcludes2001_2015",
 						  markcutoff = FALSE,
 
 						  howmany = 3,    # how far into the ranks should we go?
-						  
+
 						  # if we have a doc-topic grid, pass for a speed boost
-						  dtgrid = NULL
+						  dtgrid = NULL,
+						  filetype = c(".pdf", ".tiff")
 ){
 	require(data.table)
-    
+
+	filetype <- match.arg(filetype)
+
     if(is.null(dtgrid)) {
 	    if(!exists("get.doctopic.grid", mode="function")) {
 		    source("get doctopic grid.R")
@@ -82,9 +85,14 @@ topic.proportions <- function(dataset_name = "noexcludes2001_2015",
 
 	# Exclude non-content-bearing topics
 	# If none are set in parameters, use defaults:
-	if(is.null(bad.topics) && dataset_name=="consorts" && ntopics==55) {
-		bad.topics <- c("4", "47", "22", "2", "24", "50", "13")
+	if(is.null(bad.topics)) {
+	    if (dataset_name=="consorts" && ntopics==55) {
+		    bad.topics <- c("4", "47", "22", "2", "24", "50", "13")
+	    } else if (dataset_name=="noexcludes2001_2015" && ntopics==50 && iter_index==1) {
+	        bad.topics <- c("3", "8", "12", "15", "30", "34", "36", "47", "50")
+	    }
 	}
+
 
 
 	grid.clean <- dtgrid[, setdiff(names(dtgrid), c(bad.topics, "Pub.number")), with=F]
@@ -144,17 +152,21 @@ topic.proportions <- function(dataset_name = "noexcludes2001_2015",
 	subtitle <- paste0(subtitle, "   N=", nrow(dtgrid))
 
 	if(remake_figs) {
-	    filename <- file.path(imageloc, paste0(bigtitle, ".pdf"))
-	    pdf(filename)
+	    outfile <- file.path(imageloc, paste0(bigtitle, filetype))
+	    switch(filetype,
+	           ".pdf" = pdf(outfile),
+	           ".tiff" = tiff(outfile, height=2400, width=2400, units="px", res=400, compression="lzw")
+	    )
+
 	}
-		boxplot(grid.sorted[, 1:10],
+		boxplot(100 * grid.sorted[, 1:10],
 				cex.axis = 1,
 				las = 1,
 				main = maintitle,
 				sub = subtitle,
 				xlab = "Topic Rank Within Document",
-				ylab = "Portion of Document (scaled to 1)",
-				yaxp = c(0, 1, 10),
+				ylab = "Portion of Document (% of tokens)",
+				yaxp = c(0, 100, 10),
 				notch = use.notch
 		)
 
@@ -440,8 +452,12 @@ top_topic_histogram <- function(topic_weights = NULL,   # as produced above
                                 iter_index = 1,
                                 subset_name = "knownprograms2001_2015",
                                 bad.topics = NULL,
-                                useboxstats = FALSE)
+                                useboxstats = FALSE,
+                                filetype = c(".pdf", ".tiff"))
 {
+
+		filetype <- match.arg(filetype)
+
     if(is.null(topic_weights)) {
         topic_weights <- topic.proportions(dataset_name = dataset_name,
                                            ntopics = ntopics,
@@ -469,8 +485,11 @@ top_topic_histogram <- function(topic_weights = NULL,   # as produced above
     subtitle <- paste("N = ", nrow(wbd))
 
     if(remake_figs) {
-        outfile <- file.path(imageloc, paste0(bigtitle, ".pdf"))
-        pdf(outfile)
+        outfile <- file.path(imageloc, paste0(bigtitle, filetype))
+        switch(filetype,
+               ".pdf" = pdf(outfile),
+	           ".tiff" = tiff(outfile, height=2400, width=2400, units="px", res=400, compression="lzw")
+	    )
     }
 
     if(useboxstats) {
@@ -503,6 +522,9 @@ get_top_topics <- function(dataset_name = "noexcludes2001_2015",
                                           # otherwise, limit to topic of interest
 ){
     if (is.null(grid)) {
+        if(!exists("get.doctopic.grid", mode="function")) {
+            source("get doctopic grid.R")
+        }
         grid <- get.doctopic.grid(dataset_name=dataset_name, ntopics=ntopics,
                                       iter_index=iter_index, newnames=newnames)$outputfile.dt
     }
@@ -582,16 +604,16 @@ get_top_topics <- function(dataset_name = "noexcludes2001_2015",
 
     if(bad.count > 0) {
         warning("Found ", bad.count, " dissertations with top topic in bad.topics.")
-        if(exists("bad.on.top", envir=baseenv()) ) {
+        if(exists("bad.on.top", envir=.GlobalEnv) ) {
             a <- readline("Export list of Pub.numbers with top topic in bad.topics (as `bad.on.top`)? Y/N")
             if (substr(tolower(a), 1, 1) == 'y') {
-                assign("bad.on.top", value = bad.on.top, envir = baseenv())
+                assign("bad.on.top", value = bad.on.top, envir = .GlobalEnv)
                 message("bad.on.top exported")
             } else {
                 message("bad.on.top not exported")
             }
         } else {
-            assign("bad.on.top", value = bad.on.top, envir = baseenv())
+            assign("bad.on.top", value = bad.on.top, envir = .GlobalEnv)
             warning("Exported list of Pub.numbers with top topic in bad.topics (as `bad.on.top`)")
         }
     }
@@ -611,8 +633,11 @@ top_topics_comparison <- function(mytopics,  # which topic or topics to focus on
                                 cull.bad.topics = T,
                                 dt = NULL, # doc-topic grid. pass for speed boost.
                                 do.boxplot = T,
-                                do.qqplot = F
+                                do.qqplot = F,
+                                filetype = c(".pdf", ".tiff")
 ){
+
+		filetype <- match.arg(filetype)
 
     if(is.null(top_topics)) {
         top_topics <- get_top_topics(dataset_name = dataset_name,
@@ -687,9 +712,12 @@ top_topics_comparison <- function(mytopics,  # which topic or topics to focus on
         }
 
         if(remake_figs) {
-            outfile <- paste0(outfile, ".pdf")
+            outfile <- paste0(outfile, filetype)
             outfile <- file.path(imageloc, outfile)
-            pdf(outfile)
+            switch(filetype,
+                   ".pdf" = pdf(outfile),
+                   ".tiff" = tiff(outfile, height=2400, width=2400, units="px", res=400, compression="lzw")
+            )
         }
 
         if(do.boxplot && do.qqplot) {
@@ -697,15 +725,16 @@ top_topics_comparison <- function(mytopics,  # which topic or topics to focus on
         }
 
         if(do.boxplot) {
-            boxplot(list(samp, comp),
+            boxplot(list(100*samp, 100*comp),
                         # main = "Topic with Top Rank Within Document",
                         names = c(paste0("Sample (N=", length(samp), ")"),
                                   paste0("Complement (N=", length(comp), ")")),
                         # names = c("RCWS", "non-RCWS"),
                         # xlab = "Weights of Dissertations' Top-Ranked Topic"
-                        xlab = paste0("T", mytopic, ": ", topic_labels[Topic == mytopic, Label]),
-                        ylab = "Portion of Document (scaled to 1)",
-                        ylim = c(0, 1),
+                        main = paste0("T", mytopic, ": ", topic_labels[Topic == mytopic, Label]),
+                        ylab = "Portion of Document (% of tokens)",
+                        ylim = c(0, 100),
+                        las = 1,
                         frame.plot = F
             )
         }
@@ -725,7 +754,7 @@ top_topics_comparison <- function(mytopics,  # which topic or topics to focus on
 
         # title(main = outfile)
 
-        outside_legend("topright",
+        outside_legend("bottomright",
                        legend=paste0("p-value = ",
                                      round(tstats$p.value, 4),
                                      "\n(", tstats$method, ")"),
@@ -831,7 +860,7 @@ top_topic_assists <- function(mytopics,            # which topic or topics to fo
             if(!exists("get_topic_labels")) { source(file="get topic labels.R") }
             topic_labels <- get_topic_labels(dataset_name, ntopics, subset_name, iter_index)
             topic_labels <- data.table(topic_labels, key="Topic")
-        }    
+        }
 
         # Draw plot
         boxplot(topic_weights_wide)
@@ -898,13 +927,13 @@ top_topic_assists2 <- function(mytopic,             # which topic to focus on?
                                consolidate = TRUE     # if TRUE, combine ranks 2 and 3 for easier table-making
 ){
     require(data.table)
-    
+
     if(topic_depth != 3) {
         warning("top_topic_assists2() is only implemented with 3 topics for now. Sorry!")
     }
-    
+
     # plot.as <- match.arg(plot.as)
-    
+
     if(is.null(top_topics)) {
         top_topics <- get_top_topics(dataset_name = dataset_name,
                                      ntopics = ntopics,
@@ -913,7 +942,7 @@ top_topic_assists2 <- function(mytopic,             # which topic to focus on?
                                      bad.topics = bad.topics,
                                      grid = dtgrid)
     }
-    
+
     if(cull.bad.topics) {
         if(is.null(bad.topics)) {
             warning("top_topic_assists2(): Couldn't remove dissertations ",
@@ -923,20 +952,20 @@ top_topic_assists2 <- function(mytopic,             # which topic to focus on?
             stop("top_topic_assists2(): selected topic T", mytopic, " has been ",
                  "marked as non-content-bearing and cull.bad.topics = T.")
         }
-        
+
         top_topics <- top_topics[!topic %in% bad.topics]
         dtgrid <- dtgrid[, .SD, .SDcols=setdiff(names(dtgrid), bad.topics)]
-        
+
     }
-    
+
     # record some basic information
     disses <- top_topics[topic == mytopic, Pub.number]
     topic_weights <- dtgrid[Pub.number %in% disses]
-    
+
     to.return <- list("top_topic" = mytopic,
                       "disscount" = length(disses))
-    
-    
+
+
     # optionally treat the topic label as basic information
     if(showlabels) {
         if(is.null(topic_labels)) {
@@ -947,14 +976,14 @@ top_topic_assists2 <- function(mytopic,             # which topic to focus on?
         }
         to.return$label <- as.character(topic_labels[mytopic, Label])
     }
-    
-    
-    
-    
+
+
+
+
     if(!exists("get.topics4doc", mode="function")) {
         source(file="top docs per topic.R")
     }
-    
+
     # get top topics for all disses
     # returning just topic numbers makes the returned matrix readable.
     disses_tops <- sapply(topic_weights$Pub.number,
@@ -965,20 +994,20 @@ top_topic_assists2 <- function(mytopic,             # which topic to focus on?
                                              showlabels = F,
                                              topic_labels = topic_labels)$keys$topic
                           })
-    
-    
+
+
     # transpose disses_tops matrix to form triplets,
     # sort triplets so as to build compact Sankey flow from rank to rank...
     # or just to count and rank the unique combinations (regardless of order)
-    
+
     disslets <- data.table(t(disses_tops))
     setkey(disslets) # without a second argument, sorts increasing on all columns
-    disslets[, combo:=paste0(V1, "|", pmin(V2, V3), "|", pmax(V2, V3))] 
+    disslets[, combo:=paste0(V1, "|", pmin(V2, V3), "|", pmax(V2, V3))]
     disslets[, N:=.N, by=combo]
     disslets[order(N, decreasing=T)]
-    setnames(disslets, old = c("V1", "V2", "V3", "N"), 
+    setnames(disslets, old = c("V1", "V2", "V3", "N"),
                        new = c("rank1topic", "rank2topic", "rank3topic", "combocount"))
-    
+
     if(showlabels) {
         # add labels
         disslets[, `:=`(rank1label = topic_labels[disslets$rank1topic, Label],
@@ -987,10 +1016,10 @@ top_topic_assists2 <- function(mytopic,             # which topic to focus on?
         # reorder columns for easier association of topic number and label
         disslets <- disslets[, .(combocount, rank1topic, rank1label, rank2topic, rank2label, rank3topic, rank3label, combo)]
     }
-    
+
     # sort rows, keeping highest frequency on top, but combos together
     disslets <- disslets[order(-rank(combocount), combo)]
-    
+
     # optionally export to file
     if(remake_figs) {
         filename <- build_plot_title(dataset_name = dataset_name,
@@ -1005,11 +1034,11 @@ top_topic_assists2 <- function(mytopic,             # which topic to focus on?
         write.csv(disslets, file=filename, row.names=F)
         # Take CSV to another program: RawGraphs.io, Tableau, etc
     }
-    
+
     # for working in R, we can now drop rank1topic for better side-by-side viewing
     to.return$combos <- disslets[, -c("rank1topic", "rank1label")]
-    
-    
+
+
     # FOR NOW: build a frequency table of each rank of interest
     if(!all(disses_tops[1,] == mytopic)) {
         stop("Somehow topic ", mytopic, " produced a list of disses ",
@@ -1026,26 +1055,26 @@ top_topic_assists2 <- function(mytopic,             # which topic to focus on?
                               tmp)
             tmp[,V1:=NULL] # discard extra copy of Topic from names(tmp)
             tmp <- topic_labels[tmp][, list(Topic, Label, N, Pct=(round(100*(N/length(disses)), 2)), Agg_Rank=Rank)]
-            
-            
+
+
             to.return[[paste0("rank",i)]] <- tmp
-         
+
             # TO CONSIDER: Maybe it's more interesting to just add up rank2 and rank3,
-            # see which get the most total "votes" 
-          
-        } 
+            # see which get the most total "votes"
+
+        }
     }   # end of loop throgh topic depths
-    
+
     ## optionally consolidate ranks 2 and 3
     if(consolidate) {
-        if(!exists("na_plus", mode="function")) { source(file="na_plus.R") } 
-        
+        if(!exists("na_plus", mode="function")) { source(file="na_plus.R") }
+
         to.return$simpler <- merge(to.return$rank2, to.return$rank3, by=c("Topic", "Label"), all=T)
         to.return$simpler <- to.return$simpler[, .(Topic, Label, "N_2or3"=na_plus(N.x,N.y), "Pct_2or3"=na_plus(Pct.x,Pct.y))]
         to.return$simpler <- to.return$simpler[order(N_2or3, decreasing = T)]
     }
-    
-    
+
+
     return(to.return)
 } # end of top_topic_assists2()
 
@@ -1063,20 +1092,20 @@ top_topic_combos <- function(topic_depth = 3,
                              mygrid = NULL, # doc-topic grid
                              topic_labels = NULL,
                              showlabels = T,
-                             anywhere = F) 
+                             anywhere = F)
 {
     if (is.null(mygrid)) {
         mygrid <- get.doctopic.grid(dataset_name=dataset_name, ntopics=ntopics,
                                     iter_index=iter_index, newnames=newnames)$outputfile.dt
-    } 
-    
+    }
+
     if (!is.null(subset_name)) {
         index <- get(subset_name)$Pub.number
         mygrid <- mygrid[Pub.number %in% index]
     }
-    
+
     mygrid <- na.omit(mygrid)
-    
+
     if(cull.bad.topics) {
         if(is.null(bad.topics)) {
             warning("top_topic_combos(): Couldn't remove dissertations ",
@@ -1086,7 +1115,7 @@ top_topic_combos <- function(topic_depth = 3,
             mygrid <- mygrid[, -(..bad.topics)]
         }
     }
-    
+
     if(showlabels) {
         if(is.null(topic_labels)) {
             # get topic labels if they don't exist
@@ -1095,11 +1124,11 @@ top_topic_combos <- function(topic_depth = 3,
             topic_labels <- data.table(topic_labels, key="Topic")
         }
     }
-    
+
     if(!exists("get.topics4doc", mode="function")) {
         source(file="top docs per topic.R")
     }
-    
+
     # get top topics for all disses
     # returning just topic numbers makes the returned matrix readable.
     all_disses_tops <- sapply(mygrid$Pub.number,
@@ -1108,32 +1137,32 @@ top_topic_combos <- function(topic_depth = 3,
                                                  grid = mygrid,
                                                  howmany = topic_depth)$keys$topic
                               })
-    
-    
+
+
     # transpose disses_tops matrix to form triplets,
     # sort triplets so as to build compact Sankey flow from rank to rank...
     # or just to count and rank the unique combinations (regardless of order)
-    
+
     triplets <- data.table(t(all_disses_tops))
     setkey(triplets) # without a second argument, sorts increasing on all columns
-    
-    combos <- apply(triplets, 
+
+    combos <- apply(triplets,
                     MARGIN = 1, # by row
                     FUN = function(x) {
                         paste(sort(x), collapse="|")
                     })
-    triplets[, combo:=..combos] 
+    triplets[, combo:=..combos]
     triplets[, N:=.N, by=combo]
     triplets[order(N, decreasing=T)]
     oldnames <- c(paste0("V", 1:topic_depth), "N")
     newnames <- c(paste0("rank", 1:topic_depth, "topic"), "combocount")
     setnames(triplets, oldnames, newnames)
-    
+
     if(showlabels) {
         # add labels
         triplets[, `:=`(rank1label = topic_labels[triplets$rank1topic, Label],
                         rank2label = topic_labels[triplets$rank2topic, Label])]
-        
+
         if(topic_depth == 3) {
             triplets[, `:=`(rank3label = topic_labels[triplets$rank3topic, Label])]
             # reorder columns for easier association of topic number and label
@@ -1143,21 +1172,21 @@ top_topic_combos <- function(topic_depth = 3,
         } else {
             warning("Sorry, I haven't implemented topics below rank3.")
         }
-        
+
     }
-    
+
     # sort rows, keeping highest frequency on top, but combos together
     triplets <- triplets[order(-rank(combocount), combo)]
-    
+
     if(anywhere) {
-        # For a given top topic, what is the total frequency with which 
+        # For a given top topic, what is the total frequency with which
         # another topic pairs with it, in *either* rank2 or rank3?
         # Try for a long format:
         all_topic_assists <- data.table("rank1topic" = integer(),
                                         "partnertopic" = integer(),
                                         "partnerfreq" = integer(),
                                         key = "rank1topic")
-        
+
         for (x in setdiff(1:ntopics, bad.topics)) {
             xcombos <- triplets[rank1topic == x]
             xfreq <- sort(table(c(xcombos$rank2topic, xcombos$rank3topic)), decreasing =T)
@@ -1167,15 +1196,15 @@ top_topic_combos <- function(topic_depth = 3,
                 # print(myrow)
                 all_topic_assists <- rbindlist(list(all_topic_assists, myrow))
             }
-        } 
-        
+        }
+
         if(showlabels) {
             all_topic_assists[, `:=`(rank1label = topic_labels[all_topic_assists$rank1topic, Label],
                                      partnerlabel = topic_labels[all_topic_assists$partnertopic, Label])]
         }
-        
+
         all_topic_assists <- all_topic_assists[order(-partnerfreq)]
-        
+
         # optionally, save to file
         if(remake_figs) {
             filename <- build_plot_title(dataset_name = dataset_name,
@@ -1186,19 +1215,19 @@ top_topic_combos <- function(topic_depth = 3,
                                          for.filename = T)
             filename <- paste0(filename, ".csv")
             filename <- file.path(imageloc, filename)
-            write.csv(all_topic_assists, 
+            write.csv(all_topic_assists,
                       file=filename)
             # Take CSV to another program: RawGraphs.io, Tableau, etc
         } else {
             print(all_topic_assists)
-        }   
-        
+        }
+
         return(all_topic_assists)
     } # end of if(anywhere)
-    
+
     # report unique combinations of three topics, with frequencies
     unique_combos <- unique(triplets, by="combo")
-    
+
     # optionally export to file
     if(remake_figs) {
         filename <- build_plot_title(dataset_name = dataset_name,
@@ -1212,7 +1241,7 @@ top_topic_combos <- function(topic_depth = 3,
         write.csv(unique_combos, file=filename, row.names=F)
         # Take CSV to another program: RawGraphs.io, Tableau, etc
     }
-    
+
     return(unique_combos)
 }
 
@@ -1251,7 +1280,7 @@ if(FALSE) {
     # pick one subset:
     subset_name <- "knownprograms2001_2015"
     subset_name <- "nonrcws2001_2015"
-    
+
     bad.topics <- c("3", "8", "12", "15", "30", "34", "36", "47", "50")
     # bad.topics <- NULL
 
@@ -1261,24 +1290,24 @@ if(FALSE) {
                       subset_name=subset_name, bad.topics=bad.topics,
                       explore.outliers=T)
     # abline(0.11384, 0, col="#aa0000")
-    
+
     # repeat analysis without bad.on.top
     # TO DO: avoid mismatches by including subset_name in bad.on.top variable exported by topic.proportions()
     # assign(paste0(subset_name, "sans_badtops"), get(subset_name)[[which(get(subset_name)$Pub.number %in% bad.on.top),]])
     nonrcws2001_2015sans_badtops <- nonrcws2001_2015[-which(nonrcws2001_2015$Pub.number %in% bad.on.top),]
     nrow(nonrcws2001_2015sans_badtops)
     subset_name <- "nonrcws2001_2015sans_badtops"
-    
+
     topic.proportions(dataset_name=dataset_name, ntopics=ntopics, iter_index=iter_index,
                       subset_name=subset_name, bad.topics=bad.topics,
                       explore.outliers=T)
-    
+
     # the document-topic grid
     if(!exists("get.doctopic.grid")) { source(file="get doctopic grid.R") }
     dtgrid <- get.doctopic.grid(dataset_name=dataset_name, ntopics=ntopics,
                                 iter_index=iter_index)$outputfile.dt
     dtgrid <- na.omit(dtgrid)
-    
+
     # topic weights per document, among other stats
     topic_weights <- topic.proportions(dataset_name = dataset_name,
                       ntopics = ntopics,
@@ -1293,14 +1322,14 @@ if(FALSE) {
                       howmany = 10,
                       lowlier.rank = 2)
     str(topic_weights)
-    
-        
+
+
     top_topics <- get_top_topics(dataset_name = dataset_name,
                                  ntopics = ntopics,
                                  subset_name = subset_name,
                                  bad.topics = bad.topics,
                                  grid = dtgrid)
-    
+
     ## Confirm that upper / lower whiskers are real values, the last observed values
     ## i.e. within 1.5 * inter-quartile distance (IQR) of the hinges
     # IQR <- topic_weights$stats[1, "Uhinge"] - topic_weights$stats[1, "Lhinge"]
@@ -1325,7 +1354,7 @@ if(FALSE) {
                         bad.topics = bad.topics,
                         useboxstats = F)
 
-    
+
     remake_figs = F
     top_topics_comparison(mytopics = c(1, 27),
                           top_topics = top_topics,
@@ -1335,8 +1364,8 @@ if(FALSE) {
                           subset_name = subset_name,
                           bad.topics = bad.topics,
                           dt = dtgrid)
-    
-    
+
+
     ## Show me the median dissertation, please!
     diss_mid <- find.doc.by.topic.proportion(topic_weights = topic_weights,
                                  value = "median",
@@ -1428,8 +1457,8 @@ if(FALSE) {
         }
 
         outfile <- build_plot_title(dataset_name = dataset_name,
-                                    ntopics = ntopics, 
-                                    iter_index = iter_index, 
+                                    ntopics = ntopics,
+                                    iter_index = iter_index,
                                     subset_name = subset_name,
                                     bad.topics = bad.topics,
                                     whatitis = paste("Proportions of Text from Upper Outliers, with titles"),
@@ -1479,12 +1508,12 @@ if(FALSE) {
                       dtgrid = dtgrid,
                       top_topics = top_topics)
 
-    top_topic_assists(mytopics = c(35, 49, 18, 42), # cluster_name = "Teaching.and.Administration" 
+    top_topic_assists(mytopics = c(35, 49, 18, 42), # cluster_name = "Teaching.and.Administration"
                       bad.topics = bad.topics,
                       dtgrid = dtgrid,
                       top_topics = top_topics_rcws)
-    
-    
+
+
     #### Report the number of times each topic is the top topic               ####
     #    TO DO: make this an independent function, varying how many to report    #
     #    Also, cull bad.topics                                                   #
@@ -1493,8 +1522,8 @@ if(FALSE) {
         # get topic labels if they don't exist
         if(!exists("topic_labels")) {
             if(!exists("get_topic_labels")) { source(file="get topic labels.R") }
-            topic_labels <- get_topic_labels(dataset_name = dataset_name, 
-                                             ntopics = ntopics, 
+            topic_labels <- get_topic_labels(dataset_name = dataset_name,
+                                             ntopics = ntopics,
                                              subset_name = subset_name,
                                              iter_index = iter_index)
             topic_labels <- data.table(topic_labels, key="Topic")
@@ -1509,10 +1538,10 @@ if(FALSE) {
         # If we're saving it, try to prep for print formatting
         to.print <- tops_as_top[, .("Label (Topic #)"=paste0(Label, " (", topic, ")"),
                                     "Top Words (TF-ITF)"=Top.Words,
-                                    "Count as Top Topic (% of disses)"=paste0(times_on_top, " (", 
+                                    "Count as Top Topic (% of disses)"=paste0(times_on_top, " (",
                                                         round(100*times_on_top/sum(times_on_top), 2), ")")
                                     )]
-        
+
         filename <- build_plot_title(dataset_name = dataset_name,
                                      ntopics = ntopics,
                                      iter_index = iter_index,
@@ -1530,15 +1559,15 @@ if(FALSE) {
     }
 
 
-    
+
     t32assists <- top_topic_assists2(mytopic = 32,
                        top_topics = top_topics,
                        bad.topics = bad.topics,
                        topic_labels = topic_labels,
                        dtgrid = dtgrid)
-    
+
     t32assists$combos[combocount >= t32assists$combos$combocount[10]]
-    
+
     top3assists <- sapply(topic_labels[Rank <= 3, Topic],
            FUN = function(x) {top_topic_assists2(x,
                                                  top_topics = top_topics,
@@ -1547,10 +1576,10 @@ if(FALSE) {
                                                  dtgrid = dtgrid)$combos
                              }
            )
-    
-    
-    
-    
+
+
+
+
 
     remake_figs = T
     top3combos <- top_topic_combos(topic_depth = 3,
@@ -1562,7 +1591,7 @@ if(FALSE) {
                      # mygrid = dtgrid,
                      topic_labels = topic_labels,
                      showlabels = T)
-    
+
     top2or3partners <- top_topic_combos(topic_depth = 3,
                                    dataset_name = dataset_name,
                                    ntopics = ntopics,
@@ -1573,9 +1602,9 @@ if(FALSE) {
                                    topic_labels = topic_labels,
                                    showlabels = T,
                                    anywhere = T)
-    
 
-    
+
+
     top2combos <- top_topic_combos(topic_depth = 2,
                                    dataset_name = dataset_name,
                                    ntopics = ntopics,
@@ -1586,17 +1615,17 @@ if(FALSE) {
                                    topic_labels = topic_labels,
                                    showlabels = T)
    remake_figs = F
-    
+
 
    set1 <- c(5.57, 4.38, 4.24, 3.26, 3.14)
    set2 <- c(5.2, 4.74, 3.05, 6.1, 4.69)
    t.test(set1, set2)
-   
-   
-   
+
+
+
    ## Comparing topic combos in the Teaching.and.Administration cluster
    ## in RCWS vs. nonRCWS dissertations
-   
+
    ## TO DO: finish making this a repeatable function
       # compare_topic_assists <- function(mytopic,
    #                                   bad.topics = NULL,
@@ -1607,16 +1636,16 @@ if(FALSE) {
    #                                   top_topics2 = NULL,
    #                                   superset = "noexcludes2001_2015",
    #                                   ntopics = 50,
-   #                                   iter_index = 1) 
+   #                                   iter_index = 1)
    # {
    #     message("Comparing topics in rank 2 and 3 when top topic is ", mytopic)
-   #     
+   #
    #     if(is.null(dtgrid)) {
    #         dtgrid <- get.doctopic.grid(dataset_name = superset,
    #                                     ntopics = ntopics,
    #                                     iter_index = iter_index)
    #     }
-   #     
+   #
    #     message("Subcorpus 1: ", set1)
    #     if(is.null(top_topics1)) {
    #         top_topics1 <- get_top_topics(dataset_name = superset,
@@ -1628,39 +1657,39 @@ if(FALSE) {
    #                                       mytopic = mytopic)
    #     }
    # }
-   
+
    # T35: "Institutional Supports, Barriers, Constraints"
-   topic35assists_rcws <- top_topic_assists2(mytopic = 35,   
+   topic35assists_rcws <- top_topic_assists2(mytopic = 35,
                                              bad.topics = bad.topics,
                                              dtgrid = dtgrid,
                                              top_topics = top_topics_rcws)
-   topic35assists_nonrcws <- top_topic_assists2(mytopic = 35, 
+   topic35assists_nonrcws <- top_topic_assists2(mytopic = 35,
                                                 bad.topics = bad.topics,
                                                 dtgrid = dtgrid,
                                                 top_topics = top_topics_nonrcws)
 
     print(topic35assists_rcws$simpler)
     print(topic35assists_nonrcws$simpler)
-   
+
    # T18: "Writing Process"
-   topic18assists_rcws <- top_topic_assists2(mytopic = 18,   
+   topic18assists_rcws <- top_topic_assists2(mytopic = 18,
                                              bad.topics = bad.topics,
                                              dtgrid = dtgrid,
                                              top_topics = top_topics_rcws,
                                              cull.bad.topics = T)
-   topic18assists_nonrcws <- top_topic_assists2(mytopic = 18, 
+   topic18assists_nonrcws <- top_topic_assists2(mytopic = 18,
                                                 bad.topics = bad.topics,
                                                 dtgrid = dtgrid,
                                                 top_topics = top_topics_nonrcws,
                                                 cull.bad.topics = T)
-   
+
    print(topic18assists_rcws$simpler)
    print(topic18assists_nonrcws$simpler)
-   
-   # Hmm. Inconclusive. Maybe the sample size is just too small 
-   # for subsets of subsets. 
+
+   # Hmm. Inconclusive. Maybe the sample size is just too small
+   # for subsets of subsets.
    # Let's try overall combos...?
-   
+
    topicassists_nonrcws <- top_topic_combos(topic_depth = 3,
                                 dataset_name = "noexcludes2001_2015",
                                 ntopics = 50,
@@ -1672,41 +1701,41 @@ if(FALSE) {
                                 showlabels = T,
                                 anywhere = T)
    # See the Excel file for follow-on analysis: top_topic_partners--anywhere_in_depth_3--noexcludes2001_2015k50_iter1--nonrcws2001_2015sans_badtops
-   
-       
+
+
    # T42: "K12 Writing Pedagogy"
-   topic42assists_rcws <- top_topic_assists2(mytopic = 42,   
+   topic42assists_rcws <- top_topic_assists2(mytopic = 42,
                                              bad.topics = bad.topics,
                                              dtgrid = dtgrid,
                                              top_topics = top_topics_rcws,
                                              cull.bad.topics = T)
-   topic42assists_nonrcws <- top_topic_assists2(mytopic = 42, 
+   topic42assists_nonrcws <- top_topic_assists2(mytopic = 42,
                                                 bad.topics = bad.topics,
                                                 dtgrid = dtgrid,
                                                 top_topics = top_topics_nonrcws,
                                                 cull.bad.topics = T)
-   
+
    print(topic42assists_rcws$simpler)
    print(topic42assists_nonrcws$simpler)
-   
-   
+
+
    # T49: "Scenes of Teaching"
-   topic49assists_rcws <- top_topic_assists2(mytopic = 49,   
+   topic49assists_rcws <- top_topic_assists2(mytopic = 49,
                                              bad.topics = bad.topics,
                                              dtgrid = dtgrid,
                                              top_topics = top_topics_rcws,
                                              cull.bad.topics = T)
-   topic49assists_nonrcws <- top_topic_assists2(mytopic = 49, 
+   topic49assists_nonrcws <- top_topic_assists2(mytopic = 49,
                                                 bad.topics = bad.topics,
                                                 dtgrid = dtgrid,
                                                 top_topics = top_topics_nonrcws,
                                                 cull.bad.topics = T)
-   
+
    print(topic49assists_rcws$simpler)
    print(topic49assists_nonrcws$simpler)
-   
-   
-   
-   
-   
+
+
+
+
+
 } # end of if(FALSE)

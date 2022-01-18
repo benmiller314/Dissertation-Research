@@ -31,12 +31,15 @@ topics.by.year <- function(dataset_name = "noexcludes2001_2015",
                         smoothing = 1/3,   # f span for LOWESS smoothing, as a proportion of points 
                                           # in the plot to incorporate. Must be > 0, but set close to 0
                                           # for unsmoothed plot.
-                        legendloc_init = NULL  # optionally specify where the legend should be
+                        legendloc_init = NULL,  # optionally specify where the legend should be
+                        filetype = c(".pdf", ".tiff")   # how should we output when remake_figs = TRUE?
                         )
 {
 require(data.table)
 # require(RColorBrewer)
 require(viridisLite)
+    
+    filetype <- match.arg(filetype)
 
     # Get topic weights for every document we have
     if(!exists("get.doctopic.grid", mode="function")) {
@@ -146,13 +149,16 @@ require(viridisLite)
         if(remake_figs) {
             if(is.null(to.plot)) {
                 filename <- file.path(imageloc, paste0(maintitle, ", ", dataset_name, "k", ntopics, subset_name, ", Topics ranked ",
-                             i, "-", (i+per.plot-1), ".pdf"))
+                             i, "-", (i+per.plot-1), filetype))
             } else {
                 filename <- file.path(imageloc, paste0(maintitle, ", ", dataset_name, "k", ntopics, subset_name, ", Topics ",
-                             plot.me[i], "-", plot.me[i+per.plot-1], ".pdf"))
+                             plot.me[i], "-", plot.me[i+per.plot-1], filetype))
             }
 
-            pdf(filename)
+            switch(filetype,
+                   ".pdf" = pdf(filename),
+                   ".tiff" = tiff(filename, height=2400, width=2400, units="px", res=400, compression="lzw")
+            )
         }
 
         # set a target for when to repeat
@@ -182,14 +188,17 @@ require(viridisLite)
                     if(is.null(to.plot)) {
                         filename <- file.path(imageloc, paste0(maintitle, ", ", dataset_name, ntopics, subset_name,
                                            ", Topics ranked ", i, "-",
-                                     (i+legend.offset), ".pdf"))
+                                     (i+legend.offset), filetype))
                     } else {
                         filename <- file.path(imageloc, paste0(maintitle, ", ", dataset_name, ntopics, subset_name,
-                                           ", Topic", if(length(plot.me)>1) "s", " ", paste(plot.me[i:(i+legend.offset)], collapse="-"), ".pdf"))
+                                           ", Topic", if(length(plot.me)>1) "s", " ", paste(plot.me[i:(i+legend.offset)], collapse="-"), filetype))
                     }
 
                     # start writing a new file
-                    pdf(filename)
+                    switch(filetype,
+                           ".pdf" = pdf(filename),
+                           ".tiff" = tiff(filename, height=2400, width=2400, units="px", res=400, compression="lzw")
+                    )
                 }
 
                 # set up a blank plot in a standard size
@@ -348,8 +357,11 @@ topic.variation <- function(dataset_name = "consorts",
 
     # draw the plot
     if(remake_figs) {
-        filename <- file.path(imageloc, paste0(maintitle, ".pdf"))
-        pdf(filename)
+        filename <- file.path(imageloc, paste0(maintitle, filetype))
+        switch(filetype,
+               ".pdf" = pdf(filename),
+               ".tiff" = tiff(filename, height=2400, width=2400, units="px", res=400, compression="lzw")
+        )
     }
     
 
