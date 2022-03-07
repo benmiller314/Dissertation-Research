@@ -8,11 +8,33 @@
 
 #####   Preparing the Working Environment  #####
 
-## Set working directory to the location of R script files.
-    setwd("~/Box Sync/research/dissertations/data, code, and figures/Dissertation-Research")
+#       Are we working at home or at the office?
+#       Some file locations and memory settings will vary.
+# which_computer <- "work"
+which_computer <- "laptop"
+
+#       Try not to run out of memory, would you? Need to set this before loading the rJava VM.
+if (which_computer == "work") {
+    heap_param <- paste("-Xmx","15g",sep="")
+    home_dir <- normalizePath(file.path("~", "OneDrive - University of Pittsburgh", "_BoxMigration"))
+} else if (which_computer == "laptop") {
+    heap_param <- paste("-Xmx","3g",sep="")
+    home_dir <- normalizePath(file.path("~", "Box Sync"))
+}
+options(java.parameters=heap_param)
+
 
 ## Reload helper functions from personal RStudio setup
-    source(file=".Rprofile")
+if(!exists("ans", mode="function")) {
+    source(file="~/.Rprofile")
+}
+
+
+
+
+## Set working directory to the location of R script files.
+    setwd(file.path(home_dir, "research","dissertations", "data, code, and figures", "Dissertation-Research"))
+
 
 ## Specify the dataset and subsets you intend to work with when generating figures.
 #
@@ -59,19 +81,6 @@ tagset_name <- "no_ped_tagnames"
 #       update_realconsorts: If TRUE, overwrite file list index of dissertations from
 #                real consortium program dissertations, for text mining purposes.
         update_realconsorts <- FALSE
-
-#       Are we working at home or at the office?
-#       Some file locations and memory settings will vary.
-        # which_computer <- "work"
-        which_computer <- "laptop"
-
-#       Try not to run out of memory, would you? Need to set this before loading the rJava VM.
-        if (which_computer == "work") {
-            heap_param <- paste("-Xmx","15g",sep="")
-        } else if (which_computer == "laptop") {
-            heap_param <- paste("-Xmx","3g",sep="")
-        }
-        options(java.parameters=heap_param)
 
 ##
 # `dataprep.R`: prepares working environment by loading helper functions

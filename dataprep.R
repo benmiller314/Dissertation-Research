@@ -20,7 +20,7 @@ if (!exists("which_computer")) {
 ### define some broad parameters, since this file will always be run first
 
 # set the working directories, taking into account the GitHub setup
-sourceloc <- normalizePath(file.path("~","Box Sync", "research", "dissertations", "data, code, and figures", "Dissertation-Research"))
+sourceloc <- file.path(home_dir, "research", "dissertations", "data, code, and figures", "Dissertation-Research"))
 unixsourceloc <- sourceloc
 if(getwd() != sourceloc) {
 	setwd(sourceloc)
@@ -43,10 +43,10 @@ tagnames <- c("Clin","Crit",
 			  # "Cult",
 			  "Disc","Ethn","Expt","Hist","Intv","Meta","Modl","Phil","Poet","Prac","Rhet","Surv","Othr", "Ped")
 taggroups <- c("Phenomenological", # Clin
-               "Dialectical",      # Crit 
-               "Aggregable",       # Disc          
-               "Phenomenological", # Ethn 
-               "Aggregable",       # Expt 
+               "Dialectical",      # Crit
+               "Aggregable",       # Disc
+               "Phenomenological", # Ethn
+               "Aggregable",       # Expt
                "Dialectical",      # Hist
                "Aggregable",       # Intv
                "Aggregable",       # Meta
@@ -61,7 +61,7 @@ taggroups <- c("Phenomenological", # Clin
 )
 names(taggroups) <- tagnames
 
-tagnames.long <- c( "Clinical / Case Study", 
+tagnames.long <- c( "Clinical / Case Study",
 					"Critical / Hermeneutical",
 					# "Cultural-Critical",
 					"Discourse or Text Analytical",
@@ -76,7 +76,7 @@ tagnames.long <- c( "Clinical / Case Study",
 					"Practitioner / Teacher-Research",
 					"Rhetorical Analytical",
 					"Survey",
-					"Other", 
+					"Other",
 					"Pedagogical Projection"
 					)
 
@@ -90,13 +90,13 @@ group_pal <- c("#3B528BFF", # dark blue
                "#AADC32FF", # green
                "#FDE725FF", # yellow
                "#FFFFFF")   # white
-names(group_pal) <- c("Dialectical", 
-                      "Phenomenological", 
+names(group_pal) <- c("Dialectical",
+                      "Phenomenological",
                       "Aggregable",
                       "Performance-Based",
                       "Other")
 
-# provide a function to convert tag column labels to real tag names					
+# provide a function to convert tag column labels to real tag names
 realtags <- function(tag, tagset_name="tagnames") {
 	tagset <- get(tagset_name)
 	index <- grep(tag, tagset, ignore.case=TRUE)

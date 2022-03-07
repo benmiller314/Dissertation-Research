@@ -1,0 +1,5 @@
+new search function
+
+I may have to make this more general (i.e. find a value within a column)
+
+But it's really just a wrapper for grep() that avoids having to keep writing the dataset

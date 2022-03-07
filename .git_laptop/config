@@ -1,0 +1,19 @@
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = false
+	logallrefupdates = true
+	ignorecase = true
+	precomposeunicode = true
+[remote "origin"]
+	url = https://github.com/benmiller314/Dissertation-Research
+	fetch = +refs/heads/*:refs/remotes/origin/*
+[branch "working"]
+	remote = origin
+	merge = refs/heads/working
+[branch "grid-subsets"]
+	remote = origin
+	merge = refs/heads/grid-subsets
+[branch "sorted"]
+	remote = origin
+	merge = refs/heads/sorted

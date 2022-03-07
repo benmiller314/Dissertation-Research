@@ -1,0 +1,3 @@
+0000000000000000000000000000000000000000 35bd2a2f58b35c1da7417d1ceffba8726be497f9 benmiller314 <benmiller314@gmail.com> 1588776991 -0400	branch: Created from working
+35bd2a2f58b35c1da7417d1ceffba8726be497f9 c221caf4b1e79fc1f499473f9117691b42ba2758 benmiller314 <benmiller314@gmail.com> 1588777050 -0400	commit: add new way of sorting the topic-proportions grid
+c221caf4b1e79fc1f499473f9117691b42ba2758 0164329abae93b9e37ac577c712a57f444ba79a8 benmiller314 <benmiller314@gmail.com> 1588779161 -0400	commit: return lowliers as well

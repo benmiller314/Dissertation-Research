@@ -152,7 +152,7 @@ dfrt_from_outside_model <- function(dataset_name = "noexcludes2001_2015",
         # are not used by the visualization: for example, metadata(m)$publisher <- NULL.
 
         # Locations
-        browser_dir <- file.path("~", "Box Sync", "research", "dissertations", "dfr-browser", model_name)
+        browser_dir <- file.path(home_dir, "research", "dissertations", "dfr-browser", model_name)
         mdfile <- file.path(browser_dir, "meta.csv")
 
         # Check for supporting_files
@@ -254,7 +254,7 @@ if(false) {
     # TO DO: DESIGNATE MORE MEANINGFUL/ITERABLE DATA FOLDER NAMES
     #        (browser can be pointed to them using src/VIS.js)
     # browser_dir <- file.path(tmloc, paste0("dfrtest", i), "browser")
-    browser_dir <- file.path("~", "Box Sync", "research", "dissertations", "dfr-browser", "data_2")
+    browser_dir <- file.path(home_dir, "research", "dissertations", "dfr-browser", "data_2")
     mdfile <- file.path(browser_dir, "meta.csv")
 
 

@@ -1,0 +1,237 @@
+0000000000000000000000000000000000000000 d169ecd6c546db43e498898fdd480ba87d260258 benmiller314 <benmiller314@gmail.com> 1514487772 -0500	clone: from https://github.com/benmiller314/Dissertation-Research
+d169ecd6c546db43e498898fdd480ba87d260258 46985c84cacf495a7300a9441ceaa68295a27dfb benmiller314 <benmiller314@gmail.com> 1514916481 -0500	commit: don't show everyone your private key
+46985c84cacf495a7300a9441ceaa68295a27dfb 09e9611b9009d9e278be04c45203fa261afbb96a benmiller314 <benmiller314@gmail.com> 1514916533 -0500	commit: typo fix
+09e9611b9009d9e278be04c45203fa261afbb96a c5714c1e886fb51595d1e345330f3079c0477c18 benmiller314 <benmiller314@gmail.com> 1514916581 -0500	commit: use updated google geocode api
+c5714c1e886fb51595d1e345330f3079c0477c18 f87a15a3a9361d811dd92c7885b87b7e25419284 benmiller314 <benmiller314@gmail.com> 1514916662 -0500	commit: minor typographical changes
+f87a15a3a9361d811dd92c7885b87b7e25419284 11ce839225e841c297455b69c233178dd9124430 benmiller314 <benmiller314@gmail.com> 1514916750 -0500	commit: minor changes
+11ce839225e841c297455b69c233178dd9124430 b8b4a91d301f6849f6d7aedb0d1bdf8ad8478856 benmiller314 <benmiller314@gmail.com> 1514916844 -0500	commit: attempts to tweak sed cleanup
+b8b4a91d301f6849f6d7aedb0d1bdf8ad8478856 e86541afe88e3f6f126bdcf0861bfadbea8972fe benmiller314 <benmiller314@gmail.com> 1514916949 -0500	commit: better filename handling
+e86541afe88e3f6f126bdcf0861bfadbea8972fe 3a3167c942a519ea713f2f59646de08a4416b7e1 benmiller314 <benmiller314@gmail.com> 1514916999 -0500	commit: better filename handling
+3a3167c942a519ea713f2f59646de08a4416b7e1 af46b86bcf93f8a3045a68cb016428223ee2f5ee benmiller314 <benmiller314@gmail.com> 1514917095 -0500	commit: move tm files from Box Sync to backup drive
+af46b86bcf93f8a3045a68cb016428223ee2f5ee 430ee2171be61a5f0e6e2d588840d4047b7bf893 benmiller314 <benmiller314@gmail.com> 1514917169 -0500	commit: freeze point before upgrading dfrtopics
+430ee2171be61a5f0e6e2d588840d4047b7bf893 1e8a017f4dc371c4029566f858a3137d54c8286e benmiller314 <benmiller314@gmail.com> 1514920740 -0500	commit: fix typo: use nrow, not length, for data.frame
+1e8a017f4dc371c4029566f858a3137d54c8286e 1f64fce76904fce6595ce5995962ef54e70f233b benmiller314 <benmiller314@gmail.com> 1514922461 -0500	commit: export a list of filenames used to build topic model
+1f64fce76904fce6595ce5995962ef54e70f233b 8b3258ca36de41d91b05a31ec8fa2823c00ef9c8 benmiller314 <benmiller314@gmail.com> 1514925637 -0500	commit: add splits for noexcludes2001_2015k60
+8b3258ca36de41d91b05a31ec8fa2823c00ef9c8 edb5706c51370f60aa28defb845eedfdc992e772 benmiller314 <benmiller314@gmail.com> 1515040790 -0500	commit: major changes to deal with change in MALLET output
+edb5706c51370f60aa28defb845eedfdc992e772 8b3258ca36de41d91b05a31ec8fa2823c00ef9c8 benmiller314 <benmiller314@gmail.com> 1515040857 -0500	reset: moving to HEAD@{1}
+8b3258ca36de41d91b05a31ec8fa2823c00ef9c8 73fc546ee3a956d5c180ec41babef070cdc22424 benmiller314 <benmiller314@gmail.com> 1515041058 -0500	commit: major changes to deal with changed MALLET output
+73fc546ee3a956d5c180ec41babef070cdc22424 76b918e96f9ea9e1453287f359c8d888fff2d990 benmiller314 <benmiller314@gmail.com> 1515041094 -0500	commit: account for changed tmloc on different computers
+76b918e96f9ea9e1453287f359c8d888fff2d990 74b21614ab9338c632d16628302480729c4fbecc benmiller314 <benmiller314@gmail.com> 1515044715 -0500	commit: major changes to deal with changed MALLET output
+74b21614ab9338c632d16628302480729c4fbecc 5f47cdc9341c7e09cf38261e34d67503ce2c86a6 benmiller314 <benmiller314@gmail.com> 1515186012 -0500	commit: add color labels for topic dendrogram
+5f47cdc9341c7e09cf38261e34d67503ce2c86a6 3b22eb49ddc65aeb099aa027cd73f89f5b330f03 benmiller314 <benmiller314@gmail.com> 1515199582 -0500	commit: use file.path
+3b22eb49ddc65aeb099aa027cd73f89f5b330f03 6f6d7823f4de0caace4ec6fe55ac35866b4ba760 benmiller314 <benmiller314@gmail.com> 1515201146 -0500	commit: add missing underscore before iter_index
+6f6d7823f4de0caace4ec6fe55ac35866b4ba760 eed9e907882f644f532c6629bc96c49b4f44b45f benmiller314 <benmiller314@gmail.com> 1515201175 -0500	commit: don't assume default dataset/ntopics
+eed9e907882f644f532c6629bc96c49b4f44b45f 55fff1779c7d5a59b81212b2d49c5d1e54c5b252 benmiller314 <benmiller314@gmail.com> 1515206409 -0500	commit: use file.path() for file paths
+55fff1779c7d5a59b81212b2d49c5d1e54c5b252 3ec5d5283608780026b091a203cd10cc8b7cc300 benmiller314 <benmiller314@gmail.com> 1515206437 -0500	commit: make sure we have the function we need
+3ec5d5283608780026b091a203cd10cc8b7cc300 03445aa2339953564a8af9687f16b58887609c56 benmiller314 <benmiller314@gmail.com> 1515206449 -0500	commit: pass iter_index to get.topickeys
+03445aa2339953564a8af9687f16b58887609c56 75132901552894c9ca0d377c0646ef271537f28e benmiller314 <benmiller314@gmail.com> 1515206481 -0500	commit: fix typo
+75132901552894c9ca0d377c0646ef271537f28e b275e697fdb36620b00114e147f229c2ab36cbe0 benmiller314 <benmiller314@gmail.com> 1515206563 -0500	commit: add rhetmap-listed PhD programs (rhetmaps) as a subset
+b275e697fdb36620b00114e147f229c2ab36cbe0 12cf23a5384691796a0f52950120c3bc53834251 benmiller314 <benmiller314@gmail.com> 1515208476 -0500	commit: use file.path() for file paths
+12cf23a5384691796a0f52950120c3bc53834251 10a14e93bfd7210e3a8487da8de2db92e7aa606c benmiller314 <benmiller314@gmail.com> 1515211443 -0500	commit: add variables for data in 2011-2015
+10a14e93bfd7210e3a8487da8de2db92e7aa606c 2f1470197a96917be2c2625127d8e18550f9559f benmiller314 <benmiller314@gmail.com> 1515211477 -0500	commit: add variables for data in 2011-2015
+2f1470197a96917be2c2625127d8e18550f9559f 84a5d831fc306faef199290b22ef56c2d5147296 benmiller314 <benmiller314@gmail.com> 1515211507 -0500	commit: use file.path() for file paths
+84a5d831fc306faef199290b22ef56c2d5147296 212ae202f6294c29b10b79e4b40d9ae8cc8a3749 benmiller314 <benmiller314@gmail.com> 1516992171 -0500	commit: update realconsorts file list
+212ae202f6294c29b10b79e4b40d9ae8cc8a3749 2135358001f620530d92f75ad971093e341d9d18 benmiller314 <benmiller314@gmail.com> 1516992202 -0500	commit: update consortium schools file list
+2135358001f620530d92f75ad971093e341d9d18 d4f43ba452c0b433c36c31a11d0af412f7fb7249 benmiller314 <benmiller314@gmail.com> 1520305968 -0500	commit: use short-tag version of data tagged at cuny
+d4f43ba452c0b433c36c31a11d0af412f7fb7249 e2f55506c2f51547a09a9585faeba316908a37f8 benmiller314 <benmiller314@gmail.com> 1520306068 -0500	commit: become aware that rhetmaps != consorts
+e2f55506c2f51547a09a9585faeba316908a37f8 f72ed5978bab854d80689a0fa497b021241ae43f benmiller314 <benmiller314@gmail.com> 1520306101 -0500	commit: auto-discover the last five years for top.nonconsorts
+f72ed5978bab854d80689a0fa497b021241ae43f bdcca3a56dabf79a8a30ae279973b90899276cd3 benmiller314 <benmiller314@gmail.com> 1520306150 -0500	commit: use assign() to loop over subsets
+bdcca3a56dabf79a8a30ae279973b90899276cd3 7d59735fd22f0c353e84c0b5cc8fd78a75a6a33a benmiller314 <benmiller314@gmail.com> 1520306196 -0500	commit: add a way to list the functions currently being debugged
+7d59735fd22f0c353e84c0b5cc8fd78a75a6a33a 6f84c30e0c7acfd63c3961308883c45f3691c6c2 benmiller314 <benmiller314@gmail.com> 1520306253 -0500	commit: set which_computer here if not already set by `rerun all analyses`
+6f84c30e0c7acfd63c3961308883c45f3691c6c2 dae61acc3c38515b0d8b459450664b7f811801cf benmiller314 <benmiller314@gmail.com> 1520306312 -0500	commit: keep track of which_computer we're working on
+dae61acc3c38515b0d8b459450664b7f811801cf 596f1c86633a6f0e0626d4c028c73ca4cde4b1fa benmiller314 <benmiller314@gmail.com> 1520306330 -0500	commit: clarify documentation, name which function is returned
+596f1c86633a6f0e0626d4c028c73ca4cde4b1fa 3ca241c32509317a7f61935144c5a3588aeb7463 benmiller314 <benmiller314@gmail.com> 1520306440 -0500	commit: improved file.path()
+3ca241c32509317a7f61935144c5a3588aeb7463 b15bb5d9fe174c3a4cf3a7f9c08dc16cdf75e96a benmiller314 <benmiller314@gmail.com> 1520306519 -0500	commit: major update to account for rhetmaps + new department data
+b15bb5d9fe174c3a4cf3a7f9c08dc16cdf75e96a 031b536925ba151e6d6e1dcca0d7d2a14bd83b43 benmiller314 <benmiller314@gmail.com> 1520306575 -0500	commit: save list of dissertations with unconfirmed departments
+031b536925ba151e6d6e1dcca0d7d2a14bd83b43 46864c9292e72fc2218d40529c47db6db728febc benmiller314 <benmiller314@gmail.com> 1520306601 -0500	commit: minor documentation tweaks
+46864c9292e72fc2218d40529c47db6db728febc 84f708778a59ed93462334f81a6d6bea50d6fe8f benmiller314 <benmiller314@gmail.com> 1520349298 -0500	commit: limit overwriting by adding date to output filename
+84f708778a59ed93462334f81a6d6bea50d6fe8f ef37b3d0f276038732b993c3ce4621f530f177ea benmiller314 <benmiller314@gmail.com> 1520441324 -0500	commit: fix grep bug that missed Exclude.Level==1
+ef37b3d0f276038732b993c3ce4621f530f177ea 2aa4c9e94bc861f3c465fd3f5ee771b0b226292c benmiller314 <benmiller314@gmail.com> 1520542973 -0500	commit: fix major bug causing off-by-one error in method tag array
+2aa4c9e94bc861f3c465fd3f5ee771b0b226292c ced2b8401befc6d8b449dbf5dfff805519d05d3f benmiller314 <benmiller314@gmail.com> 1520543030 -0500	commit: updates to autotrun behavior
+ced2b8401befc6d8b449dbf5dfff805519d05d3f 61cd48913b6824fa2be92b9248e558e14d91bb7f benmiller314 <benmiller314@gmail.com> 1520543417 -0500	commit: allow there to be no diffset
+61cd48913b6824fa2be92b9248e558e14d91bb7f 04e8e4d772aeeef4c54d94a25ddccbbe586aabe8 benmiller314 <benmiller314@gmail.com> 1521682917 -0400	commit: allow for different tagsets
+04e8e4d772aeeef4c54d94a25ddccbbe586aabe8 1559d5a34e204ea790d8d8917de60f9c0a260e94 benmiller314 <benmiller314@gmail.com> 1531419978 -0400	commit: count words in text columns, plot against year
+1559d5a34e204ea790d8d8917de60f9c0a260e94 ee66708f148fd1515eaa75c084f829fe8db80ed4 benmiller314 <benmiller314@gmail.com> 1531420040 -0400	commit: lots of changes to parameterize filenames and filter updates by school
+ee66708f148fd1515eaa75c084f829fe8db80ed4 c59ee88f26de9bbb9b2ba697fa11d8bbeaa008bd benmiller314 <benmiller314@gmail.com> 1531420343 -0400	commit: better input matching (lowercase)
+c59ee88f26de9bbb9b2ba697fa11d8bbeaa008bd 420404a5ecb30a62993b3c2b2caab90c66197a50 benmiller314 <benmiller314@gmail.com> 1531420411 -0400	commit: add Intv to Aggregable, Ped to Phenomenological
+420404a5ecb30a62993b3c2b2caab90c66197a50 200542a3984df2829d81be41ec0d010b22c3abf0 benmiller314 <benmiller314@gmail.com> 1531420467 -0400	commit: use normalizePath instead of path.expand
+200542a3984df2829d81be41ec0d010b22c3abf0 6709b93a277d7d319ba0a64adce129addfd5982f benmiller314 <benmiller314@gmail.com> 1531420570 -0400	commit: improved handling of non-autorun situations
+6709b93a277d7d319ba0a64adce129addfd5982f 35a2bba758c473d3dfe2a9d8e1e18073b890b53a benmiller314 <benmiller314@gmail.com> 1531420632 -0400	commit: add support for other tagsets
+35a2bba758c473d3dfe2a9d8e1e18073b890b53a bab926948dd7ddaa1e647026907c76b5e612fbbb benmiller314 <benmiller314@gmail.com> 1531493768 -0400	commit: add some files that weren't tracked for some reason
+bab926948dd7ddaa1e647026907c76b5e612fbbb 666b83f2dbb5a5be56ff2c46144d9917ed2e2b29 benmiller314 <benmiller314@gmail.com> 1531493869 -0400	commit: tweaks to wc_timeplot labels, document/index this 'analysis'
+666b83f2dbb5a5be56ff2c46144d9917ed2e2b29 03ff4b2f371b955ee54c554e46649cd0eccc0207 benmiller314 <benmiller314@gmail.com> 1541178944 -0400	commit: fix non-numeric colsums error
+03ff4b2f371b955ee54c554e46649cd0eccc0207 810aa039aff2bdeacc0d1da1d4971e63b56b5d35 benmiller314 <benmiller314@gmail.com> 1541179830 -0400	commit: add outputfile.dt to list of return values
+810aa039aff2bdeacc0d1da1d4971e63b56b5d35 c6c222b550f6fc72229fb43c4043ebfe1eca2b50 benmiller314 <benmiller314@gmail.com> 1541180223 -0400	commit: remove obsolete get.doc.composition
+c6c222b550f6fc72229fb43c4043ebfe1eca2b50 0933ad0810cbfabdab9c17c94fdd58cfcd8a5a5f benmiller314 <benmiller314@gmail.com> 1541180266 -0400	commit: remove obsolete get.doc.composition
+0933ad0810cbfabdab9c17c94fdd58cfcd8a5a5f eb63482cd62e052b851a3b27d308b945dfc92bc5 benmiller314 <benmiller314@gmail.com> 1541184331 -0400	commit: update from previously matched files by default if available
+eb63482cd62e052b851a3b27d308b945dfc92bc5 259e7d479c0e01140106ef64167914d1840043cb benmiller314 <benmiller314@gmail.com> 1541798536 -0500	commit: progress toward browser export with diss metadata intact
+259e7d479c0e01140106ef64167914d1840043cb 9d9e0713d68ec0b8078fd16114c2d3975daf599b benmiller314 <benmiller314@gmail.com> 1543867199 -0500	commit: improve export of file list for subsets
+9d9e0713d68ec0b8078fd16114c2d3975daf599b 4d89c376e167c8d9fb830d7da42adf4398325ff0 benmiller314 <benmiller314@gmail.com> 1543867284 -0500	commit: improve export of file list for subsets
+4d89c376e167c8d9fb830d7da42adf4398325ff0 ef8d18116dfec5a68b2a101b9e483be81498d988 benmiller314 <benmiller314@gmail.com> 1543867321 -0500	commit: typo fix
+ef8d18116dfec5a68b2a101b9e483be81498d988 70eb7655c59b410c5b16dd23dfc7873cb6bc2003 benmiller314 <benmiller314@gmail.com> 1543872948 -0500	commit: add browser export to function
+70eb7655c59b410c5b16dd23dfc7873cb6bc2003 6d9287f1730a5cf995c1c1c3329ab360fcd97d32 benmiller314 <benmiller314@gmail.com> 1543944733 -0500	commit: fix get.topics4doc since MALLET update
+6d9287f1730a5cf995c1c1c3329ab360fcd97d32 8e41b9d896e76414cacaee88a1de129c2e2f9065 benmiller314 <benmiller314@gmail.com> 1544028841 -0500	commit: better filename convention for dendrograms
+8e41b9d896e76414cacaee88a1de129c2e2f9065 b4669430b4d5a4c330cff496a0f92c301f9da707 benmiller314 <benmiller314@gmail.com> 1544034074 -0500	commit: reorder parameters on top_topic_browser
+b4669430b4d5a4c330cff496a0f92c301f9da707 447f809437b862852383ef5126215f74fc24d25d benmiller314 <benmiller314@gmail.com> 1552441849 -0400	commit: return value even if remaking figs
+447f809437b862852383ef5126215f74fc24d25d 4dfe3f93e74363660d1a9040c963208b0a4a201f benmiller314 <benmiller314@gmail.com> 1552448533 -0400	commit: export most up-to-date datasets and subsets
+4dfe3f93e74363660d1a9040c963208b0a4a201f 0b6dd3537f970ec586fdf0a8f76744ec78d25395 benmiller314 <benmiller314@gmail.com> 1552449384 -0400	commit: use data.frame instead of cbind
+0b6dd3537f970ec586fdf0a8f76744ec78d25395 f1f965b10336a79cb55c820b4b44325b9f7628e7 benmiller314 <benmiller314@gmail.com> 1561397638 -0400	commit: save name of datafile
+f1f965b10336a79cb55c820b4b44325b9f7628e7 1d2686e7c3dec762c7618a9dba5eef84acd7edf7 benmiller314 <benmiller314@gmail.com> 1561397949 -0400	commit: save name of datafile
+1d2686e7c3dec762c7618a9dba5eef84acd7edf7 ba1fc1347ba61c99580f55a5a8b65db575324373 benmiller314 <benmiller314@gmail.com> 1561404978 -0400	commit: update verbose messages
+ba1fc1347ba61c99580f55a5a8b65db575324373 1e88a8937800bce372b6077c683a4568ef2ada6a benmiller314 <benmiller314@gmail.com> 1561478125 -0400	commit: make it possible to go back
+1e88a8937800bce372b6077c683a4568ef2ada6a 05c15ca4ab44323d9bffdc5b157937d7099a9a63 benmiller314 <benmiller314@gmail.com> 1561478170 -0400	commit: turn off debug
+05c15ca4ab44323d9bffdc5b157937d7099a9a63 26c2a9a94a5ba1bda94a3b195e39888375dda922 benmiller314 <benmiller314@gmail.com> 1561481238 -0400	commit: export and save maybeconsort subset
+26c2a9a94a5ba1bda94a3b195e39888375dda922 bc33aeae8684ebc76ee3134a76034df38bfea1f9 benmiller314 <benmiller314@gmail.com> 1563460862 -0400	commit: first fully functional commit
+bc33aeae8684ebc76ee3134a76034df38bfea1f9 787f9b444dae58fb189bc7be5d61bee6cb82b23e benmiller314 <benmiller314@gmail.com> 1563460908 -0400	commit (amend): first fully functional commit
+787f9b444dae58fb189bc7be5d61bee6cb82b23e 2a7df2bcdade5b74de332fd46eab6c02618672e3 benmiller314 <benmiller314@gmail.com> 1563552120 -0400	commit: fix bug in trim.wordtopic.grid
+2a7df2bcdade5b74de332fd46eab6c02618672e3 212a0a6c40dadc0968808200505560eb18d16ae7 benmiller314 <benmiller314@gmail.com> 1563561909 -0400	commit: first commit
+212a0a6c40dadc0968808200505560eb18d16ae7 9afc33e188205fd3e5e9122b52e82fd609735c7f benmiller314 <benmiller314@gmail.com> 1563588847 -0400	commit: more return options (as list)
+9afc33e188205fd3e5e9122b52e82fd609735c7f de2c921397cdc836114f0b08d3eabc34f3e02e31 benmiller314 <benmiller314@gmail.com> 1563848262 -0400	commit: oops, too many changes
+de2c921397cdc836114f0b08d3eabc34f3e02e31 fee3449707c9210fc78437039151bfe3f5781b0a benmiller314 <benmiller314@gmail.com> 1563848305 -0400	commit: first commit
+fee3449707c9210fc78437039151bfe3f5781b0a af7408d404eae9ea4a583e21809fcf23516c69a9 benmiller314 <benmiller314@gmail.com> 1563848375 -0400	commit: help position figure legends
+af7408d404eae9ea4a583e21809fcf23516c69a9 b95f9ae2c9524249676e21815d2d7385dd3b2c20 benmiller314 <benmiller314@gmail.com> 1563848439 -0400	commit: return more info
+b95f9ae2c9524249676e21815d2d7385dd3b2c20 fc76e896a6c0bb2b640a247093e43a6f1fa6bd26 benmiller314 <benmiller314@gmail.com> 1563848543 -0400	commit: name word-topic grid wt instead of dt
+fc76e896a6c0bb2b640a247093e43a6f1fa6bd26 ce76317251ee1013ea4440a3306d85c7d6fe7380 benmiller314 <benmiller314@gmail.com> 1564155429 -0400	commit: call it itf instead of idf
+ce76317251ee1013ea4440a3306d85c7d6fe7380 1ede156fa8a06ab5f116d856f4dd2177adb41da0 benmiller314 <benmiller314@gmail.com> 1564501559 -0400	commit: improved documentation
+1ede156fa8a06ab5f116d856f4dd2177adb41da0 23665313c2e210ca9dd8c9ce0ca8df871e41795a benmiller314 <benmiller314@gmail.com> 1564588086 -0400	commit: account for spaces in directory name
+23665313c2e210ca9dd8c9ce0ca8df871e41795a f5b0b4550bbbaad7f3c89f96c8882823ae0915cc benmiller314 <benmiller314@gmail.com> 1564588148 -0400	commit: improve comments for reading by other people
+f5b0b4550bbbaad7f3c89f96c8882823ae0915cc 2ab7155f0110ab092c188ec1119d384fad8c545f benmiller314 <benmiller314@gmail.com> 1565025230 -0400	commit: update ways to save to or load from files
+2ab7155f0110ab092c188ec1119d384fad8c545f ab7fa4c86143d5e3ba69100f08ea2f54c8eb9927 benmiller314 <benmiller314@gmail.com> 1565025302 -0400	commit: more explicit naming of parameters
+ab7fa4c86143d5e3ba69100f08ea2f54c8eb9927 2fe720e82215271eb954a804d1c18e53e966a9f9 benmiller314 <benmiller314@gmail.com> 1565025359 -0400	commit: clarify warning message
+2fe720e82215271eb954a804d1c18e53e966a9f9 742db7ec8dbe4ff4008a62b3e7410b56d3973f5b benmiller314 <benmiller314@gmail.com> 1565025437 -0400	commit: mallet's stable, stop complaining
+742db7ec8dbe4ff4008a62b3e7410b56d3973f5b ce32e9c550f01769aa06bc8c6b47e7420a2c5db0 benmiller314 <benmiller314@gmail.com> 1565025472 -0400	commit: account for another possible data subset
+ce32e9c550f01769aa06bc8c6b47e7420a2c5db0 a9e150ec4e835574ed910671cdbe916ea83e4f63 benmiller314 <benmiller314@gmail.com> 1565025549 -0400	commit: improved filename convention
+a9e150ec4e835574ed910671cdbe916ea83e4f63 543da2d3d6eda19e369ec0fad4fb0c766c8373fb benmiller314 <benmiller314@gmail.com> 1565025594 -0400	commit: don't use 'c' as a variable name
+543da2d3d6eda19e369ec0fad4fb0c766c8373fb 671be8b9c9a3f1bd1c81b1e2b4c7d6dd429b7318 benmiller314 <benmiller314@gmail.com> 1565025646 -0400	commit: consider looking at smaller bins
+671be8b9c9a3f1bd1c81b1e2b4c7d6dd429b7318 4a6d8b7c017f914f7c6b8e07ae39c0cd31c64322 benmiller314 <benmiller314@gmail.com> 1565025742 -0400	commit: account for variations in dataset, tagset
+4a6d8b7c017f914f7c6b8e07ae39c0cd31c64322 125d9c63279d50d89b426278670400e8ad3c339d benmiller314 <benmiller314@gmail.com> 1565025778 -0400	commit: cosmetic changes
+125d9c63279d50d89b426278670400e8ad3c339d 37fc3dcbccdfa3df4b661ccf54dddcce83245a8d benmiller314 <benmiller314@gmail.com> 1565025828 -0400	commit: use outside_legend
+37fc3dcbccdfa3df4b661ccf54dddcce83245a8d 89a8435e0e6f08e710452b3612d22371081f6995 benmiller314 <benmiller314@gmail.com> 1565025859 -0400	commit: don't use 'c' as a variable name
+89a8435e0e6f08e710452b3612d22371081f6995 e8c0724d79148e55d95bd8b3671d0e85401342c5 benmiller314 <benmiller314@gmail.com> 1565025910 -0400	commit: more datasets, tagsets to consider
+e8c0724d79148e55d95bd8b3671d0e85401342c5 91547c829e1e84cc87201b4cac989e14d15b2468 benmiller314 <benmiller314@gmail.com> 1565025957 -0400	commit: account for other possible datasets, tagsets
+91547c829e1e84cc87201b4cac989e14d15b2468 13da1b87488afebe7b09b4326e51eb5e3cca752f benmiller314 <benmiller314@gmail.com> 1565026428 -0400	commit: set java heap size based on where I'm working
+13da1b87488afebe7b09b4326e51eb5e3cca752f b6f990fe2db3744bf32f1357b65dbcfad0f83596 benmiller314 <benmiller314@gmail.com> 1565026478 -0400	commit: assume we're starting with processed data
+b6f990fe2db3744bf32f1357b65dbcfad0f83596 629988382870ed913a330b3e407f6e8cfef19c04 benmiller314 <benmiller314@gmail.com> 1565026622 -0400	commit: assume we're starting with processed data
+629988382870ed913a330b3e407f6e8cfef19c04 ebd2ce79a5a0a04ce217902c34b8f650a29b088a benmiller314 <benmiller314@gmail.com> 1565026672 -0400	commit: update how we handle unknown programs vs realconsorts
+ebd2ce79a5a0a04ce217902c34b8f650a29b088a decb91ecf99381a6b0af0476f5fc59d49d6c680a benmiller314 <benmiller314@gmail.com> 1565026783 -0400	commit: relocate shell scripts
+decb91ecf99381a6b0af0476f5fc59d49d6c680a a10b67e4125db7a315dc7d28dc7c71f9c7b331a7 benmiller314 <benmiller314@gmail.com> 1565026831 -0400	commit: remove side effects
+a10b67e4125db7a315dc7d28dc7c71f9c7b331a7 ed68114b60c66dfb515257b036c7e5675bac7ac1 benmiller314 <benmiller314@gmail.com> 1565026893 -0400	commit: account for repeated iterations on same dataset
+ed68114b60c66dfb515257b036c7e5675bac7ac1 703081c1c2ca0e560c313db64b857541f3a4c10d benmiller314 <benmiller314@gmail.com> 1565026945 -0400	commit: account for built-in data.table output of get.doctopic.grid()
+703081c1c2ca0e560c313db64b857541f3a4c10d 1af3eaf1ea7a99377c3bc45702b7f305f468ac71 benmiller314 <benmiller314@gmail.com> 1565026962 -0400	commit: improved figure labeling
+1af3eaf1ea7a99377c3bc45702b7f305f468ac71 c99401b2e2560ccbe658b9a777e9e475e62b15ce benmiller314 <benmiller314@gmail.com> 1565027002 -0400	commit: updated results of data cleaning
+c99401b2e2560ccbe658b9a777e9e475e62b15ce 7f794f2ebf3192490c7bea10d3d2a958a2c09540 benmiller314 <benmiller314@gmail.com> 1565027047 -0400	commit: change java heap based on which computer I'm working on
+7f794f2ebf3192490c7bea10d3d2a958a2c09540 d42e75f85571941274de1b302be85852ceae653d benmiller314 <benmiller314@gmail.com> 1565027118 -0400	commit: add note re: crash from library(wordnet)
+d42e75f85571941274de1b302be85852ceae653d 1535aeb9126fa7dd2f76e9697cc5611173f08ad0 benmiller314 <benmiller314@gmail.com> 1565027199 -0400	commit: more places to pass data already in memory
+1535aeb9126fa7dd2f76e9697cc5611173f08ad0 044ee4e567cd38ca25db913c006e6c67353c6e4e benmiller314 <benmiller314@gmail.com> 1565027249 -0400	commit: add functions to calculate cluster_weight, inspect a cluster
+044ee4e567cd38ca25db913c006e6c67353c6e4e a92e6c0cb5fd2aed3cff6286216a04f931ee6e4c benmiller314 <benmiller314@gmail.com> 1565027371 -0400	commit: better error handling, plus a new function to load data cleaned in openrefine
+a92e6c0cb5fd2aed3cff6286216a04f931ee6e4c e31840c8394e6ab987d5832c3666501ae7e7b030 benmiller314 <benmiller314@gmail.com> 1565027438 -0400	commit: updated results of data cleaning
+e31840c8394e6ab987d5832c3666501ae7e7b030 85fe68729df66ed8eb352554e6c8f2ecd5b3c1a8 benmiller314 <benmiller314@gmail.com> 1565027497 -0400	commit: note to self (minor change)
+85fe68729df66ed8eb352554e6c8f2ecd5b3c1a8 1852639c046adcb69ab71442426ad159db5350c6 benmiller314 <benmiller314@gmail.com> 1565027593 -0400	commit: tell R where wordnet home is
+1852639c046adcb69ab71442426ad159db5350c6 0afdeeaf4c302af19d80e1cb3d0bf42697c4a945 benmiller314 <benmiller314@gmail.com> 1565028055 -0400	commit: recursive directory creation, if needed
+0afdeeaf4c302af19d80e1cb3d0bf42697c4a945 cee1592dedd9b763d9393107da259a8a53681477 benmiller314 <benmiller314@gmail.com> 1565029734 -0400	commit: find top schools by topic output
+cee1592dedd9b763d9393107da259a8a53681477 3845483177537bc87554a15f7b54470436ca10c5 benmiller314 <benmiller314@gmail.com> 1565031225 -0400	commit: use knownprogam bits to cluster depts
+3845483177537bc87554a15f7b54470436ca10c5 559ce91f896d32e59c1e371e12b57e180c513273 benmiller314 <benmiller314@gmail.com> 1565034839 -0400	commit: speed boosts, allow for quiet mode
+559ce91f896d32e59c1e371e12b57e180c513273 559ae63154b4b12ab3ad68b0e49742c8a5a573d5 benmiller314 <benmiller314@gmail.com> 1565034889 -0400	commit: knownprogram_topical_ratio
+559ae63154b4b12ab3ad68b0e49742c8a5a573d5 8a86cc200ad3e0e2c06e1579f64d79c5b9423b33 benmiller314 <benmiller314@gmail.com> 1565120095 -0400	commit: account for multiple iterations with the same model settings
+8a86cc200ad3e0e2c06e1579f64d79c5b9423b33 a0df1981ae47f7595bc4d5d3dc0b971d7ec1e5e8 benmiller314 <benmiller314@gmail.com> 1565120121 -0400	commit: better file path handling
+a0df1981ae47f7595bc4d5d3dc0b971d7ec1e5e8 b907dcd3c4bf1c828e155e5698b7e96e48032cec benmiller314 <benmiller314@gmail.com> 1565120155 -0400	commit: remove bad.topics
+b907dcd3c4bf1c828e155e5698b7e96e48032cec 7636069aec87211577fc96ab475cce49eef53ff3 benmiller314 <benmiller314@gmail.com> 1565120182 -0400	commit: investigate outliers
+7636069aec87211577fc96ab475cce49eef53ff3 e4373a4542c741a51e300aef0514b87d0c450bb7 benmiller314 <benmiller314@gmail.com> 1565120231 -0400	commit: default to showing human-added topic labels
+e4373a4542c741a51e300aef0514b87d0c450bb7 cdd0593b99e6e13a63d1da55b06cab53c7814583 benmiller314 <benmiller314@gmail.com> 1565190353 -0400	commit: hint on how to get dfrtopics
+cdd0593b99e6e13a63d1da55b06cab53c7814583 d0fcbd93b2f15ebbaea108882ef30ca1d600f70a benmiller314 <benmiller314@gmail.com> 1565190845 -0400	commit: shell scripts show as changed even though there's no content different?
+d0fcbd93b2f15ebbaea108882ef30ca1d600f70a a7231809c0591341fc5d52aa1f9545f486190c0f benmiller314 <benmiller314@gmail.com> 1567793218 -0400	commit: update input parameters, return index of pub.numbers
+a7231809c0591341fc5d52aa1f9545f486190c0f bccb7cc36edffba6c2562a90de219e26eda738c0 benmiller314 <benmiller314@gmail.com> 1567793247 -0400	commit: update handling of bad.topics
+bccb7cc36edffba6c2562a90de219e26eda738c0 f79df8a854f4b57022d2cf3c29a2c8ab8255df9c benmiller314 <benmiller314@gmail.com> 1567793280 -0400	commit: fix bug in reach of individual-topic-within-cluster
+f79df8a854f4b57022d2cf3c29a2c8ab8255df9c 4ab374d7be07c7bd3aa7b4a54d7b2fee2a189373 benmiller314 <benmiller314@gmail.com> 1567793291 -0400	commit: add TO DO note-to-self
+4ab374d7be07c7bd3aa7b4a54d7b2fee2a189373 91bc4783947b63d83e2f74fe0368e413bcdb0d8f benmiller314 <benmiller314@gmail.com> 1567793790 -0400	commit: fix bug in reach of individual-topic-within-cluster
+91bc4783947b63d83e2f74fe0368e413bcdb0d8f b69faef6f63b06258ab3a3ca2e45d5b72ca4cce6 benmiller314 <benmiller314@gmail.com> 1567826157 -0400	pull --progress origin: Fast-forward
+b69faef6f63b06258ab3a3ca2e45d5b72ca4cce6 35571d560d606237f03a2253406c69c9c9f01c30 benmiller314 <benmiller314@gmail.com> 1568041252 -0400	commit: minor cleanup
+35571d560d606237f03a2253406c69c9c9f01c30 924168b98c748968b6511ffeb92be94440139320 benmiller314 <benmiller314@gmail.com> 1568042532 -0400	commit: handle case when multiple specific topics passed
+924168b98c748968b6511ffeb92be94440139320 b379e404bfe718149402e690b86e6118d4c25177 benmiller314 <benmiller314@gmail.com> 1569290884 -0400	commit: Create inspect topic models.R
+b379e404bfe718149402e690b86e6118d4c25177 9e5d72dcac32c789c9d99874e88f2f5f65bf9b74 benmiller314 <benmiller314@gmail.com> 1569290951 -0400	commit: allow for agglomerative or divisive clustering of topics
+9e5d72dcac32c789c9d99874e88f2f5f65bf9b74 5d63258bd0e07338983a63e8a8d95c23b49f90d7 benmiller314 <benmiller314@gmail.com> 1569377506 -0400	commit: explore lowliers
+5d63258bd0e07338983a63e8a8d95c23b49f90d7 062ee7949ca7feb21dc526172ef8a3e3365ab333 benmiller314 <benmiller314@gmail.com> 1569377555 -0400	commit: improved error handling
+062ee7949ca7feb21dc526172ef8a3e3365ab333 a565a031265677733a3875f458122889a47cdb11 benmiller314 <benmiller314@gmail.com> 1569611881 -0400	commit: allow other clustering methods
+a565a031265677733a3875f458122889a47cdb11 ab16b2fa027bfc54c9ea7d488f54920f5f17f83a benmiller314 <benmiller314@gmail.com> 1569615568 -0400	commit: improve name_topic_clusters()
+ab16b2fa027bfc54c9ea7d488f54920f5f17f83a 80cbd634cf1a0799db661ae22447fb94b18e10d3 benmiller314 <benmiller314@gmail.com> 1569615612 -0400	commit: define names for stable clusters
+80cbd634cf1a0799db661ae22447fb94b18e10d3 e9cf2e47f289587f2ae9023e7a984fa8fb88f743 benmiller314 <benmiller314@gmail.com> 1569618484 -0400	commit: system-wide functions to easily store and retrieve numeric vectors as one observation in a data-frame
+e9cf2e47f289587f2ae9023e7a984fa8fb88f743 6686474a7164ad290ba3ecfc0fe2a9fa6423a7f1 benmiller314 <benmiller314@gmail.com> 1569618689 -0400	commit: update name_topic_clusters, use for inspecting
+6686474a7164ad290ba3ecfc0fe2a9fa6423a7f1 09c6060735f3be599fd704222f6c16c5a4628b50 benmiller314 <benmiller314@gmail.com> 1569932149 -0400	commit: allow for multiple extent levels to be passed
+09c6060735f3be599fd704222f6c16c5a4628b50 f099cd79af19b5854bcf0ada5079848dece1fcb0 benmiller314 <benmiller314@gmail.com> 1569957157 -0400	commit: handle multiple extent levels for topic cluster reach
+f099cd79af19b5854bcf0ada5079848dece1fcb0 8e0dede3ed78943fe5d778fbc8b3e8e72f5a088a benmiller314 <benmiller314@gmail.com> 1569957171 -0400	commit: update defaults
+8e0dede3ed78943fe5d778fbc8b3e8e72f5a088a d99a01e5488bbcfd19ca1000761627a9ac92219e benmiller314 <benmiller314@gmail.com> 1569957199 -0400	commit: better way to find complementary set for knownprograms
+d99a01e5488bbcfd19ca1000761627a9ac92219e f9e3b02203d4e4d1ae06668f196e9e3dacf57d48 benmiller314 <benmiller314@gmail.com> 1569957211 -0400	commit: allow multiple clustering methods
+f9e3b02203d4e4d1ae06668f196e9e3dacf57d48 f64b2c62d277804974aa2e1078f35f34575d0e2f benmiller314 <benmiller314@gmail.com> 1573487316 -0500	commit: build_plot_title in its own file
+f64b2c62d277804974aa2e1078f35f34575d0e2f 539c7519e720140307f7628fa21c3ca5534d9568 benmiller314 <benmiller314@gmail.com> 1573487362 -0500	commit: shell scripts (no content changed)
+539c7519e720140307f7628fa21c3ca5534d9568 f7709e8a04a550ad209e6bcecb57e42c66cf8b26 benmiller314 <benmiller314@gmail.com> 1573487467 -0500	commit: update to work with current data.table
+f7709e8a04a550ad209e6bcecb57e42c66cf8b26 b6b8c8a43256b73663e785b97fc99ae1116fc9e7 benmiller314 <benmiller314@gmail.com> 1573487534 -0500	commit: plot rendering improvements
+b6b8c8a43256b73663e785b97fc99ae1116fc9e7 d149bb3b7e71451a4c99267adc2a95ae3a6347c6 benmiller314 <benmiller314@gmail.com> 1573487702 -0500	commit: cosmetic changes
+d149bb3b7e71451a4c99267adc2a95ae3a6347c6 57295b1bf83319e871e211198f0050b8cac80064 benmiller314 <benmiller314@gmail.com> 1580495309 -0500	commit: catch case where multiple tag columns sneak in
+57295b1bf83319e871e211198f0050b8cac80064 68235204abdbdd99cf18d4914f63818150f74af4 benmiller314 <benmiller314@gmail.com> 1580495369 -0500	commit: use function to bind year-subsets to variables
+68235204abdbdd99cf18d4914f63818150f74af4 dadff306c14bc288a8052fd667a175a37d4a6dd0 benmiller314 <benmiller314@gmail.com> 1580495396 -0500	commit: better parentheses
+dadff306c14bc288a8052fd667a175a37d4a6dd0 c66413327be24573820394f77b99924b9e8409c3 benmiller314 <benmiller314@gmail.com> 1580496276 -0500	commit: allow for subsets
+c66413327be24573820394f77b99924b9e8409c3 24b7e40560c280cf15a729e2ce69eec8d4889d44 benmiller314 <benmiller314@gmail.com> 1580496365 -0500	commit: ratio of known/unknown school for a given topic
+24b7e40560c280cf15a729e2ce69eec8d4889d44 ac3380903059905636c2dc810d67a005d918e218 benmiller314 <benmiller314@gmail.com> 1580498560 -0500	commit: get dataset from dataset_name
+ac3380903059905636c2dc810d67a005d918e218 18dcaeeee074b5441a557db0f533027605dd4c85 benmiller314 <benmiller314@gmail.com> 1581955817 -0500	commit: update file naming convention for topic labeling
+18dcaeeee074b5441a557db0f533027605dd4c85 ca856da7b25531a3e25292966176ef308ef0c1d3 benmiller314 <benmiller314@gmail.com> 1581955922 -0500	commit: allow for pre-existing tw, commit to one extent_level at a time
+ca856da7b25531a3e25292966176ef308ef0c1d3 73280d7f893266d3fa202c0300817d298cb2d76c benmiller314 <benmiller314@gmail.com> 1581955978 -0500	commit: no content change
+73280d7f893266d3fa202c0300817d298cb2d76c 7dfd133f88073eb4e4ecf5a80a5a0eb512ea42ff benmiller314 <benmiller314@gmail.com> 1581956085 -0500	commit: smarter default maxsum, recognize need to specify subj.column
+7dfd133f88073eb4e4ecf5a80a5a0eb512ea42ff fc75031f5eb6fae21f2369ebbf3db8746b95abf0 benmiller314 <benmiller314@gmail.com> 1581956190 -0500	commit: always show all topics
+fc75031f5eb6fae21f2369ebbf3db8746b95abf0 49205b0cae25f1606a64b3d7202f042087f656c5 benmiller314 <benmiller314@gmail.com> 1581956261 -0500	commit: use data.table when possible (but fail gracefully if not)
+49205b0cae25f1606a64b3d7202f042087f656c5 559a5b35645be0070c41a985d4d51da317b7b281 benmiller314 <benmiller314@gmail.com> 1581956308 -0500	commit: more informative outputs
+559a5b35645be0070c41a985d4d51da317b7b281 90a7073b3d40f1a09819e1e67baca9dd43feaeae benmiller314 <benmiller314@gmail.com> 1581956357 -0500	commit: get rid of obsolete newdataloc
+90a7073b3d40f1a09819e1e67baca9dd43feaeae 07677523ea78e7e46b8f637998c364fd887a7a10 benmiller314 <benmiller314@gmail.com> 1581957446 -0500	commit: remove manual creation of 5-year bins (I have a function now)
+07677523ea78e7e46b8f637998c364fd887a7a10 a82778e23c0e2f585514c877604198690203b337 benmiller314 <benmiller314@gmail.com> 1581957510 -0500	commit: play with some new defaults
+a82778e23c0e2f585514c877604198690203b337 025922d122a20b42d1532797cf3f052b14172d0d benmiller314 <benmiller314@gmail.com> 1581957536 -0500	commit: better file naming
+025922d122a20b42d1532797cf3f052b14172d0d 149ade4d5b1421aa89d8f217be9648e010158f9f benmiller314 <benmiller314@gmail.com> 1581967827 -0500	commit: better handling of iter_index
+149ade4d5b1421aa89d8f217be9648e010158f9f cff2b74a8e2a6e1f3669df0199b77fa3afb2a7f7 benmiller314 <benmiller314@gmail.com> 1582047767 -0500	commit: account for updated naming convention in MALLET outputs
+cff2b74a8e2a6e1f3669df0199b77fa3afb2a7f7 9f4d1650691b3d069394f7fa5afbd194d9cc3794 benmiller314 <benmiller314@gmail.com> 1582048588 -0500	commit: account for updated naming convention in MALLET outputs
+9f4d1650691b3d069394f7fa5afbd194d9cc3794 7f0c821be118b8b019d96b19c0cea39efe185d30 benmiller314 <benmiller314@gmail.com> 1582858309 -0500	commit: why do my shell scripts periodically need re-committing
+7f0c821be118b8b019d96b19c0cea39efe185d30 8bc84b592760f5c7d8f560cae6e42de5e79435d3 benmiller314 <benmiller314@gmail.com> 1582858435 -0500	pull --progress origin: Merge made by the 'recursive' strategy.
+8bc84b592760f5c7d8f560cae6e42de5e79435d3 7af4cbd9fa4b6c3c4b1f9125d7663aeb966b1ef5 benmiller314 <benmiller314@gmail.com> 1583132065 -0500	commit: rename to avoid filename spaces
+7af4cbd9fa4b6c3c4b1f9125d7663aeb966b1ef5 e16818d5921a5d0f58780c6cca762fbedc64a736 benmiller314 <benmiller314@gmail.com> 1583873444 -0400	commit: add parameter for generating filename slugs
+e16818d5921a5d0f58780c6cca762fbedc64a736 241252cb79d23d9dfb87dc58a618ab94b8f67fcb benmiller314 <benmiller314@gmail.com> 1583873562 -0400	commit: account for bad.topics
+241252cb79d23d9dfb87dc58a618ab94b8f67fcb e16818d5921a5d0f58780c6cca762fbedc64a736 benmiller314 <benmiller314@gmail.com> 1583873599 -0400	reset: moving to e16818d5921a5d0f58780c6cca762fbedc64a736
+e16818d5921a5d0f58780c6cca762fbedc64a736 b0033facd4d50f270789f9d78d1fef8ab113cc92 benmiller314 <benmiller314@gmail.com> 1583954388 -0400	commit: account for bad.topics; use build_plot_title for filenames
+b0033facd4d50f270789f9d78d1fef8ab113cc92 ca205e82a38b1829c248f9196731b1e428c7da78 benmiller314 <benmiller314@gmail.com> 1583954430 -0400	commit: update defaults; be flexible about dataset
+ca205e82a38b1829c248f9196731b1e428c7da78 2e915397105b2f23b1adda59db6cad49b9953339 benmiller314 <benmiller314@gmail.com> 1583955483 -0400	commit: allow for.bind on loop, but limited case
+2e915397105b2f23b1adda59db6cad49b9953339 f9e3fcadf83a774db02e8deb3ce8667c446929c8 benmiller314 <benmiller314@gmail.com> 1583960568 -0400	commit: fully enable for.bind on loop, create convenience function
+f9e3fcadf83a774db02e8deb3ce8667c446929c8 62baebe02c3512c2dfec11c49a740bef5643507d benmiller314 <benmiller314@gmail.com> 1584096466 -0400	commit: check before overwriting
+62baebe02c3512c2dfec11c49a740bef5643507d a7a0ad411701cc9fb88e9b6b769d837f1216c375 benmiller314 <benmiller314@gmail.com> 1584096525 -0400	commit: convenience function to make table summarizing top topics
+a7a0ad411701cc9fb88e9b6b769d837f1216c375 35bd2a2f58b35c1da7417d1ceffba8726be497f9 benmiller314 <benmiller314@gmail.com> 1588695395 -0400	commit: streamline get_topic_labels by using build_plot_title for filenames
+35bd2a2f58b35c1da7417d1ceffba8726be497f9 0164329abae93b9e37ac577c712a57f444ba79a8 benmiller314 <benmiller314@gmail.com> 1588779178 -0400	merge feature--ranked-topic-proportions: Fast-forward
+0164329abae93b9e37ac577c712a57f444ba79a8 5ecc5ea02d85fcd4dba2d1e95dc704c6dd5a623a benmiller314 <benmiller314@gmail.com> 1588784559 -0400	commit: add a few more dissertations as unreadable / bad.topic-dominated
+5ecc5ea02d85fcd4dba2d1e95dc704c6dd5a623a e5b609b55bc9eecc29c1d47653f0f6d81e48ae3b benmiller314 <benmiller314@gmail.com> 1588875291 -0400	commit: add new function to find.doc.by.topic.proportion
+e5b609b55bc9eecc29c1d47653f0f6d81e48ae3b 248fc38e226a9dc05c5ed9bfdc3135a56c781553 benmiller314 <benmiller314@gmail.com> 1588989848 -0400	commit: allow get.topics4doc to return arbitrary columns
+248fc38e226a9dc05c5ed9bfdc3135a56c781553 8ec86f910886b2b34e0a3d8b4a60239872cf9cad benmiller314 <benmiller314@gmail.com> 1589422665 -0400	commit: find dissertations at median and upper-whisker topic proportions
+8ec86f910886b2b34e0a3d8b4a60239872cf9cad 248fc38e226a9dc05c5ed9bfdc3135a56c781553 benmiller314 <benmiller314@gmail.com> 1589422684 -0400	reset: moving to 248fc38e226a9dc05c5ed9bfdc3135a56c781553
+248fc38e226a9dc05c5ed9bfdc3135a56c781553 cdda5aa71f86b76c8561fcb4bc2df99b58eac5ad benmiller314 <benmiller314@gmail.com> 1589422755 -0400	commit: find dissertations at median and upper-whisker topic proportions
+cdda5aa71f86b76c8561fcb4bc2df99b58eac5ad d26552e750eea0da7ddf985200a2972474ec9f3b benmiller314 <benmiller314@gmail.com> 1589422842 -0400	commit: new function: top.topic.histogram
+d26552e750eea0da7ddf985200a2972474ec9f3b d66c8945397ebee11888f86475c8ffacfe27aa96 benmiller314 <benmiller314@gmail.com> 1589422992 -0400	commit: return high and low outliers more robustly
+d66c8945397ebee11888f86475c8ffacfe27aa96 9e4d12f298f4341525200bfe023c11deeb1b1549 benmiller314 <benmiller314@gmail.com> 1589423085 -0400	commit: allow for investigation of lowliers at other ranks than 2
+9e4d12f298f4341525200bfe023c11deeb1b1549 c1b37365add2ba0ee23aab570dc2f54ddd639e98 benmiller314 <benmiller314@gmail.com> 1589467346 -0400	commit: browse outliers to see if they're consistently high
+c1b37365add2ba0ee23aab570dc2f54ddd639e98 90be721de2f32f38300f1754984f522f02219e5f benmiller314 <benmiller314@gmail.com> 1589470175 -0400	commit: export table of top titles for top-topic outliers
+90be721de2f32f38300f1754984f522f02219e5f 75cda98c137944260452d1aa7a2926e90c9bf319 benmiller314 <benmiller314@gmail.com> 1589815342 -0400	commit: two new analyses: get_top_topics and compare frequencies of each to the rest of the dataset
+75cda98c137944260452d1aa7a2926e90c9bf319 44dd7d9ffa3975e9792cd6e3f7010b8ca26a7937 benmiller314 <benmiller314@gmail.com> 1589815415 -0400	commit: improve documentation, speed; allow top_titles_table to be single-topic
+44dd7d9ffa3975e9792cd6e3f7010b8ca26a7937 0449bf8cb210189dd6d11c72a601c3149a22b107 benmiller314 <benmiller314@gmail.com> 1590435826 -0400	commit: default to prevent overwriting the file, even when global remake_figs = T
+0449bf8cb210189dd6d11c72a601c3149a22b107 a71d67861b096014c3dc04f58875f8c5275f5937 benmiller314 <benmiller314@gmail.com> 1590436087 -0400	commit: do t.test on quintiles, bring in topic_labels, expand to all topics
+a71d67861b096014c3dc04f58875f8c5275f5937 115018c43c535d50e5a69ce22251266855b102bd benmiller314 <benmiller314@gmail.com> 1590436426 -0400	commit: find reach of all single topics (and incorporate labels)
+115018c43c535d50e5a69ce22251266855b102bd e606fbc5b908d6bac6d3fb3ca7332a1e9c12755f benmiller314 <benmiller314@gmail.com> 1591063740 -0400	commit: return function call, too
+e606fbc5b908d6bac6d3fb3ca7332a1e9c12755f 4f0245e00f3ca1086e47bdc8da48b271467b2a22 benmiller314 <benmiller314@gmail.com> 1591063765 -0400	commit: lower stringency on topic reach
+4f0245e00f3ca1086e47bdc8da48b271467b2a22 46e003a2ab669878cee68d22f5fd5eb9baa12a4d benmiller314 <benmiller314@gmail.com> 1591063849 -0400	commit: export cluster dendrogram using plot (not pltree)
+46e003a2ab669878cee68d22f5fd5eb9baa12a4d 33f3bd2d4003d20d109d6bc673bf19083ce0661b benmiller314 <benmiller314@gmail.com> 1591063888 -0400	commit: plot cluster dendrogram using plot() instead of pltree()
+33f3bd2d4003d20d109d6bc673bf19083ce0661b 221bd07fe7c3a1ef3d7e34dd2cd259d118001c0f benmiller314 <benmiller314@gmail.com> 1593013477 -0400	commit: allow for atomic (single value) subsets
+221bd07fe7c3a1ef3d7e34dd2cd259d118001c0f 9816cc55d5a89c930ef02f701641395d7e987f90 benmiller314 <benmiller314@gmail.com> 1593013546 -0400	commit: improve error handling, update default values
+9816cc55d5a89c930ef02f701641395d7e987f90 42269bc8df7bc0cabd0e5671652cebc82545c484 benmiller314 <benmiller314@gmail.com> 1593013611 -0400	commit: load topic_term_synonyms twice
+42269bc8df7bc0cabd0e5671652cebc82545c484 b78b98f99ac28ad47325581804865f5848e450a4 benmiller314 <benmiller314@gmail.com> 1593013642 -0400	commit: use plot() instead of pltree()
+b78b98f99ac28ad47325581804865f5848e450a4 dbebcd15bfd3a4ea021d57b2402a945c1f21bf63 benmiller314 <benmiller314@gmail.com> 1593013668 -0400	commit: change bad.topics membership
+dbebcd15bfd3a4ea021d57b2402a945c1f21bf63 5661427dd4c81ed2494554356fb46f10a9242a15 benmiller314 <benmiller314@gmail.com> 1593014008 -0400	commit: new function: cluster_titles_table
+5661427dd4c81ed2494554356fb46f10a9242a15 86ae186e25c64488f5f685021a08fbdbe9f701e7 benmiller314 <benmiller314@gmail.com> 1593014161 -0400	commit: new function: topic.reach
+86ae186e25c64488f5f685021a08fbdbe9f701e7 8341585c41977292a4146c59800e19030cef2db2 benmiller314 <benmiller314@gmail.com> 1593532855 -0400	commit: update doctopic grid import
+8341585c41977292a4146c59800e19030cef2db2 e51b013bb733f27da0af7726c1878a98c4d3dc94 benmiller314 <benmiller314@gmail.com> 1594134103 -0400	commit: fix bug where indexing data.table by topic number mistakenly used row number
+e51b013bb733f27da0af7726c1878a98c4d3dc94 50246f6c0fed7d64d145120cab66ae16de78696a benmiller314 <benmiller314@gmail.com> 1594828681 -0400	commit: bug fix: always use ntopics instead of max(topic) for each token
+50246f6c0fed7d64d145120cab66ae16de78696a 301aa029cd8c19b908f1dfc0c986c828d03ad106 benmiller314 <benmiller314@gmail.com> 1595162128 -0400	commit: allow for alphabetical sort or sort by weight
+301aa029cd8c19b908f1dfc0c986c828d03ad106 99db05df21c94b41198911fc98ab0e13d1b040ce benmiller314 <benmiller314@gmail.com> 1595162201 -0400	commit: save cluster membership to file
+99db05df21c94b41198911fc98ab0e13d1b040ce 34a0f819b8f1757647fddd2a15b329d98db4942f benmiller314 <benmiller314@gmail.com> 1599675473 -0400	commit: add option to return all parts of name
+34a0f819b8f1757647fddd2a15b329d98db4942f c22849e657ed224ba35009ba41338073aa1fd509 benmiller314 <benmiller314@gmail.com> 1604893711 -0500	commit: add functions to compare one topic to full dataset
+c22849e657ed224ba35009ba41338073aa1fd509 cbdcfd3a9f5b3201e3e5764994ec81837ca55cfa benmiller314 <benmiller314@gmail.com> 1605539659 -0500	commit: new function for cotopics of a given top-ranked topic

@@ -3,7 +3,7 @@
 
 # Where are the fulltext files (from ProQuest) and the index files (from R)?
 SRC=~/'Documents/fulltext_dissertations'
-DST_ROOT=~/'Box Sync/research/firstpages'
+DST_ROOT=~/'OneDrive - University of Pittsburgh/_BoxMigration/research/firstpages'
 INDEX_DIR=~/'Dropbox/coursework, etc/dissertation/data, code, and figures/Dissertation Research/Shell scripts and commands'
 
 if ! [ -d "$DST_ROOT" ] ; then
@@ -20,7 +20,7 @@ cd "$SRC"
 STARTPAGE=1
 ENDPAGE=22
 
-# Function to extract pages from a pdf file, via 
+# Function to extract pages from a pdf file, via
 # http://www.linuxjournal.com/content/tech-tip-extract-pages-pdf
 function pdf_extract()
 {
@@ -46,7 +46,7 @@ function pdf_extract()
        ${3}
 }
 
-# Function to convert Pub.numbers from the file into proper filenames, 
+# Function to convert Pub.numbers from the file into proper filenames,
 # then copy the file. Calls pdf_extract(), defined above.
 function subset_firstpages
 {
@@ -74,7 +74,7 @@ function subset_firstpages
 		k=$((k+1))
 	done < "$INDEX_DIR/file list $1.txt"		# draw `i` from the file
 												# (each line is one input)
-	
+
 	echo "Copied $j of $k files."				# final status report.
 }
 

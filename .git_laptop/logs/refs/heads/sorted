@@ -1,0 +1,4 @@
+0000000000000000000000000000000000000000 f9e3b02203d4e4d1ae06668f196e9e3dacf57d48 benmiller314 <benmiller314@gmail.com> 1571345276 -0400	branch: Created from working
+f9e3b02203d4e4d1ae06668f196e9e3dacf57d48 4d8de13d9dfb2521b0d24c42fe18dfc7a9353712 benmiller314 <benmiller314@gmail.com> 1571345884 -0400	commit: start removing deprecated files
+4d8de13d9dfb2521b0d24c42fe18dfc7a9353712 034abb38f2f9966f85e87b7ee9bea5b8ceb28da4 benmiller314 <benmiller314@gmail.com> 1573487096 -0500	commit: move build_plot_title to its own file
+034abb38f2f9966f85e87b7ee9bea5b8ceb28da4 4d8de13d9dfb2521b0d24c42fe18dfc7a9353712 benmiller314 <benmiller314@gmail.com> 1573487208 -0500	reset: moving to HEAD~

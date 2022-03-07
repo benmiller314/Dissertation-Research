@@ -1,4 +1,4 @@
-## GOALS: 
+## GOALS:
 # Import csv with "canonical names" of acknowledgments
 # Split that into sources and targets, preserving row numbers
 # Merge sources and targets together into a combined node/edge table
@@ -27,7 +27,7 @@ rows.pruned$Relation <- "mentioned"
 rows.pruned <- rows.pruned[c("Diss_ID", "Row_Number", "Source_canonical", "Relation", "Target_canonical", "As_What_broad", "Source_as_written", "Target_as_written")]
 
 # export
-filename <- paste("/Users", "millerb", "Box Sync", "research", "dissertations", "acknowledgments - cuny pitt uiuc - edge table.csv", sep="/")
+filename <- file.path("/Users", "millerb", "Box Sync", "research", "dissertations", "acknowledgments - cuny pitt uiuc - edge table.csv", sep="/")
 write.csv(rows.pruned, filename)
 
 rm(rows, rows.split, sources, targets, rows.combined, rows.pruned)
