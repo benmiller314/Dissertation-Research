@@ -20,7 +20,7 @@ if (!exists("which_computer")) {
 ### define some broad parameters, since this file will always be run first
 
 # set the working directories, taking into account the GitHub setup
-sourceloc <- file.path(home_dir, "research", "dissertations", "data, code, and figures", "Dissertation-Research"))
+sourceloc <- file.path(home_dir, "research", "dissertations", "data, code, and figures", "Dissertation-Research")
 unixsourceloc <- sourceloc
 if(getwd() != sourceloc) {
 	setwd(sourceloc)
