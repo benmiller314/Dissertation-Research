@@ -473,7 +473,7 @@ if(dataset_name=="noexcludes2001_2015" && is.null(subset_name) && ntopics==60 &&
 
   # Ben: Update the vocabulary for those top-lists
   if(!exists("tfidf.for.topics", mode="function")) {
-        source(file="tfidf for topics.R")
+        source(file="tfidf_for_topics.R")
   }
   status_quo <- remake_figs
   remake_figs <- F

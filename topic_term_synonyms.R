@@ -70,7 +70,7 @@ two_topic_synonyms <- function(topic_a,
 
     # use topic-word table
     if(!exists("tfidf.for.topics", mode="function")) {
-        source("tfidf for topics.R")
+        source("tfidf_for_topics.R")
     }
 
     keys <- tfidf.for.topics(dataset_name=dataset_name, ntopics=ntopics,
@@ -309,7 +309,7 @@ tree_summary <- function(nclust,
                          twm = NULL,    # a topic-word distance matrix
                          tw = NULL,     # a topic-word table
                          tf = NULL,     # a table of top words for each topic,
-                                        # as per 'tfidf for topics.R'
+                                        # as per 'tfidf_for_topics.R'
                          dt = NULL,     # a doc-topic table
                          dataset_name = "noexcludes2001_2015",
                          ntopics = 150,
@@ -339,7 +339,7 @@ tree_summary <- function(nclust,
     # also, let's make sure we have a by_tfitf column
     if(is.null(tf)) {
         if(!exists("tfidf.for.topics", mode="function")) {
-            source(file="tfidf for topics.R")
+            source(file="tfidf_for_topics.R")
         }
         tf <- tfidf.for.topics(tw = tw,
                                dataset_name = dataset_name,
@@ -452,7 +452,7 @@ if(FALSE) {
                          bad.topics = bad.topics,
                          clust.method = "d")
 
-    if(!exists("tfidf.for.topics")) { source(file="tfidf for topics.R") }
+    if(!exists("tfidf.for.topics")) { source(file="tfidf_for_topics.R") }
     tf <- tfidf.for.topics(tw=tw)
 
 

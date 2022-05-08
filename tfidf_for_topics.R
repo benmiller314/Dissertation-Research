@@ -113,6 +113,6 @@ if(FALSE) {
 }
 
 
-message("(tfidf for topics.R) The following functions have been loaded:\n",
+message("(tfidf_for_topics.R) The following functions have been loaded:\n",
         " * tfidf.for.topics(nwords, tw, dataset_name, ntopics, iter_index)\n",
         " * compare_topic_vocablists(mytopic, tf)")

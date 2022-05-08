@@ -116,7 +116,7 @@ tw <- build.topicword.table(dataset_name=dataset_name,
                             bad.topics=bad.topics)
 
 # TF-ITF weighting of keywords, for topic labels
-if(!exists("tfidf.for.topics")) { source(file="tfidf for topics.R") }
+if(!exists("tfidf.for.topics")) { source(file="tfidf_for_topics.R") }
 tf <- tfidf.for.topics(tw=tw)
 
 
