@@ -16,10 +16,10 @@ which_computer <- "laptop"
 #       Try not to run out of memory, would you? Need to set this before loading the rJava VM.
 if (which_computer == "work") {
     heap_param <- paste("-Xmx","15g",sep="")
-    home_dir <- normalizePath(file.path("~", "OneDrive - University of Pittsburgh", "_BoxMigration"))
+    home_dir <- normalizePath(file.path("~", "Box Sync"))
 } else if (which_computer == "laptop") {
     heap_param <- paste("-Xmx","3g",sep="")
-    home_dir <- normalizePath(file.path("~", "Box Sync"))
+    home_dir <- normalizePath(file.path("~", "OneDrive - University of Pittsburgh", "_BoxMigration"))
 }
 options(java.parameters=heap_param)
 
@@ -33,7 +33,7 @@ if(!exists("ans", mode="function")) {
 
 
 ## Set working directory to the location of R script files.
-    setwd(file.path(home_dir, "research","dissertations", "data, code, and figures", "Dissertation-Research"))
+#    setwd(file.path(home_dir, "research","dissertations", "data, code, and figures", "Dissertation-Research"))
 
 
 ## Specify the dataset and subsets you intend to work with when generating figures.
